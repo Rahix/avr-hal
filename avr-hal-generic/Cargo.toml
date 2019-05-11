@@ -1,0 +1,13 @@
+[package]
+name = "avr-hal-generic"
+version = "0.1.0"
+authors = ["Rahix <rahix@rahix.de>"]
+edition = "2018"
+
+[dependencies]
+cfg-if = "0.1.7"
+void = "1.0.2"
+
+[dependencies.embedded-hal]
+version = "0.2.3"
+features = ["unproven"]

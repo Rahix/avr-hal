@@ -1,0 +1,12 @@
+[package]
+name = "attiny85-hal"
+version = "0.1.0"
+authors = ["Rahix <rahix@rahix.de>"]
+edition = "2018"
+
+[dependencies]
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+
+[dependencies.avr-device]
+path = "../../../avr-device/"
+features = ["attiny85"]

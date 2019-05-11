@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    # The generic hal definitions
+    "avr-hal-generic",
+
+    # The chip definitions
+    "chips/atmega32u4-hal",
+    "chips/attiny85-hal",
+]
