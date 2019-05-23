@@ -6,8 +6,11 @@ edition = "2018"
 
 [dependencies]
 cfg-if = "0.1.7"
-void = "1.0.2"
 
 [dependencies.embedded-hal]
 version = "0.2.3"
 features = ["unproven"]
+
+[dependencies.void]
+version = "1.0.2"
+default-features = false
