@@ -6,10 +6,23 @@ pub trait PortExt {
     fn split(self) -> Self::Parts;
 }
 
-avr_hal::port_impl! {
+avr_hal::impl_generic_pin! {
+    pub enum Pin {
+        B(crate::atmega32u4::PORTB, portb, pinb),
+        C(crate::atmega32u4::PORTC, portc, pinc),
+        D(crate::atmega32u4::PORTD, portd, pind),
+        E(crate::atmega32u4::PORTE, porte, pine),
+        F(crate::atmega32u4::PORTF, portf, pinf),
+    }
+}
+
+avr_hal::impl_port! {
     pub mod portb {
         #[port_ext]
         use super::PortExt;
+
+        #[generic_pin]
+        use Pin::B;
 
         impl PortExt for atmega32u4::PORTB {
             regs: (pinb, ddrb, portb),
@@ -25,10 +38,13 @@ avr_hal::port_impl! {
     }
 }
 
-avr_hal::port_impl! {
+avr_hal::impl_port! {
     pub mod portc {
         #[port_ext]
         use super::PortExt;
+
+        #[generic_pin]
+        use Pin::C;
 
         impl PortExt for atmega32u4::PORTC {
             regs: (pinc, ddrc, portc),
@@ -38,10 +54,13 @@ avr_hal::port_impl! {
     }
 }
 
-avr_hal::port_impl! {
+avr_hal::impl_port! {
     pub mod portd {
         #[port_ext]
         use super::PortExt;
+
+        #[generic_pin]
+        use Pin::D;
 
         impl PortExt for atmega32u4::PORTD {
             regs: (pind, ddrd, portd),
@@ -57,10 +76,13 @@ avr_hal::port_impl! {
     }
 }
 
-avr_hal::port_impl! {
+avr_hal::impl_port! {
     pub mod porte {
         #[port_ext]
         use super::PortExt;
+
+        #[generic_pin]
+        use Pin::E;
 
         impl PortExt for atmega32u4::PORTE {
             regs: (pine, ddre, porte),
@@ -70,10 +92,13 @@ avr_hal::port_impl! {
     }
 }
 
-avr_hal::port_impl! {
+avr_hal::impl_port! {
     pub mod portf {
         #[port_ext]
         use super::PortExt;
+
+        #[generic_pin]
+        use Pin::F;
 
         impl PortExt for atmega32u4::PORTF {
             regs: (pinf, ddrf, portf),
