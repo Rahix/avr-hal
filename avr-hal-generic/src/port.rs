@@ -134,6 +134,7 @@ macro_rules! impl_generic_pin {
 /// Implement pin abstractions for a port peripheral
 #[macro_export]
 macro_rules! impl_port {
+    // With a generic pin
     (
         pub mod $portx:ident {
             #[port_ext]
@@ -141,6 +142,40 @@ macro_rules! impl_port {
 
             #[generic_pin]
             use $GenericPin:ident::$PortEnum:ident;
+
+            impl $PortExt:ident for $PORTX:ty {
+                regs: ($reg_pin:ident, $reg_ddr:ident, $reg_port:ident),
+                $($pxi:ident: ($PXi:ident, $i:expr),)+
+            }
+        }
+    ) => {
+        $crate::impl_port! {
+            pub mod $portx {
+                #[port_ext]
+                use $portext_use;
+
+                impl $PortExt for $PORTX {
+                    regs: ($reg_pin, $reg_ddr, $reg_port),
+                    $($pxi: ($PXi, $i),)+
+                }
+            }
+        }
+
+        // Downgrade implementation ------------------------------- {{{
+        $(
+            impl<MODE> $portx::$PXi<MODE> {
+                pub fn downgrade(self) -> $GenericPin<MODE> {
+                    $GenericPin::$PortEnum($i, ::core::marker::PhantomData)
+                }
+            }
+        )+
+        // -------------------------------------------------------- }}}
+    };
+    // Without a generic pin
+    (
+        pub mod $portx:ident {
+            #[port_ext]
+            use $portext_use:path;
 
             impl $PortExt:ident for $PORTX:ty {
                 regs: ($reg_pin:ident, $reg_ddr:ident, $reg_port:ident),
@@ -193,14 +228,6 @@ macro_rules! impl_port {
                 pub struct $PXi<MODE> {
                     _mode: marker::PhantomData<MODE>,
                 }
-
-                // Downgrade implementation ------------------------------- {{{
-                impl<MODE> $PXi<MODE> {
-                    pub fn downgrade(self) -> super::$GenericPin<MODE> {
-                        super::$GenericPin::$PortEnum($i, marker::PhantomData)
-                    }
-                }
-                // -------------------------------------------------------- }}}
 
                 // Mode Switch implementations ---------------------------- {{{
                 // - Unsafe:  The unsafe blocks in here are ok, because these
