@@ -306,5 +306,66 @@ macro_rules! impl_port {
                 // -------------------------------------------------------- }}}
             )+
         }
-    }
+    };
+}
+
+/// Create a pin reexport struct for convenient access
+#[macro_export]
+macro_rules! impl_board_pins {
+    (
+        #[port_defs]
+        use $portpath:path;
+
+        $(#[$ddr_attr:meta])*
+        pub struct $DDR:ident {
+            $($portx:ident: $PORTX:ty,)+
+        }
+
+        $(#[$pins_attr:meta])*
+        pub struct $Pins:ident {
+            $(
+                $(#[$pin_attr:meta])*
+                pub $name:ident: $pinport:ident::$pin:ident::$Pin:ident,
+            )+
+        }
+    ) => {
+        use $portpath::{$($portx),+};
+
+        $(#[$ddr_attr])*
+        pub struct $DDR {
+            $($portx: $portx::DDR,)+
+        }
+
+        $(
+            impl $portx::AsDDR for $DDR {
+                fn as_ddr(&self) -> &$portx::DDR {
+                    &self.$portx
+                }
+            }
+        )+
+
+        $(#[$pins_attr])*
+        pub struct $Pins {
+            pub ddr: $DDR,
+            $(
+                $(#[$pin_attr])*
+                pub $name: $pinport::$Pin<
+                    $crate::port::mode::Input<$crate::port::mode::Floating>
+                >,
+            )+
+        }
+
+        impl $Pins {
+            pub fn new($($portx: $PORTX),+) -> $Pins {
+                $(let $portx = $portx.split();)+
+
+                $Pins {
+                    ddr: $DDR {
+                        $($portx: $portx.ddr,)+
+                    },
+                    $($name: $pinport.$pin,)+
+                }
+            }
+        }
+    };
 }
