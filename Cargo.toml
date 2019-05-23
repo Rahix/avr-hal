@@ -18,4 +18,7 @@ members = [
     # The chip definitions
     "chips/atmega32u4-hal",
     "chips/attiny85-hal",
+
+    # The board crates
+    "boards/arduino-leonardo",
 ]

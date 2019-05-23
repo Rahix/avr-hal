@@ -1,0 +1,12 @@
+[package]
+name = "arduino-leonardo"
+version = "0.1.0"
+authors = ["Rahix <rahix@rahix.de>"]
+edition = "2018"
+
+[dependencies]
+atmega32u4-hal = { path = "../../chips/atmega32u4-hal/" }
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+
+[dev-dependencies]
+panic-halt = "0.2.0"
