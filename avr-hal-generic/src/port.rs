@@ -9,6 +9,8 @@ pub mod mode {
 
     impl private::Unimplementable for Output {}
     impl<M: InputMode> private::Unimplementable for Input<M> {}
+    impl DigitalIO for Output {}
+    impl<M: InputMode> DigitalIO for Input<M> {}
 
     pub struct Floating;
     pub struct PullUp;
