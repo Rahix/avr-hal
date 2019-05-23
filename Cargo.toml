@@ -1,3 +1,15 @@
+[profile.dev]
+panic = "abort"
+codegen-units = 1
+incremental = false
+lto = true
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+debug = false
+lto = true
+
 [workspace]
 members = [
     # The generic hal definitions
