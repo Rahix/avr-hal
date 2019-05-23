@@ -281,9 +281,7 @@ macro_rules! impl_port {
                     }
 
                     fn is_set_low(&self) -> Result<bool, Self::Error> {
-                        Ok(unsafe {
-                            (*<$PORTX>::ptr()).$reg_port.read().bits()
-                        } & (1 << $i) == 0)
+                        self.is_set_high().map(|b| !b)
                     }
                 }
 
