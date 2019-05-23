@@ -6,7 +6,7 @@ pub trait PortExt {
     fn split(self) -> Self::Parts;
 }
 
-avr_hal::port_impl! {
+avr_hal::impl_port! {
     pub mod portb {
         #[port_ext]
         use super::PortExt;
