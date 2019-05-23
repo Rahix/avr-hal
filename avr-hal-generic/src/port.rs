@@ -25,13 +25,122 @@ pub mod mode {
     }
 }
 
+/// Create a generic pin to be used for downgrading
+#[macro_export]
+macro_rules! impl_generic_pin {
+    (
+        pub enum $GenericPin:ident {
+            $($PortEnum:ident($PORTX:ty, $reg_port:ident, $reg_pin:ident),)+
+        }
+    ) => {
+        mod generic_pin {
+            use $crate::hal::digital::v2 as digital;
+            use $crate::port::mode;
+            use $crate::void::Void;
+            use core::marker;
+
+            pub enum $GenericPin<MODE> {
+                $($PortEnum(u8, marker::PhantomData<MODE>),)+
+            }
+
+            // Input & Output implementations ------------------------- {{{
+            // - Unsafe:  The unsafe blocks in here are ok, because these
+            //            operations will compile down to single, atomic
+            //            `sbi`, `cbi`, `sbic`, `sbis` instructions.
+            impl digital::OutputPin for $GenericPin<mode::Output> {
+                type Error = Void;
+
+                fn set_high(&mut self) -> Result<(), Self::Error> {
+                    match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_port
+                                    .modify(|r, w| {
+                                        w.bits(r.bits() | (1 << *i))
+                                    })
+                            },
+                        )+
+                    }
+                    Ok(())
+                }
+
+                fn set_low(&mut self) -> Result<(), Self::Error> {
+                    match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_port
+                                    .modify(|r, w| {
+                                        w.bits(r.bits() & !(1 << *i))
+                                    })
+                            },
+                        )+
+                    }
+                    Ok(())
+                }
+            }
+
+            impl digital::StatefulOutputPin for $GenericPin<mode::Output> {
+                fn is_set_high(&self) -> Result<bool, Self::Error> {
+                    Ok(match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_port.read().bits() & (1 << *i) != 0
+                            },
+                        )+
+                    })
+                }
+
+                fn is_set_low(&self) -> Result<bool, Self::Error> {
+                    self.is_set_high().map(|b| !b)
+                }
+            }
+
+            impl digital::toggleable::Default for $GenericPin<mode::Output> {}
+
+            impl<MODE: mode::InputMode> digital::InputPin for $GenericPin<mode::Input<MODE>> {
+                type Error = Void;
+
+                fn is_high(&self) -> Result<bool, Self::Error> {
+                    Ok(match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_pin.read().bits() & (1 << *i) != 0
+                            }
+                        )+
+                    })
+                }
+
+                fn is_low(&self) -> Result<bool, Self::Error> {
+                    Ok(match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_pin.read().bits() & (1 << *i) == 0
+                            }
+                        )+
+                    })
+                }
+            }
+            // -------------------------------------------------------- }}}
+        }
+        pub use self::generic_pin::$GenericPin;
+    };
+}
+
 /// Implement pin abstractions for a port peripheral
 #[macro_export]
-macro_rules! port_impl {
+macro_rules! impl_port {
     (
         pub mod $portx:ident {
             #[port_ext]
             use $portext_use:path;
+
+            #[generic_pin]
+            use $GenericPin:ident::$PortEnum:ident;
 
             impl $PortExt:ident for $PORTX:ty {
                 regs: ($reg_pin:ident, $reg_ddr:ident, $reg_port:ident),
@@ -84,6 +193,14 @@ macro_rules! port_impl {
                 pub struct $PXi<MODE> {
                     _mode: marker::PhantomData<MODE>,
                 }
+
+                // Downgrade implementation ------------------------------- {{{
+                impl<MODE> $PXi<MODE> {
+                    pub fn downgrade(self) -> super::$GenericPin<MODE> {
+                        super::$GenericPin::$PortEnum($i, marker::PhantomData)
+                    }
+                }
+                // -------------------------------------------------------- }}}
 
                 // Mode Switch implementations ---------------------------- {{{
                 // - Unsafe:  The unsafe blocks in here are ok, because these
