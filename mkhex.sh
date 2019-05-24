@@ -7,7 +7,7 @@ fi
 # Go to the project root
 cd "$(dirname "$0")"
 
-ELF="target/avr-atmega32u4/release/examples/$1.elf"
+ELF="$(echo target/avr-*/release/examples/"$1.elf")"
 
 set -xe
 
