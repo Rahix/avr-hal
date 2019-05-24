@@ -1,0 +1,12 @@
+[package]
+name = "trinket"
+version = "0.1.0"
+authors = ["Rahix <rahix@rahix.de>"]
+edition = "2018"
+
+[dependencies]
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+attiny85-hal = { path = "../../chips/attiny85-hal/" }
+
+[dev-dependencies]
+panic-halt = "0.2.0"
