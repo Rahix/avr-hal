@@ -7,6 +7,7 @@ pub use avr_hal::clock;
 pub use avr_hal::delay;
 
 pub mod port;
+pub mod usart;
 
 pub mod prelude {
     pub use crate::avr_hal::prelude::*;

@@ -2,12 +2,16 @@
 #![feature(asm)]
 
 pub extern crate embedded_hal as hal;
+
+#[doc(hidden)]
+pub extern crate nb;
 #[doc(hidden)]
 pub extern crate void;
 
 pub mod clock;
 pub mod delay;
 pub mod port;
+pub mod serial;
 
 pub mod prelude {
     pub use hal::prelude::*;
@@ -17,4 +21,5 @@ pub mod prelude {
     pub use hal::digital::v2::ToggleableOutputPin as _embedded_hal_digital_v2_ToggleableOutputPin;
     pub use void::ResultVoidExt as _void_ResultVoidExt;
     pub use void::ResultVoidErrExt as _void_ResultVoidErrExt;
+    pub use core::fmt::Write as _core_fmt_Write;
 }
