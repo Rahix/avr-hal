@@ -72,6 +72,7 @@ The chip-HAL crates currently support the following peripherals:
 * [`atmega32u4-hal`](./chips/atmega32u4-hal)
   - [x] Spinning Delay
   - [x] `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF` as digital IO (v2)
+  - [x] `USART1` for serial communication
 * [`attiny85-hal`](./chips/attiny85-hal)
   - [x] Spinning Delay
   - [x] `PORTB` as digital IO (v2)
