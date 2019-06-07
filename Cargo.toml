@@ -16,10 +16,12 @@ members = [
     "avr-hal-generic",
 
     # The chip definitions
+    "chips/atmega1280-hal",
     "chips/atmega32u4-hal",
     "chips/attiny85-hal",
 
     # The board crates
     "boards/arduino-leonardo",
+    "boards/bigavr6",
     "boards/trinket",
 ]
