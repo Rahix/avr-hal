@@ -10,31 +10,23 @@ pub extern fn main() -> ! {
 
     let mut delay = bigavr6::Delay::new();
     let mut pins = bigavr6::Pins::new(
+        dp.PORTA,
         dp.PORTB,
         dp.PORTC,
         dp.PORTD,
         dp.PORTE,
+        dp.PORTF,
+        dp.PORTG,
+        dp.PORTH,
+        dp.PORTJ,
+        dp.PORTK,
+        dp.PORTL,
     );
 
-    let mut led0 = pins.led_rx.into_output(&mut pins.ddr);
-    let mut led1 = pins.led_tx.into_output(&mut pins.ddr);
-    let mut led2 = pins.d13.into_output(&mut pins.ddr);
-
-    led0.set_high().void_unwrap();
-    led1.set_high().void_unwrap();
-    led2.set_high().void_unwrap();
-
-    let mut leds = [
-        led0.downgrade(),
-        led1.downgrade(),
-        led2.downgrade(),
-    ];
+    let mut led = pins.d0.into_output(&mut pins.ddr);
 
     loop {
-        for i in 0..3 {
-            leds[i].toggle().void_unwrap();
-            leds[(i+2)%3].toggle().void_unwrap();
-            delay.delay_ms(200);
-        }
+        led.toggle().void_unwrap();
+        delay.delay_ms(500);
     }
 }
