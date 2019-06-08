@@ -2,23 +2,30 @@
 #![no_main]
 
 extern crate panic_halt;
-use arduino_leonardo::prelude::*;
+use bigavr6::prelude::*;
 
 #[no_mangle]
 pub extern fn main() -> ! {
-    let dp = arduino_leonardo::Peripherals::take().unwrap();
+    let dp = bigavr6::Peripherals::take().unwrap();
 
-    let mut pins = arduino_leonardo::Pins::new(
+    let mut pins = bigavr6::Pins::new(
+        dp.PORTA,
         dp.PORTB,
         dp.PORTC,
         dp.PORTD,
         dp.PORTE,
+        dp.PORTF,
+        dp.PORTG,
+        dp.PORTH,
+        dp.PORTJ,
+        dp.PORTK,
+        dp.PORTL,
     );
 
-    let mut serial = arduino_leonardo::Serial::new(
+    let mut serial = bigavr6::Serial::new(
         dp.USART1,
-        pins.d0,
-        pins.d1.into_output(&mut pins.ddr),
+        pins.d2,
+        pins.d3.into_output(&mut pins.ddr),
         57600,
     );
 

@@ -24,6 +24,8 @@ avr_hal_generic::impl_board_pins! {
         ///
         /// * `RX` (UART)
         /// * `INT2`: External Interrupt
-        pub d0: portd::pd2::PD2,
+        pub d0: portd::pd0::PD0,
+        pub d2: portd::pd2::PD2,
+        pub d3: portd::pd3::PD3,
     }
 }
