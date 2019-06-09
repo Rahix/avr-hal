@@ -250,14 +250,14 @@ avr_hal::impl_port! {
 
         impl PortExt for atmega1280::PORTL {
             regs: (pinl, ddrl, portl),
-            pl0: (Pl0, 0),
-            pl1: (Pl1, 1),
-            pl2: (Pl2, 2),
-            pl3: (Pl3, 3),
-            pl4: (Pl4, 4),
-            pl5: (Pl5, 5),
-            pl6: (Pl6, 6),
-            pl7: (Pl7, 7),
+            pl0: (PL0, 0),
+            pl1: (PL1, 1),
+            pl2: (PL2, 2),
+            pl3: (PL3, 3),
+            pl4: (PL4, 4),
+            pl5: (PL5, 5),
+            pl6: (PL6, 6),
+            pl7: (PL7, 7),
         }
     }
 }
