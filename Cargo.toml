@@ -23,3 +23,6 @@ members = [
     "boards/arduino-leonardo",
     "boards/trinket",
 ]
+
+[patch.crates-io]
+ufmt = { git = "https://github.com/Rahix/ufmt.git", branch = "16-bit" }
