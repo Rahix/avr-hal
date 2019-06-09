@@ -23,7 +23,7 @@ pub extern fn main() -> ! {
         dp.PORTL,
     );
 
-    let mut led = pins.d0.into_output(&mut pins.ddr);
+    let mut led = pins.a0.into_output(&mut pins.ddr);
 
     loop {
         led.toggle().void_unwrap();
