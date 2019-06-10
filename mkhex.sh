@@ -1,17 +1,25 @@
 #!/bin/sh
-if [ $# -ne 1 ]; then
+if [ $# -gt 2 ]; then
     echo "usage: $0 <elf-name>"
     exit 1
 fi
 
-# Go to the project root
-cd "$(dirname "$0")"
+BUILD="debug"
+if [ "$1" = "--debug" ]; then
+    shift 1
+    BUILD="debug"
+elif [ "$1" = "--release" ]; then
+    shift 1
+    BUILD="release"
+fi
 
-ELF="$(echo target/avr-*/release/examples/"$1.elf")"
+CWD="$(pwd)"
+ELF="$(realpath --relative-to="$CWD" "$(dirname "$0")"/target/avr-*/$BUILD/examples/"$1.elf")"
+HEX="$(realpath --relative-to="$CWD" "$(dirname "$0")"/target/"$1.hex")"
 
 set -xe
 
-avr-objcopy -S -j .text -j .data -O ihex "$ELF" "target/$1.hex"
+avr-objcopy -S -j .text -j .data -O ihex "$ELF" "$HEX"
 
 set +x
 

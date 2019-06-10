@@ -20,7 +20,7 @@ export XARGO_RUST_SRC="/path/to/avr-rust/src"
 xargo build --target avr-atmega32u4 --example leonardo-blink --release
 
 # Finally, convert it into a .hex file that you can flash using avr-dude
-../../mkhex.sh leonardo-blink
+../../mkhex.sh --release leonardo-blink
 
 ls -l ../../target/leonardo-blink.hex
 ```
