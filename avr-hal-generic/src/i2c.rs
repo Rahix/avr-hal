@@ -137,12 +137,19 @@ where
             s.write_str("0:")?;
         }
 
-        if f(addr).unwrap() {
-            s.write_char(' ')?;
-            s.write_char(ah)?;
-            s.write_char(al)?;
-        } else {
-            s.write_str(" --")?;
+        match f(addr) {
+            Ok(true) => {
+                s.write_char(' ')?;
+                s.write_char(ah)?;
+                s.write_char(al)?;
+            },
+            Ok(false) => {
+                s.write_str(" --")?;
+            },
+            Err(e) => {
+                s.write_str(" E")?;
+                s.write_char(u4_to_hex(e as u8))?;
+            },
         }
     }
 
@@ -209,16 +216,6 @@ macro_rules! impl_twi_i2c {
                     scl,
                     _clock: ::core::marker::PhantomData,
                 }
-            }
-
-            pub fn i2cdetect<W: $crate::ufmt::uWrite>(
-                &mut self,
-                w: &mut W,
-                dir: $crate::i2c::Direction,
-            ) -> Result<(), W::Error> {
-                $crate::i2c::i2cdetect(w, |a| {
-                    self.ping_slave(a, dir)
-                })
             }
 
             pub fn ping_slave(
@@ -369,6 +366,27 @@ macro_rules! impl_twi_i2c {
                 );
             }
         }
+
+        impl<CLOCK> $I2c<CLOCK>
+        where
+            CLOCK: $crate::clock::Clock,
+            $crate::delay::Delay<CLOCK>: $crate::hal::blocking::delay::DelayMs<u16>,
+        {
+            pub fn i2cdetect<W: $crate::ufmt::uWrite>(
+                &mut self,
+                w: &mut W,
+                dir: $crate::i2c::Direction,
+            ) -> Result<(), W::Error> {
+                let mut delay = $crate::delay::Delay::<CLOCK>::new();
+                $crate::i2c::i2cdetect(w, |a| {
+                    use $crate::prelude::*;
+
+                    delay.delay_ms(10u16);
+                    self.ping_slave(a, dir)
+                })
+            }
+        }
+
 
         impl<CLOCK> $crate::hal::blocking::i2c::Write for $I2c<CLOCK>
         where
