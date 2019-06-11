@@ -1,6 +1,8 @@
 #!/bin/sh
+set -e
+
 if [ $# -gt 2 ]; then
-    echo "usage: $0 <elf-name>"
+    echo "usage: $0 [--release|--debug] <elf-name>" >&2
     exit 1
 fi
 
@@ -13,15 +15,22 @@ elif [ "$1" = "--release" ]; then
     BUILD="release"
 fi
 
-CWD="$(pwd)"
-ELF="$(realpath --relative-to="$CWD" "$(dirname "$0")"/target/avr-*/$BUILD/examples/"$1.elf")"
-HEX="$(realpath --relative-to="$CWD" "$(dirname "$0")"/target/"$1.hex")"
+TARGET="$(realpath --relative-to="$(pwd)" "$(dirname "$0")/target")"
+HEX="$TARGET/$1.hex"
+ELF="$(echo "$TARGET"/avr-*/"$BUILD/examples/$1.elf")"
 
-set -xe
+if [ ! -e "$ELF" ]; then
+    echo "No $1.elf found.  The following binaries exist:" >&2
+    for target_dir in "$TARGET"/avr-*; do
+        for bin in "$target_dir/$BUILD/examples"/*.elf; do
+            echo "  - $(basename -s.elf "$bin")" >&2
+        done
+    done
+    exit 1
+fi
 
 avr-objcopy -S -j .text -j .data -O ihex "$ELF" "$HEX"
 
-set +x
-
 BYTES=$(avr-size "$ELF" | tail -1 | cut -f4 | bc)
-echo "$(numfmt --to=si "$BYTES") Bytes used ($BYTES exact)."
+echo "$ELF:" >&2
+echo "    $(numfmt --to=si "$BYTES") Bytes used ($BYTES exact)." >&2
