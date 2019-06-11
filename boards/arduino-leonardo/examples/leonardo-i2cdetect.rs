@@ -24,8 +24,8 @@ pub extern fn main() -> ! {
     );
     let mut i2c = arduino_leonardo::I2c::new(
         dp.TWI,
-        pins.d2,
-        pins.d3,
+        pins.d2.into_pull_up_input(&mut pins.ddr),
+        pins.d3.into_pull_up_input(&mut pins.ddr),
         50000,
     );
 

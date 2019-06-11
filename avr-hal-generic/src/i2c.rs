@@ -159,7 +159,9 @@ where
 }
 
 #[doc(hidden)]
-pub type I2cMode = crate::port::mode::Input<crate::port::mode::Floating>;
+pub type I2cFloating = crate::port::mode::Input<crate::port::mode::Floating>;
+#[doc(hidden)]
+pub type I2cPullUp = crate::port::mode::Input<crate::port::mode::PullUp>;
 
 #[macro_export]
 macro_rules! impl_twi_i2c {
@@ -187,23 +189,23 @@ macro_rules! impl_twi_i2c {
             },
         }
     ) => {
-        pub struct $I2c<CLOCK: $crate::clock::Clock> {
+        pub struct $I2c<CLOCK: $crate::clock::Clock, M> {
             p: $I2C,
             _clock: ::core::marker::PhantomData<CLOCK>,
-            sda: $sdamod::$SDA<$crate::i2c::I2cMode>,
-            scl: $sclmod::$SCL<$crate::i2c::I2cMode>,
+            sda: $sdamod::$SDA<M>,
+            scl: $sclmod::$SCL<M>,
         }
 
-        impl<CLOCK> $I2c<CLOCK>
+        impl<CLOCK> $I2c<CLOCK, $crate::i2c::I2cPullUp>
         where
             CLOCK: $crate::clock::Clock,
         {
             pub fn new(
                 p: $I2C,
-                sda: $sdamod::$SDA<$crate::i2c::I2cMode>,
-                scl: $sclmod::$SCL<$crate::i2c::I2cMode>,
+                sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
+                scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
                 speed: u32,
-            ) -> $I2c<CLOCK> {
+            ) -> $I2c<CLOCK, $crate::i2c::I2cPullUp> {
                 // Calculate TWBR
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| w.bits(twbr as u8));
@@ -217,7 +219,37 @@ macro_rules! impl_twi_i2c {
                     _clock: ::core::marker::PhantomData,
                 }
             }
+        }
 
+        impl<CLOCK> $I2c<CLOCK, $crate::i2c::I2cFloating>
+        where
+            CLOCK: $crate::clock::Clock,
+        {
+            pub fn new_with_external_pullup(
+                p: $I2C,
+                sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::Floating>>,
+                scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::Floating>>,
+                speed: u32,
+            ) -> $I2c<CLOCK, $crate::i2c::I2cFloating> {
+                // Calculate TWBR
+                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
+                p.$twbr.write(|w| w.bits(twbr as u8));
+                // Disable prescaler
+                p.$twsr.modify(|_, w| w.$twps().prescaler_1());
+
+                $I2c {
+                    p,
+                    sda,
+                    scl,
+                    _clock: ::core::marker::PhantomData,
+                }
+            }
+        }
+
+        impl<CLOCK, M> $I2c<CLOCK, M>
+        where
+            CLOCK: $crate::clock::Clock,
+        {
             pub fn ping_slave(
                 &mut self,
                 addr: u8,
@@ -367,7 +399,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
-        impl<CLOCK> $I2c<CLOCK>
+        impl<CLOCK, M> $I2c<CLOCK, M>
         where
             CLOCK: $crate::clock::Clock,
             $crate::delay::Delay<CLOCK>: $crate::hal::blocking::delay::DelayMs<u16>,
@@ -388,7 +420,7 @@ macro_rules! impl_twi_i2c {
         }
 
 
-        impl<CLOCK> $crate::hal::blocking::i2c::Write for $I2c<CLOCK>
+        impl<CLOCK, M> $crate::hal::blocking::i2c::Write for $I2c<CLOCK, M>
         where
             CLOCK: $crate::clock::Clock,
         {
@@ -402,7 +434,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
-        impl<CLOCK> $crate::hal::blocking::i2c::Read for $I2c<CLOCK>
+        impl<CLOCK, M> $crate::hal::blocking::i2c::Read for $I2c<CLOCK, M>
         where
             CLOCK: $crate::clock::Clock,
         {
@@ -416,7 +448,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
-        impl<CLOCK> $crate::hal::blocking::i2c::WriteRead for $I2c<CLOCK>
+        impl<CLOCK, M> $crate::hal::blocking::i2c::WriteRead for $I2c<CLOCK, M>
         where
             CLOCK: $crate::clock::Clock,
         {
