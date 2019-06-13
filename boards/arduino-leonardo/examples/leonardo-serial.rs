@@ -1,5 +1,6 @@
 #![no_std]
 #![no_main]
+#![feature(proc_macro_hygiene)]
 
 extern crate panic_halt;
 use arduino_leonardo::prelude::*;
@@ -22,17 +23,13 @@ pub extern fn main() -> ! {
         57600,
     );
 
-    // The following would also work, but needs +600% more bytes
-    // writeln!(serial, "Hello from Arduino!\r").unwrap();
-    serial.write_str("Hello from Arduino!\r\n").unwrap();
+    ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap();
 
     loop {
         // Read a byte from the serial connection
         let b = nb::block!(serial.read()).unwrap();
 
         // Answer
-        serial.write_str("You pressed ").unwrap();
-        nb::block!(serial.write(b)).unwrap();
-        serial.write_str("!\r\n").unwrap();
+        ufmt::uwriteln!(&mut serial, "Got {}!\r", b).unwrap();
     }
 }

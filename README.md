@@ -20,7 +20,7 @@ export XARGO_RUST_SRC="/path/to/avr-rust/src"
 xargo build --target avr-atmega32u4 --example leonardo-blink --release
 
 # Finally, convert it into a .hex file that you can flash using avr-dude
-../../mkhex.sh leonardo-blink
+../../mkhex.sh --release leonardo-blink
 
 ls -l ../../target/leonardo-blink.hex
 ```
@@ -66,6 +66,7 @@ This repository contains the following components:
 The following peripherals are supported in `avr-hal-generic`:
 - [x] A spinning delay implementation
 - [x] `PORTx` peripherals as digital IO (v2)
+- [x] A TWI based I2C implementation
 
 ### HAL Status
 The chip-HAL crates currently support the following peripherals:
@@ -73,6 +74,7 @@ The chip-HAL crates currently support the following peripherals:
   - [x] Spinning Delay
   - [x] `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF` as digital IO (v2)
   - [x] `USART1` for serial communication
+  - [x] I2C using `TWI`
 * [`attiny85-hal`](./chips/attiny85-hal)
   - [x] Spinning Delay
   - [x] `PORTB` as digital IO (v2)

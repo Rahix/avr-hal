@@ -104,18 +104,18 @@ macro_rules! impl_usart {
             }
         }
 
-        impl<CLOCK, RX_MODE> ::core::fmt::Write for $Usart<CLOCK, RX_MODE>
+        impl<CLOCK, RX_MODE> $crate::ufmt::uWrite for $Usart<CLOCK, RX_MODE>
         where
             CLOCK: $crate::clock::Clock,
             RX_MODE: $crate::port::mode::InputMode,
         {
-            fn write_str(&mut self, s: &str) -> ::core::fmt::Result {
+            type Error = $crate::serial::Error;
+
+            fn write_str(&mut self, s: &str) -> ::core::result::Result<(), Self::Error> {
                 use $crate::prelude::*;
 
                 for b in s.as_bytes().iter() {
-                    $crate::nb::block!(self.write(*b)).map_err(|_| {
-                        ::core::fmt::Error
-                    })?;
+                    $crate::nb::block!(self.write(*b))?;
                 }
                 Ok(())
             }
