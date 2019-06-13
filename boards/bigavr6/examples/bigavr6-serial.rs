@@ -8,24 +8,11 @@ use bigavr6::prelude::*;
 pub extern fn main() -> ! {
     let dp = bigavr6::Peripherals::take().unwrap();
 
-    let mut pins = bigavr6::Pins::new(
-        dp.PORTA,
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-        dp.PORTE,
-        dp.PORTF,
-        dp.PORTG,
-        dp.PORTH,
-        dp.PORTJ,
-        dp.PORTK,
-        dp.PORTL,
-    );
-
+    let mut porte = dp.PORTE.split();
     let mut serial = bigavr6::Serial::new(
-        dp.USART1,
-        pins.d2,
-        pins.d3.into_output(&mut pins.ddr),
+        dp.USART0,
+        porte.pe0,
+        porte.pe1.into_output(&mut porte.ddr),
         57600,
     );
 
