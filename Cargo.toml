@@ -18,6 +18,7 @@ members = [
     "avr-hal-generic",
 
     # The chip definitions
+    "chips/atmega328p-hal",
     "chips/atmega32u4-hal",
     "chips/attiny85-hal",
 

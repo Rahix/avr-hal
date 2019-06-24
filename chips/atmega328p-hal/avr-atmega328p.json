@@ -1,0 +1,29 @@
+{
+  "llvm-target": "avr-unknown-unknown",
+  "cpu": "atmega328p",
+  "target-endian": "little",
+  "target-pointer-width": "16",
+  "target-c-int-width": "16",
+  "os": "unknown",
+  "target-env": "",
+  "target-vendor": "unknown",
+  "arch": "avr",
+  "data-layout": "e-P1-p:16:8-i8:8-i16:8-i32:8-i64:8-f32:8-f64:8-n8-a:8",
+
+  "executables": true,
+
+  "linker": "avr-gcc",
+  "linker-flavor": "gcc",
+  "pre-link-args": {
+    "gcc": ["-Os", "-mmcu=atmega328p"]
+  },
+  "exe-suffix": ".elf",
+  "post-link-args": {
+    "gcc": ["-Wl,--gc-sections"]
+  },
+
+  "singlethread": true,
+  "no-builtins": false,
+
+  "no-default-libraries": false
+}

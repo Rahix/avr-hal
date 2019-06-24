@@ -1,0 +1,13 @@
+[package]
+name = "atmega328p-hal"
+version = "0.1.0"
+authors = ["Jonah Dahlquist <jonah@jonah.name>"]
+edition = "2018"
+
+[dependencies]
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+
+[dependencies.avr-device]
+git = "https://github.com/Rahix/avr-device"
+features = ["atmega328p"]
+
