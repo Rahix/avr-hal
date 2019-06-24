@@ -24,6 +24,7 @@ members = [
 
     # The board crates
     "boards/arduino-leonardo",
+    "boards/arduino-uno",
     "boards/trinket",
 ]
 

@@ -1,0 +1,15 @@
+[package]
+name = "arduino-uno"
+version = "0.1.0"
+authors = ["Jonah Dahlquist <jonah@jonah.name>"]
+edition = "2018"
+
+[dependencies]
+atmega328p-hal = { path = "../../chips/atmega328p-hal/" }
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+
+[dev-dependencies]
+panic-halt = "0.2.0"
+nb = "0.1.2"
+ufmt = "0.1.0-beta.4"
+
