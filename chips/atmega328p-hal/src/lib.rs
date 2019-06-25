@@ -15,15 +15,15 @@ pub mod prelude {
 }
 
 pub mod i2c {
-    use crate::port::portd;
+    use crate::port::portc;
     pub use avr_hal::i2c::*;
 
     avr_hal::impl_twi_i2c! {
         pub struct I2c {
             peripheral: crate::atmega328p::TWI,
             pins: {
-                sda: portd::PC4,
-                scl: portd::PC5,
+                sda: portc::PC4,
+                scl: portc::PC5,
             },
             registers: {
                 control: twcr {

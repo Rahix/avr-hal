@@ -50,84 +50,84 @@ avr_hal_generic::impl_board_pins! {
         ///
         /// * RXD (USART input pin)
         /// * PCINT16 (pin change interrupt 16)
-        pub d0: portd::pd0::PD0
+        pub d0: portd::pd0::PD0,
         /// `D1` / `TX`
         ///
         /// * TXD (USART output pin)
         /// * PCINT17 (pin change interrupt 17)
-        pub d1: portd::pd1::PD1
+        pub d1: portd::pd1::PD1,
         /// `D2`
         ///
         /// * INT0 (external interrupt 0 input)
         /// * PCINT18 (pin change interrupt 18)
-        pub d2: portd::pd2::PD2
+        pub d2: portd::pd2::PD2,
         /// `D3`
         ///
         /// * **PWM**: [atmega328p_hal::timer::Timer3Pwm]
         /// * INT1 (external interrupt 1 input)
         /// * OC2B (Timer/Counter2 output compare match B output)
         /// * PCINT19 (pin change interrupt 19)
-        pub d3: portd::pd3::PD3
+        pub d3: portd::pd3::PD3,
         /// `D4`
         ///
         /// * XCK (USART external clock input/output)
         /// * T0 (Timer/Counter 0 external counter input)
         /// * PCINT20 (pin change interrupt 20)
-        pub d4: portd::pd4::PD4
+        pub d4: portd::pd4::PD4,
         /// `D5`
         ///
         /// * **PWM**: [atmega328p_hal::timer::Timer3Pwm]
         /// * T1 (Timer/Counter 1 external counter input)
         /// * OC0B (Timer/Counter0 output compare match B output)
         /// * PCINT21 (pin change interrupt 21)
-        pub d5: portd::pd5::PD5
+        pub d5: portd::pd5::PD5,
         /// `D6`
         ///
         /// * **PWM**: [atmega328p_hal::timer::Timer3Pwm]
         /// * AIN0 (analog comparator positive input)
         /// * OC0A (Timer/Counter0 output compare match A output)
         /// * PCINT22 (pin change interrupt 22)
-        pub d6: portd::pd6::PD6
+        pub d6: portd::pd6::PD6,
         /// `D7`
         ///
         /// * AIN1 (analog comparator negative input)
         /// * PCINT23 (pin change interrupt 23)
-        pub d7: portd::pd7::PD7
+        pub d7: portd::pd7::PD7,
         /// `D8`
         ///
         /// * ICP1 (Timer/Counter1 input capture input)
         /// * CLKO (divided system clock output)
         /// * PCINT0 (pin change interrupt 0)
-        pub d8: portb::pb0::PB0
+        pub d8: portb::pb0::PB0,
         /// `D9`
         ///
         /// * **PWM**: [atmega328p_hal::timer::Timer3Pwm]
         /// * OC1A (Timer/Counter1 output compare match A output)
         /// * PCINT1 (pin change interrupt 1)
-        pub d9: portb::pb1::PB1
+        pub d9: portb::pb1::PB1,
         /// `D10`
         ///
         /// * **PWM**: [atmega328p_hal::timer::Timer3Pwm]
         /// * SS (SPI bus master slave select)
         /// * OC1B (Timer/Counter1 output compare match B output)
         /// * PCINT2 (pin change interrupt 2)
-        pub d10: portb::pb2::PB2
+        pub d10: portb::pb2::PB2,
         /// `D11`
         ///
         /// * **PWM**: [atmega328p_hal::timer::Timer3Pwm]
         /// * MOSI (SPI bus master/slave input)
         /// * OC2A (Timer/Counter2 output compare match A output)
         /// * PCINT3 (pin change interrupt 3)
-        pub d11: portb::pb3::PB3
+        pub d11: portb::pb3::PB3,
         /// `D12`
         ///
         /// * MISO (SPI bus master input/slave output)
         /// * PCINT4 (pin change interrupt 4)
-        pub d12: portb::pb4::PB4
+        pub d12: portb::pb4::PB4,
         /// `D13`
         ///
         /// * SCK (SPI bus master clock input)
         /// * PCINT5 (pin change interrupt 5)
-        pub d13: portb::pb5::PB5
+        pub d13: portb::pb5::PB5,
     }
 }
