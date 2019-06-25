@@ -27,4 +27,5 @@ members = [
 ]
 
 [patch.crates-io]
-ufmt = { git = "https://github.com/Rahix/ufmt.git", branch = "16-bit" }
+# XXX: Temporary fix for avr-rust/rust#148
+ufmt = { git = "https://github.com/Rahix/ufmt.git", rev = "5a0f82991c74becb81415d3c2b74fba872496ab6" }
