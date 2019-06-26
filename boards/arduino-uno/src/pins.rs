@@ -92,6 +92,7 @@ avr_hal_generic::impl_board_pins! {
         ///
         /// * AIN1 (analog comparator negative input)
         /// * PCINT23 (pin change interrupt 23)
+        /// * L LED on Arduino Uno
         pub d7: portd::pd7::PD7,
         /// `D8`
         ///
