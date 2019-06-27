@@ -16,11 +16,9 @@ pub extern fn main() -> ! {
     );
 
     // Digital pin 13 is also connected to an onboard LED marked "L"
-    let mut led0 = pins.d13.into_output(&mut pins.ddr);
+    let mut led = pins.d13.into_output(&mut pins.ddr);
 
-    led0.set_high().void_unwrap();
-
-    let mut led = led0.downgrade();
+    led.set_high().void_unwrap();
 
     loop {
         led.toggle().void_unwrap();
