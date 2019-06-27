@@ -92,7 +92,6 @@ avr_hal_generic::impl_board_pins! {
         ///
         /// * AIN1 (analog comparator negative input)
         /// * PCINT23 (pin change interrupt 23)
-        /// * L LED on Arduino Uno
         pub d7: portd::pd7::PD7,
         /// `D8`
         ///
@@ -129,6 +128,7 @@ avr_hal_generic::impl_board_pins! {
         ///
         /// * SCK (SPI bus master clock input)
         /// * PCINT5 (pin change interrupt 5)
+        /// * L LED on Arduino Uno
         pub d13: portb::pb5::PB5,
     }
 }
