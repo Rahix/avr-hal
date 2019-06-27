@@ -70,6 +70,11 @@ The following peripherals are supported in `avr-hal-generic`:
 
 ### HAL Status
 The chip-HAL crates currently support the following peripherals:
+* [`atmega328p-hal`]('./chips/atmega328p-hal)
+  - [x] Spinning Delay
+  - [x] `PORTB`, `PORTC`, `PORTD` as digital IO (v2)
+  - [x] `USART0` for serial communication
+  - [x] I2C using `TWI`
 * [`atmega32u4-hal`](./chips/atmega32u4-hal)
   - [x] Spinning Delay
   - [x] `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF` as digital IO (v2)
@@ -84,6 +89,9 @@ In `boards/` there are crates for the following hardware.  Please note that this
 
 * [Arduino Leonardo](./boards/arduino-leonardo)
   - [Website](https://www.arduino.cc/en/Main/Arduino_BoardLeonardo)
+  - Support for basic digital IO
+* [Arduino Uno](./boards/arduino-uno)
+  - [Website](https://store.arduino.cc/usa/arduino-uno-rev3)
   - Support for basic digital IO
 * [Adafruit Trinket (3V3 or 5V)](./boards/trinket) (**not** PRO!)
   - [Website](https://learn.adafruit.com/introducing-trinket)
