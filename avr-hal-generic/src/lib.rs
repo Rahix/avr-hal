@@ -16,6 +16,7 @@ pub mod port;
 pub mod serial;
 pub mod i2c;
 
+/// Prelude containing all HAL traits
 pub mod prelude {
     pub use hal::prelude::*;
     pub use hal::digital::v2::OutputPin as _embedded_hal_digital_v2_OutputPin;

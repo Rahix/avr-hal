@@ -14,11 +14,13 @@ pub mod prelude {
     pub use crate::port::PortExt as _atmega_PortExt;
 }
 
+/// I2C Bus
 pub mod i2c {
     use crate::port::portc;
     pub use avr_hal::i2c::*;
 
     avr_hal::impl_twi_i2c! {
+        /// I2C based on ATmega328P's TWI peripheral
         pub struct I2c {
             peripheral: crate::atmega328p::TWI,
             pins: {
@@ -44,11 +46,15 @@ pub mod i2c {
     }
 }
 
+/// Serial interface using USART
 pub mod usart {
     use crate::port::portd;
     pub use avr_hal::serial::*;
 
     crate::avr_hal::impl_usart! {
+        /// Serial interface based on ATmega328P's USART0 peripheral
+        ///
+        /// Maximum baudrate seems to be 57600
         pub struct Usart0 {
             peripheral: crate::atmega328p::USART0,
             pins: {

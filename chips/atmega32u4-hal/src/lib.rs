@@ -14,11 +14,13 @@ pub mod prelude {
     pub use crate::port::PortExt as _atmega_PortExt;
 }
 
+/// I2C Bus
 pub mod i2c {
     use crate::port::portd;
     pub use avr_hal::i2c::*;
 
     avr_hal::impl_twi_i2c! {
+        /// I2C based on ATmega32U4's TWI peripheral
         pub struct I2c {
             peripheral: crate::atmega32u4::TWI,
             pins: {
@@ -44,11 +46,15 @@ pub mod i2c {
     }
 }
 
+/// Serial interface using USART
 pub mod usart {
     use crate::port::portd;
     pub use avr_hal::serial::*;
 
     crate::avr_hal::impl_usart! {
+        /// Serial interface based on ATmega32U4's USART1 peripheral
+        ///
+        /// Maximum baudrate seems to be 57600
         pub struct Usart1 {
             peripheral: crate::atmega32u4::USART1,
             pins: {

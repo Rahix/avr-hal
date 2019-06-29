@@ -1,6 +1,22 @@
+//! Delay implementations
+
 use core::marker;
 use hal::blocking::delay;
 
+/// A busy-loop delay implementation
+///
+/// # Example
+/// ```rust
+/// let mut delay = delay::Delay::<clock::MHz16>::new();
+///
+/// // Wait 1 second
+/// delay.delay_ms(1000);
+/// ```
+///
+/// # Warning
+/// The delay is not accurate for values above 4095µs because of a loop whose
+/// overhead is not accounted for.  This will be fixed in a future version.
+#[derive(Debug, Clone, Copy)]
 pub struct Delay<SPEED> {
     _speed: marker::PhantomData<SPEED>,
 }

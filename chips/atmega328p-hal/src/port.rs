@@ -1,3 +1,4 @@
+//! `PORTB` - `PORTD` digital IO
 pub use avr_hal::port::mode;
 
 pub trait PortExt {

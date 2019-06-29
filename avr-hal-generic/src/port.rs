@@ -1,10 +1,17 @@
+//! PORTx digital IO Implementations
+
+/// IO Modes
 pub mod mode {
+    /// Any digital IO mode
     pub trait DigitalIO: private::Unimplementable {}
+    /// Any input mode
     pub trait InputMode: private::Unimplementable {}
 
+    /// Pin configured as a digital input
     pub struct Input<MODE: InputMode> {
         _m: core::marker::PhantomData<MODE>,
     }
+    /// Pin configured as a digital output
     pub struct Output;
 
     impl private::Unimplementable for Output {}
@@ -12,7 +19,9 @@ pub mod mode {
     impl DigitalIO for Output {}
     impl<M: InputMode> DigitalIO for Input<M> {}
 
+    /// Pin input configured **without** internal pull-up
     pub struct Floating;
+    /// Pin input configured with internal pull-up
     pub struct PullUp;
 
     impl private::Unimplementable for Floating {}
@@ -164,6 +173,17 @@ macro_rules! impl_port {
         // Downgrade implementation ------------------------------- {{{
         $(
             impl<MODE> $portx::$PXi<MODE> {
+                /// Downgrade this pin into a type that is generic over all pins.
+                ///
+                /// The main use for this function is to store multiple pins in
+                /// an array.  Please note that generic pins have a runtime overhead.
+                ///
+                /// # Example
+                /// ```rust
+                /// let p1 = portb.pb1.downgrade();
+                /// let p2 = portc.pc7.downgrade();
+                /// let pins = [p1, p2];
+                /// ```
                 pub fn downgrade(self) -> $GenericPin<MODE> {
                     $GenericPin::$PortEnum($i, ::core::marker::PhantomData)
                 }
@@ -239,6 +259,7 @@ macro_rules! impl_port {
                     // peripheral can't be converted back (because that would
                     // not be universally possible).
 
+                    /// Make this pin a digital output
                     pub fn into_output<D: AsDDR>(self, ddr: &D) -> $PXi<mode::Output> {
                         unsafe {
                             (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
@@ -248,6 +269,7 @@ macro_rules! impl_port {
                         $PXi { _mode: marker::PhantomData }
                     }
 
+                    /// Make this pin a digital input **without** enabling the internal pull-up
                     pub fn into_floating_input<D: AsDDR>(self, ddr: &D) -> $PXi<mode::Input<mode::Floating>> {
                         unsafe {
                             (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
@@ -260,6 +282,7 @@ macro_rules! impl_port {
                         $PXi { _mode: marker::PhantomData }
                     }
 
+                    /// Make this pin a digital input and enable the internal pull-up
                     pub fn into_pull_up_input<D: AsDDR>(self, ddr: &D) -> $PXi<mode::Input<mode::PullUp>> {
                         unsafe {
                             (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
