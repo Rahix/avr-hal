@@ -1,7 +1,8 @@
 #![no_std]
 
 extern crate avr_hal_generic as avr_hal;
-pub extern crate avr_device as atmega328p;
+
+pub use avr_device::atmega328p;
 
 pub use avr_hal::clock;
 pub use avr_hal::delay;

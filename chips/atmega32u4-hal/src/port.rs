@@ -24,7 +24,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::B;
 
-        impl PortExt for atmega32u4::PORTB {
+        impl PortExt for crate::atmega32u4::PORTB {
             regs: (pinb, ddrb, portb),
             pb0: (PB0, 0),
             pb1: (PB1, 1),
@@ -46,7 +46,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::C;
 
-        impl PortExt for atmega32u4::PORTC {
+        impl PortExt for crate::atmega32u4::PORTC {
             regs: (pinc, ddrc, portc),
             pc6: (PC6, 6),
             pc7: (PC7, 7),
@@ -62,7 +62,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::D;
 
-        impl PortExt for atmega32u4::PORTD {
+        impl PortExt for crate::atmega32u4::PORTD {
             regs: (pind, ddrd, portd),
             pd0: (PD0, 0),
             pd1: (PD1, 1),
@@ -84,7 +84,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::E;
 
-        impl PortExt for atmega32u4::PORTE {
+        impl PortExt for crate::atmega32u4::PORTE {
             regs: (pine, ddre, porte),
             pe2: (PE2, 2),
             pe6: (PE6, 6),
@@ -100,7 +100,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::F;
 
-        impl PortExt for atmega32u4::PORTF {
+        impl PortExt for crate::atmega32u4::PORTF {
             regs: (pinf, ddrf, portf),
             pf0: (PF0, 0),
             pf1: (PF1, 1),
