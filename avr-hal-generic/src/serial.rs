@@ -1,9 +1,14 @@
+//! Serial Implementations
+
+/// Serial Error
 #[derive(Debug, Clone, Copy)]
 pub enum Error { }
 
+/// Implement serial traits for a USART peripheral
 #[macro_export]
 macro_rules! impl_usart {
     (
+        $(#[$usart_attr:meta])*
         pub struct $Usart:ident {
             peripheral: $USART:ty,
             pins: {
@@ -30,6 +35,7 @@ macro_rules! impl_usart {
             },
         }
     ) => {
+        $(#[$usart_attr])*
         pub struct $Usart<CLOCK, RX_MODE>
         where
             CLOCK: $crate::clock::Clock,
@@ -46,6 +52,11 @@ macro_rules! impl_usart {
             CLOCK: $crate::clock::Clock,
             RX_MODE: $crate::port::mode::InputMode,
         {
+            /// Initialize the USART peripheral
+            ///
+            /// Please note that not all baudrates will produce a good signal
+            /// and setting it too high might make data sent completely unreadable
+            /// for the other side.
             pub fn new(
                 p: $USART,
                 rx: $rxmod::$RX<$crate::port::mode::Input<RX_MODE>>,

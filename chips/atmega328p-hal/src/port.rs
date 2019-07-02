@@ -1,3 +1,4 @@
+//! `PORTB` - `PORTD` digital IO
 pub use avr_hal::port::mode;
 
 pub trait PortExt {
@@ -22,7 +23,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::B;
 
-        impl PortExt for atmega328p::PORTB {
+        impl PortExt for crate::atmega328p::PORTB {
             regs: (pinb, ddrb, portb),
             pb0: (PB0, 0),
             pb1: (PB1, 1),
@@ -44,7 +45,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::C;
 
-        impl PortExt for atmega328p::PORTC {
+        impl PortExt for crate::atmega328p::PORTC {
             regs: (pinc, ddrc, portc),
             pc0: (PC0, 0),
             pc1: (PC1, 1),
@@ -65,7 +66,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::D;
 
-        impl PortExt for atmega328p::PORTD {
+        impl PortExt for crate::atmega328p::PORTD {
             regs: (pind, ddrd, portd),
             pd0: (PD0, 0),
             pd1: (PD1, 1),

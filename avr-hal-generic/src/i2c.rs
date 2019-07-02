@@ -1,3 +1,5 @@
+//! I2C Implementations
+
 /// TWI Status Codes
 pub mod twi_status {
     // The status codes defined in the C header are meant to be used with the
@@ -95,18 +97,27 @@ pub mod twi_status {
     pub const TW_BUS_ERROR: u8 = 0x00 >> 3;
 }
 
+/// I2C Error
 #[derive(ufmt::derive::uDebug, Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Error {
+    /// Lost arbitration while trying to acquire bus
     ArbitrationLost,
+    /// No slave answered for this address or a slave replied NACK
     AddressNack,
+    /// Slave replied NACK to sent data
     DataNack,
+    /// A bus-error occured
     BusError,
+    /// An unknown error occured.  The bus might be in an unknown state.
     Unknown,
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+/// I2C Transfer Direction
+#[derive(ufmt::derive::uDebug, Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Direction {
+    /// Write to a slave (LSB is 0)
     Write,
+    /// Read from a slave (LSB is 1)
     Read,
 }
 
@@ -163,9 +174,11 @@ pub type I2cFloating = crate::port::mode::Input<crate::port::mode::Floating>;
 #[doc(hidden)]
 pub type I2cPullUp = crate::port::mode::Input<crate::port::mode::PullUp>;
 
+/// Implement I2C traits for a TWI peripheral
 #[macro_export]
 macro_rules! impl_twi_i2c {
     (
+        $(#[$i2c_attr:meta])*
         pub struct $I2c:ident {
             peripheral: $I2C:ty,
             pins: {
@@ -189,6 +202,7 @@ macro_rules! impl_twi_i2c {
             },
         }
     ) => {
+        $(#[$i2c_attr])*
         pub struct $I2c<CLOCK: $crate::clock::Clock, M> {
             p: $I2C,
             _clock: ::core::marker::PhantomData<CLOCK>,
@@ -200,6 +214,11 @@ macro_rules! impl_twi_i2c {
         where
             CLOCK: $crate::clock::Clock,
         {
+            /// Initialize the I2C bus
+            ///
+            /// `new()` will enable the internal pull-ups to comply with the I2C
+            /// specification.  If you have external pull-ups connected, please
+            /// use `new_with_external_pullup()` instead.
             pub fn new(
                 p: $I2C,
                 sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
@@ -225,6 +244,11 @@ macro_rules! impl_twi_i2c {
         where
             CLOCK: $crate::clock::Clock,
         {
+            /// Initialize the I2C bus, without enabling internal pull-ups
+            ///
+            /// This function should be used if your hardware design includes
+            /// pull-up resistors outside the MCU.  If you do not have these,
+            /// please use `new()` instead.
             pub fn new_with_external_pullup(
                 p: $I2C,
                 sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::Floating>>,
@@ -250,6 +274,10 @@ macro_rules! impl_twi_i2c {
         where
             CLOCK: $crate::clock::Clock,
         {
+            /// Check whether a slave answers ACK for a given address
+            ///
+            /// Note that some devices might not respond to both read and write
+            /// operations.
             pub fn ping_slave(
                 &mut self,
                 addr: u8,
@@ -404,6 +432,9 @@ macro_rules! impl_twi_i2c {
             CLOCK: $crate::clock::Clock,
             $crate::delay::Delay<CLOCK>: $crate::hal::blocking::delay::DelayMs<u16>,
         {
+            /// Output an `i2cdetect`-like summary of connected slaves to a serial device
+            ///
+            /// Note that output for `Read` and `Write` might differ.
             pub fn i2cdetect<W: $crate::ufmt::uWrite>(
                 &mut self,
                 w: &mut W,
