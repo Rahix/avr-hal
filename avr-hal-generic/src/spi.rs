@@ -13,9 +13,9 @@ macro_rules! impl_spi {
             peripheral: $SPI:ty,
             pins: {
                 // Might not need references to these pins?  Seems like r/w and clock are handled by hardware.
-                clock: $clockmod:ident::$CLOCK:ident,
-                piso: $pisomod:ident::$PISO:ident,
-                posi: $posimod:ident::$POSI:ident,
+                clock: $CLOCK:ident,
+                piso: $PISO:ident,
+                posi: $POSI:ident,
             },
             registers: {
                 control: $control:ident,
@@ -47,8 +47,10 @@ macro_rules! impl_spi {
                 // I think it would be best to set all control bits for every write.  This way the user can have
                 // multiple Spi instances that communicate with different secondaries with no problem, even if they
                 // each have different settings.
+                // make sure the entire control register is set in one instruction for efficiency
+                // registers have modify/read/write/reset methods
 
-                // pull SS low
+                // pull SS (instance of embedded_hal::serial::v2::OutputPin) low
                 // set SPIE (SPI enable) control bit to 1
                 // set MSTR (primary/secondary select) control bit to 1
 
