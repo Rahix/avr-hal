@@ -67,6 +67,7 @@ The following peripherals are supported in `avr-hal-generic`:
 - [x] A spinning delay implementation
 - [x] `PORTx` peripherals as digital IO (v2)
 - [x] A TWI based I2C implementation
+- [ ] SPI primary-mode implementation
 
 ### HAL Status
 The chip-HAL crates currently support the following peripherals:
