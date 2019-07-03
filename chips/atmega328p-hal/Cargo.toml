@@ -6,6 +6,11 @@ edition = "2018"
 
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
+nb = "0.1.2"
+
+[dependencies.embedded-hal]
+version = "0.2.3"
+features = ["unproven"]
 
 [dependencies.avr-device]
 git = "https://github.com/Rahix/avr-device"
