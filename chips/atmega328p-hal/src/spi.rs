@@ -3,33 +3,37 @@
 use embedded_hal as hal;
 use nb;
 
+use crate::atmega328p::SPI;
+
 #[derive(Debug, Clone, Copy)]
 pub enum Error { }
 
 pub struct Spi<SS> where
-    SS: hal::digital::v2::OutputPin
+    SS: hal::digital::v2::OutputPin,
 {
-    ss: SS,
+    peripheral: SPI,
+    secondary_select: SS,
     // TODO add necessary properties
 }
 
 impl<SS> Spi<SS> where
-    SS: hal::digital::v2::OutputPin
+    SS: hal::digital::v2::OutputPin,
 {
     // TODO add settings arguments besides secondary select (optional?)
     /// Initialize the SPI peripheral
-    pub fn new(mut ss: SS) -> Spi<SS> {
+    pub fn new(peripheral: SPI, mut secondary_select: SS) -> Spi<SS> {
         // start by closing communication with secondary
-        ss.set_high();
+        secondary_select.set_high();
         // TODO control, status, and register pins to struct
         Spi {
-            ss: ss
+            peripheral,
+            secondary_select,
         }
     }
 }
 
 impl<SS> hal::spi::FullDuplex<u8> for Spi<SS> where
-    SS: hal::digital::v2::OutputPin
+    SS: hal::digital::v2::OutputPin,
 {
     type Error = Error;
 
@@ -41,7 +45,7 @@ impl<SS> hal::spi::FullDuplex<u8> for Spi<SS> where
         // registers have modify/read/write/reset methods
 
         // open communication with secondary via secondary-select pin
-        self.ss.set_low();
+        self.secondary_select.set_low();
 
         // pull SS (instance of embedded_hal::serial::v2::OutputPin) low
         // set SPIE (SPI enable) control bit to 1
@@ -53,10 +57,13 @@ impl<SS> hal::spi::FullDuplex<u8> for Spi<SS> where
         // set SPR (clock speed) control bits to user-defined setting (default 3)
         // set SPIX2 (x2 clock speed) status bit to user-defined setting (default 0)
 
-        // set $data to byte
+        // write byte to data register which triggers transmission
+        self.peripheral.spdr.write(|w| w.bits(byte));
+
+        // TODO wait until send complete bit is set
 
         // close communication with secondary via secondary-select pin
-        self.ss.set_high();
+        self.secondary_select.set_high();
         Ok(())
     }
 
