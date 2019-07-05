@@ -2,14 +2,13 @@
 
 use embedded_hal as hal;
 use nb;
-
 use crate::atmega328p::SPI;
 
 #[derive(Debug, Clone, Copy)]
-pub enum Error { }
+pub enum SpiError { }
 
 pub struct Spi<SS> where
-    SS: hal::digital::v2::OutputPin,
+    SS: hal::digital::v2::OutputPin<Error = ()>,
 {
     peripheral: SPI,
     secondary_select: SS,
@@ -17,13 +16,13 @@ pub struct Spi<SS> where
 }
 
 impl<SS> Spi<SS> where
-    SS: hal::digital::v2::OutputPin,
+    SS: hal::digital::v2::OutputPin<Error = ()>,
 {
     // TODO add settings arguments besides secondary select (optional?)
     /// Initialize the SPI peripheral
     pub fn new(peripheral: SPI, mut secondary_select: SS) -> Spi<SS> {
         // start by closing communication with secondary
-        secondary_select.set_high();
+        secondary_select.set_high().unwrap();
         // TODO control, status, and register pins to struct
         Spi {
             peripheral,
@@ -33,9 +32,9 @@ impl<SS> Spi<SS> where
 }
 
 impl<SS> hal::spi::FullDuplex<u8> for Spi<SS> where
-    SS: hal::digital::v2::OutputPin,
+    SS: hal::digital::v2::OutputPin<Error = ()>,
 {
-    type Error = Error;
+    type Error = SpiError;
 
     fn send(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
         // I think it would be best to set all control bits for every write.  This way the user can have
@@ -45,9 +44,8 @@ impl<SS> hal::spi::FullDuplex<u8> for Spi<SS> where
         // registers have modify/read/write/reset methods
 
         // open communication with secondary via secondary-select pin
-        self.secondary_select.set_low();
+        self.secondary_select.set_low().unwrap();
 
-        // pull SS (instance of embedded_hal::serial::v2::OutputPin) low
         // set SPIE (SPI enable) control bit to 1
         // set MSTR (primary/secondary select) control bit to 1
 
@@ -63,7 +61,7 @@ impl<SS> hal::spi::FullDuplex<u8> for Spi<SS> where
         // TODO wait until send complete bit is set
 
         // close communication with secondary via secondary-select pin
-        self.secondary_select.set_high();
+        self.secondary_select.set_high().unwrap();
         Ok(())
     }
 
