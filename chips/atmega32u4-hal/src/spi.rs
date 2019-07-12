@@ -24,15 +24,15 @@
 extern crate avr_hal_generic as avr_hal;
 
 pub use avr_hal::spi::*;
-use crate::port::{portb::PB3,portb::PB4,mode};
+use crate::port::{portb::PB2,portb::PB3,mode};
 
 
 avr_hal::impl_spi! {
     pub struct Spi {
-        peripheral: crate::atmega328p::SPI,
+        peripheral: crate::atmega32u4::SPI,
         pins: {
-            posi: PB3,
-            piso: PB4,
+            posi: PB2,
+            piso: PB3,
         }
     }
 }

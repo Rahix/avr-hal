@@ -93,5 +93,10 @@ avr_hal_generic::impl_board_pins! {
         ///
         /// Led for indicating outbound data
         pub led_tx: portd::pd5::PD5,
+
+        // ICSP MOSI pin
+        pub icsp10: portb::pb2::PB2,
+        // ICSP MISO pin
+        pub icsp11: portb::pb3::PB3,
     }
 }
