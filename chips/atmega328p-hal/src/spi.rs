@@ -3,6 +3,13 @@
 use embedded_hal as hal;
 use nb;
 use crate::atmega328p::SPI;
+use crate::port::{portb,mode};
+
+type POSI = portb::PB3<mode::Output>;
+type PISO = portb::PB4<mode::Input<mode::PullUp>>;
+
+#[derive(Debug, Clone, Copy)]
+pub enum SpiError {}
 
 /// Oscillator Clock Frequency division options
 pub enum SerialClockRate {
@@ -47,48 +54,38 @@ impl Default for Settings {
             data_order: DataOrder::MostSignificantFirst,
             clock: SerialClockRate::OscfOver4,
             clock_polarity: SerialClockPolarity::IdleLow,
-            clock_phase: SerialClockPhase::SampleLeading,
+            clock_phase: SerialClockPhase::SampleTrailing,
         }
     }
 }
 
 /// Behavior for a SPI interface.  Stores the SPI peripheral along with a secondary-select pin and the settings
-pub struct Spi<SS, OutputPinError> where
-    SS: hal::digital::v2::OutputPin<Error = OutputPinError>
-{
+pub struct Spi {
     peripheral: SPI,
-    secondary_select: SS,
+    posi: POSI,
+    piso: PISO,
     settings: Settings,
 }
 
-/// General SPI methods for reading/wrigint
-impl<SS, OutputPinError> Spi<SS, OutputPinError> where
-    SS: hal::digital::v2::OutputPin<Error = OutputPinError>
-{
+/// General SPI methods for reading/wrighting
+impl Spi {
     /// Instantiate an Spi interface
-    pub fn new(peripheral: SPI, secondary_select: SS, settings: Settings) -> Result<Spi<SS, OutputPinError>, OutputPinError> {
-        let mut instance = Spi {
+    pub fn new(peripheral: SPI, posi: POSI, piso: PISO, settings: Settings) -> Spi {
+        Spi {
             peripheral,
-            secondary_select,
+            posi,
+            piso,
             settings,
-        };
-        instance.disable_secondary()?;
-        Ok(instance)
+        }
+    }
+
+    pub fn release(self) -> (SPI, POSI, PISO) {
+        (self.peripheral, self.posi, self.piso)
     }
 
     /// Write a byte to the data register and begin transmission
     fn write(&self, byte: u8) {
         self.peripheral.spdr.write(|w| w.bits(byte));
-    }
-
-    /// Enable the secondary by settings its pin to low
-    fn enable_secondary(&mut self) -> Result<(), OutputPinError> {
-        self.secondary_select.set_low()
-    }
-
-    /// Disable the secondary by settings its pin to high
-    fn disable_secondary(&mut self) -> Result<(), OutputPinError> {
-        self.secondary_select.set_high()
     }
 
     /// Loop and keep checking that the SPI transmission is complete, returning when it has
@@ -142,18 +139,14 @@ impl<SS, OutputPinError> Spi<SS, OutputPinError> where
     }
 }
 
-impl<SS, OutputPinError> hal::spi::FullDuplex<u8> for Spi<SS, OutputPinError> where
-    SS: hal::digital::v2::OutputPin<Error = OutputPinError>
-{
-    type Error = OutputPinError;
+impl hal::spi::FullDuplex<u8> for Spi {
+    type Error = SpiError;
 
     /// Sets up the device for transmission and sends the data
     fn send(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
         self.setup();
-        self.enable_secondary()?;
         self.write(byte);
         self.block_until_transfer_complete();
-        self.disable_secondary()?;
         Ok(())
     }
 
@@ -162,3 +155,4 @@ impl<SS, OutputPinError> hal::spi::FullDuplex<u8> for Spi<SS, OutputPinError> wh
         Ok(self.peripheral.spdr.read().bits())
     }
 }
+
