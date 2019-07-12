@@ -1,4 +1,25 @@
-
+//! Implementation of the Rust Embedded-HAL SPI FullDuplex trait for AVR.
+//!
+//! The interface can be instantiated with the `new` method, and used directly
+//! or passed into a driver.  Example usage:
+//!
+//! ```
+//! pins.d10.into_output(&mut pins.ddr);// SS must be set to output mode
+//! // create SPI interface
+//! let mut spi = Spi::new(
+//!     dp.SPI,// SPI peripheral
+//!     pins.d11.into_output(&mut pins.ddr),// MOSI output pin
+//!     pins.d12.into_pull_up_input(&mut pins.ddr),// MISO input pin
+//!     Settings::default(),
+//! );
+//!
+//! // Send a byte
+//! let sent = 0b10101010;
+//! spi.send(sent).unwrap();
+//! let response = spi.read().unwrap();
+//! ```
+//! In the example above, all of the settings are left at the default.  You can
+//! also instantiate a Settings object with the other options available.
 
 use embedded_hal as hal;
 use nb;
@@ -8,10 +29,12 @@ use crate::port::{portb,mode};
 type POSI = portb::PB3<mode::Output>;
 type PISO = portb::PB4<mode::Input<mode::PullUp>>;
 
+/// Error type emitted by Spi in the event of a critical failure.  Errors have
+/// no information attached.
 #[derive(Debug, Clone, Copy)]
 pub enum SpiError {}
 
-/// Oscillator Clock Frequency division options
+/// Oscillator Clock Frequency division options.  Controls both SPR and SPI2X register bits.
 pub enum SerialClockRate {
     OscfOver2,
     OscfOver4,
@@ -28,7 +51,7 @@ pub enum DataOrder {
     LeastSignificantFirst,
 }
 
-/// Polarity of clock (rising edge is tick or falling edge)
+/// Polarity of clock (whether SCLK idles at low state or high state)
 pub enum SerialClockPolarity {
     IdleHigh,
     IdleLow,
@@ -40,7 +63,11 @@ pub enum SerialClockPhase {
     SampleTrailing,
 }
 
-/// Settings to pass to Spi.  Easiest way to initialize is with `Settings::default()`
+/// Settings to pass to Spi.
+///
+/// Easiest way to initialize is with
+/// `Settings::default()`.  Otherwise can be instantiated with alternate
+/// settings directly.
 pub struct Settings {
     data_order: DataOrder,
     clock: SerialClockRate,
@@ -59,7 +86,11 @@ impl Default for Settings {
     }
 }
 
-/// Behavior for a SPI interface.  Stores the SPI peripheral along with a secondary-select pin and the settings
+/// Behavior for a SPI interface.
+///
+/// Stores the SPI peripheral for register access.  In addition, it takes
+/// ownership of the POSI and PISO pins to ensure they are in the correct mode.
+/// Instantiate with the `new` method.
 pub struct Spi {
     peripheral: SPI,
     posi: POSI,
@@ -67,9 +98,9 @@ pub struct Spi {
     settings: Settings,
 }
 
-/// General SPI methods for reading/wrighting
+/// Implementation-specific behavior of the struct, including setup/tear-down
 impl Spi {
-    /// Instantiate an Spi interface
+    /// Instantiate an SPI with the registers, POSI/PISO pins, and settings
     pub fn new(peripheral: SPI, posi: POSI, piso: PISO, settings: Settings) -> Spi {
         Spi {
             peripheral,
@@ -79,16 +110,19 @@ impl Spi {
         }
     }
 
+    /// Release ownership of the peripheral and pins.  Instance can no-longer
+    /// be used after this is invoked.
     pub fn release(self) -> (SPI, POSI, PISO) {
         (self.peripheral, self.posi, self.piso)
     }
 
-    /// Write a byte to the data register and begin transmission
+    /// Write a byte to the data register, which begins transmission
+    /// automatically
     fn write(&self, byte: u8) {
         self.peripheral.spdr.write(|w| w.bits(byte));
     }
 
-    /// Loop and keep checking that the SPI transmission is complete, returning when it has
+    /// Loop forever, checking the transmission complete bit until it is set
     fn block_until_transfer_complete(&self) {
         while self.peripheral.spsr.read().spif().bit_is_clear() { }
     }
@@ -97,9 +131,10 @@ impl Spi {
     fn setup(&self) {
         // set up control register
         self.peripheral.spcr.write(|w| {
-            w
-                .spe().set_bit()// enable SPI
-                .mstr().set_bit();// set to primary mode
+            // enable SPI
+            w.spe().set_bit();
+            // Set to primary mode
+            w.mstr().set_bit();
             // set up data order control bit
             match self.settings.data_order {
                 DataOrder::MostSignificantFirst => w.dord().clear_bit(),
@@ -139,6 +174,9 @@ impl Spi {
     }
 }
 
+/// FullDuplex trait implementation, allowing this struct to be provided to
+/// drivers that require it for operation.  Only 8-bit word size is supported
+/// for now.
 impl hal::spi::FullDuplex<u8> for Spi {
     type Error = SpiError;
 
@@ -155,4 +193,3 @@ impl hal::spi::FullDuplex<u8> for Spi {
         Ok(self.peripheral.spdr.read().bits())
     }
 }
-
