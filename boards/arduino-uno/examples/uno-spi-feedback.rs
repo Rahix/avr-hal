@@ -1,8 +1,9 @@
-//! This example demonstrates how to set up a SPI interface and communicate over it.
-//! The physical hardware configuation consists of connecting a jumper directly from pin `~11` to
-//! pin `~12`.
+//! This example demonstrates how to set up a SPI interface and communicate
+//! over it.  The physical hardware configuation consists of connecting a
+//! jumper directly from pin `~11` to pin `~12`.
 //!
-//! Once this program is written to the board, the serial output can be accessed with
+//! Once this program is written to the board, the serial output can be
+//! accessed with
 //!
 //! ```
 //! sudo screen /tty/ACM0 57600
