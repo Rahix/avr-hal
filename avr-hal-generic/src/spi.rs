@@ -58,10 +58,10 @@ macro_rules! impl_spi {
         /// `Settings::default()`.  Otherwise can be instantiated with alternate
         /// settings directly.
         pub struct Settings {
-            data_order: DataOrder,
-            clock: SerialClockRate,
-            clock_polarity: SerialClockPolarity,
-            clock_phase: SerialClockPhase,
+            pub data_order: DataOrder,
+            pub clock: SerialClockRate,
+            pub clock_polarity: SerialClockPolarity,
+            pub clock_phase: SerialClockPhase,
         }
 
         impl Default for Settings {
