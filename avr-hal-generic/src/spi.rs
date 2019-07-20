@@ -96,13 +96,15 @@ macro_rules! impl_spi {
             /// The pins are not actually used directly, but they are accepted in order to enforce
             /// that they are in the correct mode.
             pub fn new(peripheral: $SPI, sclk: SCLK, posi: POSI, piso: PISO, settings: Settings) -> $Spi {
-                Spi {
+                let spi = Spi {
                     peripheral,
                     sclk,
                     posi,
                     piso,
                     settings,
-                }
+                };
+                spi.setup();
+                spi
             }
 
             /// Release ownership of the peripheral and pins.  Instance can no-longer
@@ -177,7 +179,6 @@ macro_rules! impl_spi {
 
             /// Sets up the device for transmission and sends the data
             fn send(&mut self, byte: u8) -> $crate::nb::Result<(), Self::Error> {
-                self.setup();
                 self.write(byte);
                 self.block_until_transfer_complete();
                 Ok(())
