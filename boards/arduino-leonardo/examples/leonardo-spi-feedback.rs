@@ -35,10 +35,11 @@ pub extern fn main() -> ! {
         57600,
     );
 
-    pins.d10.into_output(&mut pins.ddr);// SS must be set to output mode
+    pins.cs.into_output(&mut pins.ddr);// SS must be set to output mode
     // create SPI interface
     let mut spi = Spi::new(
         dp.SPI,
+        pins.icsp9.into_output(&mut pins.ddr),
         pins.icsp10.into_output(&mut pins.ddr),
         pins.icsp11.into_pull_up_input(&mut pins.ddr),
         Settings::default(),

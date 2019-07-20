@@ -38,6 +38,7 @@ pub extern fn main() -> ! {
     // create SPI interface
     let mut spi = Spi::new(
         dp.SPI,
+        pins.d13.into_output(&mut pins.ddr),
         pins.d11.into_output(&mut pins.ddr),
         pins.d12.into_pull_up_input(&mut pins.ddr),
         Settings::default(),

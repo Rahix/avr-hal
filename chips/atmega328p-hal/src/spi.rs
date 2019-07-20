@@ -8,6 +8,7 @@
 //! // create SPI interface
 //! let mut spi = Spi::new(
 //!     dp.SPI,// SPI peripheral
+//!     pins.d13.into_output(&mut pins.ddr),// SCLK
 //!     pins.d11.into_output(&mut pins.ddr),// MOSI output pin
 //!     pins.d12.into_pull_up_input(&mut pins.ddr),// MISO input pin
 //!     Settings::default(),
@@ -24,13 +25,14 @@
 extern crate avr_hal_generic as avr_hal;
 
 pub use avr_hal::spi::*;
-use crate::port::{portb::PB3,portb::PB4,mode};
+use crate::port::{portb::PB3,portb::PB4,portb::PB5,mode};
 
 
 avr_hal::impl_spi! {
     pub struct Spi {
         peripheral: crate::atmega328p::SPI,
         pins: {
+            sclk: PB5,
             posi: PB3,
             piso: PB4,
         }

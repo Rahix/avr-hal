@@ -42,11 +42,13 @@ macro_rules! impl_spi {
         pub struct $Spi:ident {
             peripheral: $SPI:ty,
             pins: {
+                sclk: $SCLK:ident,
                 posi: $POSI:ident,
                 piso: $PISO:ident,
             }
         }
     ) => {
+        type SCLK = $SCLK<mode::Output>;
         type POSI = $POSI<mode::Output>;
         type PISO = $PISO<mode::Input<mode::PullUp>>;
 
@@ -81,6 +83,7 @@ macro_rules! impl_spi {
         $(#[$spi_attr])*
         pub struct $Spi {
             peripheral: $SPI,
+            sclk: SCLK,
             posi: POSI,
             piso: PISO,
             settings: Settings,
@@ -88,10 +91,14 @@ macro_rules! impl_spi {
 
         /// Implementation-specific behavior of the struct, including setup/tear-down
         impl $Spi {
-            /// Instantiate an SPI with the registers, POSI/PISO pins, and settings
-            pub fn new(peripheral: $SPI, posi: POSI, piso: PISO, settings: Settings) -> $Spi {
+            /// Instantiate an SPI with the registers, SCLK/POSI/PISO pins, and settings
+            ///
+            /// The pins are not actually used directly, but they are accepted in order to enforce
+            /// that they are in the correct mode.
+            pub fn new(peripheral: $SPI, sclk: SCLK, posi: POSI, piso: PISO, settings: Settings) -> $Spi {
                 Spi {
                     peripheral,
+                    sclk,
                     posi,
                     piso,
                     settings,
@@ -100,8 +107,8 @@ macro_rules! impl_spi {
 
             /// Release ownership of the peripheral and pins.  Instance can no-longer
             /// be used after this is invoked.
-            pub fn release(self) -> ($SPI, POSI, PISO) {
-                (self.peripheral, self.posi, self.piso)
+            pub fn release(self) -> ($SPI, SCLK, POSI, PISO) {
+                (self.peripheral, self.sclk, self.posi, self.piso)
             }
 
             /// Write a byte to the data register, which begins transmission
