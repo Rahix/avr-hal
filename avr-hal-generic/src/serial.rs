@@ -66,7 +66,7 @@ macro_rules! impl_usart {
                 // Calculate BRR value
                 let brr = CLOCK::FREQ / (16 * baud) - 1;
                 // Set baudrate
-                p.$baud.write(|w| w.bits(brr as u16));
+                p.$baud.write(|w| unsafe { w.bits(brr as u16) });
                 // Enable receiver and transmitter
                 p.$control_b
                     .write(|w| w.$txen().set_bit().$rxen().set_bit());
@@ -102,7 +102,7 @@ macro_rules! impl_usart {
                 // Call flush to make sure the data-register is empty
                 self.flush()?;
 
-                self.p.$data.write(|w| w.bits(byte));
+                self.p.$data.write(|w| unsafe { w.bits(byte) });
                 Ok(())
             }
 
