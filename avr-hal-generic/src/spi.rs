@@ -116,7 +116,7 @@ macro_rules! impl_spi {
             /// Write a byte to the data register, which begins transmission
             /// automatically
             fn write(&self, byte: u8) {
-                self.peripheral.spdr.write(|w| w.bits(byte));
+                self.peripheral.spdr.write(|w| unsafe { w.bits(byte) });
             }
 
             /// Loop forever, checking the transmission complete bit until it is set
