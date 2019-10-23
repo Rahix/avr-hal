@@ -227,7 +227,7 @@ macro_rules! impl_twi_i2c {
             ) -> $I2c<CLOCK, $crate::i2c::I2cPullUp> {
                 // Calculate TWBR
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.$twbr.write(|w| w.bits(twbr as u8));
+                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
                 // Disable prescaler
                 p.$twsr.modify(|_, w| w.$twps().prescaler_1());
 
@@ -257,7 +257,7 @@ macro_rules! impl_twi_i2c {
             ) -> $I2c<CLOCK, $crate::i2c::I2cFloating> {
                 // Calculate TWBR
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.$twbr.write(|w| w.bits(twbr as u8));
+                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
                 // Disable prescaler
                 p.$twsr.modify(|_, w| w.$twps().prescaler_1());
 
@@ -325,7 +325,7 @@ macro_rules! impl_twi_i2c {
                 // Send slave address
                 let dirbit = if dir == $crate::i2c::Direction::Read { 1 } else { 0 };
                 let rawaddr = (addr << 1) | dirbit;
-                self.p.$twdr.write(|w| w.bits(rawaddr));
+                self.p.$twdr.write(|w| unsafe { w.bits(rawaddr) });
                 self.transact();
 
                 // Check if the slave responded
@@ -364,7 +364,7 @@ macro_rules! impl_twi_i2c {
 
             fn write_data(&mut self, bytes: &[u8]) -> Result<(), $crate::i2c::Error> {
                 for byte in bytes {
-                    self.p.$twdr.write(|w| w.bits(*byte));
+                    self.p.$twdr.write(|w| unsafe { w.bits(*byte) });
                     self.transact();
 
                     match self.p.$twsr.read().$tws().bits() {
