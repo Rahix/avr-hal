@@ -42,15 +42,15 @@ macro_rules! impl_spi {
         pub struct $Spi:ident {
             peripheral: $SPI:ty,
             pins: {
-                sclk: $SCLK:ident,
-                posi: $POSI:ident,
-                piso: $PISO:ident,
+                sclk: $sclkmod:ident::$SCLK:ident,
+                posi: $posimod:ident::$POSI:ident,
+                piso: $pisomod:ident::$PISO:ident,
             }
         }
     ) => {
-        type SCLK = $SCLK<mode::Output>;
-        type POSI = $POSI<mode::Output>;
-        type PISO = $PISO<mode::Input<mode::PullUp>>;
+        type SCLK = $sclkmod::$SCLK<$crate::port::mode::Output>;
+        type POSI = $posimod::$POSI<$crate::port::mode::Output>;
+        type PISO = $pisomod::$PISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>;
 
         /// Settings to pass to Spi.
         ///
