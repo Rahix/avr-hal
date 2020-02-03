@@ -97,9 +97,13 @@ macro_rules! impl_spi {
                 spi
             }
 
-            /// Release ownership of the peripheral and pins.  Instance can no-longer
-            /// be used after this is invoked.
+            /// Disable the SPI device and release ownership of the peripheral
+            /// and pins.  Instance can no-longer be used after this is
+            /// invoked.
             pub fn release(self) -> ($SPI, SCLK, POSI, PISO) {
+                self.peripheral.spcr.write(|w| {
+                    w.spe().clear_bit()
+                });
                 (self.peripheral, self.sclk, self.posi, self.piso)
             }
 
