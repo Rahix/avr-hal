@@ -48,6 +48,9 @@ macro_rules! impl_spi {
             }
         }
     ) => {
+
+        use $crate::void::Void;
+
         type SCLK = $sclkmod::$SCLK<$crate::port::mode::Output>;
         type POSI = $posimod::$POSI<$crate::port::mode::Output>;
         type PISO = $pisomod::$PISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>;
@@ -175,7 +178,7 @@ macro_rules! impl_spi {
         /// drivers that require it for operation.  Only 8-bit word size is supported
         /// for now.
         impl $crate::hal::spi::FullDuplex<u8> for $Spi {
-            type Error = $crate::spi::SpiError;
+            type Error = $crate::void::Void;
 
             /// Sets up the device for transmission and sends the data
             fn send(&mut self, byte: u8) -> $crate::nb::Result<(), Self::Error> {
