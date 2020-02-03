@@ -22,18 +22,6 @@ pub enum DataOrder {
     LeastSignificantFirst,
 }
 
-/// Polarity of clock (whether SCLK idles at low state or high state)
-pub enum SerialClockPolarity {
-    IdleHigh,
-    IdleLow,
-}
-
-/// Clock sampling phase (check at leading or trailing edge of signal)
-pub enum SerialClockPhase {
-    SampleLeading,
-    SampleTrailing,
-}
-
 /// Implement traits for a SPI interface
 #[macro_export]
 macro_rules! impl_spi {
@@ -50,6 +38,7 @@ macro_rules! impl_spi {
     ) => {
 
         use $crate::void::Void;
+        use $crate::hal::spi;
 
         type SCLK = $sclkmod::$SCLK<$crate::port::mode::Output>;
         type POSI = $posimod::$POSI<$crate::port::mode::Output>;
@@ -63,8 +52,7 @@ macro_rules! impl_spi {
         pub struct Settings {
             pub data_order: DataOrder,
             pub clock: SerialClockRate,
-            pub clock_polarity: SerialClockPolarity,
-            pub clock_phase: SerialClockPhase,
+            pub mode: spi::Mode,
         }
 
         impl Default for Settings {
@@ -72,8 +60,7 @@ macro_rules! impl_spi {
                 Settings {
                     data_order: DataOrder::MostSignificantFirst,
                     clock: SerialClockRate::OscfOver4,
-                    clock_polarity: SerialClockPolarity::IdleLow,
-                    clock_phase: SerialClockPhase::SampleTrailing,
+                    mode: spi::Mode { polarity: spi::Polarity::IdleLow, phase: spi::Phase::CaptureOnSecondTransition },
                 }
             }
         }
@@ -141,14 +128,14 @@ macro_rules! impl_spi {
                         DataOrder::LeastSignificantFirst => w.dord().set_bit(),
                     };
                     // set up polarity control bit
-                    match self.settings.clock_polarity {
-                        SerialClockPolarity::IdleHigh => w.cpol().set_bit(),
-                        SerialClockPolarity::IdleLow => w.cpol().clear_bit(),
+                    match self.settings.mode.polarity {
+                        spi::Polarity::IdleHigh => w.cpol().set_bit(),
+                        spi::Polarity::IdleLow => w.cpol().clear_bit(),
                     };
                     // set up phase control bit
-                    match self.settings.clock_phase {
-                        SerialClockPhase::SampleLeading => w.cpha().clear_bit(),
-                        SerialClockPhase::SampleTrailing => w.cpha().set_bit(),
+                    match self.settings.mode.phase {
+                        spi::Phase::CaptureOnFirstTransition => w.cpha().clear_bit(),
+                        spi::Phase::CaptureOnSecondTransition => w.cpha().set_bit(),
                     };
                     // set up clock rate control bit
                     match self.settings.clock {
