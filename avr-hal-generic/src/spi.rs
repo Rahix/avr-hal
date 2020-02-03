@@ -22,18 +22,6 @@ pub enum DataOrder {
     LeastSignificantFirst,
 }
 
-/// Polarity of clock (whether SCLK idles at low state or high state)
-pub enum SerialClockPolarity {
-    IdleHigh,
-    IdleLow,
-}
-
-/// Clock sampling phase (check at leading or trailing edge of signal)
-pub enum SerialClockPhase {
-    SampleLeading,
-    SampleTrailing,
-}
-
 /// Implement traits for a SPI interface
 #[macro_export]
 macro_rules! impl_spi {
@@ -42,15 +30,19 @@ macro_rules! impl_spi {
         pub struct $Spi:ident {
             peripheral: $SPI:ty,
             pins: {
-                sclk: $SCLK:ident,
-                posi: $POSI:ident,
-                piso: $PISO:ident,
+                sclk: $sclkmod:ident::$SCLK:ident,
+                mosi: $mosimod:ident::$MOSI:ident,
+                miso: $misomod:ident::$MISO:ident,
             }
         }
     ) => {
-        type SCLK = $SCLK<mode::Output>;
-        type POSI = $POSI<mode::Output>;
-        type PISO = $PISO<mode::Input<mode::PullUp>>;
+
+        use $crate::void::Void;
+        use $crate::hal::spi;
+
+        type SCLK = $sclkmod::$SCLK<$crate::port::mode::Output>;
+        type MOSI = $mosimod::$MOSI<$crate::port::mode::Output>;
+        type MISO = $misomod::$MISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>;
 
         /// Settings to pass to Spi.
         ///
@@ -60,8 +52,7 @@ macro_rules! impl_spi {
         pub struct Settings {
             pub data_order: DataOrder,
             pub clock: SerialClockRate,
-            pub clock_polarity: SerialClockPolarity,
-            pub clock_phase: SerialClockPhase,
+            pub mode: spi::Mode,
         }
 
         impl Default for Settings {
@@ -69,8 +60,7 @@ macro_rules! impl_spi {
                 Settings {
                     data_order: DataOrder::MostSignificantFirst,
                     clock: SerialClockRate::OscfOver4,
-                    clock_polarity: SerialClockPolarity::IdleLow,
-                    clock_phase: SerialClockPhase::SampleTrailing,
+                    mode: spi::Mode { polarity: spi::Polarity::IdleLow, phase: spi::Phase::CaptureOnSecondTransition },
                 }
             }
         }
@@ -78,39 +68,43 @@ macro_rules! impl_spi {
         /// Behavior for a SPI interface.
         ///
         /// Stores the SPI peripheral for register access.  In addition, it takes
-        /// ownership of the POSI and PISO pins to ensure they are in the correct mode.
+        /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
         /// Instantiate with the `new` method.
         $(#[$spi_attr])*
         pub struct $Spi {
             peripheral: $SPI,
             sclk: SCLK,
-            posi: POSI,
-            piso: PISO,
+            mosi: MOSI,
+            miso: MISO,
             settings: Settings,
         }
 
         /// Implementation-specific behavior of the struct, including setup/tear-down
         impl $Spi {
-            /// Instantiate an SPI with the registers, SCLK/POSI/PISO pins, and settings
+            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings
             ///
             /// The pins are not actually used directly, but they are accepted in order to enforce
             /// that they are in the correct mode.
-            pub fn new(peripheral: $SPI, sclk: SCLK, posi: POSI, piso: PISO, settings: Settings) -> $Spi {
+            pub fn new(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO, settings: Settings) -> $Spi {
                 let spi = Spi {
                     peripheral,
                     sclk,
-                    posi,
-                    piso,
+                    mosi,
+                    miso,
                     settings,
                 };
                 spi.setup();
                 spi
             }
 
-            /// Release ownership of the peripheral and pins.  Instance can no-longer
-            /// be used after this is invoked.
-            pub fn release(self) -> ($SPI, SCLK, POSI, PISO) {
-                (self.peripheral, self.sclk, self.posi, self.piso)
+            /// Disable the SPI device and release ownership of the peripheral
+            /// and pins.  Instance can no-longer be used after this is
+            /// invoked.
+            pub fn release(self) -> ($SPI, SCLK, MOSI, MISO) {
+                self.peripheral.spcr.write(|w| {
+                    w.spe().clear_bit()
+                });
+                (self.peripheral, self.sclk, self.mosi, self.miso)
             }
 
             /// Write a byte to the data register, which begins transmission
@@ -138,14 +132,14 @@ macro_rules! impl_spi {
                         DataOrder::LeastSignificantFirst => w.dord().set_bit(),
                     };
                     // set up polarity control bit
-                    match self.settings.clock_polarity {
-                        SerialClockPolarity::IdleHigh => w.cpol().set_bit(),
-                        SerialClockPolarity::IdleLow => w.cpol().clear_bit(),
+                    match self.settings.mode.polarity {
+                        spi::Polarity::IdleHigh => w.cpol().set_bit(),
+                        spi::Polarity::IdleLow => w.cpol().clear_bit(),
                     };
                     // set up phase control bit
-                    match self.settings.clock_phase {
-                        SerialClockPhase::SampleLeading => w.cpha().clear_bit(),
-                        SerialClockPhase::SampleTrailing => w.cpha().set_bit(),
+                    match self.settings.mode.phase {
+                        spi::Phase::CaptureOnFirstTransition => w.cpha().clear_bit(),
+                        spi::Phase::CaptureOnSecondTransition => w.cpha().set_bit(),
                     };
                     // set up clock rate control bit
                     match self.settings.clock {
@@ -175,7 +169,7 @@ macro_rules! impl_spi {
         /// drivers that require it for operation.  Only 8-bit word size is supported
         /// for now.
         impl $crate::hal::spi::FullDuplex<u8> for $Spi {
-            type Error = $crate::spi::SpiError;
+            type Error = $crate::void::Void;
 
             /// Sets up the device for transmission and sends the data
             fn send(&mut self, byte: u8) -> $crate::nb::Result<(), Self::Error> {
