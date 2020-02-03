@@ -79,8 +79,8 @@ pub mod spi {
             peripheral: crate::atmega328p::SPI,
             pins: {
                 sclk: portb::PB5,
-                posi: portb::PB3,
-                piso: portb::PB4,
+                mosi: portb::PB3,
+                miso: portb::PB4,
             }
         }
     }

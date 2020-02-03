@@ -78,8 +78,8 @@ pub mod spi {
             peripheral: crate::atmega32u4::SPI,
             pins: {
                 sclk: portb::PB1,
-                posi: portb::PB2,
-                piso: portb::PB3,
+                mosi: portb::PB2,
+                miso: portb::PB3,
             }
         }
     }

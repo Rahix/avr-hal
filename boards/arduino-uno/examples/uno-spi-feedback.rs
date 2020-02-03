@@ -47,7 +47,7 @@ pub extern fn main() -> ! {
     loop {
         // Send a byte
         spi.send(0b00001111).unwrap();
-        // Because PISO is connected to POSI, the read data should be the same
+        // Because MISO is connected to MOSI, the read data should be the same
         let data = spi.read().unwrap();
 
         ufmt::uwriteln!(&mut serial, "data: {}\r", data).unwrap();

@@ -31,8 +31,8 @@ macro_rules! impl_spi {
             peripheral: $SPI:ty,
             pins: {
                 sclk: $sclkmod:ident::$SCLK:ident,
-                posi: $posimod:ident::$POSI:ident,
-                piso: $pisomod:ident::$PISO:ident,
+                mosi: $mosimod:ident::$MOSI:ident,
+                miso: $misomod:ident::$MISO:ident,
             }
         }
     ) => {
@@ -41,8 +41,8 @@ macro_rules! impl_spi {
         use $crate::hal::spi;
 
         type SCLK = $sclkmod::$SCLK<$crate::port::mode::Output>;
-        type POSI = $posimod::$POSI<$crate::port::mode::Output>;
-        type PISO = $pisomod::$PISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>;
+        type MOSI = $mosimod::$MOSI<$crate::port::mode::Output>;
+        type MISO = $misomod::$MISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>;
 
         /// Settings to pass to Spi.
         ///
@@ -68,29 +68,29 @@ macro_rules! impl_spi {
         /// Behavior for a SPI interface.
         ///
         /// Stores the SPI peripheral for register access.  In addition, it takes
-        /// ownership of the POSI and PISO pins to ensure they are in the correct mode.
+        /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
         /// Instantiate with the `new` method.
         $(#[$spi_attr])*
         pub struct $Spi {
             peripheral: $SPI,
             sclk: SCLK,
-            posi: POSI,
-            piso: PISO,
+            mosi: MOSI,
+            miso: MISO,
             settings: Settings,
         }
 
         /// Implementation-specific behavior of the struct, including setup/tear-down
         impl $Spi {
-            /// Instantiate an SPI with the registers, SCLK/POSI/PISO pins, and settings
+            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings
             ///
             /// The pins are not actually used directly, but they are accepted in order to enforce
             /// that they are in the correct mode.
-            pub fn new(peripheral: $SPI, sclk: SCLK, posi: POSI, piso: PISO, settings: Settings) -> $Spi {
+            pub fn new(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO, settings: Settings) -> $Spi {
                 let spi = Spi {
                     peripheral,
                     sclk,
-                    posi,
-                    piso,
+                    mosi,
+                    miso,
                     settings,
                 };
                 spi.setup();
@@ -100,11 +100,11 @@ macro_rules! impl_spi {
             /// Disable the SPI device and release ownership of the peripheral
             /// and pins.  Instance can no-longer be used after this is
             /// invoked.
-            pub fn release(self) -> ($SPI, SCLK, POSI, PISO) {
+            pub fn release(self) -> ($SPI, SCLK, MOSI, MISO) {
                 self.peripheral.spcr.write(|w| {
                     w.spe().clear_bit()
                 });
-                (self.peripheral, self.sclk, self.posi, self.piso)
+                (self.peripheral, self.sclk, self.mosi, self.miso)
             }
 
             /// Write a byte to the data register, which begins transmission
