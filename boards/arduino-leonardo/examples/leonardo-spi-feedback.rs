@@ -2,14 +2,9 @@
 //! over it.  The physical hardware configuation consists of connecting a
 //! jumper directly from ICSP pin 10 to ICSP pin 11.
 //!
-//! Once this program is written to the board, the serial output can be accessed
-//! with
-//!
-//! ```
-//! sudo screen /tty/ACM0 57600
-//! ```
-//!
-//! You should see it output the line `data: 15` repeatedly (aka 0b00001111)
+//! Once this program is written to the board, you can use the board's serial
+//! connection to see the output.  You should see it output the line
+//! `data: 15` repeatedly (aka 0b00001111)
 
 #![no_std]
 #![no_main]
