@@ -2,11 +2,6 @@
 
 pub use embedded_hal::spi;
 
-/// Error type emitted by Spi in the event of a critical failure.  Errors have
-/// no information attached.
-#[derive(Debug, Clone, Copy)]
-pub enum SpiError {}
-
 /// Oscillator Clock Frequency division options.  Controls both SPR and SPI2X register bits.
 pub enum SerialClockRate {
     OscfOver2,
