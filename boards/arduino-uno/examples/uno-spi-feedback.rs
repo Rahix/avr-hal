@@ -6,7 +6,7 @@
 //! accessed with
 //!
 //! ```
-//! sudo screen /tty/ACM0 57600
+//! sudo screen /tty/ttyACM0 57600
 //! ```
 //!
 //! You should see it output the line `data: 15` repeatedly (aka 0b00001111)
