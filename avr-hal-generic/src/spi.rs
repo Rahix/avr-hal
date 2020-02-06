@@ -83,8 +83,9 @@ macro_rules! impl_spi {
         impl $Spi {
             /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings
             ///
-            /// The pins are not actually used directly, but they are accepted in order to enforce
-            /// that they are in the correct mode.
+            /// The pins are not actually used directly, but they are moved into the struct in
+            /// order to enforce that they are in the correct mode, and cannot be used by anyone
+            /// else while SPI is active.
             pub fn new(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO, settings: Settings) -> $Spi {
                 let spi = Spi {
                     peripheral,
