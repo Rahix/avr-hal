@@ -1,5 +1,7 @@
 //! SPI Implementation
 
+pub use embedded_hal::spi;
+
 /// Oscillator Clock Frequency division options.  Controls both SPR and SPI2X register bits.
 pub enum SerialClockRate {
     OscfOver2,
@@ -15,6 +17,27 @@ pub enum SerialClockRate {
 pub enum DataOrder {
     MostSignificantFirst,
     LeastSignificantFirst,
+}
+
+/// Settings to pass to Spi.
+///
+/// Easiest way to initialize is with
+/// `Settings::default()`.  Otherwise can be instantiated with alternate
+/// settings directly.
+pub struct Settings {
+    pub data_order: DataOrder,
+    pub clock: SerialClockRate,
+    pub mode: spi::Mode,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Settings {
+            data_order: DataOrder::MostSignificantFirst,
+            clock: SerialClockRate::OscfOver4,
+            mode: spi::Mode { polarity: spi::Polarity::IdleLow, phase: spi::Phase::CaptureOnSecondTransition },
+        }
+    }
 }
 
 /// Implement traits for a SPI interface
@@ -34,31 +57,11 @@ macro_rules! impl_spi {
 
         use $crate::void::Void;
         use $crate::hal::spi;
+        pub use avr_hal::spi::*;
 
         type SCLK = $sclkmod::$SCLK<$crate::port::mode::Output>;
         type MOSI = $mosimod::$MOSI<$crate::port::mode::Output>;
         type MISO = $misomod::$MISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>;
-
-        /// Settings to pass to Spi.
-        ///
-        /// Easiest way to initialize is with
-        /// `Settings::default()`.  Otherwise can be instantiated with alternate
-        /// settings directly.
-        pub struct Settings {
-            pub data_order: DataOrder,
-            pub clock: SerialClockRate,
-            pub mode: spi::Mode,
-        }
-
-        impl Default for Settings {
-            fn default() -> Self {
-                Settings {
-                    data_order: DataOrder::MostSignificantFirst,
-                    clock: SerialClockRate::OscfOver4,
-                    mode: spi::Mode { polarity: spi::Polarity::IdleLow, phase: spi::Phase::CaptureOnSecondTransition },
-                }
-            }
-        }
 
         /// Behavior for a SPI interface.
         ///
@@ -78,8 +81,9 @@ macro_rules! impl_spi {
         impl $Spi {
             /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings
             ///
-            /// The pins are not actually used directly, but they are accepted in order to enforce
-            /// that they are in the correct mode.
+            /// The pins are not actually used directly, but they are moved into the struct in
+            /// order to enforce that they are in the correct mode, and cannot be used by anyone
+            /// else while SPI is active.
             pub fn new(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO, settings: Settings) -> $Spi {
                 let spi = Spi {
                     peripheral,
