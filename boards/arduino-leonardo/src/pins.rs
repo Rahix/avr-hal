@@ -96,14 +96,14 @@ avr_hal_generic::impl_board_pins! {
         /// `SCLK`
         ///
         /// ICSP SCLK pin
-        pub icsp9: portb::pb1::PB1,
+        pub sck: portb::pb1::PB1,
         /// `MOSI`
         ///
         /// ICSP MOSI pin
-        pub icsp10: portb::pb2::PB2,
+        pub mosi: portb::pb2::PB2,
         /// `MISO`
         ///
         /// ICSP MISO pin
-        pub icsp11: portb::pb3::PB3,
+        pub miso: portb::pb3::PB3,
     }
 }
