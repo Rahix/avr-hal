@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-if [ $# -gt 2 ]; then
+if [ $# -gt 2 -o $1 = "--help" ]; then
     echo "usage: $0 [--release|--debug] <elf-name>" >&2
     exit 1
 fi
