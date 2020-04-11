@@ -3,6 +3,7 @@
 pub use embedded_hal::spi;
 
 /// Oscillator Clock Frequency division options.  Controls both SPR and SPI2X register bits.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SerialClockRate {
     OscfOver2,
     OscfOver4,
@@ -14,6 +15,7 @@ pub enum SerialClockRate {
 }
 
 /// Order of data transmission, either MSB first or LSB first
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DataOrder {
     MostSignificantFirst,
     LeastSignificantFirst,
@@ -24,6 +26,7 @@ pub enum DataOrder {
 /// Easiest way to initialize is with
 /// `Settings::default()`.  Otherwise can be instantiated with alternate
 /// settings directly.
+#[derive(Clone, PartialEq, Eq)]
 pub struct Settings {
     pub data_order: DataOrder,
     pub clock: SerialClockRate,
@@ -35,7 +38,10 @@ impl Default for Settings {
         Settings {
             data_order: DataOrder::MostSignificantFirst,
             clock: SerialClockRate::OscfOver4,
-            mode: spi::Mode { polarity: spi::Polarity::IdleLow, phase: spi::Phase::CaptureOnSecondTransition },
+            mode: spi::Mode {
+                polarity: spi::Polarity::IdleLow,
+                phase: spi::Phase::CaptureOnSecondTransition,
+            },
         }
     }
 }
@@ -44,7 +50,7 @@ impl Default for Settings {
 #[macro_export]
 macro_rules! impl_spi {
     (
-        $(#[$spi_attr:meta])*
+        $(#[$spi_attr:meta, derive(Clone, Debug, Eq)])*
         pub struct $Spi:ident {
             peripheral: $SPI:ty,
             pins: {
@@ -68,7 +74,7 @@ macro_rules! impl_spi {
         /// Stores the SPI peripheral for register access.  In addition, it takes
         /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
         /// Instantiate with the `new` method.
-        $(#[$spi_attr])*
+        $(#[$spi_attr, derive(Clone, Debug, Eq)])*
         pub struct $Spi {
             peripheral: $SPI,
             sclk: SCLK,
