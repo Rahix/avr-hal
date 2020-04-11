@@ -3,6 +3,7 @@
 pub use embedded_hal::spi;
 
 /// Oscillator Clock Frequency division options.  Controls both SPR and SPI2X register bits.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SerialClockRate {
     OscfOver2,
     OscfOver4,
@@ -14,6 +15,7 @@ pub enum SerialClockRate {
 }
 
 /// Order of data transmission, either MSB first or LSB first
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DataOrder {
     MostSignificantFirst,
     LeastSignificantFirst,
@@ -24,6 +26,7 @@ pub enum DataOrder {
 /// Easiest way to initialize is with
 /// `Settings::default()`.  Otherwise can be instantiated with alternate
 /// settings directly.
+#[derive(Clone, PartialEq, Eq)]
 pub struct Settings {
     pub data_order: DataOrder,
     pub clock: SerialClockRate,
@@ -35,7 +38,10 @@ impl Default for Settings {
         Settings {
             data_order: DataOrder::MostSignificantFirst,
             clock: SerialClockRate::OscfOver4,
-            mode: spi::Mode { polarity: spi::Polarity::IdleLow, phase: spi::Phase::CaptureOnSecondTransition },
+            mode: spi::Mode {
+                polarity: spi::Polarity::IdleLow,
+                phase: spi::Phase::CaptureOnSecondTransition,
+            },
         }
     }
 }
@@ -44,7 +50,7 @@ impl Default for Settings {
 #[macro_export]
 macro_rules! impl_spi {
     (
-        $(#[$spi_attr:meta])*
+        $(#[$spi_attr:meta, derive(Clone, Debug, Eq)])*
         pub struct $Spi:ident {
             peripheral: $SPI:ty,
             pins: {
@@ -68,13 +74,14 @@ macro_rules! impl_spi {
         /// Stores the SPI peripheral for register access.  In addition, it takes
         /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
         /// Instantiate with the `new` method.
-        $(#[$spi_attr])*
+        $(#[$spi_attr, derive(Clone, Debug, Eq)])*
         pub struct $Spi {
             peripheral: $SPI,
             sclk: SCLK,
             mosi: MOSI,
             miso: MISO,
             settings: Settings,
+            is_write_in_progress: bool,
         }
 
         /// Implementation-specific behavior of the struct, including setup/tear-down
@@ -91,6 +98,7 @@ macro_rules! impl_spi {
                     mosi,
                     miso,
                     settings,
+                    is_write_in_progress: false,
                 };
                 spi.setup();
                 spi
@@ -112,9 +120,13 @@ macro_rules! impl_spi {
                 self.peripheral.spdr.write(|w| unsafe { w.bits(byte) });
             }
 
-            /// Loop forever, checking the transmission complete bit until it is set
-            fn block_until_transfer_complete(&self) {
-                while self.peripheral.spsr.read().spif().bit_is_clear() { }
+            /// Check if write flag is set, and return a WouldBlock error if it is not.
+            fn assert_write_complete(&self) -> $crate::nb::Result<(), $crate::void::Void> {
+                if self.peripheral.spsr.read().spif().bit_is_set() {
+                    Ok(())
+                } else {
+                    Err($crate::nb::Error::WouldBlock)
+                }
             }
 
             /// Sets up the control/status registers with the right settings for this secondary device
@@ -172,8 +184,12 @@ macro_rules! impl_spi {
 
             /// Sets up the device for transmission and sends the data
             fn send(&mut self, byte: u8) -> $crate::nb::Result<(), Self::Error> {
-                self.write(byte);
-                self.block_until_transfer_complete();
+                if !self.is_write_in_progress {
+                    self.is_write_in_progress = true;
+                    self.write(byte);
+                }
+                self.assert_write_complete()?;
+                self.is_write_in_progress = true;
                 Ok(())
             }
 
