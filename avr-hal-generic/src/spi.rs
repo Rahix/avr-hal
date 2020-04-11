@@ -81,6 +81,7 @@ macro_rules! impl_spi {
             mosi: MOSI,
             miso: MISO,
             settings: Settings,
+            is_write_in_progress: bool,
         }
 
         /// Implementation-specific behavior of the struct, including setup/tear-down
@@ -97,6 +98,7 @@ macro_rules! impl_spi {
                     mosi,
                     miso,
                     settings,
+                    is_write_in_progress: false,
                 };
                 spi.setup();
                 spi
@@ -118,9 +120,13 @@ macro_rules! impl_spi {
                 self.peripheral.spdr.write(|w| unsafe { w.bits(byte) });
             }
 
-            /// Loop forever, checking the transmission complete bit until it is set
-            fn block_until_transfer_complete(&self) {
-                while self.peripheral.spsr.read().spif().bit_is_clear() { }
+            /// Check if write flag is set, and return a WouldBlock error if it is not.
+            fn assert_write_complete(&self) -> $crate::nb::Result<(), $crate::void::Void> {
+                if self.peripheral.spsr.read().spif().bit_is_set() {
+                    Ok(())
+                } else {
+                    Err($crate::nb::Error::WouldBlock)
+                }
             }
 
             /// Sets up the control/status registers with the right settings for this secondary device
@@ -178,8 +184,12 @@ macro_rules! impl_spi {
 
             /// Sets up the device for transmission and sends the data
             fn send(&mut self, byte: u8) -> $crate::nb::Result<(), Self::Error> {
-                self.write(byte);
-                self.block_until_transfer_complete();
+                if !self.is_write_in_progress {
+                    self.is_write_in_progress = true;
+                    self.write(byte);
+                }
+                self.assert_write_complete()?;
+                self.is_write_in_progress = true;
                 Ok(())
             }
 
