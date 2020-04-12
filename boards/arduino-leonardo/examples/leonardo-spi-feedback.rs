@@ -14,18 +14,13 @@
 #![feature(proc_macro_hygiene)]
 extern crate panic_halt;
 use arduino_leonardo::prelude::*;
-use arduino_leonardo::spi::{Spi,Settings};
+use arduino_leonardo::spi::{Settings, Spi};
 use nb::block;
 #[no_mangle]
-pub extern fn main() -> ! {
+pub extern "C" fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
     let mut delay = arduino_leonardo::Delay::new();
-    let mut pins = arduino_leonardo::Pins::new(
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-        dp.PORTE,
-    );
+    let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
 
     let mut serial = arduino_leonardo::Serial::new(
         dp.USART1,
@@ -34,8 +29,9 @@ pub extern fn main() -> ! {
         57600,
     );
 
-    pins.led_rx.into_output(&mut pins.ddr);// SS must be set to output mode
-    // create SPI interface
+    pins.led_rx.into_output(&mut pins.ddr); // SS must be set to output mode.
+
+    // Create SPI interface.
     let mut spi = Spi::new(
         dp.SPI,
         pins.sck.into_output(&mut pins.ddr),
@@ -60,4 +56,3 @@ pub extern fn main() -> ! {
         delay.delay_ms(1000);
     }
 }
-
