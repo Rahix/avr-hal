@@ -46,14 +46,16 @@ pub extern fn main() -> ! {
 
     loop {
         // Send a byte
-        block!(spi.send(0b00001111)).unwrap();
-        let data = block!(spi.read()).unwrap();
+        block!(spi.send(64)).unwrap();
+        let data: u8 = block!(spi.read()).unwrap();
 
-        // Because MISO is connected to MOSI, the read data should be the same
-        if data == 0b00001111 {
-            ufmt::uwriteln!(&mut serial, "Correct value transmitted!\r").unwrap();
+        // Input in pull-up mode, so always reading high if no connection
+        if data != 0b11111111 {
+            ufmt::uwrite!(&mut serial, "Character fed back: ").unwrap();
+            block!(serial.write(data)).unwrap();
+            ufmt::uwrite!(&mut serial, "\r\n").unwrap();
         } else {
-            ufmt::uwriteln!(&mut serial, "Data not fed back.  Make sure you have a jumper between the MISO and MOSI pins.\r").unwrap();
+            ufmt::uwriteln!(&mut serial, "Character not fed back.  Make sure you have a jumper between the MISO and MOSI pins.\r").unwrap();
         }
         delay.delay_ms(1000);
     }
