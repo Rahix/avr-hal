@@ -189,7 +189,7 @@ macro_rules! impl_spi {
                     self.write(byte);
                 }
                 self.assert_write_complete()?;
-                self.is_write_in_progress = true;
+                self.is_write_in_progress = false;
                 Ok(())
             }
 
