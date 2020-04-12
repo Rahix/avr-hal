@@ -9,7 +9,9 @@
 //! sudo screen /dev/ttyACM0 57600
 //! ```
 //!
-//! You should see it output the line `data: 15` repeatedly (aka 0b00001111)
+//! As long as the jumper is in place, you should repeatedly get the output
+//! "Correct value transmitted!".  Try disconnecting it while running to see
+//! what changes.
 
 #![no_std]
 #![no_main]
@@ -17,6 +19,7 @@
 extern crate panic_halt;
 use arduino_uno::prelude::*;
 use arduino_uno::spi::{Spi,Settings};
+use nb::block;
 #[no_mangle]
 pub extern fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
@@ -46,11 +49,15 @@ pub extern fn main() -> ! {
 
     loop {
         // Send a byte
-        spi.send(0b00001111).unwrap();
-        // Because MISO is connected to MOSI, the read data should be the same
-        let data = spi.read().unwrap();
+        block!(spi.send(0b00001111)).unwrap();
+        let data = block!(spi.read()).unwrap();
 
-        ufmt::uwriteln!(&mut serial, "data: {}\r", data).unwrap();
+        // Because MISO is connected to MOSI, the read data should be the same
+        if data == 0b00001111 {
+            ufmt::uwriteln!(&mut serial, "Correct value transmitted!\r").unwrap();
+        } else {
+            ufmt::uwriteln!(&mut serial, "Data not fed back.  Make sure you have a jumper between pins 11 and 12.\r").unwrap();
+        }
         delay.delay_ms(1000);
     }
 }

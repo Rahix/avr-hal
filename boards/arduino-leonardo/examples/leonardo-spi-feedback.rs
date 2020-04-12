@@ -3,8 +3,11 @@
 //! jumper directly from ICSP pin 10 to ICSP pin 11.
 //!
 //! Once this program is written to the board, you can use the board's serial
-//! connection to see the output.  You should see it output the line
-//! `data: 15` repeatedly (aka 0b00001111)
+//! connection to see the output.
+//!
+//! As long as the jumper is in place, you should repeatedly get the output
+//! "Correct value transmitted!".  Try disconnecting it while running to see
+//! what changes.
 
 #![no_std]
 #![no_main]
@@ -12,6 +15,7 @@
 extern crate panic_halt;
 use arduino_leonardo::prelude::*;
 use arduino_leonardo::spi::{Spi,Settings};
+use nb::block;
 #[no_mangle]
 pub extern fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
@@ -42,11 +46,15 @@ pub extern fn main() -> ! {
 
     loop {
         // Send a byte
-        spi.send(0b00001111).unwrap();
-        // Because MISO is connected to MOSI, the read data should be the same
-        let data = spi.read().unwrap();
+        block!(spi.send(0b00001111)).unwrap();
+        let data = block!(spi.read()).unwrap();
 
-        ufmt::uwriteln!(&mut serial, "data: {}\r", data).unwrap();
+        // Because MISO is connected to MOSI, the read data should be the same
+        if data == 0b00001111 {
+            ufmt::uwriteln!(&mut serial, "Correct value transmitted!\r").unwrap();
+        } else {
+            ufmt::uwriteln!(&mut serial, "Data not fed back.  Make sure you have a jumper between the MISO and MOSI pins.\r").unwrap();
+        }
         delay.delay_ms(1000);
     }
 }
