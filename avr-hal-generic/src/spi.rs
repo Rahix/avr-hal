@@ -74,7 +74,7 @@ macro_rules! impl_spi {
         /// Stores the SPI peripheral for register access.  In addition, it takes
         /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
         /// Instantiate with the `new` method.
-        $(#[$spi_attr, derive(Clone, Debug, Eq)])*
+        $(#[$spi_attr])*
         pub struct $Spi {
             peripheral: $SPI,
             sclk: SCLK,
