@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 cfg-if = "0.1.7"
 nb = "0.1.2"
-ufmt = "0.1.0-beta.4"
+ufmt = "0.1.0"
 
 [dependencies.embedded-hal]
 version = "0.2.3"
