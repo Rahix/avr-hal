@@ -115,18 +115,22 @@ macro_rules! impl_spi {
             }
 
             /// Write a byte to the data register, which begins transmission
-            /// automatically
-            fn write(&self, byte: u8) {
+            /// automatically.
+            fn write(&mut self, byte: u8) {
+                self.is_write_in_progress = true;
                 self.peripheral.spdr.write(|w| unsafe { w.bits(byte) });
             }
 
             /// Check if write flag is set, and return a WouldBlock error if it is not.
-            fn assert_write_complete(&self) -> $crate::nb::Result<(), $crate::void::Void> {
-                if self.peripheral.spsr.read().spif().bit_is_set() {
-                    Ok(())
-                } else {
-                    Err($crate::nb::Error::WouldBlock)
+            fn flush(&mut self) -> $crate::nb::Result<(), $crate::void::Void> {
+                if self.is_write_in_progress {
+                    if self.peripheral.spsr.read().spif().bit_is_set() {
+                        self.is_write_in_progress = false;
+                    } else {
+                        return Err($crate::nb::Error::WouldBlock);
+                    }
                 }
+                Ok(())
             }
 
             /// Sets up the control/status registers with the right settings for this secondary device
@@ -184,17 +188,14 @@ macro_rules! impl_spi {
 
             /// Sets up the device for transmission and sends the data
             fn send(&mut self, byte: u8) -> $crate::nb::Result<(), Self::Error> {
-                if !self.is_write_in_progress {
-                    self.is_write_in_progress = true;
-                    self.write(byte);
-                }
-                self.assert_write_complete()?;
-                self.is_write_in_progress = false;
+                self.flush()?;
+                self.write(byte);
                 Ok(())
             }
 
             /// Reads and returns the response in the data register
             fn read(&mut self) -> $crate::nb::Result<u8, Self::Error> {
+                self.flush()?;
                 Ok(self.peripheral.spdr.read().bits())
             }
         }
