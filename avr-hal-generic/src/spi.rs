@@ -50,7 +50,7 @@ impl Default for Settings {
 #[macro_export]
 macro_rules! impl_spi {
     (
-        $(#[$spi_attr:meta, derive(Clone, Debug, Eq)])*
+        $(#[$spi_attr:meta])*
         pub struct $Spi:ident {
             peripheral: $SPI:ty,
             pins: {

@@ -9,9 +9,8 @@
 //! sudo screen /dev/ttyACM0 57600
 //! ```
 //!
-//! As long as the jumper is in place, you should repeatedly get the output
-//! "Correct value transmitted!".  Try disconnecting it while running to see
-//! what changes.
+//! You should see it output the line `data: 15` repeatedly (aka 0b00001111).
+//! If the output you see is `data: 255`, you may need to check your jumper.
 
 #![no_std]
 #![no_main]
@@ -46,21 +45,11 @@ pub extern "C" fn main() -> ! {
 
     loop {
         // Send a byte
-        block!(spi.send(64)).unwrap();
-        let data: u8 = block!(spi.read()).unwrap();
+        block!(spi.send(0b00001111)).unwrap();
+        // Because MISO is connected to MOSI, the read data should be the same
+        let data = block!(spi.read()).unwrap();
 
-        // Input in pull-up mode, so always reading high if no connection
-        if data != 0b11111111 {
-            ufmt::uwrite!(&mut serial, "Character fed back: ").unwrap();
-            block!(serial.write(data)).unwrap();
-            ufmt::uwrite!(&mut serial, "\r\n").unwrap();
-        } else {
-            ufmt::uwriteln!(
-                &mut serial,
-                "Character not fed back.  Make sure you have a jumper between pins 11 and 12.\r"
-            )
-            .unwrap();
-        }
+        ufmt::uwriteln!(&mut serial, "data: {}\r", data).unwrap();
         delay.delay_ms(1000);
     }
 }
