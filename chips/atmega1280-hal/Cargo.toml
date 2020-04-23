@@ -1,0 +1,12 @@
+[package]
+name = "atmega1280-hal"
+version = "0.1.0"
+authors = ["Gabriel Pickl <peacememories@posteo.net>"]
+edition = "2018"
+
+[dependencies]
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+
+[dependencies.avr-device]
+git = "https://github.com/Rahix/avr-device"
+features = ["atmega1280"]
