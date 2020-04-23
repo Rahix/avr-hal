@@ -30,7 +30,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::A;
 
-        impl PortExt for atmega1280::PORTA {
+        impl PortExt for crate::atmega1280::PORTA {
             regs: (pina, ddra, porta),
             pa0: (PA0, 0),
             pa1: (PA1, 1),
@@ -52,7 +52,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::B;
 
-        impl PortExt for atmega1280::PORTB {
+        impl PortExt for crate::atmega1280::PORTB {
             regs: (pinb, ddrb, portb),
             pb0: (PB0, 0),
             pb1: (PB1, 1),
@@ -74,7 +74,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::C;
 
-        impl PortExt for atmega1280::PORTC {
+        impl PortExt for crate::atmega1280::PORTC {
             regs: (pinc, ddrc, portc),
             pc0: (PC0, 0),
             pc1: (PC1, 1),
@@ -96,7 +96,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::D;
 
-        impl PortExt for atmega1280::PORTD {
+        impl PortExt for crate::atmega1280::PORTD {
             regs: (pind, ddrd, portd),
             pd0: (PD0, 0),
             pd1: (PD1, 1),
@@ -118,7 +118,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::E;
 
-        impl PortExt for atmega1280::PORTE {
+        impl PortExt for crate::atmega1280::PORTE {
             regs: (pine, ddre, porte),
             pe0: (PE0, 0),
             pe1: (PE1, 1),
@@ -140,7 +140,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::F;
 
-        impl PortExt for atmega1280::PORTF {
+        impl PortExt for crate::atmega1280::PORTF {
             regs: (pinf, ddrf, portf),
             pf0: (PF0, 0),
             pf1: (PF1, 1),
@@ -162,7 +162,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::G;
 
-        impl PortExt for atmega1280::PORTG {
+        impl PortExt for crate::atmega1280::PORTG {
             regs: (ping, ddrg, portg),
             pg0: (PG0, 0),
             pg1: (PG1, 1),
@@ -182,7 +182,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::H;
 
-        impl PortExt for atmega1280::PORTH {
+        impl PortExt for crate::atmega1280::PORTH {
             regs: (pinh, ddrh, porth),
             ph0: (PH0, 0),
             ph1: (PH1, 1),
@@ -204,7 +204,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::J;
 
-        impl PortExt for atmega1280::PORTJ {
+        impl PortExt for crate::atmega1280::PORTJ {
             regs: (pinj, ddrj, portj),
             pj0: (PJ0, 0),
             pj1: (PJ1, 1),
@@ -226,7 +226,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::K;
 
-        impl PortExt for atmega1280::PORTK {
+        impl PortExt for crate::atmega1280::PORTK {
             regs: (pink, ddrk, portk),
             pk0: (PK0, 0),
             pk1: (PK1, 1),
@@ -248,7 +248,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::L;
 
-        impl PortExt for atmega1280::PORTL {
+        impl PortExt for crate::atmega1280::PORTL {
             regs: (pinl, ddrl, portl),
             pl0: (PL0, 0),
             pl1: (PL1, 1),
