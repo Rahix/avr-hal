@@ -15,6 +15,7 @@ pub mod delay;
 pub mod port;
 pub mod serial;
 pub mod i2c;
+pub mod spi;
 
 /// Prelude containing all HAL traits
 pub mod prelude {

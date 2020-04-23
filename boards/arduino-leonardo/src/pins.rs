@@ -87,11 +87,23 @@ avr_hal_generic::impl_board_pins! {
         pub d13: portc::pc7::PC7,
         /// `RX`
         ///
-        /// Led for indicating inbound data
+        /// Led for indicating inbound data.  Also the CS pin.
         pub led_rx: portb::pb0::PB0,
         /// `TX`
         ///
         /// Led for indicating outbound data
         pub led_tx: portd::pd5::PD5,
+        /// `SCLK`
+        ///
+        /// ICSP SCLK pin
+        pub sck: portb::pb1::PB1,
+        /// `MOSI`
+        ///
+        /// ICSP MOSI pin
+        pub mosi: portb::pb2::PB2,
+        /// `MISO`
+        ///
+        /// ICSP MISO pin
+        pub miso: portb::pb3::PB3,
     }
 }
