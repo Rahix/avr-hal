@@ -71,7 +71,7 @@ The following peripherals are supported in `avr-hal-generic`:
 
 ### HAL Status
 The chip-HAL crates currently support the following peripherals:
-* [`atmega328p-hal`]('./chips/atmega328p-hal)
+* [`atmega328p-hal`](./chips/atmega328p-hal)
   - [x] Spinning Delay
   - [x] `PORTB`, `PORTC`, `PORTD` as digital IO (v2)
   - [x] `USART0` for serial communication
