@@ -11,5 +11,5 @@ pub mod port;
 
 pub mod prelude {
     pub use crate::avr_hal::prelude::*;
-    pub use crate::port::PortExt as _attiny_PortExt;
+    pub use crate::port::PortExt as _;
 }

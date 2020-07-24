@@ -12,7 +12,7 @@ pub mod usart;
 
 pub mod prelude {
     pub use crate::avr_hal::prelude::*;
-    pub use crate::port::PortExt as _atmega_PortExt;
+    pub use crate::port::PortExt as _;
 }
 
 pub mod i2c {
