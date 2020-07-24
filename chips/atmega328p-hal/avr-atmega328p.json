@@ -22,7 +22,7 @@
     "gcc": ["-Wl,--gc-sections"]
   },
 
-  "singlethread": true,
+  "singlethread": false,
   "no-builtins": false,
 
   "no-default-libraries": false,
