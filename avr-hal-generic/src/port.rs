@@ -13,6 +13,7 @@ pub mod mode {
     }
     /// Pin configured as a digital output
     pub struct Output;
+    pub struct Analog;
 
     impl private::Unimplementable for Output {}
     impl<M: InputMode> private::Unimplementable for Input<M> {}
@@ -246,7 +247,7 @@ macro_rules! impl_port {
 
             $(
                 pub struct $PXi<MODE> {
-                    _mode: marker::PhantomData<MODE>,
+                    pub(crate)_mode: marker::PhantomData<MODE>,
                 }
 
                 // Mode Switch implementations ---------------------------- {{{
