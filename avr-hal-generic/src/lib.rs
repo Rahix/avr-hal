@@ -9,6 +9,8 @@ pub extern crate nb;
 pub extern crate void;
 #[doc(hidden)]
 pub extern crate ufmt;
+#[doc(hidden)]
+pub extern crate paste;
 
 pub mod clock;
 pub mod delay;

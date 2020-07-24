@@ -8,6 +8,7 @@ edition = "2018"
 cfg-if = "0.1.7"
 nb = "0.1.2"
 ufmt = "0.1.0"
+paste = "0.1.18"
 
 [dependencies.embedded-hal]
 version = "0.2.3"
