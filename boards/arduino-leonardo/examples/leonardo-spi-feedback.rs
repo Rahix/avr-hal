@@ -9,10 +9,12 @@
 
 #![no_std]
 #![no_main]
+
 extern crate panic_halt;
 use arduino_leonardo::prelude::*;
-use arduino_leonardo::spi::{Settings, Spi};
+use arduino_leonardo::spi;
 use nb::block;
+
 #[no_mangle]
 pub extern "C" fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
@@ -29,12 +31,12 @@ pub extern "C" fn main() -> ! {
     pins.led_rx.into_output(&mut pins.ddr); // SS must be set to output mode.
 
     // Create SPI interface.
-    let mut spi = Spi::new(
+    let mut spi = spi::Spi::new(
         dp.SPI,
         pins.sck.into_output(&mut pins.ddr),
         pins.mosi.into_output(&mut pins.ddr),
         pins.miso.into_pull_up_input(&mut pins.ddr),
-        Settings::default(),
+        spi::Settings::default(),
     );
 
     loop {
