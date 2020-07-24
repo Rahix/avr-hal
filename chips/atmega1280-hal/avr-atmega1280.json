@@ -26,5 +26,7 @@
   },
   "singlethread": true,
   "no-builtins": false,
-  "no-default-libraries": false
+  "no-default-libraries": false,
+
+  "eh-frame-header": false
 }

@@ -36,7 +36,7 @@ cfg_if::cfg_if! {
         #[allow(unused_assignments)]
         fn busy_loop(mut c: u16) {
             unsafe {
-                asm!("1: sbiw $0,1\n\tbrne 1b"
+                llvm_asm!("1: sbiw $0,1\n\tbrne 1b"
                      : "=w"(c)
                      : "0"(c)
                      :
@@ -82,7 +82,7 @@ impl delay::DelayUs<u16> for Delay<crate::clock::MHz20> {
         // for a one-microsecond delay, simply return.  the overhead
         // of the function call takes 18 (20) cycles, which is 1us
         unsafe {
-            asm!("nop\nnop\nnop\nnop" :::: "volatile");
+            llvm_asm!("nop\nnop\nnop\nnop" :::: "volatile");
         } //just waiting 4 cycles
 
         if us <= 1 {
