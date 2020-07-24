@@ -1,5 +1,5 @@
 #![no_std]
-#![feature(asm, llvm_asm)]
+#![feature(llvm_asm)]
 
 pub extern crate embedded_hal as hal;
 
