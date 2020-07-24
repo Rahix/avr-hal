@@ -9,7 +9,6 @@
 
 #![no_std]
 #![no_main]
-#![feature(proc_macro_hygiene)]
 extern crate panic_halt;
 use arduino_leonardo::prelude::*;
 use arduino_leonardo::spi::{Settings, Spi};

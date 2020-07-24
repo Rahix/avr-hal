@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(proc_macro_hygiene)]
 
 use arduino_leonardo::prelude::*;
 

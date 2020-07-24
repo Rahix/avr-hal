@@ -14,7 +14,6 @@
 
 #![no_std]
 #![no_main]
-#![feature(proc_macro_hygiene)]
 extern crate panic_halt;
 use arduino_uno::prelude::*;
 use arduino_uno::spi::{Settings, Spi};
