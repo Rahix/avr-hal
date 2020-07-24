@@ -3,24 +3,23 @@ avr-hal
 `embedded-hal` implementations for AVR microcontrollers.  Based on the register definitions from [`avr-device`](https://github.com/Rahix/avr-device).
 
 ## Quickstart
-Go into `./boards/arduino-leonardo`, and run the following commands:
+You need nightly rust for compiling rust code for AVR.  Install dependencies for [`avr-device`](https://github.com/Rahix/avr-device):
+
 ```bash
-# Tell rustc where the target description can be found
-# (it is in this directory)
-export RUST_TARGET_PATH="$(pwd)"
+rustup component add --toolchain nightly rustfmt
+cargo install form
+cargo install svd2rust
+cargo install atdf2svd
+pip3 install --user pyyaml
+```
 
-# Set the toolchain to your avr toolchain.  The name might
-# be different, depending on how you installed avr-rust.
-export RUSTUP_TOOLCHAIN=avr
-
-# xargo needs a path to the rust sources to build libcore.
-export XARGO_RUST_SRC="/path/to/avr-rust/src"
-
+Go into `./boards/arduino-leonardo` (or the directory for whatever board you want), and run the following commands:
+```bash
 # Now you are ready to build your first avr blink example!
-xargo build --target avr-atmega32u4 --example leonardo-blink --release
+cargo +nightly build -Z build-std=core --target avr-atmega32u4.json --example leonardo-blink
 
 # Finally, convert it into a .hex file that you can flash using avr-dude
-../../mkhex.sh --release leonardo-blink
+../../mkhex.sh --debug leonardo-blink
 
 ls -l ../../target/leonardo-blink.hex
 ```
@@ -28,7 +27,6 @@ ls -l ../../target/leonardo-blink.hex
 ## Starting your own project
 You need at least the following:
 * A target description for the chip you are using.  In most cases, just copy the one from this repo.
-* The `Xargo.toml` file, as found in this repo.
 * The Cargo profiles, as found in `Cargo.toml` of this repo.
 * Add the board-support-crate for your hardware as a dependency, and also include `panic-halt` to provide a panic implementation.
 
