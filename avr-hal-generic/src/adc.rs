@@ -28,7 +28,7 @@ impl Default for ClockRateDivision {
 pub enum ReferenceVoltage {
     /// Voltage applied to AREF pin.
     Aref,
-    /// Default referece voltage.
+    /// Default reference voltage.
     AVcc,
     /// Internal reference voltage
     Internal,
