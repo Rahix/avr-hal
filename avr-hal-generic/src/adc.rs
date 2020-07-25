@@ -1,5 +1,8 @@
 
-
+/// The division factor between the system clock frequency and the input clock to the AD converter.
+///
+/// To get 10bit precision, clock from 50kHz to 200kHz must be supplied. If you need less precision, you can supply higher clock.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ClockRateDivision {
     Factor2,
     Factor4,
@@ -10,23 +13,39 @@ pub enum ClockRateDivision {
     Factor128,
 }
 
+
+impl Default for ClockRateDivision {
+    fn default() -> Self {
+       Self::Factor128
+    }
+}
+
+
+/// Select the voltage reference for the ADC peripheral
+///
+/// The inernal voltage reference options may not be used if an external reference voltage isbeing applied to the AREF pin.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ReferenceVoltage {
+    /// Voltage applied to AREF pin.
     Aref,
-    Vcc,
+    /// Default referece voltage.
+    AVcc,
+    /// Internal reference voltage
     Internal,
 }
 
-pub struct AdcSettings{
-    pub adps: ClockRateDivision,
-    pub aref: ReferenceVoltage
-}
-
-
-impl Default for AdcSettings {
+impl Default for ReferenceVoltage {
     fn default() -> Self {
-        Self { adps: ClockRateDivision::Factor128, aref: ReferenceVoltage::Vcc}
+       Self::AVcc
     }
 }
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AdcSettings{
+    pub clock_divider: ClockRateDivision,
+    pub ref_voltage: ReferenceVoltage
+}
+
 
 #[macro_export]
 macro_rules! impl_adc {
@@ -34,7 +53,7 @@ macro_rules! impl_adc {
         pub struct $Adc:ident {
             type ChannelID = $ID:ty;
             peripheral: $ADC:ty,
-            pins: {$($pxi:ident: ($PXi:ident, $ChannelID:expr, $name:ident),)+}
+            pins: {$($pxi:ident: ($PXi:ident, $ChannelIDExpr:expr, $ChannelIDPat:pat, $name:ident),)+}
         }
     ) => {
 
@@ -46,37 +65,52 @@ macro_rules! impl_adc {
 
         pub struct $Adc {
             peripheral: $ADC,
-            is_reading: bool,
+            $( $pxi: bool,)+
         }
 
         impl $Adc {
             pub fn new(peripheral: $ADC, settings: AdcSettings) -> $Adc {
-                let s = Self { peripheral, is_reading: false } ;
+                let s = Self { peripheral, $( $pxi: false,)+ } ;
                 s.enable(settings);
                 s
             }
 
             fn enable(&self, settings: AdcSettings) {
-                self.peripheral.adcsra.write(|w| {w.aden().set_bit();
-                                            match settings.adps {
-                                                ClockRateDivision::Factor2 => w.adps().val_0x01(),
-                                                ClockRateDivision::Factor4 => w.adps().val_0x02(),
-                                                ClockRateDivision::Factor8 => w.adps().val_0x03(),
-                                                ClockRateDivision::Factor16 => w.adps().val_0x04(),
-                                                ClockRateDivision::Factor32 => w.adps().val_0x05(),
-                                                ClockRateDivision::Factor64 => w.adps().val_0x06(),
-                                                ClockRateDivision::Factor128 => w.adps().val_0x07(),
-                                            }});
-                self.peripheral.admux.write(|w| match settings.aref {
-                    ReferenceVoltage::Aref => w.refs().val_0x00(),
-                    ReferenceVoltage::Vcc => w.refs().val_0x01(),
-                    ReferenceVoltage::Internal => w.refs().val_0x03(),
+                self.peripheral.adcsra.write(|w| {
+                    w.aden().set_bit();
+                    match settings.clock_divider {
+                        ClockRateDivision::Factor2 => w.adps().prescaler_2(),
+                        ClockRateDivision::Factor4 => w.adps().prescaler_4(),
+                        ClockRateDivision::Factor8 => w.adps().prescaler_8(),
+                        ClockRateDivision::Factor16 => w.adps().prescaler_16(),
+                        ClockRateDivision::Factor32 => w.adps().prescaler_32(),
+                        ClockRateDivision::Factor64 => w.adps().prescaler_64(),
+                        ClockRateDivision::Factor128 => w.adps().prescaler_128(),
+                    }});
+                self.peripheral.admux.write(|w| match settings.ref_voltage {
+                    ReferenceVoltage::Aref => w.refs().aref(),
+                    ReferenceVoltage::AVcc => w.refs().avcc(),
+                    ReferenceVoltage::Internal => w.refs().internal(),
                 });
                                                 
             }
 
             fn disable(&self) {
                 self.peripheral.adcsra.reset();
+            }
+
+            fn set_reading(&mut self, channel: $ID, state: bool) {
+                match channel {
+                    $( $ChannelIDPat => self.$pxi = state, )+
+                    _ => unreachable!(),
+                }
+            }
+
+            fn is_reading(&self, channel: $ID) -> bool {
+                match channel {
+                    $( $ChannelIDPat => self.$pxi, )+
+                    _ => unreachable!(),
+                }
             }
 
             pub fn release(self) -> $ADC {
@@ -93,15 +127,17 @@ macro_rules! impl_adc {
             type Error = ();
 
             fn read(&mut self, _pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
-                match (self.is_reading, self.peripheral.adcsra.read().adsc().bit_is_set()) {
+                let channel = PIN::channel();
+
+                match (self.is_reading(channel), self.peripheral.adcsra.read().adsc().bit_is_set()) {
                     (true, true) =>  Err(nb::Error::WouldBlock),
                     (true, false) => {
-                        self.is_reading = false;
+                        self.set_reading(channel, false);
                         Ok(self.peripheral.adc.read().bits().into())
                     },
                     (false, _) => {
-                        self.is_reading = true; self.peripheral.admux.modify(|_, w| w.adlar().clear_bit()
-                                                                                     .mux().variant(PIN::channel()));
+                        self.set_reading(channel, true);
+                        self.peripheral.admux.modify(|_, w| w.mux().variant(channel));
                         self.peripheral.adcsra.modify(|_, w| w.adsc().set_bit());
                         Err(nb::Error::WouldBlock)
                     }
@@ -113,7 +149,7 @@ macro_rules! impl_adc {
             impl Channel<$Adc> for $PXi<Analog> {
                 type ID = $ID;
                 fn channel() -> Self::ID {
-                    $ChannelID
+                    $ChannelIDExpr
                 }
             }
 
