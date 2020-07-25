@@ -123,9 +123,7 @@ macro_rules! impl_adc {
                         self.reading_channel = None;
                         Ok(self.peripheral.adc.read().bits().into())
                     },
-                    (Some(channel), _) => {
-                        Err(nb::Error::Other(AdcError::AlreadyReaddingOtherChannel))
-                    },
+                    (Some(_), _) => Err(nb::Error::Other(AdcError::AlreadyReaddingOtherChannel)),
                     (None, _) => {
                         self.reading_channel = Some(PIN::channel());
                         self.peripheral.admux.modify(|_, w| w.mux().variant(PIN::channel()));
@@ -145,7 +143,7 @@ macro_rules! impl_adc {
             }
 
             impl<MODE> $PXi<MODE> {
-                    /// Make this pin a analog input and enable the internal pull-up
+                    /// Make this pin a analog input and set the didr register
                     pub fn into_analog_input(self, adc: &mut $Adc) -> $PXi<Analog> {
                         adc.peripheral.$didr.modify(|_, w| w.$didr_method().set_bit());
                         $PXi { _mode: core::marker::PhantomData }
