@@ -46,6 +46,10 @@ pub struct AdcSettings{
     pub ref_voltage: ReferenceVoltage
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AdcError {
+    AlreadyReaddingOtherChannel
+}
 
 #[macro_export]
 macro_rules! impl_adc {
@@ -53,7 +57,7 @@ macro_rules! impl_adc {
         pub struct $Adc:ident {
             type ChannelID = $ID:ty;
             peripheral: $ADC:ty,
-            pins: {$($pxi:ident: ($PXi:ident, $ChannelIDExpr:expr, $ChannelIDPat:pat, $didr:ident::$didr_method:ident),)+}
+            pins: {$($pxi:ident: ($PXi:ident, $ChannelID:expr, $didr:ident::$didr_method:ident),)+}
         }
     ) => {
 
@@ -65,12 +69,12 @@ macro_rules! impl_adc {
 
         pub struct $Adc {
             peripheral: $ADC,
-            $( $pxi: bool,)+
+            reading_channel: Option<$ID>,
         }
 
         impl $Adc {
             pub fn new(peripheral: $ADC, settings: AdcSettings) -> $Adc {
-                let s = Self { peripheral, $( $pxi: false,)+ } ;
+                let s = Self { peripheral, reading_channel: None } ;
                 s.enable(settings);
                 s
             }
@@ -99,20 +103,6 @@ macro_rules! impl_adc {
                 self.peripheral.adcsra.reset();
             }
 
-            fn set_reading(&mut self, channel: $ID, state: bool) {
-                match channel {
-                    $( $ChannelIDPat => self.$pxi = state, )+
-                    _ => unreachable!(),
-                }
-            }
-
-            fn is_reading(&self, channel: $ID) -> bool {
-                match channel {
-                    $( $ChannelIDPat => self.$pxi, )+
-                    _ => unreachable!(),
-                }
-            }
-
             pub fn release(self) -> $ADC {
                 self.disable();
                 self.peripheral
@@ -124,20 +114,21 @@ macro_rules! impl_adc {
             WORD: From<u16>,
             PIN: Channel<$Adc, ID=$ID>,
         {
-            type Error = ();
+            type Error = AdcError;
 
             fn read(&mut self, _pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
-                let channel = PIN::channel();
-
-                match (self.is_reading(channel), self.peripheral.adcsra.read().adsc().bit_is_set()) {
-                    (true, true) =>  Err(nb::Error::WouldBlock),
-                    (true, false) => {
-                        self.set_reading(channel, false);
+                match (self.reading_channel, self.peripheral.adcsra.read().adsc().bit_is_set()) {
+                    (Some(channel), true) if channel == PIN::channel() =>  Err(nb::Error::WouldBlock),
+                    (Some(channel), false) if channel == PIN::channel() => {
+                        self.reading_channel = None;
                         Ok(self.peripheral.adc.read().bits().into())
                     },
-                    (false, _) => {
-                        self.set_reading(channel, true);
-                        self.peripheral.admux.modify(|_, w| w.mux().variant(channel));
+                    (Some(channel), _) => {
+                        Err(nb::Error::Other(AdcError::AlreadyReaddingOtherChannel))
+                    },
+                    (None, _) => {
+                        self.reading_channel = Some(PIN::channel());
+                        self.peripheral.admux.modify(|_, w| w.mux().variant(PIN::channel()));
                         self.peripheral.adcsra.modify(|_, w| w.adsc().set_bit());
                         Err(nb::Error::WouldBlock)
                     }
@@ -149,7 +140,7 @@ macro_rules! impl_adc {
             impl Channel<$Adc> for $PXi<Analog> {
                 type ID = $ID;
                 fn channel() -> Self::ID {
-                    $ChannelIDExpr
+                    $ChannelID
                 }
             }
 
