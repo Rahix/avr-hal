@@ -46,12 +46,14 @@ panic = "abort"
 codegen-units = 1
 incremental = false
 lto = true
+opt-level = "s"
 
 [profile.release]
 panic = "abort"
 codegen-units = 1
 debug = false
 lto = true
+opt-level = "s"
 ```
 
 ## Structure
