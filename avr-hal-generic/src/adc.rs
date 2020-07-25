@@ -53,7 +53,7 @@ macro_rules! impl_adc {
         pub struct $Adc:ident {
             type ChannelID = $ID:ty;
             peripheral: $ADC:ty,
-            pins: {$($pxi:ident: ($PXi:ident, $ChannelIDExpr:expr, $ChannelIDPat:pat, $name:ident),)+}
+            pins: {$($pxi:ident: ($PXi:ident, $ChannelIDExpr:expr, $ChannelIDPat:pat, $didr:ident::$didr_method:ident),)+}
         }
     ) => {
 
@@ -156,7 +156,7 @@ macro_rules! impl_adc {
             impl<MODE> $PXi<MODE> {
                     /// Make this pin a analog input and enable the internal pull-up
                     pub fn into_analog_input(self, adc: &mut $Adc) -> $PXi<Analog> {
-                        adc.peripheral.didr0.modify(|_, w| w.$name().set_bit());
+                        adc.peripheral.$didr.modify(|_, w| w.$didr_method().set_bit());
                         $PXi { _mode: core::marker::PhantomData }
                     }
             }

@@ -9,12 +9,12 @@ avr_hal::impl_adc! {
         type ChannelID = MUX_A;
         peripheral: crate::atmega328p::ADC,
         pins: {
-            pc0: (PC0, MUX_A::ADC0, MUX_A::ADC0, adc0d),
-            pc1: (PC1, MUX_A::ADC1, MUX_A::ADC1, adc1d),
-            pc2: (PC2, MUX_A::ADC2, MUX_A::ADC2, adc2d),
-            pc3: (PC3, MUX_A::ADC3, MUX_A::ADC3, adc3d),
-            pc4: (PC4, MUX_A::ADC4, MUX_A::ADC4, adc4d),
-            pc5: (PC5, MUX_A::ADC5, MUX_A::ADC5, adc5d),
+            pc0: (PC0, MUX_A::ADC0, MUX_A::ADC0, didr0::adc0d),
+            pc1: (PC1, MUX_A::ADC1, MUX_A::ADC1, didr0::adc1d),
+            pc2: (PC2, MUX_A::ADC2, MUX_A::ADC2, didr0::adc2d),
+            pc3: (PC3, MUX_A::ADC3, MUX_A::ADC3, didr0::adc3d),
+            pc4: (PC4, MUX_A::ADC4, MUX_A::ADC4, didr0::adc4d),
+            pc5: (PC5, MUX_A::ADC5, MUX_A::ADC5, didr0::adc5d),
         }
     }
 }
