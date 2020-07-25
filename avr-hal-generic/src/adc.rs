@@ -23,7 +23,7 @@ impl Default for ClockRateDivision {
 
 /// Select the voltage reference for the ADC peripheral
 ///
-/// The inernal voltage reference options may not be used if an external reference voltage isbeing applied to the AREF pin.
+/// The internal voltage reference options may not be used if an external reference voltage is being applied to the AREF pin.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ReferenceVoltage {
     /// Voltage applied to AREF pin.
