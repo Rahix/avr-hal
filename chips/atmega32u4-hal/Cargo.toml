@@ -8,6 +8,5 @@ edition = "2018"
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-# git = "https://github.com/Rahix/avr-device"
-path = "../../../avr-device"
+git = "https://github.com/Rahix/avr-device"
 features = ["atmega32u4"]
