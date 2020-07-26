@@ -24,8 +24,8 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 
-#[no_mangle]
-pub extern fn main() -> ! {
+#[bigavr6::entry]
+fn main() -> ! {
     let dp = bigavr6::Peripherals::take().unwrap();
 
     let mut porte = dp.PORTE.split();

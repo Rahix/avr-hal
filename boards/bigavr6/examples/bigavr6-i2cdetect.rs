@@ -4,8 +4,8 @@
 extern crate panic_halt;
 use bigavr6::prelude::*;
 
-#[no_mangle]
-pub extern fn main() -> ! {
+#[bigavr6::entry]
+fn main() -> ! {
     let dp = bigavr6::Peripherals::take().unwrap();
 
     let mut delay = bigavr6::Delay::new();
