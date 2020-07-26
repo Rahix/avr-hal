@@ -15,12 +15,17 @@ pub enum AdcMux {
     Adc6 = 0b000110,
     Adc7 = 0b000111,
 
+    AdcVbg = 0b011110,
+    AdcGnd = 0b011111,
+
     Adc8 = 0b100000,
     Adc9 = 0b100001,
     Adc10 = 0b100010,
     Adc11 = 0b100011,
     Adc12 = 0b100100,
     Adc13 = 0b100101,
+
+    AdcTemp = 0b100111,
 }
 
 avr_hal::impl_adc! {
@@ -46,5 +51,34 @@ avr_hal::impl_adc! {
             pb5: (PB5, AdcMux::Adc12, didr2::adc12d),
             pb6: (PB6, AdcMux::Adc13, didr2::adc13d),
         }
+    }
+}
+
+/// Additional channels
+///
+/// This module contains ADC channels, additional to the direct pin channels.
+pub mod channel {
+    use avr_hal::hal::adc::Channel;
+    use super::AdcMux;
+
+    /// Channel for the _Bandgap Reference Voltage_
+    pub struct Vbg;
+    impl Channel<super::Adc> for Vbg {
+        type ID = AdcMux;
+        fn channel() -> Self::ID { AdcMux::AdcVbg }
+    }
+
+    /// Channel for _GND_
+    pub struct Gnd;
+    impl Channel<super::Adc> for Gnd {
+        type ID = AdcMux;
+        fn channel() -> Self::ID { AdcMux::AdcGnd }
+    }
+
+    /// Channel for the built-in _Temperature Sensor_
+    pub struct Temperature;
+    impl Channel<super::Adc> for Temperature {
+        type ID = AdcMux;
+        fn channel() -> Self::ID { AdcMux::AdcTemp }
     }
 }

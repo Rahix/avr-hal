@@ -21,3 +21,32 @@ avr_hal::impl_adc! {
         }
     }
 }
+
+/// Additional channels
+///
+/// This module contains ADC channels, additional to the direct pin channels.
+pub mod channel {
+    use avr_hal::hal::adc::Channel;
+    use crate::atmega328p::adc::admux::MUX_A;
+
+    /// Channel for the _Bandgap Reference Voltage_
+    pub struct Vbg;
+    impl Channel<super::Adc> for Vbg {
+        type ID = MUX_A;
+        fn channel() -> Self::ID { MUX_A::ADC_VBG }
+    }
+
+    /// Channel for _GND_
+    pub struct Gnd;
+    impl Channel<super::Adc> for Gnd {
+        type ID = MUX_A;
+        fn channel() -> Self::ID { MUX_A::ADC_GND }
+    }
+
+    /// Channel for the built-in _Temperature Sensor_
+    pub struct Temperature;
+    impl Channel<super::Adc> for Temperature {
+        type ID = MUX_A;
+        fn channel() -> Self::ID { MUX_A::TEMPSENS }
+    }
+}
