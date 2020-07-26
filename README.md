@@ -3,17 +3,7 @@ avr-hal
 `embedded-hal` implementations for AVR microcontrollers.  Based on the register definitions from [`avr-device`](https://github.com/Rahix/avr-device).
 
 ## Quickstart
-You need nightly rust for compiling rust code for AVR.  Install dependencies for [`avr-device`](https://github.com/Rahix/avr-device):
-
-```bash
-rustup component add --toolchain nightly rustfmt
-cargo install form
-cargo install svd2rust
-cargo install atdf2svd
-pip3 install --user pyyaml
-```
-
-Go into `./boards/arduino-leonardo` (or the directory for whatever board you want), and run the following commands:
+You need nightly rust for compiling rust code for AVR.  Go into `./boards/arduino-leonardo` (or the directory for whatever board you want), and run the following commands:
 ```bash
 # Now you are ready to build your first avr blink example!
 cargo +nightly build -Z build-std=core --target avr-atmega32u4.json --example leonardo-blink
