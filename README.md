@@ -6,7 +6,7 @@ avr-hal
 You need nightly rust for compiling rust code for AVR.  Go into `./boards/arduino-leonardo` (or the directory for whatever board you want), and run the following commands:
 ```bash
 # Now you are ready to build your first avr blink example!
-cargo +nightly build -Z build-std=core --target avr-atmega32u4.json --example leonardo-blink
+cargo +nightly build --example leonardo-blink
 
 # Finally, convert it into a .hex file that you can flash using avr-dude
 ../../mkhex.sh --debug leonardo-blink
@@ -15,36 +15,69 @@ ls -l ../../target/leonardo-blink.hex
 ```
 
 ## Starting your own project
-You need at least the following:
-* A target description for the chip you are using.  In most cases, just copy the one from this repo.
-* The Cargo profiles, as found in `Cargo.toml` of this repo.
-* Add the board-support-crate for your hardware as a dependency, and also include `panic-halt` to provide a panic implementation.
+This is a step-by-step guide for creating a new project targeting Arduino Leonardo (`ATmega32U4`).  You can of course apply the same steps for any other microcontroller.
 
-In the end, your `Cargo.toml` should contain the following:
-```toml
-[package]
-...
+1. Start by creating a new project:
+   ```bash
+   cargo new --bin avr-example
+   cd avr-example
+   ```
+2. Copy the target description for your MCU (e.g. `boards/arduino-leonardo/avr-atmega32u4.json`) into your project.
+3. Create a file `.cargo/config.toml` with the following content:
+   ```toml
+   [build]
+   target = "avr-atmega32u4.json"
 
-[dependencies]
-panic-halt = "0.2.0"
+   [unstable]
+   build-std = ["core"]
+   ```
+4. Fill `Cargo.toml` with these additional directives:
+   ```toml
+   [dependencies]
+   # A panic handler is needed.  This is a crate with the most basic one.
+   # The `leonardo-panic` example shows a more elaborate version.
+   panic-halt = "0.2.0"
 
-[dependencies.arduino-leonardo]
-path = "/path/to/avr-hal/boards/arduino-leonardo"
+   [dependencies.arduino-leonardo]
+   git = "https://github.com/Rahix/avr-hal"
 
-[profile.dev]
-panic = "abort"
-codegen-units = 1
-incremental = false
-lto = true
-opt-level = "s"
+   # Configure the build for minimal size
+   [profile.dev]
+   panic = "abort"
+   lto = true
+   opt-level = "s"
 
-[profile.release]
-panic = "abort"
-codegen-units = 1
-debug = false
-lto = true
-opt-level = "s"
-```
+   [profile.release]
+   panic = "abort"
+   codegen-units = 1
+   debug = true
+   lto = true
+   opt-level = "s"
+   ```
+5. Start your project with this basic template:
+   ```rust
+   #![no_std]
+   #![no_main]
+
+   // Pull in the panic handler from panic-halt
+   extern crate panic_halt;
+
+   use arduino_leonardo::prelude::*;
+
+   #[arduino_leonardo::entry]
+   fn main() -> ! {
+       let dp = arduino_leonardo::Peripherals::take().unwrap();
+
+       unimplemented!()
+   }
+   ```
+6. Build with
+   ```bash
+   cargo +nightly build
+   # or
+   cargo +nightly build --release
+   ```
+   and find your binary in `.`
 
 ## Structure
 This repository contains the following components:
