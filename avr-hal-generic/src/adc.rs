@@ -49,7 +49,10 @@ macro_rules! impl_adc {
         pub struct $Adc:ident {
             type ChannelID = $ID:ty;
             peripheral: $ADC:ty,
-            pins: {$($pxi:ident: ($PXi:ident, $ChannelID:expr, $didr:ident::$didr_method:ident),)+}
+            set_mux: |$periph_var:ident, $id_var:ident| $set_mux:block,
+            pins: {
+                $($pxi:ident: ($PXi:ident, $ChannelID:expr, $didr:ident::$didr_method:ident),)+
+            }
         }
     ) => {
 
@@ -125,7 +128,12 @@ macro_rules! impl_adc {
                     // Start measurement
                     (None, _) => {
                         self.reading_channel = Some(PIN::channel());
-                        self.peripheral.admux.modify(|_, w| w.mux().variant(PIN::channel()));
+                        {
+                            let $periph_var = &mut self.peripheral;
+                            let $id_var = PIN::channel();
+
+                            $set_mux
+                        }
                         self.peripheral.adcsra.modify(|_, w| w.adsc().set_bit());
                         Err(nb::Error::WouldBlock)
                     },

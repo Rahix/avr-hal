@@ -8,6 +8,9 @@ avr_hal::impl_adc! {
     pub struct Adc {
         type ChannelID = MUX_A;
         peripheral: crate::atmega328p::ADC,
+        set_mux: |peripheral, id| {
+            peripheral.admux.modify(|_, w| w.mux().variant(id));
+        },
         pins: {
             pc0: (PC0, MUX_A::ADC0, didr0::adc0d),
             pc1: (PC1, MUX_A::ADC1, didr0::adc1d),
