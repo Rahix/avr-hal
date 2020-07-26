@@ -1,18 +1,18 @@
 #![no_std]
 #![no_main]
 
-use arduino_leonardo::prelude::*;
+use arduino_leonardo::hal::port::mode;
 
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    let mut serial: arduino_leonardo::Serial<arduino_leonardo::hal::port::mode::Floating> = unsafe {
-        core::mem::uninitialized()
+    let mut serial: arduino_leonardo::Serial<mode::Floating> = unsafe {
+        core::mem::MaybeUninit::uninit().assume_init()
     };
 
-    ufmt::uwriteln!(&mut serial, "Firmware panic!\r");
+    let _ = ufmt::uwriteln!(&mut serial, "Firmware panic!\r");
 
     if let Some(loc) = info.location() {
-        ufmt::uwriteln!(
+        let _ = ufmt::uwriteln!(
             &mut serial,
             "  At {}:{}:{}\r",
             loc.file(),
