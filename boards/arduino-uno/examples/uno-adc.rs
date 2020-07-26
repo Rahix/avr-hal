@@ -41,6 +41,6 @@ fn main() -> ! {
         let aread: u16 = nb::block!{adc.read(&mut a0)}.unwrap();
 
         // Write it to Serial
-        ufmt::uwriteln!(&mut serial, "read: {}\r", aread);
+        ufmt::uwriteln!(&mut serial, "read: {}\r", aread).unwrap();
     }
 }
