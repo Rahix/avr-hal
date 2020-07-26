@@ -1,4 +1,3 @@
-
 /// The division factor between the system clock frequency and the input clock to the AD converter.
 ///
 /// To get 10bit precision, clock from 50kHz to 200kHz must be supplied. If you need less precision, you can supply higher clock.
@@ -13,13 +12,11 @@ pub enum ClockRateDivision {
     Factor128,
 }
 
-
 impl Default for ClockRateDivision {
     fn default() -> Self {
-       Self::Factor128
+        Self::Factor128
     }
 }
-
 
 /// Select the voltage reference for the ADC peripheral
 ///
@@ -36,19 +33,14 @@ pub enum ReferenceVoltage {
 
 impl Default for ReferenceVoltage {
     fn default() -> Self {
-       Self::AVcc
+        Self::AVcc
     }
 }
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AdcSettings{
+pub struct AdcSettings {
     pub clock_divider: ClockRateDivision,
-    pub ref_voltage: ReferenceVoltage
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum AdcError {
-    AlreadyReaddingOtherChannel
+    pub ref_voltage: ReferenceVoltage,
 }
 
 #[macro_export]
@@ -96,7 +88,7 @@ macro_rules! impl_adc {
                     ReferenceVoltage::AVcc => w.refs().avcc(),
                     ReferenceVoltage::Internal => w.refs().internal(),
                 });
-                                                
+
             }
 
             fn disable(&self) {
@@ -114,22 +106,29 @@ macro_rules! impl_adc {
             WORD: From<u16>,
             PIN: Channel<$Adc, ID=$ID>,
         {
-            type Error = AdcError;
+            type Error = Void;
 
             fn read(&mut self, _pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
                 match (self.reading_channel, self.peripheral.adcsra.read().adsc().bit_is_set()) {
-                    (Some(channel), true) if channel == PIN::channel() =>  Err(nb::Error::WouldBlock),
+                    // Measurement on current pin is ongoing
+                    (Some(channel), true) if channel == PIN::channel() => Err(nb::Error::WouldBlock),
+                    // Measurement on current pin completed
                     (Some(channel), false) if channel == PIN::channel() => {
                         self.reading_channel = None;
                         Ok(self.peripheral.adc.read().bits().into())
                     },
-                    (Some(_), _) => Err(nb::Error::Other(AdcError::AlreadyReaddingOtherChannel)),
+                    // Measurement on other pin is ongoing
+                    (Some(_), _) => {
+                        self.reading_channel = None;
+                        Err(nb::Error::WouldBlock)
+                    },
+                    // Start measurement
                     (None, _) => {
                         self.reading_channel = Some(PIN::channel());
                         self.peripheral.admux.modify(|_, w| w.mux().variant(PIN::channel()));
                         self.peripheral.adcsra.modify(|_, w| w.adsc().set_bit());
                         Err(nb::Error::WouldBlock)
-                    }
+                    },
                 }
             }
         }
