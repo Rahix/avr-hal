@@ -6,13 +6,13 @@ use bigavr6::prelude::*;
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     let mut serial: bigavr6::Serial<bigavr6::hal::port::mode::Floating> = unsafe {
-        core::mem::uninitialized()
+        core::mem::MaybeUninit::uninit().assume_init()
     };
 
     ufmt::uwriteln!(&mut serial, "Firmware panic!\r").unwrap();
 
     if let Some(loc) = info.location() {
-        ufmt::uwriteln!(
+        let _ = ufmt::uwriteln!(
             &mut serial,
             "  At {}:{}:{}\r",
             loc.file(),
