@@ -4,8 +4,8 @@
 extern crate panic_halt;
 use trinket::prelude::*;
 
-#[no_mangle]
-pub extern fn main() -> ! {
+#[trinket::entry]
+fn main() -> ! {
     let dp = trinket::Peripherals::take().unwrap();
 
     let mut delay = trinket::Delay::new();
