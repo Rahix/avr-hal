@@ -14,5 +14,5 @@ nb = "0.1.2"
 ufmt = "0.1.0"
 
 [dev-dependencies.avr-device]
-git = "https://github.com/Rahix/avr-device"
-features = ["rt", "atmega32u4"]
+version = "0.1.0"
+features = ["rt"]

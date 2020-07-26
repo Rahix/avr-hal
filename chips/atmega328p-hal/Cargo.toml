@@ -8,6 +8,6 @@ edition = "2018"
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-git = "https://github.com/Rahix/avr-device"
+version = "0.1.0"
 features = ["atmega328p"]
 
