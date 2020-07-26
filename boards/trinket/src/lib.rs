@@ -1,6 +1,9 @@
 #![no_std]
 
 pub extern crate attiny85_hal as hal;
+/// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
+#[cfg(feature = "rt")]
+pub use hal::entry;
 
 pub use attiny85_hal::attiny85;
 pub use crate::attiny85::Peripherals;

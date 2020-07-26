@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["Jonah Dahlquist <jonah@jonah.name>"]
 edition = "2018"
 
+[features]
+rt = ["avr-device/rt"]
+
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 

@@ -3,6 +3,9 @@
 extern crate avr_hal_generic as avr_hal;
 
 pub use avr_device::atmega328p;
+/// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
+#[cfg(feature = "rt")]
+pub use avr_device::entry;
 
 pub use avr_hal::clock;
 pub use avr_hal::delay;

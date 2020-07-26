@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Jonah Dahlquist <jonah@jonah.name>"]
 edition = "2018"
 
+[features]
+default = ["rt"]
+rt = ["atmega328p-hal/rt"]
+
 [dependencies]
 atmega328p-hal = { path = "../../chips/atmega328p-hal/" }
 avr-hal-generic = { path = "../../avr-hal-generic/" }

@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Gabriel Pickl <gabriel.pickl@posteo.net>"]
 edition = "2018"
 
+[features]
+default = ["rt"]
+rt = ["atmega1280-hal/rt"]
+
 [dependencies]
 atmega1280-hal = { path = "../../chips/atmega1280-hal/" }
 avr-hal-generic = { path = "../../avr-hal-generic/" }
