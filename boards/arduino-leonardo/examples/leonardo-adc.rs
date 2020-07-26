@@ -1,0 +1,60 @@
+#![no_std]
+#![no_main]
+
+extern crate panic_halt;
+use arduino_leonardo::prelude::*;
+
+#[arduino_leonardo::entry]
+fn main() -> ! {
+    let dp = arduino_leonardo::Peripherals::take().unwrap();
+
+    let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
+    let mut delay = arduino_leonardo::Delay::new();
+
+    let mut serial = arduino_leonardo::Serial::new(
+        dp.USART1,
+        pins.d0,
+        pins.d1.into_output(&mut pins.ddr),
+        57600,
+    );
+
+    ufmt::uwriteln!(&mut serial, "Reading analog inputs ...\r").unwrap();
+
+    let mut adc = arduino_leonardo::adc::Adc::new(dp.ADC, Default::default());
+
+    let (vbg, gnd, temp): (u16, u16, u16) = (
+        nb::block!(adc.read(&mut arduino_leonardo::adc::channel::Vbg)).unwrap(),
+        nb::block!(adc.read(&mut arduino_leonardo::adc::channel::Gnd)).unwrap(),
+        nb::block!(adc.read(&mut arduino_leonardo::adc::channel::Temperature)).unwrap(),
+    );
+
+    ufmt::uwriteln!(&mut serial, "Vbandgap: {}\r", vbg).unwrap();
+    ufmt::uwriteln!(&mut serial, "GND: {}\r", gnd).unwrap();
+    ufmt::uwriteln!(&mut serial, "Temperature Sensor: {}\r", temp).unwrap();
+
+    let portf = dp.PORTF.split();
+    let mut a0 = portf.pf7.into_analog_input(&mut adc);
+    let mut a1 = portf.pf6.into_analog_input(&mut adc);
+    let mut a2 = portf.pf5.into_analog_input(&mut adc);
+    let mut a3 = portf.pf4.into_analog_input(&mut adc);
+    let mut a4 = portf.pf1.into_analog_input(&mut adc);
+    let mut a5 = portf.pf0.into_analog_input(&mut adc);
+
+    loop {
+        let values: [u16; 6] = [
+            nb::block!(adc.read(&mut a0)).unwrap(),
+            nb::block!(adc.read(&mut a1)).unwrap(),
+            nb::block!(adc.read(&mut a2)).unwrap(),
+            nb::block!(adc.read(&mut a3)).unwrap(),
+            nb::block!(adc.read(&mut a4)).unwrap(),
+            nb::block!(adc.read(&mut a5)).unwrap(),
+        ];
+
+        for (i, v) in values.iter().enumerate() {
+            ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).unwrap();
+        }
+        ufmt::uwriteln!(&mut serial, "\r").unwrap();
+
+        delay.delay_ms(1000);
+    }
+}
