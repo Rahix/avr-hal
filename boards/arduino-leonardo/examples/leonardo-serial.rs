@@ -4,8 +4,8 @@
 extern crate panic_halt;
 use arduino_leonardo::prelude::*;
 
-#[no_mangle]
-pub extern fn main() -> ! {
+#[arduino_leonardo::entry]
+fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
 
     let mut pins = arduino_leonardo::Pins::new(

@@ -15,8 +15,8 @@ use arduino_leonardo::prelude::*;
 use arduino_leonardo::spi;
 use nb::block;
 
-#[no_mangle]
-pub extern "C" fn main() -> ! {
+#[arduino_leonardo::entry]
+fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
     let mut delay = arduino_leonardo::Delay::new();
     let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
