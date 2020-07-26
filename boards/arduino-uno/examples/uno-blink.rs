@@ -4,8 +4,8 @@
 extern crate panic_halt;
 use arduino_uno::prelude::*;
 
-#[no_mangle]
-pub extern fn main() -> ! {
+#[arduino_uno::entry]
+fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
 
     let mut delay = arduino_uno::Delay::new();

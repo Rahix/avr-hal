@@ -14,12 +14,14 @@
 
 #![no_std]
 #![no_main]
+
 extern crate panic_halt;
 use arduino_uno::prelude::*;
 use arduino_uno::spi::{Settings, Spi};
 use nb::block;
-#[no_mangle]
-pub extern "C" fn main() -> ! {
+
+#[arduino_uno::entry]
+fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
     let mut delay = arduino_uno::Delay::new();
     let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);

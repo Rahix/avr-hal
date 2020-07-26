@@ -24,8 +24,8 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 
-#[no_mangle]
-pub extern fn main() -> ! {
+#[arduino_uno::entry]
+fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
 
     let mut pins = arduino_uno::Pins::new(
