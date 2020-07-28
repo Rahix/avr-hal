@@ -41,11 +41,11 @@ fn main() -> ! {
 
     loop {
         // Send a byte
-        block!(spi.send(0b00001111)).unwrap();
+        block!(spi.send(0b00001111)).void_unwrap();
         // Because MISO is connected to MOSI, the read data should be the same
-        let data = block!(spi.read()).unwrap();
+        let data = block!(spi.read()).void_unwrap();
 
-        ufmt::uwriteln!(&mut serial, "data: {}\r", data).unwrap();
+        ufmt::uwriteln!(&mut serial, "data: {}\r", data).void_unwrap();
         delay.delay_ms(1000);
     }
 }

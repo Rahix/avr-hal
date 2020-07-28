@@ -9,16 +9,16 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
         core::mem::MaybeUninit::uninit().assume_init()
     };
 
-    ufmt::uwriteln!(&mut serial, "Firmware panic!\r").unwrap();
+    ufmt::uwriteln!(&mut serial, "Firmware panic!\r").void_unwrap();
 
     if let Some(loc) = info.location() {
-        let _ = ufmt::uwriteln!(
+        ufmt::uwriteln!(
             &mut serial,
             "  At {}:{}:{}\r",
             loc.file(),
             loc.line(),
             loc.column(),
-        );
+        ).void_unwrap();
     }
 
     loop {}
@@ -37,7 +37,7 @@ fn main() -> ! {
         57600,
     );
 
-    ufmt::uwriteln!(&mut serial, "Hello from BIGAVR6!\r").unwrap();
+    ufmt::uwriteln!(&mut serial, "Hello from BIGAVR6!\r").void_unwrap();
     // Panic messages cannot yet be captured because they rely on core::fmt
     // which is way too big for AVR
     panic!();

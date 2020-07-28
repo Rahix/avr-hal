@@ -34,13 +34,13 @@ fn main() -> ! {
     let mut a0 = pins.a0.into_analog_input(&mut adc);
 
 
-    ufmt::uwriteln!(&mut serial, "Reading Analog Input on PORT a0\r").unwrap();
+    ufmt::uwriteln!(&mut serial, "Reading Analog Input on PORT a0\r").void_unwrap();
 
     loop {
         // Read the Analog value
-        let aread: u16 = nb::block!{adc.read(&mut a0)}.unwrap();
+        let aread: u16 = nb::block!{adc.read(&mut a0)}.void_unwrap();
 
         // Write it to Serial
-        ufmt::uwriteln!(&mut serial, "read: {}\r", aread).unwrap();
+        ufmt::uwriteln!(&mut serial, "read: {}\r", aread).void_unwrap();
     }
 }

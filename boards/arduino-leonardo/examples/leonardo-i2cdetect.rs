@@ -9,12 +9,7 @@ fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
 
     let mut delay = arduino_leonardo::Delay::new();
-    let mut pins = arduino_leonardo::Pins::new(
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-        dp.PORTE,
-    );
+    let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
     let mut serial = arduino_leonardo::Serial::new(
         dp.USART1,
         pins.d0,
@@ -28,10 +23,12 @@ fn main() -> ! {
         50000,
     );
 
-    ufmt::uwriteln!(&mut serial, "Write direction test:\r").unwrap();
-    i2c.i2cdetect(&mut serial, arduino_leonardo::hal::i2c::Direction::Write).unwrap();
-    ufmt::uwriteln!(&mut serial, "\r\nRead direction test:\r").unwrap();
-    i2c.i2cdetect(&mut serial, arduino_leonardo::hal::i2c::Direction::Read).unwrap();
+    ufmt::uwriteln!(&mut serial, "Write direction test:\r").void_unwrap();
+    i2c.i2cdetect(&mut serial, arduino_leonardo::hal::i2c::Direction::Write)
+        .void_unwrap();
+    ufmt::uwriteln!(&mut serial, "\r\nRead direction test:\r").void_unwrap();
+    i2c.i2cdetect(&mut serial, arduino_leonardo::hal::i2c::Direction::Read)
+        .void_unwrap();
 
     loop {
         delay.delay_ms(1000);
