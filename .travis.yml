@@ -5,5 +5,23 @@ rust:
 cache:
   - cargo
 
+addons:
+  apt:
+    packages:
+      - avr-libc
+      - binutils-avr
+      - gcc-avr
+
+env:
+  matrix:
+    - BOARD=arduino-leonardo
+    - BOARD=arduino-uno
+    - BOARD=bigavr6
+    - BOARD=trinket
+
+install:
+  - rustup component add rust-src
+
 script:
-  - cargo build --verbose --all
+  - echo "Building board \"$BOARD\" ..."
+  - cd "boards/$BOARD" && cargo build --verbose --examples
