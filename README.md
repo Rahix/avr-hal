@@ -100,12 +100,14 @@ The chip-HAL crates currently support the following peripherals:
   - [x] `USART0` for serial communication
   - [x] I2C using `TWI`
   - [x] SPI
+  - [x] ADC
 * [`atmega32u4-hal`](./chips/atmega32u4-hal)
   - [x] Spinning Delay
   - [x] `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF` as digital IO (v2)
   - [x] `USART1` for serial communication
   - [x] I2C using `TWI`
   - [x] SPI
+  - [x] ADC (no differential channels yet)
 * [`attiny85-hal`](./chips/attiny85-hal)
   - [x] Spinning Delay
   - [x] `PORTB` as digital IO (v2)
@@ -115,13 +117,11 @@ In `boards/` there are crates for the following hardware.  Please note that this
 
 * [Arduino Leonardo](./boards/arduino-leonardo)
   - [Website](https://www.arduino.cc/en/Main/Arduino_BoardLeonardo)
-  - Support for basic digital IO and SPI
 * [Arduino Uno](./boards/arduino-uno)
   - [Website](https://store.arduino.cc/usa/arduino-uno-rev3)
-  - Support for basic digital IO and SPI
 * [Adafruit Trinket (3V3 or 5V)](./boards/trinket) (**not** PRO!)
   - [Website](https://learn.adafruit.com/introducing-trinket)
-  - Support for basic digital IO
+* [BigAVR 6](./boards/bigavr6)
 
 ## Disclaimer
 This project is not affiliated with either Microchip (former Atmel) nor any of the Vendors that created the boards supported in this repository.
