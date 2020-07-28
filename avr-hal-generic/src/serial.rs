@@ -1,9 +1,5 @@
 //! Serial Implementations
 
-/// Serial Error
-#[derive(Debug, Clone, Copy)]
-pub enum Error { }
-
 /// Implement serial traits for a USART peripheral
 #[macro_export]
 macro_rules! impl_usart {
@@ -122,7 +118,7 @@ macro_rules! impl_usart {
             CLOCK: $crate::clock::Clock,
             RX_MODE: $crate::port::mode::InputMode,
         {
-            type Error = $crate::serial::Error;
+            type Error = $crate::void::Void;
 
             fn write(&mut self, byte: u8) -> $crate::nb::Result<(), Self::Error> {
                 // Call flush to make sure the data-register is empty
@@ -146,7 +142,7 @@ macro_rules! impl_usart {
             CLOCK: $crate::clock::Clock,
             RX_MODE: $crate::port::mode::InputMode,
         {
-            type Error = $crate::serial::Error;
+            type Error = $crate::void::Void;
 
             fn write_str(&mut self, s: &str) -> ::core::result::Result<(), Self::Error> {
                 use $crate::prelude::*;
@@ -163,7 +159,7 @@ macro_rules! impl_usart {
             CLOCK: $crate::clock::Clock,
             RX_MODE: $crate::port::mode::InputMode,
         {
-            type Error = $crate::serial::Error;
+            type Error = $crate::void::Void;
 
             fn read(&mut self) -> $crate::nb::Result<u8, Self::Error> {
                 if self.p.$control_a.read().$rxc().bit_is_clear() {
@@ -231,7 +227,7 @@ macro_rules! impl_usart {
             where
                 CLOCK: $crate::clock::Clock,
             {
-                type Error = $crate::serial::Error;
+                type Error = $crate::void::Void;
 
                 fn write(&mut self, byte: u8) -> $crate::nb::Result<(), Self::Error> {
                     // Call flush to make sure the data-register is empty
@@ -254,7 +250,7 @@ macro_rules! impl_usart {
             where
                 CLOCK: $crate::clock::Clock,
             {
-                type Error = $crate::serial::Error;
+                type Error = $crate::void::Void;
 
                 fn write_str(&mut self, s: &str) -> ::core::result::Result<(), Self::Error> {
                     use $crate::prelude::*;
@@ -271,7 +267,7 @@ macro_rules! impl_usart {
                 CLOCK: $crate::clock::Clock,
                 RX_MODE: $crate::port::mode::InputMode,
             {
-                type Error = $crate::serial::Error;
+                type Error = $crate::void::Void;
 
                 fn read(&mut self) -> $crate::nb::Result<u8, Self::Error> {
                     if self.p.$control_a.read().$rxc().bit_is_clear() {
