@@ -94,6 +94,11 @@ The following peripherals are supported in `avr-hal-generic`:
 
 ### HAL Status
 The chip-HAL crates currently support the following peripherals:
+* [`atmega2560-hal`](./chips/atmega2560-hal)
+  - [x] Spinning Delay
+  - [x] `PORTA`, `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF`, `PORTG`, `PORTH`, `PORTJ`, `PORTK`, `PORTL` as digital IO
+  - [x] `USART0`, `USART1`, `USART2`, `USART3` for serial communication
+  - [x] I2C using `TWI`
 * [`atmega328p-hal`](./chips/atmega328p-hal)
   - [x] Spinning Delay
   - [x] `PORTB`, `PORTC`, `PORTD` as digital IO (v2)
