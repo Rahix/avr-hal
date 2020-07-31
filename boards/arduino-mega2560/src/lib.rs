@@ -5,9 +5,12 @@ pub extern crate atmega2560_hal as hal;
 #[cfg(feature = "rt")]
 pub use hal::entry;
 
+mod pins;
+
 pub use atmega2560_hal::atmega2560;
 pub use crate::atmega2560::Peripherals;
 pub use atmega2560_hal::prelude;
+pub use crate::pins::*;
 
 pub type Delay = hal::delay::Delay<hal::clock::MHz16>;
 pub type Serial<IMODE> = atmega2560_hal::usart::Usart0<hal::clock::MHz16, IMODE>;
