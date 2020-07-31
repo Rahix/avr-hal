@@ -9,8 +9,21 @@ fn main() -> ! {
     let dp = arduino_mega2560::Peripherals::take().unwrap();
 
     let mut delay = arduino_mega2560::Delay::new();
-    let mut portb = dp.PORTB.split();
-    let mut led = portb.pb7.into_output(&mut portb.ddr);
+    let mut pins = arduino_mega2560::Pins::new(
+        dp.PORTA,
+        dp.PORTB,
+        dp.PORTC,
+        dp.PORTD,
+        dp.PORTE,
+        dp.PORTF,
+        dp.PORTG,
+        dp.PORTH,
+        dp.PORTJ,
+        dp.PORTK,
+        dp.PORTL,
+    );
+
+    let mut led = pins.d13.into_output(&mut pins.ddr);
 
     loop {
         led.toggle().void_unwrap();
