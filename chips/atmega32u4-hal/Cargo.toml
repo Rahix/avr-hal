@@ -11,5 +11,5 @@ rt = ["avr-device/rt"]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-version = "0.1.0"
+version = "0.1.1"
 features = ["atmega32u4"]
