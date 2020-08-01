@@ -11,6 +11,8 @@ pub extern crate void;
 pub extern crate ufmt;
 #[doc(hidden)]
 pub extern crate paste;
+#[doc(hidden)]
+pub extern crate avr_device;
 
 pub mod clock;
 pub mod delay;
@@ -19,6 +21,7 @@ pub mod serial;
 pub mod i2c;
 pub mod spi;
 pub mod adc;
+pub mod pwm;
 
 /// Prelude containing all HAL traits
 pub mod prelude {

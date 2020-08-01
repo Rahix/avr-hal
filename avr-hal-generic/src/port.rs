@@ -14,6 +14,10 @@ pub mod mode {
     /// Pin configured as a digital output
     pub struct Output;
     pub struct Analog;
+    /// Pin configured as PWM output
+    pub struct Pwm<TIMER> {
+        _m: core::marker::PhantomData<TIMER>,
+    }
 
     impl private::Unimplementable for Output {}
     impl<M: InputMode> private::Unimplementable for Input<M> {}
