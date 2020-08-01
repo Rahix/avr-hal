@@ -10,6 +10,7 @@ pub use avr_device::entry;
 pub use avr_hal::clock;
 pub use avr_hal::delay;
 
+pub mod adc;
 pub mod port;
 pub mod usart;
 
