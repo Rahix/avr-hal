@@ -99,6 +99,7 @@ The chip-HAL crates currently support the following peripherals:
   - [x] `PORTA`, `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF`, `PORTG`, `PORTH`, `PORTJ`, `PORTK`, `PORTL` as digital IO
   - [x] `USART0`, `USART1`, `USART2`, `USART3` for serial communication
   - [x] I2C using `TWI`
+  - [x] SPI
   - [x] ADC (no differential channels yet)
 * [`atmega328p-hal`](./chips/atmega328p-hal)
   - [x] Spinning Delay

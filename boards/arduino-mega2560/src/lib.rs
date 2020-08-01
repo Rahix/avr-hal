@@ -10,6 +10,7 @@ mod pins;
 pub use atmega2560_hal::atmega2560;
 pub use crate::atmega2560::Peripherals;
 pub use atmega2560_hal::prelude;
+pub use atmega2560_hal::spi;
 pub use atmega2560_hal::adc;
 pub use crate::pins::*;
 

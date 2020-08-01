@@ -12,6 +12,7 @@ pub use avr_hal::delay;
 
 pub mod adc;
 pub mod port;
+pub mod spi;
 pub mod usart;
 
 pub mod prelude {
