@@ -20,6 +20,7 @@ members = [
     "chips/atmega328p-hal",
     "chips/atmega32u4-hal",
     "chips/attiny85-hal",
+    "chips/attiny88-hal",
 
     # The board crates
     "boards/arduino-leonardo",

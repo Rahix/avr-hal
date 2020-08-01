@@ -111,6 +111,9 @@ The chip-HAL crates currently support the following peripherals:
 * [`attiny85-hal`](./chips/attiny85-hal)
   - [x] Spinning Delay
   - [x] `PORTB` as digital IO (v2)
+* [`attiny88-hal`](./chips/attiny88-hal)
+  - [x] Spinning Delay
+  - [x] `PORTA`, `PORTB`, `PORTC`, `PORTD` as digital IO
 
 ### Supported Hardware
 In `boards/` there are crates for the following hardware.  Please note that this project is in no way affiliated with any of the vendors.
