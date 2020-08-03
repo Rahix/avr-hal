@@ -16,9 +16,7 @@ fn main() -> ! {
         57600,
     );
 
-    // The following would also work, but needs +600% more bytes
-    // writeln!(serial, "Hello from Arduino!\r").unwrap();
-    serial.write_str("Hello from Arduino!\r\n").void_unwrap();
+    ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").void_unwrap();
 
     loop {
         // Read a byte from the serial connection
