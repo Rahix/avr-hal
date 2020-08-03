@@ -11,6 +11,8 @@ avr_hal::impl_adc! {
         peripheral: crate::atmega2560::ADC,
         set_mux: |peripheral, id| {
             peripheral.admux.modify(|_, w| w.mux().variant(id));
+            // n.b. the high bit of ADMUX[MUX] is in the ADCSRB register
+            peripheral.adcsrb.modify(|_, w| w.mux5().bit((id as u8) & 0b100000 != 0));
         },
         pins: {
             pf0: (PF0, MUX_A::ADC0, didr0::adc0d),
