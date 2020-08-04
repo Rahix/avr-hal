@@ -17,6 +17,7 @@ members = [
 
     # The chip definitions
     "chips/atmega1280-hal",
+    "chips/atmega2560-hal",
     "chips/atmega328p-hal",
     "chips/atmega32u4-hal",
     "chips/attiny85-hal",
@@ -24,6 +25,7 @@ members = [
     # The board crates
     "boards/arduino-leonardo",
     "boards/arduino-uno",
+    "boards/arduino-mega2560",
     "boards/bigavr6",
     "boards/trinket",
 ]

@@ -1,0 +1,5 @@
+[build]
+target = "avr-atmega2560.json"
+
+[unstable]
+build-std = ["core"]

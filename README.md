@@ -94,6 +94,13 @@ The following peripherals are supported in `avr-hal-generic`:
 
 ### HAL Status
 The chip-HAL crates currently support the following peripherals:
+* [`atmega2560-hal`](./chips/atmega2560-hal)
+  - [x] Spinning Delay
+  - [x] `PORTA`, `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF`, `PORTG`, `PORTH`, `PORTJ`, `PORTK`, `PORTL` as digital IO
+  - [x] `USART0`, `USART1`, `USART2`, `USART3` for serial communication
+  - [x] I2C using `TWI`
+  - [x] SPI
+  - [x] ADC (no differential channels yet)
 * [`atmega328p-hal`](./chips/atmega328p-hal)
   - [x] Spinning Delay
   - [x] `PORTB`, `PORTC`, `PORTD` as digital IO (v2)
@@ -119,6 +126,8 @@ In `boards/` there are crates for the following hardware.  Please note that this
   - [Website](https://www.arduino.cc/en/Main/Arduino_BoardLeonardo)
 * [Arduino Uno](./boards/arduino-uno)
   - [Website](https://store.arduino.cc/usa/arduino-uno-rev3)
+* [Arduino Mega 2560](./boards/arduino-mega2560)
+  - [Website](http://arduino.cc/en/Main/ArduinoBoardMega2560)
 * [Adafruit Trinket (3V3 or 5V)](./boards/trinket) (**not** PRO!)
   - [Website](https://learn.adafruit.com/introducing-trinket)
 * [BigAVR 6](./boards/bigavr6)
