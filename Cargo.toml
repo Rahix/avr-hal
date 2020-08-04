@@ -17,6 +17,7 @@ members = [
 
     # The chip definitions
     "chips/atmega1280-hal",
+    "chips/atmega168-hal",
     "chips/atmega2560-hal",
     "chips/atmega328p-hal",
     "chips/atmega32u4-hal",
