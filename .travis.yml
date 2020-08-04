@@ -15,6 +15,7 @@ addons:
 env:
   matrix:
     - BOARD=arduino-leonardo
+    - BOARD=arduino-mega2560
     - BOARD=arduino-uno
     - BOARD=bigavr6
     - BOARD=trinket
