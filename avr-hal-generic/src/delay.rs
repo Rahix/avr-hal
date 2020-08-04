@@ -229,3 +229,12 @@ where
         delay::DelayUs::<u32>::delay_us(self, ms as u32 * 1000);
     }
 }
+
+impl <SPEED> delay::DelayMs<u8> for Delay<SPEED>
+where
+    Delay<SPEED>: delay::DelayMs<u16>,
+{
+    fn delay_ms(&mut self, ms: u8) {
+        delay::DelayMs::<u16>::delay_ms(self, ms as u16);
+    }
+}
