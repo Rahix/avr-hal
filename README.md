@@ -117,6 +117,14 @@ This repository contains the following components:
 ### Supported MCUs
 The following HAL crates currently exist.  Take a look at the docs for more details on what's supported.
 
+* [`atmega168-hal`](./chips/atmega168-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/atmega168_hal)
+  - [x] ADC
+  - [x] Digital IO
+  - [x] I2C using `TWI`
+  - [x] PWM
+  - [x] SPI
+  - [x] Spinning Delay
+  - [x] USART Serial
 * [`atmega2560-hal`](./chips/atmega2560-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/atmega2560_hal)
   - [x] ADC (no differential channels yet)
   - [x] Digital IO
