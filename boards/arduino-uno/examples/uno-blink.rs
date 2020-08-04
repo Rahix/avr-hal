@@ -22,12 +22,12 @@ fn main() -> ! {
 
     loop {
         led.toggle().void_unwrap();
-        delay.delay_ms(200);
+        delay.delay_ms(200 as u16);
         led.toggle().void_unwrap();
-        delay.delay_ms(200);
+        delay.delay_ms(200 as u16);
         led.toggle().void_unwrap();
-        delay.delay_ms(200);
+        delay.delay_ms(200 as u16);
         led.toggle().void_unwrap();
-        delay.delay_ms(800);
+        delay.delay_ms(800 as u16);
     }
 }

@@ -14,6 +14,6 @@ fn main() -> ! {
 
     loop {
         led.toggle().void_unwrap();
-        delay.delay_ms(500);
+        delay.delay_ms(500u16);
     }
 }

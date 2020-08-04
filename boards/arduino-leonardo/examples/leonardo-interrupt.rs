@@ -54,7 +54,7 @@ fn main() -> ! {
     loop {
         led0.toggle().void_unwrap();
         led1.toggle().void_unwrap();
-        delay.delay_ms(300);
+        delay.delay_ms(300u16);
     }
 }
 
