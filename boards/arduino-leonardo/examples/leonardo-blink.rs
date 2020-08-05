@@ -34,7 +34,7 @@ fn main() -> ! {
         for i in 0..3 {
             leds[i].toggle().void_unwrap();
             leds[(i+2)%3].toggle().void_unwrap();
-            delay.delay_ms(200);
+            delay.delay_ms(200u16);
         }
     }
 }

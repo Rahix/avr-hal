@@ -51,6 +51,6 @@ fn main() -> ! {
         let data = block!(spi.read()).void_unwrap();
 
         ufmt::uwriteln!(&mut serial, "data: {}\r", data).void_unwrap();
-        delay.delay_ms(1000);
+        delay.delay_ms(1000 as u16);
     }
 }

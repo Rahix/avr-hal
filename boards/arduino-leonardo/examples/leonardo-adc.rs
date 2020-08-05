@@ -55,6 +55,6 @@ fn main() -> ! {
         }
         ufmt::uwriteln!(&mut serial, "\r").void_unwrap();
 
-        delay.delay_ms(1000);
+        delay.delay_ms(1000u16);
     }
 }

@@ -33,6 +33,6 @@ fn main() -> ! {
     i2c.i2cdetect(&mut serial, arduino_uno::hal::i2c::Direction::Read).void_unwrap();
 
     loop {
-        delay.delay_ms(1000);
+        delay.delay_ms(1000 as u16);
     }
 }

@@ -31,6 +31,6 @@ fn main() -> ! {
         .void_unwrap();
 
     loop {
-        delay.delay_ms(1000);
+        delay.delay_ms(1000u16);
     }
 }
