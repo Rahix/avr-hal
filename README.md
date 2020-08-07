@@ -22,8 +22,12 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    cargo new --bin avr-example
    cd avr-example
    ```
-2. Copy the target description for your MCU (e.g. `boards/arduino-leonardo/avr-atmega32u4.json`) into your project.
-3. Create a file `.cargo/config.toml` with the following content:
+2. If you're using rustup, you probably want to set an override for this directory, to use the nightly toolchain:
+   ```bash
+   rustup override set nightly
+   ```
+3. Copy the target description for your MCU (e.g. `boards/arduino-leonardo/avr-atmega32u4.json`) into your project.
+4. Create a file `.cargo/config.toml` with the following content:
    ```toml
    [build]
    target = "avr-atmega32u4.json"
@@ -31,7 +35,7 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    [unstable]
    build-std = ["core"]
    ```
-4. Fill `Cargo.toml` with these additional directives:
+5. Fill `Cargo.toml` with these additional directives:
    ```toml
    [dependencies]
    # A panic handler is needed.  This is a crate with the most basic one.
@@ -54,7 +58,7 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    lto = true
    opt-level = "s"
    ```
-5. Start your project with this basic template:
+6. Start your project with this basic template:
    ```rust
    #![no_std]
    #![no_main]
@@ -71,13 +75,13 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
        unimplemented!()
    }
    ```
-6. Build with
+6. Build with these commands (make sure you're using _nightly_ rust!):
    ```bash
-   cargo +nightly build
+   cargo build
    # or
-   cargo +nightly build --release
+   cargo build --release
    ```
-   and find your binary in `.`
+   and find your binary in `target/avr-atmega32u4/debug/` (or `target/avr-atmega32u4/release`).
 
 ## Structure
 This repository contains the following components:
