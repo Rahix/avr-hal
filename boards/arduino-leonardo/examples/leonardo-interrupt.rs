@@ -49,7 +49,9 @@ fn main() -> ! {
     ei.eimsk.write(|w| w.int().bits(0x40));
 
     // Enable interrupts
-    avr_device::interrupt::enable();
+    unsafe {
+        avr_device::interrupt::enable();
+    }
 
     loop {
         led0.toggle().void_unwrap();

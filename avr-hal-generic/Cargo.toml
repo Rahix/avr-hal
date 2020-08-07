@@ -9,7 +9,7 @@ cfg-if = "0.1.7"
 nb = "0.1.2"
 ufmt = "0.1.0"
 paste = "0.1.18"
-avr-device = "0.1.1"
+avr-device = "0.2.0"
 
 [dependencies.embedded-hal]
 version = "0.2.3"
