@@ -73,6 +73,38 @@ macro_rules! impl_usart {
                 );
             }
 
+            /// Enable/disable "RX Complete" interrupt
+            ///
+            /// When this interrupt triggers, new data is available to be read from the
+            /// data-register.  The corresponding ISR is `USARTi_RX` (where `i` is this
+            /// peripheral's number).  For example, for `USART1` on `ATmega32U4`:
+            ///
+            /// ```
+            /// #[avr_device::interrupt(atmega32u4)]
+            /// fn USART1_RX() {
+            ///     // ...
+            /// }
+            /// ```
+            pub fn interrupt_rxc(&mut self, state: bool) {
+                self.p.[<ucsr $n b>].modify(|_, w| w.[<rxcie $n>]().bit(state));
+            }
+
+            /// Enable/disable "USART Data-Register Empty" interrupt
+            ///
+            /// This interrupt signals that new data can be written to the data-register.  The
+            /// corresponding ISR is `USARTi_UDRE` (where `i` is this peripheral's number).  For
+            /// example, for `USART1` on `ATmega32U4`:
+            ///
+            /// ```
+            /// #[avr_device::interrupt(atmega32u4)]
+            /// fn USART1_UDRE() {
+            ///     // ...
+            /// }
+            /// ```
+            pub fn interrupt_udre(&mut self, state: bool) {
+                self.p.[<ucsr $n b>].modify(|_, w| w.[<txcie $n>]().bit(state));
+            }
+
             /// Helper method for splitting this read/write object into two halves.
             ///
             /// The two halves returned implement the `Read` and `Write` traits, respectively.
