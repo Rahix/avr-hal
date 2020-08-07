@@ -87,7 +87,7 @@ macro_rules! impl_usart {
             }
         }
 
-        $crate::paste::item! {
+        $crate::paste::paste! {
             impl<CLOCK, RX_MODE> $Usart<CLOCK, RX_MODE>
             where
                 CLOCK: $crate::clock::Clock,
@@ -170,7 +170,7 @@ macro_rules! impl_usart {
             }
         }
 
-        $crate::paste::item! {
+        $crate::paste::paste! {
             /// The readable half of the
             $(#[$usart_attr])*
             pub struct [<Read $Usart>]<CLOCK, RX_MODE>

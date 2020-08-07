@@ -8,7 +8,7 @@ edition = "2018"
 cfg-if = "0.1.7"
 nb = "0.1.2"
 ufmt = "0.1.0"
-paste = "0.1.18"
+paste = "1.0.0"
 avr-device = "0.2.1"
 
 [dependencies.embedded-hal]
