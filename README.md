@@ -2,6 +2,12 @@ avr-hal [![Build Status](https://travis-ci.com/Rahix/avr-hal.svg?branch=master)]
 =======
 `embedded-hal` implementations for AVR microcontrollers.  Based on the register definitions from [`avr-device`](https://github.com/Rahix/avr-device).
 
+- [Quickstart](#quickstart)
+- [Starting your own project](#starting-your-own-project)
+- [Repository Structure](#repository-structure)
+  - [Supported MCUs](#supported-mcus)
+  - [Supported Boards](#supported-boards)
+
 ## Quickstart
 You need nightly rust for compiling rust code for AVR.  Go into `./boards/arduino-leonardo` (or the directory for whatever board you want), and run the following commands:
 ```bash
@@ -83,53 +89,49 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    ```
    and find your binary in `target/avr-atmega32u4/debug/` (or `target/avr-atmega32u4/release`).
 
-## Structure
+## Repository Structure
 This repository contains the following components:
 * A generic crate containing implementations that can be used chip-independently and macros to create chip-dependent instances of peripheral abstractions.  This crate is named [`avr-hal-generic`](./avr-hal-generic).
-* HAL crates for each chip in `chips/`.  These make use of `avr-hal-generic` to create chip-specific definitions.
+* HAL crates for each MCU in `chips/`.  These make use of `avr-hal-generic` to create chip-specific definitions.
 * Board Support Crates for popular hardware in `boards/`.  They, for the most part, just re-export functionality from the chip-HAL, with the names that are printed on the PCB.
 
-## Status
-The following peripherals are supported in `avr-hal-generic`:
-- [x] A spinning delay implementation
-- [x] `PORTx` peripherals as digital IO (v2)
-- [x] A TWI based I2C implementation
-- [X] SPI primary-mode implementation
+### Supported MCUs
+The following HAL crates currently exist.  Take a look at the docs for more details on what's supported.
 
-### HAL Status
-The chip-HAL crates currently support the following peripherals:
 * [`atmega2560-hal`](./chips/atmega2560-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/atmega2560_hal)
-  - [x] Spinning Delay
-  - [x] `PORTA`, `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF`, `PORTG`, `PORTH`, `PORTJ`, `PORTK`, `PORTL` as digital IO
-  - [x] `USART0`, `USART1`, `USART2`, `USART3` for serial communication
+  - [x] ADC (no differential channels yet)
+  - [x] Digital IO
   - [x] I2C using `TWI`
   - [x] SPI
-  - [x] ADC (no differential channels yet)
+  - [x] Spinning Delay
+  - [x] USART Serial
 * [`atmega328p-hal`](./chips/atmega328p-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/atmega328p_hal)
-  - [x] Spinning Delay
-  - [x] `PORTB`, `PORTC`, `PORTD` as digital IO (v2)
-  - [x] `USART0` for serial communication
-  - [x] I2C using `TWI`
-  - [x] SPI
   - [x] ADC
+  - [x] Digital IO
+  - [x] I2C using `TWI`
+  - [x] SPI
+  - [x] Spinning Delay
+  - [x] USART Serial
 * [`atmega32u4-hal`](./chips/atmega32u4-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/atmega32u4_hal)
-  - [x] Spinning Delay
-  - [x] `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF` as digital IO (v2)
-  - [x] `USART1` for serial communication
-  - [x] I2C using `TWI`
-  - [x] SPI
   - [x] ADC (no differential channels yet)
-* [`attiny85-hal`](./chips/attiny85-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/attiny85_hal)
-  - [x] Spinning Delay
-  - [x] `PORTB` as digital IO (v2)
-* [`attiny88-hal`](./chips/attiny88-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/attiny88_hal)
-  - [x] Spinning Delay
-  - [x] `PORTA`, `PORTB`, `PORTC`, `PORTD` as digital IO
+  - [x] Digital IO
   - [x] I2C using `TWI`
   - [x] SPI
+  - [x] Spinning Delay
+  - [x] USART Serial
+* [`attiny85-hal`](./chips/attiny85-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/attiny85_hal)
+  - [x] Digital IO
+  - [x] Spinning Delay
+* [`attiny88-hal`](./chips/attiny88-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/attiny88_hal)
+  - [x] Digital IO
+  - [x] I2C using `TWI`
+  - [x] SPI
+  - [x] Spinning Delay
 
-### Supported Hardware
+### Supported Boards
 In `boards/` there are crates for the following hardware.  Please note that this project is in no way affiliated with any of the vendors.
+
+Each board crate comes with a few examples showing how to use them.  For more details, follow the links to the documentation.
 
 * [Arduino Leonardo](./boards/arduino-leonardo) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_leonardo)
   - [Website](https://www.arduino.cc/en/Main/Arduino_BoardLeonardo)
