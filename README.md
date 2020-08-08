@@ -98,31 +98,31 @@ The following peripherals are supported in `avr-hal-generic`:
 
 ### HAL Status
 The chip-HAL crates currently support the following peripherals:
-* [`atmega2560-hal`](./chips/atmega2560-hal)
+* [`atmega2560-hal`](./chips/atmega2560-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/atmega2560_hal)
   - [x] Spinning Delay
   - [x] `PORTA`, `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF`, `PORTG`, `PORTH`, `PORTJ`, `PORTK`, `PORTL` as digital IO
   - [x] `USART0`, `USART1`, `USART2`, `USART3` for serial communication
   - [x] I2C using `TWI`
   - [x] SPI
   - [x] ADC (no differential channels yet)
-* [`atmega328p-hal`](./chips/atmega328p-hal)
+* [`atmega328p-hal`](./chips/atmega328p-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/atmega328p_hal)
   - [x] Spinning Delay
   - [x] `PORTB`, `PORTC`, `PORTD` as digital IO (v2)
   - [x] `USART0` for serial communication
   - [x] I2C using `TWI`
   - [x] SPI
   - [x] ADC
-* [`atmega32u4-hal`](./chips/atmega32u4-hal)
+* [`atmega32u4-hal`](./chips/atmega32u4-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/atmega32u4_hal)
   - [x] Spinning Delay
   - [x] `PORTB`, `PORTC`, `PORTD`, `PORTE`, `PORTF` as digital IO (v2)
   - [x] `USART1` for serial communication
   - [x] I2C using `TWI`
   - [x] SPI
   - [x] ADC (no differential channels yet)
-* [`attiny85-hal`](./chips/attiny85-hal)
+* [`attiny85-hal`](./chips/attiny85-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/attiny85_hal)
   - [x] Spinning Delay
   - [x] `PORTB` as digital IO (v2)
-* [`attiny88-hal`](./chips/attiny88-hal)
+* [`attiny88-hal`](./chips/attiny88-hal) - [Crate Documentation](https://rahix.github.io/avr-hal/attiny88_hal)
   - [x] Spinning Delay
   - [x] `PORTA`, `PORTB`, `PORTC`, `PORTD` as digital IO
   - [x] I2C using `TWI`
@@ -131,15 +131,15 @@ The chip-HAL crates currently support the following peripherals:
 ### Supported Hardware
 In `boards/` there are crates for the following hardware.  Please note that this project is in no way affiliated with any of the vendors.
 
-* [Arduino Leonardo](./boards/arduino-leonardo)
+* [Arduino Leonardo](./boards/arduino-leonardo) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_leonardo)
   - [Website](https://www.arduino.cc/en/Main/Arduino_BoardLeonardo)
-* [Arduino Uno](./boards/arduino-uno)
+* [Arduino Uno](./boards/arduino-uno) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_uno)
   - [Website](https://store.arduino.cc/usa/arduino-uno-rev3)
-* [Arduino Mega 2560](./boards/arduino-mega2560)
+* [Arduino Mega 2560](./boards/arduino-mega2560) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_mega2560)
   - [Website](http://arduino.cc/en/Main/ArduinoBoardMega2560)
-* [Adafruit Trinket (3V3 or 5V)](./boards/trinket) (**not** PRO!)
+* [Adafruit Trinket (3V3 or 5V)](./boards/trinket) (**not** PRO!) - [Crate Documentation](https://rahix.github.io/avr-hal/trinket)
   - [Website](https://learn.adafruit.com/introducing-trinket)
-* [BigAVR 6](./boards/bigavr6)
+* [BigAVR 6](./boards/bigavr6) - [Crate Documentation](https://rahix.github.io/avr-hal/bigavr6)
 
 ## Disclaimer
 This project is not affiliated with either Microchip (former Atmel) nor any of the Vendors that created the boards supported in this repository.
