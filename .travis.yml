@@ -26,3 +26,18 @@ install:
 script:
   - echo "Building board \"$BOARD\" ..."
   - cd "boards/$BOARD" && cargo build --verbose --examples
+
+jobs:
+  include:
+    - if: branch = master
+      stage: deploy
+      script: cargo doc --all
+      env: BOARD=
+
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        local_dir: target/doc
+        github_token: $GITHUB_TOKEN
+        on:
+          branch: master
