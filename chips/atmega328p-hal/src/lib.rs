@@ -13,6 +13,7 @@ pub use avr_hal::delay;
 pub mod port;
 
 pub mod adc;
+pub mod pwm;
 
 pub mod prelude {
     pub use crate::avr_hal::prelude::*;

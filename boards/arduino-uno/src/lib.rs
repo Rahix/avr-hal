@@ -12,6 +12,7 @@ pub use crate::atmega328p::Peripherals;
 pub use atmega328p_hal::prelude;
 pub use atmega328p_hal::spi;
 pub use atmega328p_hal::adc;
+pub use atmega328p_hal::pwm;
 pub use crate::pins::*;
 
 pub type Delay = hal::delay::Delay<hal::clock::MHz16>;
