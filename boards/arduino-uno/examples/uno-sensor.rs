@@ -51,7 +51,7 @@ fn main() -> ! {
         while echo.is_low().void_unwrap() {
             // exiting the loop if the timer has reached 200 ms.
             // 0.2s/4µs = 50000
-            if timer1.tcnt1.read().bits()>=50000{
+            if timer1.tcnt1.read().bits() >= 50000 {
                 // jump to the beginning of the outer loop if no obstacle is detected
                 ufmt::uwriteln!(&mut serial, "Nothing was detected and jump to outer loop.\r").void_unwrap();
                 continue 'outer;
@@ -74,4 +74,3 @@ fn main() -> ! {
         ufmt::uwriteln!(&mut serial, "Hello, we are {} cms away from target!\r", value).void_unwrap();
     }
 }
-
