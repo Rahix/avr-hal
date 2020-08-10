@@ -13,12 +13,8 @@ fn main() -> ! {
 
     let mut delay = arduino_uno::Delay::new();
 
-    let mut pins = arduino_uno::Pins::new(
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-    );
-
+    let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
+    
     let mut serial = arduino_uno::Serial::new(
         dp.USART0,
         pins.d0,
@@ -74,4 +70,3 @@ fn main() -> ! {
         ufmt::uwriteln!(&mut serial, "Hello, we are {} cms away from target!\r", value).void_unwrap();
     }
 }
-
