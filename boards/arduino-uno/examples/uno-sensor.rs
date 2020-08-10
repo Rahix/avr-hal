@@ -47,7 +47,7 @@ fn main() -> ! {
         while echo.is_low().void_unwrap() {
             // exiting the loop if the timer has reached 200 ms.
             // 0.2s/4µs = 50000
-            if timer1.tcnt1.read().bits()>=50000{
+            if timer1.tcnt1.read().bits() >= 50000 {
                 // jump to the beginning of the outer loop if no obstacle is detected
                 ufmt::uwriteln!(&mut serial, "Nothing was detected and jump to outer loop.\r").void_unwrap();
                 continue 'outer;
@@ -57,7 +57,7 @@ fn main() -> ! {
         timer1.tcnt1.write(|w| unsafe { w.bits(0) });
 
         // Wait for the echo to get low again
-        while echo.is_high().void_unwrap(){}
+        while echo.is_high().void_unwrap() {}
 
         // 1 count == 4 us, so the value is multiplied by 4.
         // 1/58 ≈ (34000 ms/2)* 1µs
