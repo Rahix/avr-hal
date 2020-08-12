@@ -23,7 +23,7 @@ use nb::block;
 #[arduino_uno::entry]
 fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
-    let mut delay = arduino_uno::Delay::new();
+
     let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
     // set up serial interface for text output
     let mut serial = arduino_uno::Serial::new(
@@ -51,6 +51,6 @@ fn main() -> ! {
         let data = block!(spi.read()).void_unwrap();
 
         ufmt::uwriteln!(&mut serial, "data: {}\r", data).void_unwrap();
-        delay.delay_ms(1000 as u16);
+        arduino_uno::delay_ms(1000);
     }
 }

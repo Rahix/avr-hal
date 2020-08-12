@@ -8,7 +8,6 @@ use arduino_uno::prelude::*;
 fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
 
-    let mut delay = arduino_uno::Delay::new();
     let mut pins = arduino_uno::Pins::new(
         dp.PORTB,
         dp.PORTC,
@@ -22,12 +21,12 @@ fn main() -> ! {
 
     loop {
         led.toggle().void_unwrap();
-        delay.delay_ms(200 as u16);
+        arduino_uno::delay_ms(200);
         led.toggle().void_unwrap();
-        delay.delay_ms(200 as u16);
+        arduino_uno::delay_ms(200);
         led.toggle().void_unwrap();
-        delay.delay_ms(200 as u16);
+        arduino_uno::delay_ms(200);
         led.toggle().void_unwrap();
-        delay.delay_ms(800 as u16);
+        arduino_uno::delay_ms(800);
     }
 }
