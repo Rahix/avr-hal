@@ -18,7 +18,7 @@ use nb::block;
 #[arduino_leonardo::entry]
 fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
-    let mut delay = arduino_leonardo::Delay::new();
+
     let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
 
     let mut serial = arduino_leonardo::Serial::new(
@@ -46,6 +46,6 @@ fn main() -> ! {
         let data = block!(spi.read()).void_unwrap();
 
         ufmt::uwriteln!(&mut serial, "data: {}\r", data).void_unwrap();
-        delay.delay_ms(1000u16);
+        arduino_leonardo::delay_ms(1000);
     }
 }

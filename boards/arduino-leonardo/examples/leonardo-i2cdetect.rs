@@ -8,7 +8,6 @@ use arduino_leonardo::prelude::*;
 fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
 
-    let mut delay = arduino_leonardo::Delay::new();
     let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
     let mut serial = arduino_leonardo::Serial::new(
         dp.USART1,
@@ -31,6 +30,6 @@ fn main() -> ! {
         .void_unwrap();
 
     loop {
-        delay.delay_ms(1000u16);
+        arduino_leonardo::delay_ms(1000);
     }
 }

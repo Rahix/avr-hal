@@ -13,7 +13,6 @@ static mut PIN: Option<port::portc::PC7<port::mode::Output>> = None;
 fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
 
-    let mut delay = arduino_leonardo::Delay::new();
     let mut pins = arduino_leonardo::Pins::new(
         dp.PORTB,
         dp.PORTC,
@@ -56,7 +55,7 @@ fn main() -> ! {
     loop {
         led0.toggle().void_unwrap();
         led1.toggle().void_unwrap();
-        delay.delay_ms(300u16);
+        arduino_leonardo::delay_ms(300);
     }
 }
 

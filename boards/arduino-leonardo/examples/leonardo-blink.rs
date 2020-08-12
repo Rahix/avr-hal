@@ -8,7 +8,6 @@ use arduino_leonardo::prelude::*;
 fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
 
-    let mut delay = arduino_leonardo::Delay::new();
     let mut pins = arduino_leonardo::Pins::new(
         dp.PORTB,
         dp.PORTC,
@@ -34,7 +33,7 @@ fn main() -> ! {
         for i in 0..3 {
             leds[i].toggle().void_unwrap();
             leds[(i+2)%3].toggle().void_unwrap();
-            delay.delay_ms(200u16);
+            arduino_leonardo::delay_ms(200);
         }
     }
 }
