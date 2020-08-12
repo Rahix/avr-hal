@@ -55,7 +55,28 @@ pub use atmega32u4_hal::prelude;
 
 
 /// Busy-Delay
+///
+/// **Note**: For just delaying, using [`arduino_leonardo::delay_ms()`][delay_ms] or
+/// [`arduino_leonardo::delay_us()`][delay_us] is probably the better choice.  This type is more
+/// useful when an `embedded-hal` driver needs a delay implementation.
+///
+/// [delay_ms]: fn.delay_ms.html
+/// [delay_us]: fn.delay_us.html
 pub type Delay = hal::delay::Delay<hal::clock::MHz16>;
+
+/// Wait (busy spin) for `ms` milliseconds
+pub fn delay_ms(ms: u16) {
+    use prelude::*;
+
+    Delay::new().delay_ms(ms)
+}
+
+/// Wait (busy spin) for `us` microseconds
+pub fn delay_us(us: u16) {
+    use prelude::*;
+
+    Delay::new().delay_us(us)
+}
 
 /// Support for the Serial Peripheral Interface
 ///
