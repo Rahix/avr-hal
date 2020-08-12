@@ -1,3 +1,11 @@
+//! Digital IO Implementations
+//!
+//! For a detailed explanation, refer to the [general Digital IO documentation][1].
+//!
+//! [1]: ../../avr_hal_generic/port/index.html
+
+pub use avr_hal::port::mode;
+
 pub trait PortExt {
     type Parts;
 
