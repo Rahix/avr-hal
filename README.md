@@ -14,10 +14,14 @@ You need nightly rust for compiling rust code for AVR.  Go into `./boards/arduin
 # Now you are ready to build your first avr blink example!
 cargo +nightly build --example leonardo-blink
 
-# Finally, convert it into a .hex file that you can flash using avr-dude
-../../mkhex.sh --debug leonardo-blink
+# For some boards, you can even run it directly (this will attempt to flash it
+# onto a connected board):
+cargo +nightly run --example leonardo-blink
 
-ls -l ../../target/leonardo-blink.hex
+# For others, you can find the binary file in
+ls ../../target/avr-atmega32u4/debug/examples/leonardo-blink.elf
+# and e.g. create an ihex file using
+avr-objcopy -S -j .text -j .data -O ihex leonardo-blink.elf leonardo-blink.hex
 ```
 
 ## Starting your own project
@@ -81,13 +85,28 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
        unimplemented!()
    }
    ```
-6. Build with these commands (make sure you're using _nightly_ rust!):
+7. Build with these commands (make sure you're using _nightly_ rust!):
    ```bash
    cargo build
    # or
    cargo build --release
    ```
    and find your binary in `target/avr-atmega32u4/debug/` (or `target/avr-atmega32u4/release`).
+
+8. (**Optional**): To make development as smooth as possible, you can configure a cargo runner for your board.  This repository contains a few example scripts (e.g. [`leonardo-runner.sh`][leonardo-runner], [`uno-runner.sh`][uno-runner]) which you can copy into your project.  You'll then need to add the following section to your `.cargo/config.toml`:
+   ```toml
+   [target.'cfg(target_arch = "avr")']
+   runner = "./leonardo-runner.sh"
+   ```
+   And that's it, now you can build an run your project in a single command!
+   ```bash
+   cargo run
+   # or
+   cargo run --release
+   ```
+
+[leonardo-runner]: ./boards/arduino-leonardo/leonardo-runner.sh
+[uno-runner]: ./boards/arduino-uno/uno-runner.sh
 
 ## Repository Structure
 This repository contains the following components:
