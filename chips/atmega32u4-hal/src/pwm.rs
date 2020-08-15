@@ -208,7 +208,7 @@ avr_hal::impl_pwm! {
                     Prescaler::Prescale256 => w.cs4().prescale_256(),
                     Prescaler::Prescale1024 => w.cs4().prescale_1024(),
             });
-            tim.tccr4d.modify(|_, w| w.wgm4().pwm_correct());
+            tim.tccr4d.modify(|_, w| w.wgm4().pwm_fast());
         },
         pins: {
             portc::PC7: {
