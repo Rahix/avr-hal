@@ -3,6 +3,7 @@
 
 extern crate panic_halt;
 use arduino_leonardo::prelude::*;
+use arduino_leonardo::pwm;
 
 #[arduino_leonardo::entry]
 fn main() -> ! {
@@ -10,7 +11,7 @@ fn main() -> ! {
 
     let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
 
-    let mut timer4 = arduino_leonardo::pwm::Timer4Pwm::new(dp.TC4);
+    let mut timer4 = pwm::Timer4Pwm::new(dp.TC4, pwm::Prescaler::Prescale64);
 
     let mut led = pins.d13.into_output(&mut pins.ddr).into_pwm(&mut timer4);
 

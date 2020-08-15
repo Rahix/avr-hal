@@ -26,6 +26,7 @@
 //! | `PD6` | `.into_pwm(&mut timer0)` |
 
 use crate::port::{portb, portd};
+pub use avr_hal::pwm::*;
 
 avr_hal::impl_pwm! {
     /// Use `TC0` for PWM (pins `PD5`, `PD6`)
@@ -43,9 +44,15 @@ avr_hal::impl_pwm! {
     /// ```
     pub struct Timer0Pwm {
         timer: crate::atmega328p::TC0,
-        init: |tim| {
+        init: |tim, prescaler| {
             tim.tccr0a.modify(|_, w| w.wgm0().pwm_fast());
-            tim.tccr0b.modify(|_, w| w.cs0().prescale_64());
+            tim.tccr0b.modify(|_, w| match prescaler {
+                Prescaler::Direct => w.cs0().direct(),
+                Prescaler::Prescale8 => w.cs0().prescale_8(),
+                Prescaler::Prescale64 => w.cs0().prescale_64(),
+                Prescaler::Prescale256 => w.cs0().prescale_256(),
+                Prescaler::Prescale1024 => w.cs0().prescale_1024(),
+            });
         },
         pins: {
             portd::PD6: {
@@ -84,9 +91,18 @@ avr_hal::impl_pwm! {
     /// ```
     pub struct Timer1Pwm {
         timer: crate::atmega328p::TC1,
-        init: |tim| {
+        init: |tim, prescaler| {
             tim.tccr1a.modify(|_, w| w.wgm1().bits(0b01));
-            tim.tccr1b.modify(|_, w| w.wgm1().bits(0b01).cs1().prescale_64());
+            tim.tccr1b.modify(|_, w| {
+                w.wgm1().bits(0b01);
+                match prescaler {
+                    Prescaler::Direct => w.cs1().direct(),
+                    Prescaler::Prescale8 => w.cs1().prescale_8(),
+                    Prescaler::Prescale64 => w.cs1().prescale_64(),
+                    Prescaler::Prescale256 => w.cs1().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs1().prescale_1024(),
+                }
+            });
         },
         pins: {
             portb::PB1: {
@@ -126,9 +142,15 @@ avr_hal::impl_pwm! {
     /// ```
     pub struct Timer2Pwm {
         timer: crate::atmega328p::TC2,
-        init: |tim| {
+        init: |tim, prescaler| {
             tim.tccr2a.modify(|_, w| w.wgm2().pwm_fast());
-            tim.tccr2b.modify(|_, w| w.cs2().prescale_64());
+            tim.tccr2b.modify(|_, w| match prescaler {
+                Prescaler::Direct => w.cs2().direct(),
+                Prescaler::Prescale8 => w.cs2().prescale_8(),
+                Prescaler::Prescale64 => w.cs2().prescale_64(),
+                Prescaler::Prescale256 => w.cs2().prescale_256(),
+                Prescaler::Prescale1024 => w.cs2().prescale_1024(),
+            });
         },
         pins: {
             portb::PB3: {
