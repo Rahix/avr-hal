@@ -6,7 +6,7 @@
 //! # Example
 //! ```
 //! let mut portb = dp.PORTB.split();
-//! let mut timer1 = Timer1Pwm::new(dp.TC1);
+//! let mut timer1 = Timer1Pwm::new(dp.TC1, pwm::Prescaler::Prescale64);
 //!
 //! let mut pb5 = portb.pb5.into_output(&mut portb.ddr).into_pwm(&mut timer1);
 //!
@@ -36,7 +36,7 @@ avr_hal::impl_pwm! {
     /// ```
     /// let mut portb = dp.PORTB.split();
     /// let mut portd = dp.PORTD.split();
-    /// let mut timer0 = Timer0Pwm::new(dp.TC0);
+    /// let mut timer0 = Timer0Pwm::new(dp.TC0, pwm::Prescaler::Prescale64);
     ///
     /// let mut pb7 = portb.pb7.into_output(&mut portb.ddr).into_pwm(&mut timer0);
     /// let mut pd0 = portd.pd0.into_output(&mut portd.ddr).into_pwm(&mut timer0);
@@ -83,7 +83,7 @@ avr_hal::impl_pwm! {
     /// # Example
     /// ```
     /// let mut portb = dp.PORTB.split();
-    /// let mut timer1 = Timer1Pwm::new(dp.TC1);
+    /// let mut timer1 = Timer1Pwm::new(dp.TC1, pwm::Prescaler::Prescale64);
     ///
     /// let mut pb5 = portb.pb5.into_output(&mut portb.ddr).into_pwm(&mut timer1);
     /// let mut pb6 = portb.pb6.into_output(&mut portb.ddr).into_pwm(&mut timer1);
@@ -144,7 +144,7 @@ avr_hal::impl_pwm! {
     /// # Example
     /// ```
     /// let mut portc = dp.PORTC.split();
-    /// let mut timer3 = Timer3Pwm::new(dp.TC3);
+    /// let mut timer3 = Timer3Pwm::new(dp.TC3, pwm::Prescaler::Prescale64);
     ///
     /// let mut pc6 = portc.pc6.into_output(&mut portc.ddr).into_pwm(&mut timer3);
     ///
@@ -187,7 +187,7 @@ avr_hal::impl_pwm! {
     /// let mut portb = dp.PORTB.split();
     /// let mut portc = dp.PORTC.split();
     /// let mut portd = dp.PORTD.split();
-    /// let mut timer4 = Timer4Pwm::new(dp.TC4);
+    /// let mut timer4 = Timer4Pwm::new(dp.TC4, pwm::Prescaler::Prescale64);
     ///
     /// let pb6 = portb.pb6.into_output(&mut portb.ddr).into_pwm4(&mut timer4);
     /// let pc7 = portc.pc7.into_output(&mut portc.ddr).into_pwm(&mut timer4);

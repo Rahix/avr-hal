@@ -135,7 +135,10 @@ pub mod adc {
 /// ```
 /// let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
 ///
-/// let mut timer1 = arduino_uno::pwm::Timer1Pwm::new(dp.TC1);
+/// let mut timer1 = arduino_uno::pwm::Timer1Pwm::new(
+///     dp.TC1,
+///     arduino_uno::pwm::Prescaler::Prescale64,
+/// );
 ///
 /// let mut pin = pins.d9.into_output(&mut pins.ddr).into_pwm(&mut timer1);
 ///

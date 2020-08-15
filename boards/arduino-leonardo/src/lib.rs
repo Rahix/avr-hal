@@ -144,7 +144,10 @@ pub mod adc {
 /// For a full example, see [`examples/leonardo-pwm.rs`][ex-pwm].  In short:
 /// ```
 /// let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
-/// let mut timer1 = Timer1Pwm::new(dp.TC1);
+/// let mut timer1 = arduino_leonardo::pwm::Timer1Pwm::new(
+///     dp.TC1,
+///     arduino_leonardo::pwm::Prescaler::Prescale64,
+/// );
 ///
 /// let mut d3 = pins.d3.into_output(&mut pins.ddr).into_pwm(&mut timer0);
 ///
