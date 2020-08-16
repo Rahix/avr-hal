@@ -2,7 +2,26 @@
 
 pub use embedded_hal::spi;
 
-/// Oscillator Clock Frequency division options.  Controls both SPR and SPI2X register bits.
+/// Oscillator Clock Frequency division options.
+///
+/// The bus speed is calculated by dividing the IO clock by the prescaler:
+///
+/// ```text
+/// F_sck = CLK_io / Prescaler
+/// ```
+///
+/// Please note that the overall transfer speed might be lower due to software overhead while
+/// sending / receiving.
+///
+/// | Prescale | 16 MHz Clock | 8 MHz Clock |
+/// | --- | --- | --- |
+/// | `OscfOver2` | 8 MHz | 4 MHz |
+/// | `OscfOver4` | 4 MHz | 2 MHz |
+/// | `OscfOver8` | 2 MHz | 1 MHz |
+/// | `OscfOver16` | 1 MHz | 500 kHz |
+/// | `OscfOver32` | 500 kHz | 250 kHz |
+/// | `OscfOver64` | 250 kHz | 125 kHz |
+/// | `OscfOver128` | 125 kHz | 62.5 kHz |
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SerialClockRate {
     OscfOver2,
