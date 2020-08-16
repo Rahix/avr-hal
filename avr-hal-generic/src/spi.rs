@@ -175,7 +175,7 @@ macro_rules! impl_spi {
                     SerialClockRate::OscfOver16 => w.spi2x().clear_bit(),
                     SerialClockRate::OscfOver32 => w.spi2x().set_bit(),
                     SerialClockRate::OscfOver64 => w.spi2x().clear_bit(),
-                    SerialClockRate::OscfOver128 => w.spi2x().set_bit(),
+                    SerialClockRate::OscfOver128 => w.spi2x().clear_bit(),
                 });
             }
         }
