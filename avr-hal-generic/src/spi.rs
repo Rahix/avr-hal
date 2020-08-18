@@ -103,14 +103,14 @@ macro_rules! impl_spi {
             is_write_in_progress: bool,
         }
 
-        /// Implementation-specific behavior of the struct, including setup/tear-down
-        impl<MisoInputMode: $crate::port::mode::InputMode> $Spi<MisoInputMode> {
-            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings
+        impl $Spi<$crate::port::mode::PullUp> {
+            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings,
+            /// with the internal pull-up enabled on the MISO pin.
             ///
             /// The pins are not actually used directly, but they are moved into the struct in
             /// order to enforce that they are in the correct mode, and cannot be used by anyone
             /// else while SPI is active.
-            pub fn new(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO<MisoInputMode>, settings: Settings) -> $Spi<MisoInputMode> {
+            pub fn new(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO<$crate::port::mode::PullUp>, settings: Settings) -> Self {
                 let spi = Spi {
                     peripheral,
                     sclk,
@@ -122,7 +122,30 @@ macro_rules! impl_spi {
                 spi.setup();
                 spi
             }
+        }
 
+        impl $Spi<$crate::port::mode::Floating> {
+            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings,
+            /// with an external pull-up on the MISO pin.
+            ///
+            /// The pins are not actually used directly, but they are moved into the struct in
+            /// order to enforce that they are in the correct mode, and cannot be used by anyone
+            /// else while SPI is active.
+            pub fn with_external_pullup(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO<$crate::port::mode::Floating>, settings: Settings) -> Self {
+                let spi = Spi {
+                    peripheral,
+                    sclk,
+                    mosi,
+                    miso,
+                    settings,
+                    is_write_in_progress: false,
+                };
+                spi.setup();
+                spi
+            }
+        }
+
+        impl<MisoInputMode: $crate::port::mode::InputMode> $Spi<MisoInputMode> {
             /// Disable the SPI device and release ownership of the peripheral
             /// and pins.  Instance can no-longer be used after this is
             /// invoked.
