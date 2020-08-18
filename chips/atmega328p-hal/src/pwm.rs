@@ -158,7 +158,7 @@ avr_hal::impl_pwm! {
                 into_pwm: |tim| if enable {
                     tim.tccr2a.modify(|_, w| w.com2a().match_clear());
                 } else {
-                    tim.tccr2a.modify(|_, w| w.com2b().disconnected());
+                    tim.tccr2a.modify(|_, w| w.com2a().disconnected());
                 },
             },
             portd::PD3: {
