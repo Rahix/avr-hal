@@ -14,10 +14,10 @@ pub trait PortExt {
 
 avr_hal::impl_generic_pin! {
     pub enum Pin {
-        A(crate::attiny88::PORTA, porta, pina),
-        B(crate::attiny88::PORTB, portb, pinb),
-        C(crate::attiny88::PORTC, portc, pinc),
-        D(crate::attiny88::PORTD, portd, pind),
+        A(crate::attiny88::PORTA, porta, pina, ddra),
+        B(crate::attiny88::PORTB, portb, pinb, ddrb),
+        C(crate::attiny88::PORTC, portc, pinc, ddrc),
+        D(crate::attiny88::PORTD, portd, pind, ddrd),
     }
 }
 

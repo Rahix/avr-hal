@@ -14,11 +14,11 @@ pub trait PortExt {
 
 avr_hal::impl_generic_pin! {
     pub enum Pin {
-        B(crate::atmega32u4::PORTB, portb, pinb),
-        C(crate::atmega32u4::PORTC, portc, pinc),
-        D(crate::atmega32u4::PORTD, portd, pind),
-        E(crate::atmega32u4::PORTE, porte, pine),
-        F(crate::atmega32u4::PORTF, portf, pinf),
+        B(crate::atmega32u4::PORTB, portb, pinb, ddrb),
+        C(crate::atmega32u4::PORTC, portc, pinc, ddrc),
+        D(crate::atmega32u4::PORTD, portd, pind, ddrd),
+        E(crate::atmega32u4::PORTE, porte, pine, ddre),
+        F(crate::atmega32u4::PORTF, portf, pinf, ddrf),
     }
 }
 

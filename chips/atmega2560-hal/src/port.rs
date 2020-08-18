@@ -14,17 +14,17 @@ pub trait PortExt {
 
 avr_hal::impl_generic_pin! {
     pub enum Pin {
-        A(crate::atmega2560::PORTA, porta, pina),
-        B(crate::atmega2560::PORTB, portb, pinb),
-        C(crate::atmega2560::PORTC, portc, pinc),
-        D(crate::atmega2560::PORTD, portd, pind),
-        E(crate::atmega2560::PORTE, porte, pine),
-        F(crate::atmega2560::PORTF, portf, pinf),
-        G(crate::atmega2560::PORTG, portg, ping),
-        H(crate::atmega2560::PORTH, porth, pinh),
-        J(crate::atmega2560::PORTJ, portj, pinj),
-        K(crate::atmega2560::PORTK, portk, pink),
-        L(crate::atmega2560::PORTL, portl, pinl),
+        A(crate::atmega2560::PORTA, porta, pina, ddra),
+        B(crate::atmega2560::PORTB, portb, pinb, ddrb),
+        C(crate::atmega2560::PORTC, portc, pinc, ddrc),
+        D(crate::atmega2560::PORTD, portd, pind, ddrd),
+        E(crate::atmega2560::PORTE, porte, pine, ddre),
+        F(crate::atmega2560::PORTF, portf, pinf, ddrf),
+        G(crate::atmega2560::PORTG, portg, ping, ddrg),
+        H(crate::atmega2560::PORTH, porth, pinh, ddrh),
+        J(crate::atmega2560::PORTJ, portj, pinj, ddrj),
+        K(crate::atmega2560::PORTK, portk, pink, ddrk),
+        L(crate::atmega2560::PORTL, portl, pinl, ddrl),
     }
 }
 

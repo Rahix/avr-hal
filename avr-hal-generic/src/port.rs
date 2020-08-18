@@ -48,6 +48,9 @@
 //!
 //! // Convert into output
 //! let pd2: PD2<mode::Output> = pd2.into_output(&mut portd.ddr);
+//!
+//! // Convert into open drain input and output.
+//! let pd2: PD2<mode::OpenDrain> = pd2.into_open_drain(&mut portd.ddr);
 //! ```
 //!
 //! ### Digital Input
@@ -72,6 +75,23 @@
 //! // Check what the pin was last set to
 //! pd2.is_set_high().void_unwrap();
 //! pd2.is_set_low().void_unwrap();
+//! ```
+//!
+//! ### Digital open drain Output and Input
+//! Digital Output and input pins in open drain or open mode with external pull-up,
+//! usefull for one wire bus (i.e. where `MODE` = `mode::OpenDrain`) can be used like this:
+//!
+//! ```ignore
+//! // Set pin low.
+//! pd2.set_low().void_unwrap();
+//! // Release the pin (externa pull-up sets the pin high)
+//! pd2.set_high().void_unwrap();
+//!
+//! // `true` if the pin is high, `false` if it is low
+//! pd2.is_high().void_unwrap();
+//!
+//! // `true if the pin is low, `false` if it is high
+//! pd2.is_low().void_unwrap();
 //! ```
 //!
 //! ### Other Modes
@@ -125,11 +145,15 @@ pub mod mode {
     pub struct Pwm<TIMER> {
         _m: core::marker::PhantomData<TIMER>,
     }
+    /// Pin configured in open drain mode.
+    pub struct OpenDrain;
 
     impl private::Unimplementable for Output {}
     impl<M: InputMode> private::Unimplementable for Input<M> {}
+    impl private::Unimplementable for OpenDrain {}
     impl DigitalIO for Output {}
     impl<M: InputMode> DigitalIO for Input<M> {}
+    impl DigitalIO for OpenDrain {}
 
     /// Pin input configured **without** internal pull-up
     pub struct Floating;
@@ -151,7 +175,7 @@ pub mod mode {
 macro_rules! impl_generic_pin {
     (
         pub enum $GenericPin:ident {
-            $($PortEnum:ident($PORTX:ty, $reg_port:ident, $reg_pin:ident),)+
+            $($PortEnum:ident($PORTX:ty, $reg_port:ident, $reg_pin:ident, $reg_ddr:ident),)+
         }
     ) => {
         mod generic_pin {
@@ -233,6 +257,62 @@ macro_rules! impl_generic_pin {
             impl digital::toggleable::Default for $GenericPin<mode::Output> {}
 
             impl<MODE: mode::InputMode> digital::InputPin for $GenericPin<mode::Input<MODE>> {
+                type Error = Void;
+
+                fn is_high(&self) -> Result<bool, Self::Error> {
+                    Ok(match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_pin.read().bits() & (1 << *i) != 0
+                            }
+                        )+
+                    })
+                }
+
+                fn is_low(&self) -> Result<bool, Self::Error> {
+                    Ok(match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_pin.read().bits() & (1 << *i) == 0
+                            }
+                        )+
+                    })
+                }
+            }
+
+            impl digital::OutputPin for $GenericPin<mode::OpenDrain> {
+                type Error = Void;
+
+                fn set_high(&mut self) -> Result<(), Self::Error> {
+                    match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                        w.bits(r.bits() & !(1 << *i))
+                                    })
+                            },
+                        )+
+                    }
+                    Ok(())
+                }
+
+                fn set_low(&mut self) -> Result<(), Self::Error> {
+                    match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                        w.bits(r.bits() | (1 << *i))
+                                    })
+                            },
+                        )+
+                    }
+                    Ok(())
+                }
+            }
+
+            impl digital::InputPin for $GenericPin<mode::OpenDrain> {
                 type Error = Void;
 
                 fn is_high(&self) -> Result<bool, Self::Error> {
@@ -444,6 +524,20 @@ macro_rules! impl_port {
                         }
                         $PXi { _mode: marker::PhantomData }
                     }
+
+                    /// Make this pin a open drain pin. Default state is released (high) mode.
+                    /// Internal pull-up is not used.
+                    pub fn into_open_drain<D: AsDDR>(self, ddr: &D) -> $PXi<mode::OpenDrain> {
+                        unsafe {
+                            (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                w.bits(r.bits() & !(1 << $i))
+                            });
+                            (*<$PORTX>::ptr()).$reg_port.modify(|r, w| {
+                                w.bits(r.bits() & !(1 << $i))
+                            });
+                        }
+                        $PXi { _mode: marker::PhantomData }
+                    }
                 }
                 // -------------------------------------------------------- }}}
 
@@ -488,6 +582,44 @@ macro_rules! impl_port {
                 impl digital::toggleable::Default for $PXi<mode::Output> {}
 
                 impl<MODE: mode::InputMode> digital::InputPin for $PXi<mode::Input<MODE>> {
+                    type Error = Void;
+
+                    fn is_high(&self) -> Result<bool, Self::Error> {
+                        Ok(unsafe {
+                            (*<$PORTX>::ptr()).$reg_pin.read().bits()
+                        } & (1 << $i) != 0)
+                    }
+
+                    fn is_low(&self) -> Result<bool, Self::Error> {
+                        Ok(unsafe {
+                            (*<$PORTX>::ptr()).$reg_pin.read().bits()
+                        } & (1 << $i) == 0)
+                    }
+                }
+
+                impl digital::OutputPin for $PXi<mode::OpenDrain> {
+                    type Error = Void;
+
+                    fn set_high(&mut self) -> Result<(), Self::Error> {
+                        unsafe {
+                            (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                w.bits(r.bits() & !(1 << $i))
+                            });
+                        }
+                        Ok(())
+                    }
+
+                    fn set_low(&mut self) -> Result<(), Self::Error> {
+                        unsafe {
+                            (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                w.bits(r.bits() | (1 << $i))
+                            });
+                        }
+                        Ok(())
+                    }
+                }
+
+                impl digital::InputPin for $PXi<mode::OpenDrain> {
                     type Error = Void;
 
                     fn is_high(&self) -> Result<bool, Self::Error> {
