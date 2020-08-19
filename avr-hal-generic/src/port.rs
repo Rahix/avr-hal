@@ -254,7 +254,22 @@ macro_rules! impl_generic_pin {
                 }
             }
 
-            impl digital::toggleable::Default for $GenericPin<mode::Output> {}
+            impl digital::ToggleableOutputPin for $GenericPin<mode::Output> {
+                type Error = Void;
+
+                fn toggle(&mut self) -> Result<(), Self::Error> {
+                    match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_pin
+                                    .write(|w| w.bits(1 << *i))
+                            },
+                        )+
+                    }
+                    Ok(())
+                }
+            }
 
             impl<MODE: mode::InputMode> digital::InputPin for $GenericPin<mode::Input<MODE>> {
                 type Error = Void;
@@ -579,7 +594,18 @@ macro_rules! impl_port {
                     }
                 }
 
-                impl digital::toggleable::Default for $PXi<mode::Output> {}
+                impl digital::ToggleableOutputPin for $PXi<mode::Output> {
+                    type Error = Void;
+
+                    fn toggle(&mut self) -> Result<(), Self::Error> {
+                        unsafe {
+                            (*<$PORTX>::ptr()).$reg_pin.write(|w| {
+                                w.bits(1 << $i)
+                            });
+                        }
+                        Ok(())
+                    }
+                }
 
                 impl<MODE: mode::InputMode> digital::InputPin for $PXi<mode::Input<MODE>> {
                     type Error = Void;
