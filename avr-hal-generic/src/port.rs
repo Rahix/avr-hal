@@ -49,8 +49,8 @@
 //! // Convert into output
 //! let pd2: PD2<mode::Output> = pd2.into_output(&mut portd.ddr);
 //!
-//! // Convert into open drain input and output.
-//! let pd2: PD2<mode::OpenDrain> = pd2.into_open_drain(&mut portd.ddr);
+//! // Convert into tri-state input and output.
+//! let pd2: PD2<mode::TriState> = pd2.into_tri_state(&mut portd.ddr);
 //! ```
 //!
 //! ### Digital Input
@@ -77,20 +77,22 @@
 //! pd2.is_set_low().void_unwrap();
 //! ```
 //!
-//! ### Digital open drain Output and Input
-//! Digital Output and input pins in open drain or open mode with external pull-up,
-//! usefull for one wire bus (i.e. where `MODE` = `mode::OpenDrain`) can be used like this:
+//! ### Digital Tri-State Output and Input
+//! Digital I/O pins in tri-state mode (i.e. where `MODE` = `mode::TriState`),
+//! usually with an external pull-up, are useful for a one wire bus.
+//! They can be used as both output and input pins, like this:
 //!
 //! ```ignore
-//! // Set pin low.
+//! // Actively drive the pin low.
 //! pd2.set_low().void_unwrap();
-//! // Release the pin (externa pull-up sets the pin high)
+//! // Release the pin, allowing the external pull-up to pull the pin
+//! // in the absence of another driver
 //! pd2.set_high().void_unwrap();
 //!
-//! // `true` if the pin is high, `false` if it is low
+//! // `true` if the pin is electrically high, `false` if it is low
 //! pd2.is_high().void_unwrap();
-//!
-//! // `true if the pin is low, `false` if it is high
+//! // `true` if the pin is electrically low, driven by either the
+//! // microcontroller or externally
 //! pd2.is_low().void_unwrap();
 //! ```
 //!
@@ -146,14 +148,14 @@ pub mod mode {
         _m: core::marker::PhantomData<TIMER>,
     }
     /// Pin configured in open drain mode.
-    pub struct OpenDrain;
+    pub struct TriState;
 
     impl private::Unimplementable for Output {}
     impl<M: InputMode> private::Unimplementable for Input<M> {}
-    impl private::Unimplementable for OpenDrain {}
+    impl private::Unimplementable for TriState {}
     impl DigitalIO for Output {}
     impl<M: InputMode> DigitalIO for Input<M> {}
-    impl DigitalIO for OpenDrain {}
+    impl DigitalIO for TriState {}
 
     /// Pin input configured **without** internal pull-up
     pub struct Floating;
@@ -282,7 +284,7 @@ macro_rules! impl_generic_pin {
                 }
             }
 
-            impl digital::OutputPin for $GenericPin<mode::OpenDrain> {
+            impl digital::OutputPin for $GenericPin<mode::TriState> {
                 type Error = Void;
 
                 fn set_high(&mut self) -> Result<(), Self::Error> {
@@ -312,7 +314,7 @@ macro_rules! impl_generic_pin {
                 }
             }
 
-            impl digital::InputPin for $GenericPin<mode::OpenDrain> {
+            impl digital::InputPin for $GenericPin<mode::TriState> {
                 type Error = Void;
 
                 fn is_high(&self) -> Result<bool, Self::Error> {
@@ -525,9 +527,13 @@ macro_rules! impl_port {
                         $PXi { _mode: marker::PhantomData }
                     }
 
-                    /// Make this pin a open drain pin. Default state is released (high) mode.
+                    /// Make this pin a tri-state pin. Default state is released (high) mode.
                     /// Internal pull-up is not used.
-                    pub fn into_open_drain<D: AsDDR>(self, ddr: &D) -> $PXi<mode::OpenDrain> {
+                    ///
+                    /// Note that, as always, it is ***not safe*** to connect the external
+                    /// pull-up to a voltage higher than VCC + 0.5.  See your chip's
+                    /// datasheet for more details.
+                    pub fn into_tri_state<D: AsDDR>(self, ddr: &D) -> $PXi<mode::TriState> {
                         unsafe {
                             (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
                                 w.bits(r.bits() & !(1 << $i))
@@ -597,7 +603,7 @@ macro_rules! impl_port {
                     }
                 }
 
-                impl digital::OutputPin for $PXi<mode::OpenDrain> {
+                impl digital::OutputPin for $PXi<mode::TriState> {
                     type Error = Void;
 
                     fn set_high(&mut self) -> Result<(), Self::Error> {
@@ -619,7 +625,7 @@ macro_rules! impl_port {
                     }
                 }
 
-                impl digital::InputPin for $PXi<mode::OpenDrain> {
+                impl digital::InputPin for $PXi<mode::TriState> {
                     type Error = Void;
 
                     fn is_high(&self) -> Result<bool, Self::Error> {
