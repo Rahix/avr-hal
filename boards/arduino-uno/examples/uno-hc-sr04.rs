@@ -32,7 +32,7 @@ fn main() -> ! {
     // Sensor used in this example: https://www.electroschematics.com/hc-sr04-datasheet/
     let mut trig = pins.d2.into_output(&mut pins.ddr);
     // Pins are floating input by default.
-    let mut echo = pins.d3;
+    let echo = pins.d3;
 
     'outer: loop {
 
