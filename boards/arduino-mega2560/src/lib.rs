@@ -32,12 +32,12 @@ pub type I2c<M> = hal::i2c::I2c<hal::clock::MHz16, M>;
 ///     dp.PORTJ, dp.PORTK, dp.PORTL,
 /// );
 ///
-/// let mut timer1 = arduino_mega2560::pwm::Timer1Pwm::new(
-///     dp.TC1,
+/// let mut timer0 = arduino_mega2560::pwm::Timer0Pwm::new(
+///     dp.TC0,
 ///     arduino_mega2560::pwm::Prescaler::Prescale64,
 /// );
 ///
-/// let mut pin = pins.b7.into_output(&mut pins.ddr).into_pwm(&mut timer1);
+/// let mut pin = pins.d13.into_output(&mut pins.ddr).into_pwm(&mut timer0);
 ///
 /// pin.set_duty(128);
 /// pin.enable();
@@ -45,23 +45,20 @@ pub type I2c<M> = hal::i2c::I2c<hal::clock::MHz16, M>;
 ///
 /// Here is an overview of pins and which timer they work with:
 ///
-/// | Pin | Conversion Method |
-/// | --- | --- |
-/// | `PB4` | `.into_pwm(&mut timer2)` |
-/// | `PB5` | `.into_pwm(&mut timer1)` |
-/// | `PB6` | `.into_pwm(&mut timer1)` |
-/// | `PB7` | `.into_pwm(&mut timer0)` |
-/// | `PE3` | `.into_pwm(&mut timer3)` |
-/// | `PE4` | `.into_pwm(&mut timer3)` |
-/// | `PE5` | `.into_pwm(&mut timer3)` |
-/// | `PG5` | `.into_pwm(&mut timer0)` |
-/// | `PH3` | `.into_pwm(&mut timer4)` |
-/// | `PH4` | `.into_pwm(&mut timer4)` |
-/// | `PH5` | `.into_pwm(&mut timer4)` |
-/// | `PH6` | `.into_pwm(&mut timer2)` |
-/// | `PL3` | `.into_pwm(&mut timer5)` |
-/// | `PL4` | `.into_pwm(&mut timer5)` |
-/// | `PL5` | `.into_pwm(&mut timer5)` |
+/// | Pin | Conversion Method | Alternate Conversion Method |
+/// | --- | --- | --- |
+/// `pins.d2` | `.into_pwm(&mut timer3)` | |
+/// `pins.d3` | `.into_pwm(&mut timer3)` | |
+/// `pins.d4` | `.into_pwm(&mut timer0)` | |
+/// `pins.d5` | `.into_pwm(&mut timer3)` | |
+/// `pins.d6` | `.into_pwm(&mut timer4)` | |
+/// `pins.d7` | `.into_pwm(&mut timer4)` | |
+/// `pins.d8` | `.into_pwm(&mut timer4)` | |
+/// `pins.d9` | `.into_pwm(&mut timer2)` | |
+/// `pins.d10` | `.into_pwm(&mut timer2)` | |
+/// `pins.d11` | `.into_pwm(&mut timer1)` | |
+/// `pins.d12` | `.into_pwm(&mut timer1)` | |
+/// `pins.d13` | `.into_pwm(&mut timer0)` | `.into_pwm1(&mut timer1)` |
 ///
 /// [ex-pwm]: https://github.com/sepotvin/avr-hal/blob/master/boards/arduino-mega2560/examples/mega2560-pwm.rs
 pub mod pwm {
