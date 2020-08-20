@@ -160,6 +160,8 @@ In `boards/` there are crates for the following hardware.  Please note that this
 
 Each board crate comes with a few examples showing how to use them.  For more details, follow the links to the documentation.
 
+* [Arduino diecimila](./boards/arduino-diecimila) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_diecimila)
+  - [Website](https://www.arduino.cc/en/Main/Arduino_BoardDiecimila)
 * [Arduino Leonardo](./boards/arduino-leonardo) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_leonardo)
   - [Website](https://www.arduino.cc/en/Main/Arduino_BoardLeonardo)
 * [Arduino Uno](./boards/arduino-uno) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_uno)
