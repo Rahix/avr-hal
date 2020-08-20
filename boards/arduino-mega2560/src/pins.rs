@@ -224,14 +224,17 @@ avr_hal_generic::impl_board_pins! {
         pub d43: portl::pl6::PL6,
         /// `D44`
         ///
+        /// * **PWM**: [atmega2560_hal::timer::Timer5Pwm]
         /// * `OC5C`: Output Compare Channel `C` for Timer/Counter5
         pub d44: portl::pl5::PL5,
         /// `D45`
         ///
+        /// * **PWM**: [atmega2560_hal::timer::Timer5Pwm]
         /// * `OC5B`: Output Compare Channel `B` for Timer/Counter5
         pub d45: portl::pl4::PL4,
         /// `D46`
         ///
+        /// * **PWM**: [atmega2560_hal::timer::Timer5Pwm]
         /// * `OC5A`: Output Compare Channel `A` for Timer/Counter5
         pub d46: portl::pl3::PL3,
         /// `D47`
