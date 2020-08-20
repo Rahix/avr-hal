@@ -16,23 +16,23 @@
 //!
 //! Here is an overview of pins and which timer they work with:
 //!
-//! | Pin | Conversion Method |
-//! | --- | --- |
-//! | `PB4` | `.into_pwm(&mut timer2)` |
-//! | `PB5` | `.into_pwm(&mut timer1)` |
-//! | `PB6` | `.into_pwm(&mut timer1)` |
-//! | `PB7` | `.into_pwm(&mut timer0)` |
-//! | `PE3` | `.into_pwm(&mut timer3)` |
-//! | `PE4` | `.into_pwm(&mut timer3)` |
-//! | `PE5` | `.into_pwm(&mut timer3)` |
-//! | `PG5` | `.into_pwm(&mut timer0)` |
-//! | `PH3` | `.into_pwm(&mut timer4)` |
-//! | `PH4` | `.into_pwm(&mut timer4)` |
-//! | `PH5` | `.into_pwm(&mut timer4)` |
-//! | `PH6` | `.into_pwm(&mut timer2)` |
-//! | `PL3` | `.into_pwm(&mut timer5)` |
-//! | `PL4` | `.into_pwm(&mut timer5)` |
-//! | `PL5` | `.into_pwm(&mut timer5)` |
+//! | Pin | Conversion Method | Alternate Conversion Method |
+//! | --- | --- | --- |
+//! | `PB4` | `.into_pwm(&mut timer2)` | |
+//! | `PB5` | `.into_pwm(&mut timer1)` | |
+//! | `PB6` | `.into_pwm(&mut timer1)` | |
+//! | `PB7` | `.into_pwm(&mut timer0)` | `.into_pwm1(&mut timer1)` |
+//! | `PE3` | `.into_pwm(&mut timer3)` | |
+//! | `PE4` | `.into_pwm(&mut timer3)` | |
+//! | `PE5` | `.into_pwm(&mut timer3)` | |
+//! | `PG5` | `.into_pwm(&mut timer0)` | |
+//! | `PH3` | `.into_pwm(&mut timer4)` | |
+//! | `PH4` | `.into_pwm(&mut timer4)` | |
+//! | `PH5` | `.into_pwm(&mut timer4)` | |
+//! | `PH6` | `.into_pwm(&mut timer2)` | |
+//! | `PL3` | `.into_pwm(&mut timer5)` | |
+//! | `PL4` | `.into_pwm(&mut timer5)` | |
+//! | `PL5` | `.into_pwm(&mut timer5)` | |
 
 use crate::port::{portb, porte, portg, porth, portl};
 pub use avr_hal::pwm::*;
@@ -86,9 +86,7 @@ avr_hal::impl_pwm! {
 }
 
 avr_hal::impl_pwm! {
-    /// Use `TC1` for PWM (pins `PB5`, `PB6`)
-    ///
-    /// Note: `PB7` is not currently supported (enter in conflict with `PB7` from timer0).
+    /// Use `TC1` for PWM (pins `PB5`, `PB6`, `PB7`)
     ///
     /// # Example
     /// ```
@@ -97,10 +95,13 @@ avr_hal::impl_pwm! {
     ///
     /// let mut pb5 = portb.pb5.into_output(&mut portb.ddr).into_pwm(&mut timer1);
     /// let mut pb6 = portb.pb6.into_output(&mut portb.ddr).into_pwm(&mut timer1);
+    /// let mut pb7 = portb.pb7.into_output(&mut portb.ddr).into_pwm1(&mut timer1);
     ///
     /// pb5.set_duty(128);
     /// pb5.enable();
     /// ```
+    ///
+    /// **Note**: For `PB7` the method is called `into_pwm1()`!
     pub struct Timer1Pwm {
         timer: crate::atmega2560::TC1,
         init: |tim, prescaler| {
@@ -133,6 +134,14 @@ avr_hal::impl_pwm! {
                     tim.tccr1a.modify(|_, w| w.com1b().disconnected());
                 },
             },
+            portb::PB7: {
+                ocr: ocr1c,
+                into_pwm1: |tim| if enable {
+                    tim.tccr1a.modify(|_, w| w.com1c().match_clear());
+                } else {
+                    tim.tccr1a.modify(|_, w| w.com1c().disconnected());
+                },
+            },
         },
     }
 }
@@ -155,13 +164,16 @@ avr_hal::impl_pwm! {
     pub struct Timer2Pwm {
         timer: crate::atmega2560::TC2,
         init: |tim, prescaler| {
-            tim.tccr2a.modify(|_, w| w.wgm2().pwm_fast());
-            tim.tccr2b.modify(|_, w| match prescaler {
-                Prescaler::Direct => w.cs2().direct(),
-                Prescaler::Prescale8 => w.cs2().prescale_8(),
-                Prescaler::Prescale64 => w.cs2().prescale_64(),
-                Prescaler::Prescale256 => w.cs2().prescale_256(),
-                Prescaler::Prescale1024 => w.cs2().prescale_1024(),
+            tim.tccr2a.modify(|_, w| w.wgm2().bits(0b01));
+            tim.tccr2b.modify(|_, w| {
+                w.wgm22().clear_bit();
+                match prescaler {
+                    Prescaler::Direct => w.cs2().direct(),
+                    Prescaler::Prescale8 => w.cs2().prescale_8(),
+                    Prescaler::Prescale64 => w.cs2().prescale_64(),
+                    Prescaler::Prescale256 => w.cs2().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs2().prescale_1024(),
+                }
             });
         },
         pins: {
@@ -174,7 +186,7 @@ avr_hal::impl_pwm! {
                 },
             },
             porth::PH6: {
-                ocr: ocr2a,
+                ocr: ocr2b,
                 into_pwm: |tim| if enable {
                     tim.tccr2a.modify(|_, w| w.com2b().match_clear());
                 } else {
