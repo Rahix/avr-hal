@@ -31,13 +31,12 @@ fn main() -> ! {
     ufmt::uwriteln!(&mut serial, "GND: {}\r", gnd).void_unwrap();
     ufmt::uwriteln!(&mut serial, "Temperature Sensor: {}\r", temp).void_unwrap();
 
-    let portf = dp.PORTF.split();
-    let mut a0 = portf.pf7.into_analog_input(&mut adc);
-    let mut a1 = portf.pf6.into_analog_input(&mut adc);
-    let mut a2 = portf.pf5.into_analog_input(&mut adc);
-    let mut a3 = portf.pf4.into_analog_input(&mut adc);
-    let mut a4 = portf.pf1.into_analog_input(&mut adc);
-    let mut a5 = portf.pf0.into_analog_input(&mut adc);
+    let mut a0 = pins.a0.into_analog_input(&mut adc);
+    let mut a1 = pins.a1.into_analog_input(&mut adc);
+    let mut a2 = pins.a2.into_analog_input(&mut adc);
+    let mut a3 = pins.a3.into_analog_input(&mut adc);
+    let mut a4 = pins.a4.into_analog_input(&mut adc);
+    let mut a5 = pins.a5.into_analog_input(&mut adc);
 
     loop {
         let values: [u16; 6] = [
