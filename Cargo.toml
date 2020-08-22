@@ -28,6 +28,7 @@ members = [
     "boards/arduino-uno",
     "boards/arduino-mega2560",
     "boards/bigavr6",
+    "boards/sparkfun-pro-micro",
     "boards/trinket",
 ]
 
