@@ -85,7 +85,7 @@ pub fn delay_us(us: u16) {
 /// ```no_run
 /// let dp = sparkfun_pro_micro::Peripherals::take().unwrap();
 ///
-/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
+/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 ///
 /// pins.led_rx.into_output(&mut pins.ddr); // Chip Select must be set to output mode.
 ///
@@ -111,7 +111,7 @@ pub mod spi {
 /// ```no_run
 /// let dp = sparkfun_pro_micro::Peripherals::take().unwrap();
 ///
-/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
+/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 ///
 /// let mut adc = sparkfun_pro_micro::adc::Adc::new(dp.ADC, Default::default());
 ///
@@ -143,7 +143,7 @@ pub mod adc {
 /// # Example
 /// For a full example, see [`examples/pro-micro-pwm.rs`][ex-pwm].  In short:
 /// ```
-/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
+/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 /// let mut timer1 = Timer1Pwm::new(dp.TC1);
 ///
 /// let mut d3 = pins.d3.into_output(&mut pins.ddr).into_pwm(&mut timer0);
@@ -176,7 +176,7 @@ pub mod pwm {
 /// ```no_run
 /// let dp = sparkfun_pro_micro::Peripherals::take().unwrap();
 ///
-/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
+/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 ///
 /// let mut serial = sparkfun_pro_micro::Serial::new(
 ///     dp.USART1,
@@ -198,7 +198,7 @@ pub type Serial<IMODE> = hal::usart::Usart1<hal::clock::MHz16, IMODE>;
 /// ```no_run
 /// let dp = sparkfun_pro_micro::Peripherals::take().unwrap();
 ///
-/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
+/// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 ///
 /// let mut i2c = sparkfun_pro_micro::I2c::new(
 ///     dp.TWI,
