@@ -8,12 +8,7 @@ use sparkfun_pro_micro::prelude::*;
 fn main() -> ! {
     let dp = sparkfun_pro_micro::Peripherals::take().unwrap();
 
-    let mut pins = sparkfun_pro_micro::Pins::new(
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-        dp.PORTE,
-    );
+    let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 
     let mut led0 = pins.led_rx.into_output(&mut pins.ddr);
     let mut led1 = pins.led_tx.into_output(&mut pins.ddr);

@@ -8,12 +8,7 @@ use sparkfun_pro_micro::prelude::*;
 fn main() -> ! {
     let dp = sparkfun_pro_micro::Peripherals::take().unwrap();
 
-    let mut pins = sparkfun_pro_micro::Pins::new(
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-        dp.PORTE,
-    );
+    let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 
     let mut serial = sparkfun_pro_micro::Serial::new(
         dp.USART1,
