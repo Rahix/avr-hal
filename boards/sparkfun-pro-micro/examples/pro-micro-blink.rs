@@ -12,23 +12,25 @@ fn main() -> ! {
 
     let mut led0 = pins.led_rx.into_output(&mut pins.ddr);
     let mut led1 = pins.led_tx.into_output(&mut pins.ddr);
-    let mut led2 = pins.d13.into_output(&mut pins.ddr);
 
     led0.set_high().void_unwrap();
     led1.set_high().void_unwrap();
-    led2.set_high().void_unwrap();
 
-    let mut leds = [
-        led0.downgrade(),
-        led1.downgrade(),
-        led2.downgrade(),
-    ];
-
+    let mut time: u16 = 0;
     loop {
-        for i in 0..3 {
-            leds[i].toggle().void_unwrap();
-            leds[(i+2)%3].toggle().void_unwrap();
-            sparkfun_pro_micro::delay_ms(200);
+        if time % 2 == 0 {
+            led0.set_low().void_unwrap();
+        } else {
+            led0.set_high().void_unwrap();
         }
+
+        if time % 3 == 0 {
+            led1.set_low().void_unwrap();
+        } else {
+            led1.set_high().void_unwrap();
+        }
+
+        sparkfun_pro_micro::delay_ms(500);
+        time = time.wrapping_add(1);
     }
 }
