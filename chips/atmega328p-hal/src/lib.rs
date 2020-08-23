@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(llvm_asm)]
 
 extern crate avr_hal_generic as avr_hal;
 
@@ -14,6 +15,7 @@ pub mod port;
 
 pub mod adc;
 pub mod pwm;
+pub mod wdt;
 
 pub mod prelude {
     pub use crate::avr_hal::prelude::*;
