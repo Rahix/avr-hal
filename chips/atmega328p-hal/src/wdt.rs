@@ -2,7 +2,7 @@
 //!
 //! # Example
 //! ```
-//! let mut watchdog = Wdt::new(dp.CPU, dp.WDT);
+//! let mut watchdog = Wdt::new(&dp.CPU.mcusr, dp.WDT);
 //! watchdog.disable();
 //! watchdog.start(WatchdogTimeOutPeriod::Ms8000);
 //!
@@ -11,6 +11,7 @@
 //! }
 //! ```
 
+use avr_device::generic::Reg;
 use avr_hal::hal::watchdog::*;
 
 pub enum WatchdogTimeOutPeriod {
@@ -26,19 +27,24 @@ pub enum WatchdogTimeOutPeriod {
     Ms8000,
 }
 
-pub struct Wdt {
-    cpu: crate::atmega328p::CPU,
+pub struct Wdt<'wdt> {
+    mcu_status_register: &'wdt Reg<crate::atmega328p::cpu::mcusr::MCUSR_SPEC>,
     peripheral: crate::atmega328p::WDT,
 }
 
-impl Wdt {
-    pub fn new(cpu: crate::atmega328p::CPU, peripheral: crate::atmega328p::WDT) -> Self {
-        let watchdog = Wdt { cpu, peripheral };
-        watchdog
+impl<'wdt> Wdt<'wdt> {
+    pub fn new(
+        mcu_status_register: &'wdt Reg<crate::atmega328p::cpu::mcusr::MCUSR_SPEC>,
+        peripheral: crate::atmega328p::WDT,
+    ) -> Self {
+        Wdt {
+            mcu_status_register,
+            peripheral,
+        }
     }
 }
 
-impl WatchdogEnable for Wdt {
+impl<'wdt> WatchdogEnable for Wdt<'wdt> {
     type Time = WatchdogTimeOutPeriod;
 
     fn start<T>(&mut self, period: T)
@@ -50,7 +56,7 @@ impl WatchdogEnable for Wdt {
             // Reset the watchdog timer
             self.feed();
             // Reset the watchdog reset flag in the mcu status register
-            self.cpu.mcusr.modify(|_, w| w.wdrf().clear_bit());
+            self.mcu_status_register.modify(|_, w| w.wdrf().clear_bit());
             // Enable watchdog configuration mode
             self.peripheral
                 .wdtcsr
@@ -76,21 +82,21 @@ impl WatchdogEnable for Wdt {
     }
 }
 
-impl Watchdog for Wdt {
+impl<'wdt> Watchdog for Wdt<'wdt> {
     #[inline]
     fn feed(&mut self) {
         unsafe { llvm_asm!("WDR") }
     }
 }
 
-impl WatchdogDisable for Wdt {
+impl<'wdt> WatchdogDisable for Wdt<'wdt> {
     fn disable(&mut self) {
         // Disable interrupts while disabling the watchdog timer
         avr_hal::avr_device::interrupt::free(|_| {
             // Reset the watchdog timer
             self.feed();
             // Reset the watchdog reset flag in the mcu status register
-            self.cpu.mcusr.modify(|_, w| w.wdrf().clear_bit());
+            self.mcu_status_register.modify(|_, w| w.wdrf().clear_bit());
             // Enable watchdog configuration mode
             self.peripheral
                 .wdtcsr
