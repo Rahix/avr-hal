@@ -72,7 +72,7 @@ impl<'wdt> WatchdogEnable for Wdt<'wdt> {
                     WatchdogTimeOutPeriod::Ms500 => w.wdpl().cycles_64k(),
                     WatchdogTimeOutPeriod::Ms1000 => w.wdpl().cycles_128k(),
                     WatchdogTimeOutPeriod::Ms2000 => w.wdpl().cycles_256k(),
-                    WatchdogTimeOutPeriod::Ms4000 => w.wdpl().cycles_256k().wdph().set_bit(),
+                    WatchdogTimeOutPeriod::Ms4000 => w.wdpl().cycles_2k_512k().wdph().set_bit(),
                     WatchdogTimeOutPeriod::Ms8000 => w.wdpl().cycles_4k_1024k().wdph().set_bit(),
                 })
                 .wde()
