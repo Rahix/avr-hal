@@ -17,6 +17,7 @@
 //! }
 //! ```
 
+use crate::atmega328p::{cpu, WDT};
 use avr_device::generic::Reg;
 use avr_hal::hal::watchdog::*;
 
@@ -34,15 +35,12 @@ pub enum WatchdogTimeOutPeriod {
 }
 
 pub struct Wdt<'wdt> {
-    mcu_status_register: &'wdt Reg<crate::atmega328p::cpu::mcusr::MCUSR_SPEC>,
-    peripheral: crate::atmega328p::WDT,
+    mcu_status_register: &'wdt Reg<cpu::mcusr::MCUSR_SPEC>,
+    peripheral: WDT,
 }
 
 impl<'wdt> Wdt<'wdt> {
-    pub fn new(
-        mcu_status_register: &'wdt Reg<crate::atmega328p::cpu::mcusr::MCUSR_SPEC>,
-        peripheral: crate::atmega328p::WDT,
-    ) -> Self {
+    pub fn new(mcu_status_register: &'wdt Reg<cpu::mcusr::MCUSR_SPEC>, peripheral: WDT) -> Self {
         Wdt {
             mcu_status_register,
             peripheral,
