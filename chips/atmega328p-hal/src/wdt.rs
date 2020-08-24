@@ -87,6 +87,8 @@ impl<'wdt> WatchdogEnable for Wdt<'wdt> {
                 })
                 .wde()
                 .set_bit()
+                .wdce()
+                .clear_bit()
             });
         });
     }
