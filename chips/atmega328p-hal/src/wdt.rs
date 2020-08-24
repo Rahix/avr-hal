@@ -1,5 +1,11 @@
 //! Provides a system reset when a counter reaches a given time-out value.
 //!
+//! # Note
+//! Changing the watchdog configuration requires two separate writes to WDTCSR where the second
+//! write must occur within 4 cycles of the first or the configuration will not change. You may need
+//! to adjust optimization settings to prevent other operations from being emitted between these two
+//! writes.
+//!
 //! # Example
 //! ```
 //! let mut watchdog = Wdt::new(&dp.CPU.mcusr, dp.WDT);
