@@ -35,21 +35,22 @@ pub enum WatchdogTimeOutPeriod {
     Ms8000,
 }
 
-pub struct Wdt<'wdt> {
-    mcu_status_register: &'wdt Reg<cpu::mcusr::MCUSR_SPEC>,
+pub struct Wdt {
     peripheral: WDT,
 }
 
-impl<'wdt> Wdt<'wdt> {
-    pub fn new(mcu_status_register: &'wdt Reg<cpu::mcusr::MCUSR_SPEC>, peripheral: WDT) -> Self {
-        Wdt {
-            mcu_status_register,
-            peripheral,
-        }
+impl Wdt {
+    /// Initializes a Wdt.
+    ///
+    /// If a prior reset was provided by the watchdog, the WDRF in MCUSR would be set, so WDRF is
+    /// also cleared to allow for re-enabling the watchdog.
+    pub fn new(mcu_status_register: &Reg<cpu::mcusr::MCUSR_SPEC>, peripheral: WDT) -> Self {
+        mcu_status_register.modify(|_, w| w.wdrf().clear_bit());
+        Wdt { peripheral }
     }
 }
 
-impl<'wdt> WatchdogEnable for Wdt<'wdt> {
+impl WatchdogEnable for Wdt {
     type Time = WatchdogTimeOutPeriod;
 
     fn start<T>(&mut self, period: T)
@@ -66,8 +67,6 @@ impl<'wdt> WatchdogEnable for Wdt<'wdt> {
         avr_hal::avr_device::interrupt::free(|_| {
             // Reset the watchdog timer
             self.feed();
-            // Reset the watchdog reset flag in the mcu status register
-            self.mcu_status_register.modify(|_, w| w.wdrf().clear_bit());
             // Enable watchdog configuration mode
             self.peripheral
                 .wdtcsr
@@ -95,14 +94,14 @@ impl<'wdt> WatchdogEnable for Wdt<'wdt> {
     }
 }
 
-impl<'wdt> Watchdog for Wdt<'wdt> {
+impl Watchdog for Wdt {
     #[inline]
     fn feed(&mut self) {
         avr_device::asm::wdr();
     }
 }
 
-impl<'wdt> WatchdogDisable for Wdt<'wdt> {
+impl WatchdogDisable for Wdt {
     fn disable(&mut self) {
         // The sequence for clearing WDE is as follows:
         //
@@ -114,8 +113,6 @@ impl<'wdt> WatchdogDisable for Wdt<'wdt> {
         avr_hal::avr_device::interrupt::free(|_| {
             // Reset the watchdog timer
             self.feed();
-            // Reset the watchdog reset flag in the mcu status register
-            self.mcu_status_register.modify(|_, w| w.wdrf().clear_bit());
             // Enable watchdog configuration mode
             self.peripheral
                 .wdtcsr
