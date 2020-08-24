@@ -21,6 +21,7 @@ use crate::atmega328p::{cpu, WDT};
 use avr_device::generic::Reg;
 use avr_hal::hal::watchdog::*;
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum WatchdogTimeOutPeriod {
     Ms16,
     Ms32,
