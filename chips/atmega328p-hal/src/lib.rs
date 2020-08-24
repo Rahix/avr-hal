@@ -1,5 +1,4 @@
 #![no_std]
-#![feature(llvm_asm)]
 
 extern crate avr_hal_generic as avr_hal;
 

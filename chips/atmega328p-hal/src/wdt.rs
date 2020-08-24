@@ -85,7 +85,7 @@ impl<'wdt> WatchdogEnable for Wdt<'wdt> {
 impl<'wdt> Watchdog for Wdt<'wdt> {
     #[inline]
     fn feed(&mut self) {
-        unsafe { llvm_asm!("WDR") }
+        avr_device::asm::wdr();
     }
 }
 
