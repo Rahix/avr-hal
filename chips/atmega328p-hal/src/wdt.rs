@@ -55,7 +55,13 @@ impl<'wdt> WatchdogEnable for Wdt<'wdt> {
     where
         T: Into<Self::Time>,
     {
-        // Disable interrupts while starting the watchdog timer
+        // The sequence for changing time-out configuration is as follows:
+        //
+        //     1. In the same operation, write a logic one to the Watchdog change enable bit (WDCE)
+        //        and WDE. A logic one must be written to WDE regardless of the previous value of
+        //        the WDE bit.
+        //     2. Within the next four clock cycles, write the WDE and Watchdog prescaler bits (WDP)
+        //        as desired, but with the WDCE bit cleared. This must be done in one operation.
         avr_hal::avr_device::interrupt::free(|_| {
             // Reset the watchdog timer
             self.feed();
@@ -95,7 +101,13 @@ impl<'wdt> Watchdog for Wdt<'wdt> {
 
 impl<'wdt> WatchdogDisable for Wdt<'wdt> {
     fn disable(&mut self) {
-        // Disable interrupts while disabling the watchdog timer
+        // The sequence for clearing WDE is as follows:
+        //
+        //     1. In the same operation, write a logic one to the Watchdog change enable bit (WDCE)
+        //        and WDE. A logic one must be written to WDE regardless of the previous value of
+        //        the WDE bit.
+        //     2. Within the next four clock cycles, clear the WDE and WDCE bits.
+        //        This must be done in one operation.
         avr_hal::avr_device::interrupt::free(|_| {
             // Reset the watchdog timer
             self.feed();
