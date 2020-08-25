@@ -44,9 +44,24 @@ macro_rules! impl_wdt {
             peripheral: $WDT:ty,
         }
     ) => {
-        use avr_device::generic::Reg;
-        pub use avr_hal::hal::watchdog::*;
-
+        /// Provides a system reset when a counter reaches a given time-out value.
+        ///
+        /// # Note
+        /// Changing the watchdog configuration requires two separate writes to WDTCSR where the second
+        /// write must occur within 4 cycles of the first or the configuration will not change. You may need
+        /// to adjust optimization settings to prevent other operations from being emitted between these two
+        /// writes.
+        ///
+        /// # Example
+        /// ```
+        /// let mut watchdog = board::wdt::Wdt::new(&dp.CPU.mcusr, dp.WDT);
+        /// watchdog.disable();
+        /// watchdog.start(board::wdt::WatchdogTimeOutPeriod::Ms8000);
+        ///
+        /// loop {
+        ///     watchdog.feed();
+        /// }
+        /// ```
         pub struct $Wdt {
             peripheral: $WDT,
         }
@@ -56,13 +71,13 @@ macro_rules! impl_wdt {
             ///
             /// If a prior reset was provided by the watchdog, the WDRF in MCUSR would be set, so
             /// WDRF is also cleared to allow for re-enabling the watchdog.
-            pub fn new(mcu_status_register: &Reg<$MCUSR>, peripheral: $WDT) -> Self {
+            pub fn new(mcu_status_register: &$MCUSR, peripheral: $WDT) -> Self {
                 mcu_status_register.modify(|_, w| w.wdrf().clear_bit());
                 Wdt { peripheral }
             }
         }
 
-        impl WatchdogEnable for $Wdt {
+        impl $crate::hal::watchdog::WatchdogEnable for $Wdt {
             type Time = WatchdogTimeOutPeriod;
 
             fn start<T>(&mut self, period: T)
@@ -111,14 +126,14 @@ macro_rules! impl_wdt {
             }
         }
 
-        impl Watchdog for $Wdt {
+        impl $crate::hal::watchdog::Watchdog for $Wdt {
             #[inline]
             fn feed(&mut self) {
                 avr_device::asm::wdr();
             }
         }
 
-        impl WatchdogDisable for $Wdt {
+        impl $crate::hal::watchdog::WatchdogDisable for $Wdt {
             fn disable(&mut self) {
                 // The sequence for clearing WDE is as follows:
                 //
