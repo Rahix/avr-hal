@@ -1,6 +1,5 @@
 //! SPI Implementation
-
-pub use embedded_hal::spi;
+use embedded_hal::spi;
 
 /// Oscillator Clock Frequency division options.
 ///
@@ -79,11 +78,6 @@ macro_rules! impl_spi {
             }
         }
     ) => {
-
-        use $crate::void::Void;
-        use $crate::hal::spi;
-        pub use avr_hal::spi::*;
-
         type SCLK = $sclkmod::$SCLK<$crate::port::mode::Output>;
         type MOSI = $mosimod::$MOSI<$crate::port::mode::Output>;
         type MISO<InputMode> = $misomod::$MISO<$crate::port::mode::Input<InputMode>>;
@@ -177,6 +171,8 @@ macro_rules! impl_spi {
 
             /// Sets up the control/status registers with the right settings for this secondary device
             fn setup(&self) {
+                use $crate::hal::spi;
+
                 // set up control register
                 self.peripheral.spcr.write(|w| {
                     // enable SPI
