@@ -4,10 +4,12 @@ pub use embedded_hal::watchdog;
 
 /// Approximate length of the time-out period before the watchdog provides a system reset.
 ///
-/// After enabling the watchdog timer, call [`feed`](trait.Watchdog.html#tymethod.feed) before the
-/// period ends to prevent a reset.
+/// After enabling the watchdog timer, call [`Watchdog::feed`] before the period ends to prevent a
+/// reset.
 ///
 /// Some AVR models do not support all period lengths.
+///
+/// [`Watchdog::feed`]: watchdog/trait.Watchdog.html#tymethod.feed
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum WatchdogTimeOutPeriod {
     /// 16 milliseconds
