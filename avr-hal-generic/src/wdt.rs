@@ -29,8 +29,8 @@ macro_rules! impl_wdt {
 
         /// Approximate length of the time-out period before the watchdog provides a system reset.
         ///
-        /// After enabling the watchdog timer, call [`Watchdog::feed`] before the period ends to prevent a
-        /// reset.
+        /// After enabling the watchdog timer, call [`Watchdog::feed`] before the period ends to
+        /// prevent a reset.
         ///
         /// [`Watchdog::feed`]: watchdog/trait.Watchdog.html#tymethod.feed
         #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -41,10 +41,10 @@ macro_rules! impl_wdt {
         /// Provides a system reset when a counter reaches a given time-out value.
         ///
         /// # Note
-        /// Changing the watchdog configuration requires two separate writes to WDTCSR where the second
-        /// write must occur within 4 cycles of the first or the configuration will not change. You may need
-        /// to adjust optimization settings to prevent other operations from being emitted between these two
-        /// writes.
+        /// Changing the watchdog configuration requires two separate writes to WDTCSR where the
+        /// second write must occur within 4 cycles of the first or the configuration will not
+        /// change. You may need to adjust optimization settings to prevent other operations from
+        /// being emitted between these two writes.
         ///
         /// # Example
         /// ```
