@@ -3,17 +3,30 @@
 
 pub use embedded_hal::watchdog;
 
+
 /// Implement traits for the watchdog interface
 #[macro_export]
 macro_rules! impl_wdt {
+    // Build the match for translating time out period into wdtcsr bits
+    ($w:ident, $period:ident, $($variant:ident => {$($bits:ident()).+}),+) =>
+    {
+        (match $period.into() {
+            $(WatchdogTimeOutPeriod::$variant => $w.$($bits()).+),+
+        })
+        .wde()
+        .set_bit()
+        .wdce()
+        .clear_bit()
+    };
+    // Create time out periods and watchdog
     (
-        pub enum WatchdogTimeOutPeriod $supported_periods:tt
+        pub enum WatchdogTimeOutPeriod {
+            $($(#[$doc:meta])*$variant:ident $prescale:tt),+$(,)*
+        }
 
-        $(#[$wdt_attr:meta])*
         pub struct $Wdt:ident {
             mcu_status_register: $MCUSR:ty,
             peripheral: $WDT:ty,
-            prescaler_bits: {$($period:path => $($bits:ident()).+ ),+}
         }
     ) => {
         /// Approximate length of the time-out period before the watchdog provides a system reset.
@@ -23,7 +36,9 @@ macro_rules! impl_wdt {
         ///
         /// [`Watchdog::feed`]: watchdog/trait.Watchdog.html#tymethod.feed
         #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-        pub enum WatchdogTimeOutPeriod $supported_periods
+        pub enum WatchdogTimeOutPeriod {
+            $($(#[$doc])*$variant),+
+        }
 
         /// Provides a system reset when a counter reaches a given time-out value.
         ///
@@ -36,7 +51,6 @@ macro_rules! impl_wdt {
         /// # Example
         /// ```
         /// let mut watchdog = board::wdt::Wdt::new(&dp.CPU.mcusr, dp.WDT);
-        /// watchdog.disable();
         /// watchdog.start(board::wdt::WatchdogTimeOutPeriod::Ms8000);
         ///
         /// loop {
@@ -82,13 +96,7 @@ macro_rules! impl_wdt {
                         .modify(|_, w| w.wdce().set_bit().wde().set_bit());
                     // Enable watchdog and set interval
                     self.peripheral.wdtcsr.write(|w| {
-                        (match period.into() {
-                            $($period => w.$($bits()).+),+
-                        })
-                        .wde()
-                        .set_bit()
-                        .wdce()
-                        .clear_bit()
+                        $crate::impl_wdt!(w, period, $($variant => $prescale),+)
                     });
                 });
             }
