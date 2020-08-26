@@ -215,7 +215,7 @@ pub type I2c<M> = hal::i2c::I2c<hal::clock::MHz16, M>;
 /// # Example
 /// ```
 /// let mut watchdog = arduino_uno::wdt::Wdt::new(&dp.CPU.mcusr, dp.WDT);
-/// watchdog.start(arduino_uno::wdt::WatchdogTimeOutPeriod::Ms8000);
+/// watchdog.start(arduino_uno::wdt::Timeout::Ms8000);
 ///
 /// loop {
 ///     watchdog.feed();

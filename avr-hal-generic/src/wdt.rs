@@ -7,7 +7,7 @@ macro_rules! impl_wdt {
     ($w:ident, $period:ident, $($variant:ident => {$($bits:ident()).+}),+) =>
     {
         (match $period.into() {
-            $(WatchdogTimeOutPeriod::$variant => $w.$($bits()).+),+
+            $(Timeout::$variant => $w.$($bits()).+),+
         })
         .wde()
         .set_bit()
@@ -16,7 +16,7 @@ macro_rules! impl_wdt {
     };
     // Create time out periods and watchdog
     (
-        pub enum WatchdogTimeOutPeriod {
+        pub enum Timeout {
             $($(#[$doc:meta])*$variant:ident $prescale:tt),+$(,)*
         }
 
@@ -34,7 +34,7 @@ macro_rules! impl_wdt {
         ///
         /// [`Watchdog::feed`]: watchdog/trait.Watchdog.html#tymethod.feed
         #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-        pub enum WatchdogTimeOutPeriod {
+        pub enum Timeout {
             $($(#[$doc])*$variant),+
         }
 
@@ -49,7 +49,7 @@ macro_rules! impl_wdt {
         /// # Example
         /// ```
         /// let mut watchdog = board::wdt::Wdt::new(&dp.CPU.mcusr, dp.WDT);
-        /// watchdog.start(board::wdt::WatchdogTimeOutPeriod::Ms8000);
+        /// watchdog.start(board::wdt::Timeout::Ms8000);
         ///
         /// loop {
         ///     watchdog.feed();
@@ -71,7 +71,7 @@ macro_rules! impl_wdt {
         }
 
         impl $crate::hal::watchdog::WatchdogEnable for $Wdt {
-            type Time = WatchdogTimeOutPeriod;
+            type Time = Timeout;
 
             fn start<T>(&mut self, period: T)
             where

@@ -4,7 +4,7 @@ pub use avr_hal_generic::wdt::*;
 
 avr_hal::impl_wdt! {
 
-    pub enum WatchdogTimeOutPeriod {
+    pub enum Timeout {
         /// 16 milliseconds
         Ms16 { wdpl().cycles_2k_512k() },
         /// 32 milliseconds
