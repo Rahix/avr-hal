@@ -66,7 +66,7 @@ macro_rules! impl_wdt {
             /// WDRF is also cleared to allow for re-enabling the watchdog.
             pub fn new(mcu_status_register: &$MCUSR, peripheral: $WDT) -> Self {
                 mcu_status_register.modify(|_, w| w.wdrf().clear_bit());
-                Wdt { peripheral }
+                $Wdt { peripheral }
             }
         }
 
