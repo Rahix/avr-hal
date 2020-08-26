@@ -1,9 +1,5 @@
 //! WDT Implementation
 
-
-pub use embedded_hal::watchdog;
-
-
 /// Implement traits for the watchdog interface
 #[macro_export]
 macro_rules! impl_wdt {
@@ -29,6 +25,8 @@ macro_rules! impl_wdt {
             peripheral: $WDT:ty,
         }
     ) => {
+        use $crate::hal::watchdog::*;
+
         /// Approximate length of the time-out period before the watchdog provides a system reset.
         ///
         /// After enabling the watchdog timer, call [`Watchdog::feed`] before the period ends to prevent a
