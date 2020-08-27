@@ -203,3 +203,24 @@ pub type Serial<IMODE> = hal::usart::Usart0<hal::clock::MHz16, IMODE>;
 ///
 /// [ex-i2c]: https://github.com/Rahix/avr-hal/blob/master/boards/arduino-uno/examples/uno-i2cdetect.rs
 pub type I2c<M> = hal::i2c::I2c<hal::clock::MHz16, M>;
+
+/// Support for the WatchDog Timer
+///
+/// # Note
+/// Changing the watchdog configuration requires two separate writes to WDTCSR where the second
+/// write must occur within 4 cycles of the first or the configuration will not change. You may need
+/// to adjust optimization settings to prevent other operations from being emitted between these two
+/// writes.
+///
+/// # Example
+/// ```
+/// let mut watchdog = arduino_uno::wdt::Wdt::new(&dp.CPU.mcusr, dp.WDT);
+/// watchdog.start(arduino_uno::wdt::Timeout::Ms8000);
+///
+/// loop {
+///     watchdog.feed();
+/// }
+/// ```
+pub mod wdt {
+    pub use atmega328p_hal::wdt::*;
+}
