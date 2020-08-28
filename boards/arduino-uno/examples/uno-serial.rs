@@ -1,8 +1,8 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
 use arduino_uno::prelude::*;
+use panic_halt as _;
 
 // This example opens a serial connection to the host computer.  On most POSIX operating systems (like GNU/Linux or
 // OSX), you can interface with the program by running (assuming the device appears as ttyACM0)

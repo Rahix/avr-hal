@@ -1,9 +1,8 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
-
 use arduino_uno::prelude::*;
+use panic_halt as _;
 
 #[arduino_uno::entry]
 fn main() -> ! {
