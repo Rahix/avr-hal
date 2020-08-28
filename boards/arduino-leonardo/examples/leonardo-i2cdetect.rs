@@ -1,8 +1,8 @@
 #![no_std]
 #![no_main]
 
-use panic_halt as _;
 use arduino_leonardo::prelude::*;
+use panic_halt as _;
 
 #[arduino_leonardo::entry]
 fn main() -> ! {
