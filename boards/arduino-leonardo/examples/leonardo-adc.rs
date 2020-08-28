@@ -3,6 +3,7 @@
 
 extern crate panic_halt;
 use arduino_leonardo::prelude::*;
+use arduino_leonardo::adc;
 
 #[arduino_leonardo::entry]
 fn main() -> ! {
@@ -19,12 +20,12 @@ fn main() -> ! {
 
     ufmt::uwriteln!(&mut serial, "Reading analog inputs ...\r").void_unwrap();
 
-    let mut adc = arduino_leonardo::adc::Adc::new(dp.ADC, Default::default());
+    let mut adc = adc::Adc::new(dp.ADC, Default::default());
 
     let (vbg, gnd, temp): (u16, u16, u16) = (
-        nb::block!(adc.read(&mut arduino_leonardo::adc::channel::Vbg)).void_unwrap(),
-        nb::block!(adc.read(&mut arduino_leonardo::adc::channel::Gnd)).void_unwrap(),
-        nb::block!(adc.read(&mut arduino_leonardo::adc::channel::Temperature)).void_unwrap(),
+        nb::block!(adc.read(&mut adc::channel::Vbg)).void_unwrap(),
+        nb::block!(adc.read(&mut adc::channel::Gnd)).void_unwrap(),
+        nb::block!(adc.read(&mut adc::channel::Temperature)).void_unwrap(),
     );
 
     ufmt::uwriteln!(&mut serial, "Vbandgap: {}\r", vbg).void_unwrap();
