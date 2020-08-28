@@ -14,7 +14,7 @@ fn main() -> ! {
     let mut delay = arduino_uno::Delay::new();
 
     let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
-    
+
     let mut serial = arduino_uno::Serial::new(
         dp.USART0,
         pins.d0,
