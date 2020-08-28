@@ -8,11 +8,7 @@ use arduino_uno::prelude::*;
 fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
 
-    let mut pins = arduino_uno::Pins::new(
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-    );
+    let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
     let mut serial = arduino_uno::Serial::new(
         dp.USART0,
         pins.d0,
@@ -27,9 +23,11 @@ fn main() -> ! {
     );
 
     ufmt::uwriteln!(&mut serial, "Write direction test:\r").void_unwrap();
-    i2c.i2cdetect(&mut serial, arduino_uno::hal::i2c::Direction::Write).void_unwrap();
+    i2c.i2cdetect(&mut serial, arduino_uno::hal::i2c::Direction::Write)
+        .void_unwrap();
     ufmt::uwriteln!(&mut serial, "\r\nRead direction test:\r").void_unwrap();
-    i2c.i2cdetect(&mut serial, arduino_uno::hal::i2c::Direction::Read).void_unwrap();
+    i2c.i2cdetect(&mut serial, arduino_uno::hal::i2c::Direction::Read)
+        .void_unwrap();
 
     loop {
         arduino_uno::delay_ms(1000);

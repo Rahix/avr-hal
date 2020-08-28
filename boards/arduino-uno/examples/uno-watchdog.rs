@@ -1,9 +1,9 @@
 #![no_std]
 #![no_main]
 
-use panic_halt as _;
 use arduino_uno::prelude::*;
 use arduino_uno::wdt;
+use panic_halt as _;
 
 #[arduino_uno::entry]
 fn main() -> ! {

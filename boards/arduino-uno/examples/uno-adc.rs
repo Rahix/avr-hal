@@ -2,8 +2,8 @@
 #![no_main]
 
 extern crate panic_halt;
-use arduino_uno::prelude::*;
 use arduino_uno::adc;
+use arduino_uno::prelude::*;
 
 // This example opens a serial connection to the host computer.  On most POSIX operating systems (like GNU/Linux or
 // OSX), you can interface with the program by running (assuming the device appears as ttyACM0)
@@ -14,18 +14,10 @@ use arduino_uno::adc;
 fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
 
-    let mut pins = arduino_uno::Pins::new(
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-    );
+    let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
 
-    let mut serial = arduino_uno::Serial::new(
-        dp.USART0,
-        pins.d0,
-        pins.d1.into_output(&mut pins.ddr),
-        9600,
-    );
+    let mut serial =
+        arduino_uno::Serial::new(dp.USART0, pins.d0, pins.d1.into_output(&mut pins.ddr), 9600);
 
     let mut adc = adc::Adc::new(dp.ADC, Default::default());
     let mut a0 = pins.a0.into_analog_input(&mut adc);

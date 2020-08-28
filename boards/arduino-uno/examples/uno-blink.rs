@@ -8,11 +8,7 @@ use arduino_uno::prelude::*;
 fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
 
-    let mut pins = arduino_uno::Pins::new(
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-    );
+    let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
 
     // Digital pin 13 is also connected to an onboard LED marked "L"
     let mut led = pins.d13.into_output(&mut pins.ddr);

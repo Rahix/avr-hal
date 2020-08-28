@@ -5,10 +5,8 @@ extern crate panic_halt;
 
 use arduino_uno::prelude::*;
 
-
 #[arduino_uno::entry]
 fn main() -> ! {
-
     let dp = arduino_uno::Peripherals::take().unwrap();
 
     let mut delay = arduino_uno::Delay::new();
@@ -35,7 +33,6 @@ fn main() -> ! {
     let echo = pins.d3;
 
     'outer: loop {
-
         // the timer is reinitialized with value 0.
         timer1.tcnt1.write(|w| unsafe { w.bits(0) });
 
@@ -49,7 +46,11 @@ fn main() -> ! {
             // 0.2s/4µs = 50000
             if timer1.tcnt1.read().bits() >= 50000 {
                 // jump to the beginning of the outer loop if no obstacle is detected
-                ufmt::uwriteln!(&mut serial, "Nothing was detected and jump to outer loop.\r").void_unwrap();
+                ufmt::uwriteln!(
+                    &mut serial,
+                    "Nothing was detected and jump to outer loop.\r"
+                )
+                .void_unwrap();
                 continue 'outer;
             }
         }
@@ -67,6 +68,11 @@ fn main() -> ! {
         // 0.1s/4µs = 50000
         while timer1.tcnt1.read().bits() < 25000 {}
 
-        ufmt::uwriteln!(&mut serial, "Hello, we are {} cms away from target!\r", value).void_unwrap();
+        ufmt::uwriteln!(
+            &mut serial,
+            "Hello, we are {} cms away from target!\r",
+            value
+        )
+        .void_unwrap();
     }
 }
