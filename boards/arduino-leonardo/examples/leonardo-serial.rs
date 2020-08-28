@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
+use panic_halt as _;
 use arduino_leonardo::prelude::*;
 
 #[arduino_leonardo::entry]

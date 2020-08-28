@@ -2,7 +2,7 @@
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
-extern crate panic_halt;
+use panic_halt as _;
 use arduino_leonardo::prelude::*;
 
 // This pin will be used from the interrupt handler
