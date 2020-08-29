@@ -237,5 +237,15 @@ macro_rules! impl_spi {
                 Ok(self.peripheral.spdr.read().bits())
             }
         }
+
+        /// Default Trasmer trait implementation. Only 8-bit word size is supported for now.
+        impl<MisoInputMode: $crate::port::mode::InputMode> $crate::hal::blocking::spi::transfer::Default<u8> for $Spi<MisoInputMode>
+        {
+        }
+
+        /// Default Write trait implementation. Only 8-bit word size is supported for now.
+        impl<MisoInputMode: $crate::port::mode::InputMode> $crate::hal::blocking::spi::write::Default<u8> for $Spi<MisoInputMode>
+        {
+        }
     };
 }
