@@ -1,7 +1,7 @@
 [package]
 name = "sparkfun-pro-micro"
 version = "0.1.0"
-authors = ["Rahix <rahix@rahix.de>"]
+authors = ["Cecile Tonglet <cecile.tonglet@cecton.com>"]
 edition = "2018"
 
 [features]
