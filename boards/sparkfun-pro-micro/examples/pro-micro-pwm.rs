@@ -1,8 +1,9 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
 use sparkfun_pro_micro::prelude::*;
+use sparkfun_pro_micro::pwm;
+use panic_halt as _;
 
 #[sparkfun_pro_micro::entry]
 fn main() -> ! {
@@ -10,7 +11,7 @@ fn main() -> ! {
 
     let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 
-    let mut timer4 = sparkfun_pro_micro::pwm::Timer4Pwm::new(dp.TC4);
+    let mut timer4 = pwm::Timer4Pwm::new(dp.TC4, pwm::Prescaler::Prescale64);
 
     let mut led = pins.d13.into_output(&mut pins.ddr).into_pwm(&mut timer4);
 
