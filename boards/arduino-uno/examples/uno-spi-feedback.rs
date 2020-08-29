@@ -15,10 +15,9 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
 use arduino_uno::prelude::*;
-use arduino_uno::spi::{Settings, Spi};
-use nb::block;
+use arduino_uno::spi;
+use panic_halt as _;
 
 #[arduino_uno::entry]
 fn main() -> ! {
@@ -36,19 +35,19 @@ fn main() -> ! {
     pins.d10.into_output(&mut pins.ddr); // SS must be set to output mode.
 
     // Create SPI interface.
-    let mut spi = Spi::new(
+    let mut spi = spi::Spi::new(
         dp.SPI,
         pins.d13.into_output(&mut pins.ddr),
         pins.d11.into_output(&mut pins.ddr),
         pins.d12.into_pull_up_input(&mut pins.ddr),
-        Settings::default(),
+        spi::Settings::default(),
     );
 
     loop {
         // Send a byte
-        block!(spi.send(0b00001111)).void_unwrap();
+        nb::block!(spi.send(0b00001111)).void_unwrap();
         // Because MISO is connected to MOSI, the read data should be the same
-        let data = block!(spi.read()).void_unwrap();
+        let data = nb::block!(spi.read()).void_unwrap();
 
         ufmt::uwriteln!(&mut serial, "data: {}\r", data).void_unwrap();
         arduino_uno::delay_ms(1000);

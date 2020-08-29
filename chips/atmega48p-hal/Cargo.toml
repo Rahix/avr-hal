@@ -1,0 +1,15 @@
+[package]
+name = "atmega48p-hal"
+version = "0.1.0"
+authors = ["Boris Vinogradov <no111u3@gmail.com>"]
+edition = "2018"
+
+[features]
+rt = ["avr-device/rt"]
+
+[dependencies]
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+
+[dependencies.avr-device]
+version = "0.2.2"
+features = ["atmega48p"]

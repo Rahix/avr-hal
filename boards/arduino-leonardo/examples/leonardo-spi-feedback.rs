@@ -10,10 +10,10 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
 use arduino_leonardo::prelude::*;
 use arduino_leonardo::spi;
 use nb::block;
+use panic_halt as _;
 
 #[arduino_leonardo::entry]
 fn main() -> ! {

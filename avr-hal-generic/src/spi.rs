@@ -1,8 +1,26 @@
 //! SPI Implementation
+use embedded_hal::spi;
 
-pub use embedded_hal::spi;
-
-/// Oscillator Clock Frequency division options.  Controls both SPR and SPI2X register bits.
+/// Oscillator Clock Frequency division options.
+///
+/// The bus speed is calculated by dividing the IO clock by the prescaler:
+///
+/// ```text
+/// F_sck = CLK_io / Prescaler
+/// ```
+///
+/// Please note that the overall transfer speed might be lower due to software overhead while
+/// sending / receiving.
+///
+/// | Prescale | 16 MHz Clock | 8 MHz Clock |
+/// | --- | --- | --- |
+/// | `OscfOver2` | 8 MHz | 4 MHz |
+/// | `OscfOver4` | 4 MHz | 2 MHz |
+/// | `OscfOver8` | 2 MHz | 1 MHz |
+/// | `OscfOver16` | 1 MHz | 500 kHz |
+/// | `OscfOver32` | 500 kHz | 250 kHz |
+/// | `OscfOver64` | 250 kHz | 125 kHz |
+/// | `OscfOver128` | 125 kHz | 62.5 kHz |
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SerialClockRate {
     OscfOver2,
@@ -60,14 +78,9 @@ macro_rules! impl_spi {
             }
         }
     ) => {
-
-        use $crate::void::Void;
-        use $crate::hal::spi;
-        pub use avr_hal::spi::*;
-
         type SCLK = $sclkmod::$SCLK<$crate::port::mode::Output>;
         type MOSI = $mosimod::$MOSI<$crate::port::mode::Output>;
-        type MISO = $misomod::$MISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>;
+        type MISO<InputMode> = $misomod::$MISO<$crate::port::mode::Input<InputMode>>;
 
         /// Behavior for a SPI interface.
         ///
@@ -75,23 +88,23 @@ macro_rules! impl_spi {
         /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
         /// Instantiate with the `new` method.
         $(#[$spi_attr])*
-        pub struct $Spi {
+        pub struct $Spi<MisoInputMode: $crate::port::mode::InputMode> {
             peripheral: $SPI,
             sclk: SCLK,
             mosi: MOSI,
-            miso: MISO,
+            miso: MISO<MisoInputMode>,
             settings: Settings,
             is_write_in_progress: bool,
         }
 
-        /// Implementation-specific behavior of the struct, including setup/tear-down
-        impl $Spi {
-            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings
+        impl $Spi<$crate::port::mode::PullUp> {
+            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings,
+            /// with the internal pull-up enabled on the MISO pin.
             ///
             /// The pins are not actually used directly, but they are moved into the struct in
             /// order to enforce that they are in the correct mode, and cannot be used by anyone
             /// else while SPI is active.
-            pub fn new(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO, settings: Settings) -> $Spi {
+            pub fn new(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO<$crate::port::mode::PullUp>, settings: Settings) -> Self {
                 let spi = Spi {
                     peripheral,
                     sclk,
@@ -103,11 +116,34 @@ macro_rules! impl_spi {
                 spi.setup();
                 spi
             }
+        }
 
+        impl $Spi<$crate::port::mode::Floating> {
+            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings,
+            /// with an external pull-up on the MISO pin.
+            ///
+            /// The pins are not actually used directly, but they are moved into the struct in
+            /// order to enforce that they are in the correct mode, and cannot be used by anyone
+            /// else while SPI is active.
+            pub fn with_external_pullup(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO<$crate::port::mode::Floating>, settings: Settings) -> Self {
+                let spi = Spi {
+                    peripheral,
+                    sclk,
+                    mosi,
+                    miso,
+                    settings,
+                    is_write_in_progress: false,
+                };
+                spi.setup();
+                spi
+            }
+        }
+
+        impl<MisoInputMode: $crate::port::mode::InputMode> $Spi<MisoInputMode> {
             /// Disable the SPI device and release ownership of the peripheral
             /// and pins.  Instance can no-longer be used after this is
             /// invoked.
-            pub fn release(self) -> ($SPI, SCLK, MOSI, MISO) {
+            pub fn release(self) -> ($SPI, SCLK, MOSI, MISO<MisoInputMode>) {
                 self.peripheral.spcr.write(|w| {
                     w.spe().clear_bit()
                 });
@@ -135,6 +171,8 @@ macro_rules! impl_spi {
 
             /// Sets up the control/status registers with the right settings for this secondary device
             fn setup(&self) {
+                use $crate::hal::spi;
+
                 // set up control register
                 self.peripheral.spcr.write(|w| {
                     // enable SPI
@@ -175,7 +213,7 @@ macro_rules! impl_spi {
                     SerialClockRate::OscfOver16 => w.spi2x().clear_bit(),
                     SerialClockRate::OscfOver32 => w.spi2x().set_bit(),
                     SerialClockRate::OscfOver64 => w.spi2x().clear_bit(),
-                    SerialClockRate::OscfOver128 => w.spi2x().set_bit(),
+                    SerialClockRate::OscfOver128 => w.spi2x().clear_bit(),
                 });
             }
         }
@@ -183,7 +221,7 @@ macro_rules! impl_spi {
         /// FullDuplex trait implementation, allowing this struct to be provided to
         /// drivers that require it for operation.  Only 8-bit word size is supported
         /// for now.
-        impl $crate::hal::spi::FullDuplex<u8> for $Spi {
+        impl<MisoInputMode: $crate::port::mode::InputMode> $crate::hal::spi::FullDuplex<u8> for $Spi<MisoInputMode> {
             type Error = $crate::void::Void;
 
             /// Sets up the device for transmission and sends the data

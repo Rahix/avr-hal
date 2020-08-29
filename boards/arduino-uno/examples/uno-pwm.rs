@@ -1,8 +1,9 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
 use arduino_uno::prelude::*;
+use arduino_uno::pwm;
+use panic_halt as _;
 
 #[arduino_uno::entry]
 fn main() -> ! {
@@ -10,7 +11,7 @@ fn main() -> ! {
 
     let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
 
-    let mut timer1 = arduino_uno::pwm::Timer1Pwm::new(dp.TC1);
+    let mut timer1 = pwm::Timer1Pwm::new(dp.TC1, pwm::Prescaler::Prescale64);
 
     let mut pin = pins.d9.into_output(&mut pins.ddr).into_pwm(&mut timer1);
 

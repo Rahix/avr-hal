@@ -1,0 +1,19 @@
+[package]
+name = "arduino-diecimila"
+version = "0.1.0"
+authors = ["Karl Thorén <karl.h.thoren@gmail.com>"]
+edition = "2018"
+
+[features]
+default = ["rt"]
+rt = ["atmega168-hal/rt"]
+
+[dependencies]
+atmega168-hal = { path = "../../chips/atmega168-hal/" }
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+
+[dev-dependencies]
+panic-halt = "0.2.0"
+nb = "0.1.2"
+ufmt = "0.1.0"
+

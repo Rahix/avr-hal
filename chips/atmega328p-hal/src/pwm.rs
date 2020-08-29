@@ -6,7 +6,7 @@
 //! # Example
 //! ```
 //! let mut portd = dp.PORTD.split();
-//! let mut timer0 = Timer0Pwm::new(dp.TC0);
+//! let mut timer0 = Timer0Pwm::new(dp.TC0, pwm::Prescaler::Prescale64);
 //!
 //! let mut pd5 = portd.pd5.into_output(&mut portd.ddr).into_pwm(&mut timer0);
 //!
@@ -26,6 +26,7 @@
 //! | `PD6` | `.into_pwm(&mut timer0)` |
 
 use crate::port::{portb, portd};
+pub use avr_hal::pwm::*;
 
 avr_hal::impl_pwm! {
     /// Use `TC0` for PWM (pins `PD5`, `PD6`)
@@ -33,7 +34,7 @@ avr_hal::impl_pwm! {
     /// # Example
     /// ```
     /// let mut portd = dp.PORTD.split();
-    /// let mut timer0 = Timer0Pwm::new(dp.TC0);
+    /// let mut timer0 = Timer0Pwm::new(dp.TC0, pwm::Prescaler::Prescale64);
     ///
     /// let mut pd5 = portd.pd5.into_output(&mut portd.ddr).into_pwm(&mut timer0);
     /// let mut pd6 = portd.pd6.into_output(&mut portd.ddr).into_pwm(&mut timer0);
@@ -43,9 +44,15 @@ avr_hal::impl_pwm! {
     /// ```
     pub struct Timer0Pwm {
         timer: crate::atmega328p::TC0,
-        init: |tim| {
+        init: |tim, prescaler| {
             tim.tccr0a.modify(|_, w| w.wgm0().pwm_fast());
-            tim.tccr0b.modify(|_, w| w.cs0().prescale_64());
+            tim.tccr0b.modify(|_, w| match prescaler {
+                Prescaler::Direct => w.cs0().direct(),
+                Prescaler::Prescale8 => w.cs0().prescale_8(),
+                Prescaler::Prescale64 => w.cs0().prescale_64(),
+                Prescaler::Prescale256 => w.cs0().prescale_256(),
+                Prescaler::Prescale1024 => w.cs0().prescale_1024(),
+            });
         },
         pins: {
             portd::PD6: {
@@ -74,7 +81,7 @@ avr_hal::impl_pwm! {
     /// # Example
     /// ```
     /// let mut portb = dp.PORTB.split();
-    /// let mut timer1 = Timer1Pwm::new(dp.TC1);
+    /// let mut timer1 = Timer1Pwm::new(dp.TC1, pwm::Prescaler::Prescale64);
     ///
     /// let mut pb1 = portb.pb1.into_output(&mut portb.ddr).into_pwm(&mut timer1);
     /// let mut pb2 = portb.pb2.into_output(&mut portb.ddr).into_pwm(&mut timer1);
@@ -84,9 +91,18 @@ avr_hal::impl_pwm! {
     /// ```
     pub struct Timer1Pwm {
         timer: crate::atmega328p::TC1,
-        init: |tim| {
+        init: |tim, prescaler| {
             tim.tccr1a.modify(|_, w| w.wgm1().bits(0b01));
-            tim.tccr1b.modify(|_, w| w.wgm1().bits(0b01).cs1().prescale_64());
+            tim.tccr1b.modify(|_, w| {
+                w.wgm1().bits(0b01);
+                match prescaler {
+                    Prescaler::Direct => w.cs1().direct(),
+                    Prescaler::Prescale8 => w.cs1().prescale_8(),
+                    Prescaler::Prescale64 => w.cs1().prescale_64(),
+                    Prescaler::Prescale256 => w.cs1().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs1().prescale_1024(),
+                }
+            });
         },
         pins: {
             portb::PB1: {
@@ -116,7 +132,7 @@ avr_hal::impl_pwm! {
     /// ```
     /// let mut portb = dp.PORTB.split();
     /// let mut portd = dp.PORTD.split();
-    /// let mut timer2 = Timer2Pwm::new(dp.TC2);
+    /// let mut timer2 = Timer2Pwm::new(dp.TC2, pwm::Prescaler::Prescale64);
     ///
     /// let mut pb3 = portb.pb3.into_output(&mut portb.ddr).into_pwm(&mut timer2);
     /// let mut pd3 = portd.pd3.into_output(&mut portd.ddr).into_pwm(&mut timer2);
@@ -126,9 +142,15 @@ avr_hal::impl_pwm! {
     /// ```
     pub struct Timer2Pwm {
         timer: crate::atmega328p::TC2,
-        init: |tim| {
+        init: |tim, prescaler| {
             tim.tccr2a.modify(|_, w| w.wgm2().pwm_fast());
-            tim.tccr2b.modify(|_, w| w.cs2().prescale_64());
+            tim.tccr2b.modify(|_, w| match prescaler {
+                Prescaler::Direct => w.cs2().direct(),
+                Prescaler::Prescale8 => w.cs2().prescale_8(),
+                Prescaler::Prescale64 => w.cs2().prescale_64(),
+                Prescaler::Prescale256 => w.cs2().prescale_256(),
+                Prescaler::Prescale1024 => w.cs2().prescale_1024(),
+            });
         },
         pins: {
             portb::PB3: {
@@ -136,7 +158,7 @@ avr_hal::impl_pwm! {
                 into_pwm: |tim| if enable {
                     tim.tccr2a.modify(|_, w| w.com2a().match_clear());
                 } else {
-                    tim.tccr2a.modify(|_, w| w.com2b().disconnected());
+                    tim.tccr2a.modify(|_, w| w.com2a().disconnected());
                 },
             },
             portd::PD3: {

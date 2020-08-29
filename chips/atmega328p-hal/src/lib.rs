@@ -14,6 +14,7 @@ pub mod port;
 
 pub mod adc;
 pub mod pwm;
+pub mod wdt;
 
 pub mod prelude {
     pub use crate::avr_hal::prelude::*;

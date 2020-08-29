@@ -22,19 +22,16 @@
 //! In the example above, all of the settings are left at the default.  You can
 //! also instantiate a Settings object with the other options available.
 
-extern crate avr_hal_generic as avr_hal;
-
+use crate::port::portb;
 pub use avr_hal::spi::*;
-use crate::port::{portb::PB3,portb::PB4,portb::PB5,mode};
-
 
 avr_hal::impl_spi! {
     pub struct Spi {
-        peripheral: crate::atmega328p::SPI,
+        peripheral: crate::atmega48p::SPI,
         pins: {
-            sclk: PB5,
-            posi: PB3,
-            piso: PB4,
+            sclk: portb::PB5,
+            mosi: portb::PB3,
+            miso: portb::PB4,
         }
     }
 }

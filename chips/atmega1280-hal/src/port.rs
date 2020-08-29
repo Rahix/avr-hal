@@ -14,17 +14,17 @@ pub trait PortExt {
 
 avr_hal::impl_generic_pin! {
     pub enum Pin {
-        A(crate::atmega1280::PORTA, porta, pina),
-        B(crate::atmega1280::PORTB, portb, pinb),
-        C(crate::atmega1280::PORTC, portc, pinc),
-        D(crate::atmega1280::PORTD, portd, pind),
-        E(crate::atmega1280::PORTE, porte, pine),
-        F(crate::atmega1280::PORTF, portf, pinf),
-        G(crate::atmega1280::PORTG, portg, ping),
-        H(crate::atmega1280::PORTH, porth, pinh),
-        J(crate::atmega1280::PORTJ, portj, pinj),
-        K(crate::atmega1280::PORTK, portk, pink),
-        L(crate::atmega1280::PORTL, portl, pinl),
+        A(crate::atmega1280::PORTA, porta, pina, ddra),
+        B(crate::atmega1280::PORTB, portb, pinb, ddrb),
+        C(crate::atmega1280::PORTC, portc, pinc, ddrc),
+        D(crate::atmega1280::PORTD, portd, pind, ddrd),
+        E(crate::atmega1280::PORTE, porte, pine, ddre),
+        F(crate::atmega1280::PORTF, portf, pinf, ddrf),
+        G(crate::atmega1280::PORTG, portg, ping, ddrg),
+        H(crate::atmega1280::PORTH, porth, pinh, ddrh),
+        J(crate::atmega1280::PORTJ, portj, pinj, ddrj),
+        K(crate::atmega1280::PORTK, portk, pink, ddrk),
+        L(crate::atmega1280::PORTL, portl, pinl, ddrl),
     }
 }
 

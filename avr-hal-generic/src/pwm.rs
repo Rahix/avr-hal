@@ -1,5 +1,35 @@
 //! PWM Implementation
 
+/// Clock prescaler for PWM
+///
+/// The prescaler dictates the PWM frequency, together with the IO clock.  The formula is as
+/// follows:
+///
+/// ```text
+/// F_pwm = CLK_io / (Prescaler * 256);
+/// ```
+///
+/// | Prescaler | 16 MHz Clock | 8 MHz Clock |
+/// | --- | --- | ---|
+/// | `Direct` | 62.5 kHz | 31.3 kHz |
+/// | `Prescale8` | 7.81 kHz | 3.91 kHz |
+/// | `Prescale64` | 977 Hz | 488 Hz |
+/// | `Prescale256` | 244 Hz | 122 Hz |
+/// | `Prescale1024` | 61.0 Hz | 30.5 Hz |
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Prescaler {
+    /// No prescaling, the IO clock drives the timer directly.
+    Direct,
+    /// Divide the IO clock by 8.
+    Prescale8,
+    /// Divide the IO clock by 64.
+    Prescale64,
+    /// Divide the IO clock by 256.
+    Prescale256,
+    /// Divide the IO clock by 1024.
+    Prescale1024,
+}
+
 /// Implement traits and types for PWM timers
 #[macro_export]
 macro_rules! impl_pwm {
@@ -7,7 +37,7 @@ macro_rules! impl_pwm {
         $(#[$timer_pwm_attr:meta])*
         pub struct $TimerPwm:ident {
             timer: $TIMER:ty,
-            init: |$init_timer:ident| $init_block:block,
+            init: |$init_timer:ident, $prescaler:ident| $init_block:block,
             pins: {$(
                 $port:ident::$PXi:ident: {
                     ocr: $ocr:ident,
@@ -23,11 +53,12 @@ macro_rules! impl_pwm {
         }
 
         impl $TimerPwm {
-            pub fn new(timer: $TIMER) -> $TimerPwm {
+            pub fn new(timer: $TIMER, prescaler: $crate::pwm::Prescaler) -> $TimerPwm {
                 let mut t = $TimerPwm { timer };
 
                 {
                     let $init_timer = &mut t.timer;
+                    let $prescaler = prescaler;
                     $init_block
                 }
 

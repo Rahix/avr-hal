@@ -5,9 +5,8 @@ use arduino_uno::prelude::*;
 
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    let mut serial: arduino_uno::Serial<arduino_uno::hal::port::mode::Floating> = unsafe {
-        core::mem::MaybeUninit::uninit().assume_init()
-    };
+    let mut serial: arduino_uno::Serial<arduino_uno::hal::port::mode::Floating> =
+        unsafe { core::mem::MaybeUninit::uninit().assume_init() };
 
     ufmt::uwriteln!(&mut serial, "Firmware panic!\r").void_unwrap();
 
@@ -18,7 +17,8 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
             loc.file(),
             loc.line(),
             loc.column(),
-        ).void_unwrap();
+        )
+        .void_unwrap();
     }
 
     loop {}
@@ -28,11 +28,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
 
-    let mut pins = arduino_uno::Pins::new(
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-    );
+    let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
 
     let mut serial = arduino_uno::Serial::new(
         dp.USART0,

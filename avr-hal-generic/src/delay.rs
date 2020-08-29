@@ -218,6 +218,7 @@ where
         for _ in 0..(us >> 12) {
             delay::DelayUs::<u16>::delay_us(self, 0xfff);
         }
+        delay::DelayUs::<u16>::delay_us(self, (us & 0xfff) as u16);
     }
 }
 

@@ -48,6 +48,9 @@
 //!
 //! // Convert into output
 //! let pd2: PD2<mode::Output> = pd2.into_output(&mut portd.ddr);
+//!
+//! // Convert into tri-state input and output.
+//! let pd2: PD2<mode::TriState> = pd2.into_tri_state(&mut portd.ddr);
 //! ```
 //!
 //! ### Digital Input
@@ -72,6 +75,25 @@
 //! // Check what the pin was last set to
 //! pd2.is_set_high().void_unwrap();
 //! pd2.is_set_low().void_unwrap();
+//! ```
+//!
+//! ### Digital Tri-State Output and Input
+//! Digital I/O pins in tri-state mode (i.e. where `MODE` = `mode::TriState`),
+//! usually with an external pull-up, are useful for a one wire bus.
+//! They can be used as both output and input pins, like this:
+//!
+//! ```ignore
+//! // Actively drive the pin low.
+//! pd2.set_low().void_unwrap();
+//! // Release the pin, allowing the external pull-up to pull the pin
+//! // in the absence of another driver
+//! pd2.set_high().void_unwrap();
+//!
+//! // `true` if the pin is electrically high, `false` if it is low
+//! pd2.is_high().void_unwrap();
+//! // `true` if the pin is electrically low, driven by either the
+//! // microcontroller or externally
+//! pd2.is_low().void_unwrap();
 //! ```
 //!
 //! ### Other Modes
@@ -125,11 +147,15 @@ pub mod mode {
     pub struct Pwm<TIMER> {
         _m: core::marker::PhantomData<TIMER>,
     }
+    /// Pin configured in open drain mode.
+    pub struct TriState;
 
     impl private::Unimplementable for Output {}
     impl<M: InputMode> private::Unimplementable for Input<M> {}
+    impl private::Unimplementable for TriState {}
     impl DigitalIO for Output {}
     impl<M: InputMode> DigitalIO for Input<M> {}
+    impl DigitalIO for TriState {}
 
     /// Pin input configured **without** internal pull-up
     pub struct Floating;
@@ -151,7 +177,7 @@ pub mod mode {
 macro_rules! impl_generic_pin {
     (
         pub enum $GenericPin:ident {
-            $($PortEnum:ident($PORTX:ty, $reg_port:ident, $reg_pin:ident),)+
+            $($PortEnum:ident($PORTX:ty, $reg_port:ident, $reg_pin:ident, $reg_ddr:ident),)+
         }
     ) => {
         mod generic_pin {
@@ -230,9 +256,80 @@ macro_rules! impl_generic_pin {
                 }
             }
 
-            impl digital::toggleable::Default for $GenericPin<mode::Output> {}
+            impl digital::ToggleableOutputPin for $GenericPin<mode::Output> {
+                type Error = Void;
+
+                fn toggle(&mut self) -> Result<(), Self::Error> {
+                    match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_pin
+                                    .write(|w| w.bits(1 << *i))
+                            },
+                        )+
+                    }
+                    Ok(())
+                }
+            }
 
             impl<MODE: mode::InputMode> digital::InputPin for $GenericPin<mode::Input<MODE>> {
+                type Error = Void;
+
+                fn is_high(&self) -> Result<bool, Self::Error> {
+                    Ok(match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_pin.read().bits() & (1 << *i) != 0
+                            }
+                        )+
+                    })
+                }
+
+                fn is_low(&self) -> Result<bool, Self::Error> {
+                    Ok(match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr())
+                                    .$reg_pin.read().bits() & (1 << *i) == 0
+                            }
+                        )+
+                    })
+                }
+            }
+
+            impl digital::OutputPin for $GenericPin<mode::TriState> {
+                type Error = Void;
+
+                fn set_high(&mut self) -> Result<(), Self::Error> {
+                    match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                        w.bits(r.bits() & !(1 << *i))
+                                    })
+                            },
+                        )+
+                    }
+                    Ok(())
+                }
+
+                fn set_low(&mut self) -> Result<(), Self::Error> {
+                    match self {
+                        $(
+                            $GenericPin::$PortEnum(i, _) => unsafe {
+                                (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                        w.bits(r.bits() | (1 << *i))
+                                    })
+                            },
+                        )+
+                    }
+                    Ok(())
+                }
+            }
+
+            impl digital::InputPin for $GenericPin<mode::TriState> {
                 type Error = Void;
 
                 fn is_high(&self) -> Result<bool, Self::Error> {
@@ -444,6 +541,24 @@ macro_rules! impl_port {
                         }
                         $PXi { _mode: marker::PhantomData }
                     }
+
+                    /// Make this pin a tri-state pin. Default state is released (high) mode.
+                    /// Internal pull-up is not used.
+                    ///
+                    /// Note that, as always, it is ***not safe*** to connect the external
+                    /// pull-up to a voltage higher than VCC + 0.5.  See your chip's
+                    /// datasheet for more details.
+                    pub fn into_tri_state<D: AsDDR>(self, ddr: &D) -> $PXi<mode::TriState> {
+                        unsafe {
+                            (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                w.bits(r.bits() & !(1 << $i))
+                            });
+                            (*<$PORTX>::ptr()).$reg_port.modify(|r, w| {
+                                w.bits(r.bits() & !(1 << $i))
+                            });
+                        }
+                        $PXi { _mode: marker::PhantomData }
+                    }
                 }
                 // -------------------------------------------------------- }}}
 
@@ -485,9 +600,58 @@ macro_rules! impl_port {
                     }
                 }
 
-                impl digital::toggleable::Default for $PXi<mode::Output> {}
+                impl digital::ToggleableOutputPin for $PXi<mode::Output> {
+                    type Error = Void;
+
+                    fn toggle(&mut self) -> Result<(), Self::Error> {
+                        unsafe {
+                            (*<$PORTX>::ptr()).$reg_pin.write(|w| {
+                                w.bits(1 << $i)
+                            });
+                        }
+                        Ok(())
+                    }
+                }
 
                 impl<MODE: mode::InputMode> digital::InputPin for $PXi<mode::Input<MODE>> {
+                    type Error = Void;
+
+                    fn is_high(&self) -> Result<bool, Self::Error> {
+                        Ok(unsafe {
+                            (*<$PORTX>::ptr()).$reg_pin.read().bits()
+                        } & (1 << $i) != 0)
+                    }
+
+                    fn is_low(&self) -> Result<bool, Self::Error> {
+                        Ok(unsafe {
+                            (*<$PORTX>::ptr()).$reg_pin.read().bits()
+                        } & (1 << $i) == 0)
+                    }
+                }
+
+                impl digital::OutputPin for $PXi<mode::TriState> {
+                    type Error = Void;
+
+                    fn set_high(&mut self) -> Result<(), Self::Error> {
+                        unsafe {
+                            (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                w.bits(r.bits() & !(1 << $i))
+                            });
+                        }
+                        Ok(())
+                    }
+
+                    fn set_low(&mut self) -> Result<(), Self::Error> {
+                        unsafe {
+                            (*<$PORTX>::ptr()).$reg_ddr.modify(|r, w| {
+                                w.bits(r.bits() | (1 << $i))
+                            });
+                        }
+                        Ok(())
+                    }
+                }
+
+                impl digital::InputPin for $PXi<mode::TriState> {
                     type Error = Void;
 
                     fn is_high(&self) -> Result<bool, Self::Error> {
