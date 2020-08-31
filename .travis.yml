@@ -20,6 +20,7 @@ env:
     - BOARD=arduino-uno
     - BOARD=bigavr6
     - BOARD=trinket
+    - BOARD=sparkfun-pro-micro
 
 install:
   - rustup component add rust-src
