@@ -57,6 +57,8 @@ macro_rules! impl_usart {
                 let brr = CLOCK::FREQ / (16 * baud) - 1;
                 self.p.[<ubrr $n>].write(|w| unsafe { w.bits(brr as u16) });
 
+                self.p.[<ucsr $n a>].reset();
+
                 // Enable receiver and transmitter but leave interrupts disabled.
                 self.p.[<ucsr $n b>].write(|w| w
                     .[<txen $n>]().set_bit()
