@@ -229,7 +229,7 @@ macro_rules! impl_twi_i2c {
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
                 // Disable prescaler
-                p.$twsr.modify(|_, w| w.$twps().prescaler_1());
+                p.$twsr.write(|w| w.$twps().prescaler_1());
 
                 $I2c {
                     p,
@@ -259,7 +259,7 @@ macro_rules! impl_twi_i2c {
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
                 // Disable prescaler
-                p.$twsr.modify(|_, w| w.$twps().prescaler_1());
+                p.$twsr.write(|w| w.$twps().prescaler_1());
 
                 $I2c {
                     p,
