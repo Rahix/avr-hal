@@ -214,9 +214,11 @@ where
     Delay<SPEED>: delay::DelayUs<u16>,
 {
     fn delay_us(&mut self, us: u32) {
-        // TODO: Somehow fix the overhead induced by this loop
-        for _ in 0..(us >> 12) {
+        let iters = (us >> 12);
+        let mut i = 0;
+        while i < iters {
             delay::DelayUs::<u16>::delay_us(self, 0xfff);
+            i += 1;
         }
         delay::DelayUs::<u16>::delay_us(self, (us & 0xfff) as u16);
     }
