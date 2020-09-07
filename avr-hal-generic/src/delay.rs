@@ -214,6 +214,11 @@ where
     Delay<SPEED>: delay::DelayUs<u16>,
 {
     fn delay_us(&mut self, us: u32) {
+        // TODO: Somehow fix the overhead induced by this loop
+        // This was previously a range-based for loop, but that would
+        // compile down to fairly poor code. This is slightly better,
+        // but still has some overhead and may not lead to cycle-accurate
+        // delays.
         let iters = (us >> 12);
         let mut i = 0;
         while i < iters {
