@@ -50,8 +50,28 @@ fn main() -> ! {
         for (i, v) in values.iter().enumerate() {
             ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).void_unwrap();
         }
-        ufmt::uwriteln!(&mut serial, "\r").void_unwrap();
 
+        // Arduino Nano has two more ADC pins A6 and A7.  Accessing them works a bit different from
+        // the other pins as they are not normal IO pins.  The code below shows how it works.
+        //
+        // The `arduino-nano` feature of this crate needs to be enabled to make them available.
+        // You can build the example for Arduino Nano like this:
+        //
+        //      cargo +nightly build --example uno-adc --features arduino-nano
+        //
+        // And run it with:
+        //
+        //      cargo +nightly run --example uno-adc --features arduino-nano
+        #[cfg(feature = "arduino-nano")]
+        {
+            let adc6: u16 = nb::block!(adc.read(&mut adc::channel::ADC6)).void_unwrap();
+            ufmt::uwrite!(&mut serial, "A6: {} ", adc6).void_unwrap();
+
+            let adc7: u16 = nb::block!(adc.read(&mut adc::channel::ADC7)).void_unwrap();
+            ufmt::uwrite!(&mut serial, "A7: {} ", adc7).void_unwrap();
+        }
+
+        ufmt::uwriteln!(&mut serial, "\r").void_unwrap();
         arduino_uno::delay_ms(1000);
     }
 }

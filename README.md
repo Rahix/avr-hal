@@ -166,6 +166,8 @@ Each board crate comes with a few examples showing how to use them.  For more de
   - [Website](https://www.arduino.cc/en/Main/Arduino_BoardLeonardo)
 * [Arduino Uno](./boards/arduino-uno) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_uno)
   - [Website](https://store.arduino.cc/usa/arduino-uno-rev3)
+* [Arduino Nano](./boards/arduino-uno) (via `arduino-uno` crate) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_uno)
+  - [Website](https://store.arduino.cc/arduino-nano)
 * [Arduino Mega 2560](./boards/arduino-mega2560) - [Crate Documentation](https://rahix.github.io/avr-hal/arduino_mega2560)
   - [Website](http://arduino.cc/en/Main/ArduinoBoardMega2560)
 * [Adafruit Trinket (3V3 or 5V)](./boards/trinket) (**not** PRO!) - [Crate Documentation](https://rahix.github.io/avr-hal/trinket)

@@ -1,4 +1,4 @@
-//! Board Support Crate for _Arduino Uno_.
+//! Board Support Crate for [Arduino Uno] (and compatible boards; [see below](#compatible-boards)).
 //!
 //! This crate provides abstractions for interfacing with the hardware of Arduino Uno.  It
 //! re-exports functionality from the underlying HAL in ways that make more sense for this
@@ -38,6 +38,20 @@
 //! ```
 //!
 //! [guide]: https://github.com/Rahix/avr-hal#starting-your-own-project
+//!
+//! # Compatible Boards
+//! This crate primarily targets [Arduino Uno] but is also compatible with a number of very similar
+//! boards.  Where there are differences, those can be enabled with a crate feature.  Here is an
+//! overview:
+//!
+//! | Feature | Board | Differences against Uno |
+//! | --- | --- | --- |
+//! | `arduino-nano` | [Arduino Nano] | Additional `ADC6` and `ADC7` pins/channels (see [`examples/uno-adc.rs`]) |
+//!
+//! [`examples/uno-adc.rs`]: https://github.com/Rahix/avr-hal/blob/master/boards/arduino-uno/examples/uno-adc.rs
+//!
+//! [Arduino Uno]: https://store.arduino.cc/usa/arduino-uno-rev3
+//! [Arduino Nano]: https://store.arduino.cc/arduino-nano
 
 #![no_std]
 
