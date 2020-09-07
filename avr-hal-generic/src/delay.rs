@@ -219,7 +219,7 @@ where
         // compile down to fairly poor code. This is slightly better,
         // but still has some overhead and may not lead to cycle-accurate
         // delays.
-        let iters = (us >> 12);
+        let iters = us >> 12;
         let mut i = 0;
         while i < iters {
             delay::DelayUs::<u16>::delay_us(self, 0xfff);
