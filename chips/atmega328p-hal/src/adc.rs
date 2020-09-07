@@ -29,6 +29,30 @@ pub mod channel {
     use avr_hal::hal::adc::Channel;
     use crate::atmega328p::adc::admux::MUX_A;
 
+    /// Channel for `ADC6` pin.
+    ///
+    /// This pin is not available in all ATmega328P packages (only 32TQFP, 32MLF, 32UFBGA).  If you
+    /// are using one of them, enable the `adc-pins` feature to make them available.
+    #[cfg(feature = "adc-pins")]
+    pub struct ADC6;
+    #[cfg(feature = "adc-pins")]
+    impl Channel<super::Adc> for ADC6 {
+        type ID = MUX_A;
+        fn channel() -> Self::ID { MUX_A::ADC6 }
+    }
+
+    /// Channel for `ADC7` pin.
+    ///
+    /// This pin is not available in all ATmega328P packages (only 32TQFP, 32MLF, 32UFBGA).  If you
+    /// are using one of them, enable the `adc-pins` feature to make them available.
+    #[cfg(feature = "adc-pins")]
+    pub struct ADC7;
+    #[cfg(feature = "adc-pins")]
+    impl Channel<super::Adc> for ADC7 {
+        type ID = MUX_A;
+        fn channel() -> Self::ID { MUX_A::ADC7 }
+    }
+
     /// Channel for the _Bandgap Reference Voltage_
     pub struct Vbg;
     impl Channel<super::Adc> for Vbg {

@@ -6,6 +6,8 @@ edition = "2018"
 
 [features]
 rt = ["avr-device/rt"]
+# Package exposes the ADC6 and ADC7 pins (only 32TQFP, 32MLF, 32UFBGA)
+adc-pins = []
 
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
