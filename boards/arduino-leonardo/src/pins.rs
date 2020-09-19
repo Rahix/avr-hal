@@ -10,12 +10,23 @@ avr_hal_generic::impl_board_pins! {
         portc: crate::atmega32u4::PORTC,
         portd: crate::atmega32u4::PORTD,
         porte: crate::atmega32u4::PORTE,
-        // Not used yet
-        // portf: crate::atmega32u4::PORTF,
+        portf: crate::atmega32u4::PORTF,
     }
 
     /// Reexport of the Leonardo's pins, with the names they have on the board
     pub struct Pins {
+        /// `A0`
+        pub a0: portf::pf7::PF7,
+        /// `A1`
+        pub a1: portf::pf6::PF6,
+        /// `A2`
+        pub a2: portf::pf5::PF5,
+        /// `A3`
+        pub a3: portf::pf4::PF4,
+        /// `A4`
+        pub a4: portf::pf1::PF1,
+        /// `A5`
+        pub a5: portf::pf0::PF0,
         /// `D0` / `RX`
         ///
         /// * `RX` (UART)
