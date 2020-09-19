@@ -1,8 +1,9 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
+use sparkfun_pro_micro::adc;
 use sparkfun_pro_micro::prelude::*;
+use panic_halt as _;
 
 #[sparkfun_pro_micro::entry]
 fn main() -> ! {
@@ -19,7 +20,7 @@ fn main() -> ! {
 
     ufmt::uwriteln!(&mut serial, "Reading analog inputs ...\r").void_unwrap();
 
-    let mut adc = sparkfun_pro_micro::adc::Adc::new(dp.ADC, Default::default());
+    let mut adc = adc::Adc::new(dp.ADC, Default::default());
 
     let (vbg, gnd, temp): (u16, u16, u16) = (
         nb::block!(adc.read(&mut sparkfun_pro_micro::adc::channel::Vbg)).void_unwrap(),
