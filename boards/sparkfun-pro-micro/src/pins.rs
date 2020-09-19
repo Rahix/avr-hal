@@ -68,22 +68,6 @@ avr_hal_generic::impl_board_pins! {
         /// * `OC1B`: Output Compare Channel `B` for Timer/Counter1
         /// * `OC4B`: Output Compare Channel `B` for Timer/Counter4 (Not implemented)
         pub d10: portb::pb6::PB6,
-        /// `D11`
-        ///
-        /// * **PWM**: [atmega32u4_hal::timer::Timer0Pwm]
-        /// * `OC0A`: Output Compare Channel `B` for Timer/Counter0
-        /// * `OC1C`: Output Compare Channel `C` for Timer/Counter1
-        pub d11: portb::pb7::PB7,
-        /// `D12`
-        ///
-        /// * `#OC4D`: Inverted Output Compare Channel `D` for Timer/Counter4 (Not implemented)
-        pub d12: portd::pd6::PD6,
-        /// `D13` / `LED_BUILTIN`
-        ///
-        /// * Onboard LED
-        /// * **PWM**: [atmega32u4_hal::timer::Timer4Pwm]
-        /// * `OC4A`: Output Compare Channel `A` for Timer/Counter4
-        pub d13: portc::pc7::PC7,
         /// `RX`
         ///
         /// Led for indicating inbound data.  Also the CS pin.
