@@ -8,7 +8,7 @@ use panic_halt as _;
 fn main() -> ! {
     let dp = arduino_leonardo::Peripherals::take().unwrap();
 
-    let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
+    let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 
     let mut led0 = pins.led_rx.into_output(&mut pins.ddr);
     let mut led1 = pins.led_tx.into_output(&mut pins.ddr);
