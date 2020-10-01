@@ -20,6 +20,7 @@ members = [
     "chips/atmega168-hal",
     "chips/atmega2560-hal",
     "chips/atmega328p-hal",
+    "chips/atmega328pb-hal",
     "chips/atmega32u4-hal",
     "chips/atmega48p-hal",
     "chips/attiny85-hal",
