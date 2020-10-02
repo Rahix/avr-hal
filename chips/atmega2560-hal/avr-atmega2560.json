@@ -10,13 +10,11 @@
   "arch": "avr",
   "data-layout": "e-P1-p:16:8-i8:8-i16:8-i32:8-i64:8-f32:8-f64:8-n8-a:8",
   "max-atomic-width": 8,
-
   "executables": true,
   "linker": "avr-gcc",
   "linker-flavor": "gcc",
   "pre-link-args": {
     "gcc": [
-      "-Os",
       "-mmcu=atmega2560"
     ]
   },
@@ -29,6 +27,5 @@
   "singlethread": false,
   "no-builtins": false,
   "no-default-libraries": false,
-
   "eh-frame-header": false
 }

@@ -16,7 +16,7 @@
   "linker": "avr-gcc",
   "linker-flavor": "gcc",
   "pre-link-args": {
-    "gcc": ["-Os", "-mmcu=atmega32u4"]
+    "gcc": ["-mmcu=atmega32u4"]
   },
   "exe-suffix": ".elf",
   "post-link-args": {
