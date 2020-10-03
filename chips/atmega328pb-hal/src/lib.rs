@@ -25,12 +25,12 @@ pub mod prelude {
 
 /// I2C Bus
 pub mod i2c {
-    use crate::port::portc;
+    use crate::port::{portc, porte};
     pub use avr_hal::i2c::*;
 
     avr_hal::impl_twi_i2c! {
         /// I2C based on ATmega328P's TWI peripheral
-        pub struct I2c {
+        pub struct I2c0 {
             peripheral: crate::mcu::TWI0,
             pins: {
                 sda: portc::PC4,
@@ -53,9 +53,36 @@ pub mod i2c {
             },
         }
     }
+
+    avr_hal::impl_twi_i2c! {
+        /// I2C based on ATmega328P's TWI peripheral
+        pub struct I2c1 {
+            peripheral: crate::mcu::TWI1,
+            pins: {
+                sda: porte::PE0,
+                scl: porte::PE1,
+            },
+            registers: {
+                control: twcr {
+                    enable: twen,
+                    ack: twea,
+                    int: twint,
+                    start: twsta,
+                    stop: twsto,
+                },
+                status: twsr {
+                    prescaler: twps,
+                    status: tws,
+                },
+                bitrate: twbr,
+                data: twdr,
+            },
+        }
+    }
+
 }
 
-pub mod spi {
+pub mod spi0 {
     //! Implementation of the Rust Embedded-HAL SPI FullDuplex trait for AVR.
     //!
     //! The interface can be instantiated with the `new` method, and used directly
@@ -93,6 +120,24 @@ pub mod spi {
             }
         }
     }
+
+}
+
+pub mod spi1 {
+    use crate::port::{portc, porte};
+    pub use avr_hal::spi::*;
+
+    avr_hal::impl_spi! {
+        pub struct Spi {
+            peripheral: crate::mcu::SPI1,
+            pins: {
+                sclk: portc::PC1,
+                mosi: porte::PE3,
+                miso: portc::PC0,
+            }
+        }
+    }
+
 }
 
 /// Serial interface using USART

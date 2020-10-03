@@ -17,6 +17,7 @@ avr_hal::impl_generic_pin! {
         B(crate::mcu::PORTB, portb, pinb, ddrb),
         C(crate::mcu::PORTC, portc, pinc, ddrc),
         D(crate::mcu::PORTD, portd, pind, ddrd),
+        E(crate::mcu::PORTE, porte, pine, ddre),
     }
 }
 
@@ -85,3 +86,21 @@ avr_hal::impl_port! {
     }
 }
 
+
+avr_hal::impl_port! {
+    pub mod porte {
+        #[port_ext]
+        use super::PortExt;
+
+        #[generic_pin]
+        use Pin::E;
+
+        impl PortExt for crate::mcu::PORTE {
+            regs: (pine, ddre, porte),
+            pe0: (PE0, 0),
+            pe1: (PE1, 1),
+            pe2: (PE2, 2),
+            pe3: (PE3, 3),
+        }
+    }
+}
