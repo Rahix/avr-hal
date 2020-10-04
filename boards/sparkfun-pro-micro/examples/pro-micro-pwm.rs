@@ -11,9 +11,9 @@ fn main() -> ! {
 
     let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 
-    let mut timer4 = pwm::Timer4Pwm::new(dp.TC4, pwm::Prescaler::Prescale64);
+    let mut timer0 = pwm::Timer0Pwm::new(dp.TC0, pwm::Prescaler::Prescale64);
 
-    let mut led = pins.d13.into_output(&mut pins.ddr).into_pwm(&mut timer4);
+    let mut led = pins.d3.into_output(&mut pins.ddr).into_pwm(&mut timer0);
 
     led.set_duty(128);
     led.enable();
