@@ -7,7 +7,7 @@ use sparkfun_pro_micro::prelude::*;
 
 // This pin will be used from the interrupt handler
 use sparkfun_pro_micro::hal::port;
-static mut PIN: Option<port::portc::PC7<port::mode::Output>> = None;
+static mut PIN: Option<port::portd::PD0<port::mode::Output>> = None;
 
 #[sparkfun_pro_micro::entry]
 fn main() -> ! {
@@ -18,7 +18,7 @@ fn main() -> ! {
     let mut led0 = pins.led_rx.into_output(&mut pins.ddr);
     let mut led1 = pins.led_tx.into_output(&mut pins.ddr);
 
-    let mut led = pins.d13.into_output(&mut pins.ddr);
+    let mut led = pins.d3.into_output(&mut pins.ddr);
 
     led0.set_high().void_unwrap();
     led1.set_low().void_unwrap();

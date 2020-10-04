@@ -1,8 +1,9 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
+use sparkfun_pro_micro::adc;
 use sparkfun_pro_micro::prelude::*;
+use panic_halt as _;
 
 #[sparkfun_pro_micro::entry]
 fn main() -> ! {
@@ -19,7 +20,7 @@ fn main() -> ! {
 
     ufmt::uwriteln!(&mut serial, "Reading analog inputs ...\r").void_unwrap();
 
-    let mut adc = sparkfun_pro_micro::adc::Adc::new(dp.ADC, Default::default());
+    let mut adc = adc::Adc::new(dp.ADC, Default::default());
 
     let (vbg, gnd, temp): (u16, u16, u16) = (
         nb::block!(adc.read(&mut sparkfun_pro_micro::adc::channel::Vbg)).void_unwrap(),
@@ -35,8 +36,8 @@ fn main() -> ! {
     let mut a1 = pins.a1.into_analog_input(&mut adc);
     let mut a2 = pins.a2.into_analog_input(&mut adc);
     let mut a3 = pins.a3.into_analog_input(&mut adc);
-    let mut a4 = pins.a4.into_analog_input(&mut adc);
-    let mut a5 = pins.a5.into_analog_input(&mut adc);
+    let mut d4 = pins.d4.into_analog_input(&mut adc);
+    let mut d8 = pins.d8.into_analog_input(&mut adc);
 
     loop {
         let values: [u16; 6] = [
@@ -44,8 +45,8 @@ fn main() -> ! {
             nb::block!(adc.read(&mut a1)).void_unwrap(),
             nb::block!(adc.read(&mut a2)).void_unwrap(),
             nb::block!(adc.read(&mut a3)).void_unwrap(),
-            nb::block!(adc.read(&mut a4)).void_unwrap(),
-            nb::block!(adc.read(&mut a5)).void_unwrap(),
+            nb::block!(adc.read(&mut d4)).void_unwrap(),
+            nb::block!(adc.read(&mut d8)).void_unwrap(),
         ];
 
         for (i, v) in values.iter().enumerate() {
