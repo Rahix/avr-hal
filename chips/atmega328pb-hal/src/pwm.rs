@@ -214,7 +214,7 @@ avr_hal::impl_pwm! {
             },
             portd::PD2: {
                 ocr: ocr3b,
-                into_pwm: |tim| if enable {
+                into_pwm3: |tim| if enable {
                     tim.tccr3a.modify(|_, w| w.com3b().match_clear());
                 } else {
                     tim.tccr3a.modify(|_, w| w.com3b().disconnected());
@@ -223,9 +223,6 @@ avr_hal::impl_pwm! {
         },
     }
 }
-
-/*
-    TODO: Disabled due to overlapping pin error for PD2
 
 avr_hal::impl_pwm! {
     /// Use `TC4` for PWM (pins `PD1`, `PD2`)
@@ -268,7 +265,7 @@ avr_hal::impl_pwm! {
             },
             portd::PD2: {
                 ocr: ocr4b,
-                into_pwm: |tim| if enable {
+                into_pwm4: |tim| if enable {
                     tim.tccr4a.modify(|_, w| w.com4b().match_clear());
                 } else {
                     tim.tccr4a.modify(|_, w| w.com4b().disconnected());
@@ -277,4 +274,3 @@ avr_hal::impl_pwm! {
         },
     }
 }
- */
