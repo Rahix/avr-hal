@@ -1,5 +1,5 @@
 [build]
-target = "avr-atmega32u4.json"
+target = "../../avr-specs/avr-atmega32u4.json"
 
 [target.'cfg(target_arch = "avr")']
 runner = "./pro-micro-runner.sh"
