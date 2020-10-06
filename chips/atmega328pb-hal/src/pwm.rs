@@ -172,3 +172,109 @@ avr_hal::impl_pwm! {
         },
     }
 }
+
+avr_hal::impl_pwm! {
+    /// Use `TC3` for PWM (pins `PD0`, `PD2`)
+    ///
+    /// # Example
+    /// ```
+    /// let mut portb = dp.PORTB.split();
+    /// let mut timer1 = Timer1Pwm::new(dp.TC1, pwm::Prescaler::Prescale64);
+    ///
+    /// let mut pb1 = portb.pb1.into_output(&mut portb.ddr).into_pwm(&mut timer1);
+    /// let mut pb2 = portb.pb2.into_output(&mut portb.ddr).into_pwm(&mut timer1);
+    ///
+    /// pb1.set_duty(128);
+    /// pb1.enable();
+    /// ```
+    pub struct Timer3Pwm {
+        timer: crate::mcu::TC3,
+        init: |tim, prescaler| {
+            tim.tccr3a.modify(|_, w| w.wgm3().bits(0b01));
+            tim.tccr3b.modify(|_, w| {
+                //TODO: Figure out how to make svdtool mark this as safe
+                unsafe { w.wgm3().bits(0b01) };
+                match prescaler {
+                    Prescaler::Direct => w.cs3().direct(),
+                    Prescaler::Prescale8 => w.cs3().prescale_8(),
+                    Prescaler::Prescale64 => w.cs3().prescale_64(),
+                    Prescaler::Prescale256 => w.cs3().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs3().prescale_1024(),
+                }
+            });
+        },
+        pins: {
+            portd::PD0: {
+                ocr: ocr3a,
+                into_pwm: |tim| if enable {
+                    tim.tccr3a.modify(|_, w| w.com3a().match_clear());
+                } else {
+                    tim.tccr3a.modify(|_, w| w.com3a().disconnected());
+                },
+            },
+            portd::PD2: {
+                ocr: ocr3b,
+                into_pwm: |tim| if enable {
+                    tim.tccr3a.modify(|_, w| w.com3b().match_clear());
+                } else {
+                    tim.tccr3a.modify(|_, w| w.com3b().disconnected());
+                },
+            },
+        },
+    }
+}
+
+/*
+    TODO: Disabled due to overlapping pin error for PD2
+
+avr_hal::impl_pwm! {
+    /// Use `TC4` for PWM (pins `PD1`, `PD2`)
+    ///
+    /// # Example
+    /// ```
+    /// let mut portb = dp.PORTB.split();
+    /// let mut timer1 = Timer1Pwm::new(dp.TC1, pwm::Prescaler::Prescale64);
+    ///
+    /// let mut pb1 = portb.pb1.into_output(&mut portb.ddr).into_pwm(&mut timer1);
+    /// let mut pb2 = portb.pb2.into_output(&mut portb.ddr).into_pwm(&mut timer1);
+    ///
+    /// pb1.set_duty(128);
+    /// pb1.enable();
+    /// ```
+    pub struct Timer4Pwm {
+        timer: crate::mcu::TC4,
+        init: |tim, prescaler| {
+            tim.tccr4a.modify(|_, w| w.wgm4().bits(0b01));
+            tim.tccr4b.modify(|_, w| {
+                //TODO:
+                //w.wgm32().bits(0b01);
+                match prescaler {
+                    Prescaler::Direct => w.cs4().direct(),
+                    Prescaler::Prescale8 => w.cs4().prescale_8(),
+                    Prescaler::Prescale64 => w.cs4().prescale_64(),
+                    Prescaler::Prescale256 => w.cs4().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs4().prescale_1024(),
+                }
+            });
+        },
+        pins: {
+            portd::PD1: {
+                ocr: ocr4a,
+                into_pwm: |tim| if enable {
+                    tim.tccr4a.modify(|_, w| w.com4a().match_clear());
+                } else {
+                    tim.tccr4a.modify(|_, w| w.com4a().disconnected());
+                },
+            },
+            portd::PD2: {
+                ocr: ocr4b,
+                into_pwm: |tim| if enable {
+                    tim.tccr4a.modify(|_, w| w.com4b().match_clear());
+                } else {
+                    tim.tccr4a.modify(|_, w| w.com4b().disconnected());
+                },
+            },
+        },
+    }
+}
+ */

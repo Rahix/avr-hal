@@ -146,7 +146,7 @@ pub mod usart {
     pub use avr_hal::serial::*;
 
     crate::avr_hal::impl_usart! {
-        /// Serial interface based on ATmega328P's USART0 peripheral
+        /// Serial interface based on ATmega328PB's USART0 peripheral
         ///
         /// Maximum baudrate seems to be 57600
         pub struct Usart0 {
