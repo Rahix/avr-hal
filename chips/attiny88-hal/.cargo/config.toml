@@ -1,0 +1,5 @@
+[build]
+target = "../../avr-specs/avr-attiny88.json"
+
+[unstable]
+build-std = ["core"]

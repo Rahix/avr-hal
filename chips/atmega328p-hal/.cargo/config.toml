@@ -1,8 +1,5 @@
 [build]
 target = "../../avr-specs/avr-atmega328p.json"
 
-[target.'cfg(target_arch = "avr")']
-runner = "./uno-runner.sh"
-
 [unstable]
 build-std = ["core"]
