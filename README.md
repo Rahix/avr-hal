@@ -36,7 +36,7 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    ```bash
    rustup override set nightly
    ```
-3. Copy the target description for your MCU (e.g. [`avr-atmega32u4.json`](chips/atmega32u4-hal/avr-atmega32u4.json)) into your project.
+3. Copy the target description for your MCU (e.g. [`avr-atmega32u4.json`](avr-specs/avr-atmega32u4.json)) into your project.
 4. Create a file `.cargo/config.toml` with the following content:
    ```toml
    [build]
