@@ -56,7 +56,7 @@ def merge_specs(legacy, ref):
     data_layout = legacy['data-layout']
     ref['cpu'] = cpu
     ref['data-layout'] = data_layout
-    ref['pre-link-args']['gcc'] = ['-mmcu=%s' % cpu]
+    ref['pre-link-args']['gcc'][0] = '-mmcu=%s' % cpu
     return ref
 
 

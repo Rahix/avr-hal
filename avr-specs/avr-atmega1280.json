@@ -21,7 +21,8 @@
   "os": "unknown",
   "pre-link-args": {
     "gcc": [
-      "-mmcu=atmega1280"
+      "-mmcu=atmega1280",
+      "-Wl,--as-needed"
     ]
   },
   "target-c-int-width": "16",

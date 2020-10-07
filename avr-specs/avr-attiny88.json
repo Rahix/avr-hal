@@ -21,7 +21,8 @@
   "os": "unknown",
   "pre-link-args": {
     "gcc": [
-      "-mmcu=attiny88"
+      "-mmcu=attiny88",
+      "-Wl,--as-needed"
     ]
   },
   "target-c-int-width": "16",
