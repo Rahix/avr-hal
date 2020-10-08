@@ -8,11 +8,11 @@ ENCODING = 'utf-8'
 
 
 def main():
-    process = subprocess.Popen(['rustc', '--print', 'target-spec-json', '-Z', 'unstable-options', '--target', 'avr-unknown-gnu-atmega328'],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-
-    ref_spec_string, stderr = process.communicate()
+    ref_spec_string = subprocess.run(
+        ['rustc', '--print', 'target-spec-json', '-Z', 'unstable-options', '--target', 'avr-unknown-gnu-atmega328'],
+        check=True,
+        stdout=subprocess.PIPE,
+    ).stdout
 
     if ref_spec_string is not None:
         ref_spec = json.loads(ref_spec_string)
