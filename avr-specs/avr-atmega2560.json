@@ -18,6 +18,7 @@
   "linker-is-gnu": true,
   "llvm-target": "avr-unknown-unknown",
   "max-atomic-width": 0,
+  "no-default-libraries": false,
   "os": "unknown",
   "pre-link-args": {
     "gcc": [
