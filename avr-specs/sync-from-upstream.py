@@ -42,6 +42,15 @@ SPECS = {
 
 
 def main():
+    rustc_version = subprocess.run(
+        ['rustc', '--version'],
+        check=True,
+        stdout=subprocess.PIPE,
+    ).stdout.decode()
+
+    if 'nightly' not in rustc_version:
+        raise RuntimeError('You need nightly rustc!')
+
     upstream_spec_string = subprocess.run(
         ['rustc', '--print', 'target-spec-json', '-Z',
             'unstable-options', '--target', 'avr-unknown-gnu-atmega328'],
