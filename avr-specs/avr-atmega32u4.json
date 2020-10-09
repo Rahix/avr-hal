@@ -3,6 +3,7 @@
   "cpu": "atmega32u4",
   "data-layout": "e-P1-p:16:8-i8:8-i16:8-i32:8-i64:8-f32:8-f64:8-n8-a:8",
   "eh-frame-header": false,
+  "env": "",
   "exe-suffix": ".elf",
   "executables": true,
   "linker": "avr-gcc",
@@ -25,7 +26,6 @@
   "singlethread": false,
   "target-c-int-width": "16",
   "target-endian": "little",
-  "target-env": "",
   "target-pointer-width": "16",
-  "target-vendor": "unknown"
+  "vendor": "unknown"
 }
