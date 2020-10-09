@@ -8,36 +8,32 @@ import os
 SPECS = {
     "atmega32u4": {
         "cpu": "atmega32u4",
-        "no-default-libraries": False,
     },
     "atmega48p": {
         "cpu": "atmega48p",
-        "no-default-libraries": False,
     },
     "atmega168": {
         "cpu": "atmega168",
-        "no-default-libraries": False,
     },
     "atmega328p": {
         "cpu": "atmega328p",
-        "no-default-libraries": False,
     },
     "atmega1280": {
         "cpu": "atmega1280",
-        "no-default-libraries": False,
     },
     "atmega2560": {
         "cpu": "atmega2560",
-        "no-default-libraries": False,
     },
     "attiny85": {
         "cpu": "attiny85",
-        "no-default-libraries": False,
     },
     "attiny88": {
         "cpu": "attiny88",
-        "no-default-libraries": False,
     },
+}
+
+COMMON = {
+    "no-default-libraries": False,
 }
 
 
@@ -63,6 +59,7 @@ def main():
 
     for mcu, settings in SPECS.items():
         spec = copy.deepcopy(upstream_spec)
+        spec.update(COMMON)
         spec.update(settings)
         spec['pre-link-args']['gcc'][0] = f"-mmcu={mcu}"
 
