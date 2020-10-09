@@ -54,8 +54,7 @@ def main():
         stdout=subprocess.PIPE,
     ).stdout
 
-    if upstream_spec_string is not None:
-        upstream_spec = json.loads(upstream_spec_string)
+    upstream_spec = json.loads(upstream_spec_string)
 
     for mcu, settings in SPECS.items():
         spec = copy.deepcopy(upstream_spec)
