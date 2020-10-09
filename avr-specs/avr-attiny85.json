@@ -1,31 +1,31 @@
 {
-  "llvm-target": "avr-unknown-unknown",
-  "cpu": "attiny85",
-  "target-endian": "little",
-  "target-pointer-width": "16",
-  "target-c-int-width": "16",
-  "os": "unknown",
-  "target-env": "",
-  "target-vendor": "unknown",
   "arch": "avr",
+  "cpu": "attiny85",
   "data-layout": "e-P1-p:16:8-i8:8-i16:8-i32:8-i64:8-f32:8-f64:8-n8-a:8",
-  "max-atomic-width": 8,
+  "eh-frame-header": false,
+  "exe-suffix": ".elf",
   "executables": true,
   "linker": "avr-gcc",
   "linker-flavor": "gcc",
-  "pre-link-args": {
-    "gcc": [
-      "-mmcu=attiny85"
-    ]
-  },
-  "exe-suffix": ".elf",
+  "llvm-target": "avr-unknown-unknown",
+  "max-atomic-width": 8,
+  "no-builtins": false,
+  "no-default-libraries": false,
+  "os": "unknown",
   "post-link-args": {
     "gcc": [
       "-Wl,--gc-sections"
     ]
   },
+  "pre-link-args": {
+    "gcc": [
+      "-mmcu=attiny85"
+    ]
+  },
   "singlethread": false,
-  "no-builtins": false,
-  "no-default-libraries": false,
-  "eh-frame-header": false
+  "target-c-int-width": "16",
+  "target-endian": "little",
+  "target-env": "",
+  "target-pointer-width": "16",
+  "target-vendor": "unknown"
 }
