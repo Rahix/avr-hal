@@ -31,7 +31,10 @@ SPECS = {
 }
 
 COMMON = {
+    # needed because we currently rely on avr-libc
     "no-default-libraries": False,
+    # 8-bit operations on AVR are atomic
+    "max-atomic-width": 8,
 }
 
 
@@ -60,6 +63,9 @@ def main():
     ).stdout
 
     upstream_spec = json.loads(upstream_spec_string)
+
+    # our targets are of course not built into rustc
+    del upstream_spec["is-builtin"]
 
     for mcu, settings in SPECS.items():
         spec = copy.deepcopy(upstream_spec)
