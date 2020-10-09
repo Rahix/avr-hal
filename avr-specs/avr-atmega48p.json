@@ -13,11 +13,6 @@
   "max-atomic-width": 8,
   "no-default-libraries": false,
   "os": "unknown",
-  "post-link-args": {
-    "gcc": [
-      "-Wl,--gc-sections"
-    ]
-  },
   "pre-link-args": {
     "gcc": [
       "-mmcu=atmega48p"
