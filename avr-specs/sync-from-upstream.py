@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-
-import subprocess
-import json
 import copy
-import os
+import json
+import subprocess
 
 SPECS = {
     "atmega32u4": {
@@ -39,17 +37,24 @@ COMMON = {
 
 def main():
     rustc_version = subprocess.run(
-        ['rustc', '--version'],
+        ["rustc", "--version"],
         check=True,
         stdout=subprocess.PIPE,
     ).stdout.decode()
 
-    if 'nightly' not in rustc_version:
-        raise Exception('You need nightly rustc!')
+    if "nightly" not in rustc_version:
+        raise Exception("You need nightly rustc!")
 
     upstream_spec_string = subprocess.run(
-        ['rustc', '--print', 'target-spec-json', '-Z',
-            'unstable-options', '--target', 'avr-unknown-gnu-atmega328'],
+        [
+            "rustc",
+            "--print",
+            "target-spec-json",
+            "-Z",
+            "unstable-options",
+            "--target",
+            "avr-unknown-gnu-atmega328",
+        ],
         check=True,
         stdout=subprocess.PIPE,
     ).stdout
@@ -60,7 +65,7 @@ def main():
         spec = copy.deepcopy(upstream_spec)
         spec.update(COMMON)
         spec.update(settings)
-        spec['pre-link-args']['gcc'][0] = f"-mmcu={mcu}"
+        spec["pre-link-args"]["gcc"][0] = f"-mmcu={mcu}"
 
         with open(f"avr-specs/avr-{mcu}.json", "w") as f:
             json.dump(spec, f, sort_keys=True, indent=2)
