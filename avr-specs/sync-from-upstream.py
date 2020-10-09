@@ -49,7 +49,7 @@ def main():
     ).stdout.decode()
 
     if 'nightly' not in rustc_version:
-        raise RuntimeError('You need nightly rustc!')
+        raise Exception('You need nightly rustc!')
 
     upstream_spec_string = subprocess.run(
         ['rustc', '--print', 'target-spec-json', '-Z',
