@@ -30,7 +30,7 @@ if [ $OS = $LINUX_OS ]; then
 elif [ $OS = $MAC_OS ]; then
     ARDUINO_UPLOAD_PORT="/dev/cu.usbmodem146201"
 else
-    echo "Not supporte OS!"
+    echo "Not supported OS!"
     exit 1    
 fi
 
