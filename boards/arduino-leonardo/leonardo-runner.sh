@@ -21,13 +21,13 @@ then
     exit 1
 fi
 
-if [ $OS = $LINUX_OS ]; then
-    ARDUINO_UPLOAD_PORT="/dev/ttyACM0"
-elif [ $OS = $MAC_OS ]; then
-    ARDUINO_UPLOAD_PORT="/dev/cu.usbmodem146201"
+if [ $OS = "Linux" ]; then
+    SERIAL_PORT="/dev/ttyACM0"
+elif [ $OS = "Mac" ]; then
+    SERIAL_PORT="/dev/cu.usbmodem146201"
 else
-    echo "Not supported OS!"
-    exit 1    
+    echo "unsupported OS, things might not work" >&2
+    SERIAL_PORT="/dev/ttyACM0"
 fi
 
 if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
@@ -57,4 +57,4 @@ read -r
 printf "Attempting to flash ...\n"
 printf "\n"
 
-avrdude -qq -patmega32u4 -cavr109 -P"${ARDUINO_UPLOAD_PORT}" -b57600 -D "-Uflash:w:$1:e"
+avrdude -qq -patmega32u4 -cavr109 -P"${SERIAL_PORT}" -b57600 -D "-Uflash:w:$1:e"
