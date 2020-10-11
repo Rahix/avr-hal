@@ -1,14 +1,10 @@
 #!/usr/bin/env sh
 set -e
 
-LINUX_OS="LINUX"
-MAC_OS="MAC"
-UNKNOWN_OS="UNKNOWN"
-
 case "$(uname -s)" in
-    Linux*)     OS=$LINUX_OS;;
-    Darwin*)    OS=$MAC_OS;;
-    *)          OS=$UNKNOWN_OS
+    Linux*)     OS="Linux";;
+    Darwin*)    OS="Mac";;
+    *)          OS="Unknown";;
 esac
 
 if ! command -v numfmt &> /dev/null
