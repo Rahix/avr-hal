@@ -9,9 +9,9 @@ esac
 
 if ! command -v numfmt &> /dev/null
 then
-    echo "required numfmt could not be found!"
-    echo "please install https://command-not-found.com/numfmt"
-    exit 1
+    echo "numfmt is needed for human-readable sizes." >&2
+    echo "please install https://command-not-found.com/numfmt" >&2
+    alias numfmt=true
 fi
 
 if ! command -v avrdude &> /dev/null
