@@ -16,8 +16,8 @@ fi
 
 if ! command -v avrdude &> /dev/null
 then
-    echo "required avrdude could not be found!"
-    echo "please install https://command-not-found.com/avrdude"
+    echo "required avrdude could not be found!" >&2
+    echo "please install https://command-not-found.com/avrdude" >&2
     exit 1
 fi
 
