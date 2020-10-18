@@ -1,27 +1,29 @@
 #![no_std]
 
-pub extern crate attiny85_hal as hal;
+// Expose hal & pac crates
+pub use attiny85_hal as hal;
+pub use crate::hal::pac;
+
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
-pub use hal::entry;
+pub use crate::hal::entry;
 
-pub use attiny85_hal::attiny85;
-pub use crate::attiny85::Peripherals;
-pub use attiny85_hal::prelude;
+pub use crate::pac::Peripherals;
+pub use crate::hal::prelude;
 
-pub type Delay = hal::delay::Delay<hal::clock::MHz8>;
+pub type Delay = crate::hal::delay::Delay<hal::clock::MHz8>;
 
 pub use crate::pins::*;
 mod pins {
-    use attiny85_hal::port::PortExt;
+    use crate::hal::port::PortExt;
 
     avr_hal_generic::impl_board_pins! {
         #[port_defs]
-        use attiny85_hal::port;
+        use crate::hal::port;
 
         /// Generic DDR (not strictly necessary for ATtiny85)
         pub struct DDR {
-            portb: crate::attiny85::PORTB,
+            portb: crate::pac::PORTB,
         }
 
         /// Reexport of the pins with names as on the Trinket board
