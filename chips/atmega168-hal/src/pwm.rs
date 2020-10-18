@@ -26,9 +26,9 @@
 //! | `PD6` | `.into_pwm(&mut timer0)` |
 
 use crate::port::{portb, portd};
-pub use avr_hal::pwm::*;
+pub use avr_hal_generic::pwm::*;
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC0` for PWM (pins `PD5`, `PD6`)
     ///
     /// # Example
@@ -75,7 +75,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC1` for PWM (pins `PB1`, `PB2`)
     ///
     /// # Example
@@ -125,7 +125,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC2` for PWM (pins `PB3`, `PD3`)
     ///
     /// # Example
