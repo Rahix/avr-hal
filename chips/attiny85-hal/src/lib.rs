@@ -1,6 +1,8 @@
 #![no_std]
 
-pub use avr_device::attiny85;
+/// Reexport of `attiny85` from `avr-device`
+pub use avr_device::attiny85 as pac;
+
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
 pub use avr_device::entry;

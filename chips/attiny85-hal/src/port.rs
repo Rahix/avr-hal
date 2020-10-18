@@ -17,7 +17,7 @@ avr_hal_generic::impl_port! {
         #[port_ext]
         use super::PortExt;
 
-        impl PortExt for crate::attiny85::PORTB {
+        impl PortExt for crate::pac::PORTB {
             regs: (pinb, ddrb, portb),
             pb0: (PB0, 0),
             pb1: (PB1, 1),
