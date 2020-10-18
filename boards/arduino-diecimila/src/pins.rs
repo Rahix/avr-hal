@@ -1,14 +1,14 @@
-use atmega168_hal::port::PortExt;
+use crate::hal::port::PortExt;
 
 avr_hal_generic::impl_board_pins! {
     #[port_defs]
-    use atmega168_hal::port;
+    use crate::hal::port;
 
     /// Generic DDR that works for all ports
     pub struct DDR {
-        portb: crate::atmega168::PORTB,
-        portc: crate::atmega168::PORTC,
-        portd: crate::atmega168::PORTD,
+        portb: crate::pac::PORTB,
+        portc: crate::pac::PORTC,
+        portd: crate::pac::PORTD,
     }
 
     /// Reexport of the Diecimila's pins, with the names they have on the board
