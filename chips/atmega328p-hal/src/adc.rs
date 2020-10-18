@@ -4,7 +4,7 @@ use crate::port::portc::{PC0, PC1, PC2, PC3, PC4, PC5};
 
 use crate::atmega328p::adc::admux::MUX_A;
 
-avr_hal::impl_adc! {
+avr_hal_generic::impl_adc! {
     pub struct Adc {
         type ChannelID = MUX_A;
         peripheral: crate::atmega328p::ADC,
@@ -26,7 +26,7 @@ avr_hal::impl_adc! {
 ///
 /// This module contains ADC channels, additional to the direct pin channels.
 pub mod channel {
-    use avr_hal::hal::adc::Channel;
+    use avr_hal_generic::hal::adc::Channel;
     use crate::atmega328p::adc::admux::MUX_A;
 
     /// Channel for `ADC6` pin.
