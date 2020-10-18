@@ -1,14 +1,14 @@
-use atmega328p_hal::port::PortExt;
+use crate::hal::port::PortExt;
 
 avr_hal_generic::impl_board_pins! {
     #[port_defs]
-    use atmega328p_hal::port;
+    use crate::hal::port;
 
     /// Generic DDR that works for all ports
     pub struct DDR {
-        portb: crate::atmega328p::PORTB,
-        portc: crate::atmega328p::PORTC,
-        portd: crate::atmega328p::PORTD,
+        portb: crate::pac::PORTB,
+        portc: crate::pac::PORTC,
+        portd: crate::pac::PORTD,
     }
 
     /// Reexport of the Leonardo's pins, with the names they have on the board
