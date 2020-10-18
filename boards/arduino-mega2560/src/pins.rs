@@ -1,22 +1,22 @@
-use atmega2560_hal::port::PortExt;
+use crate::hal::port::PortExt;
 
 avr_hal_generic::impl_board_pins! {
     #[port_defs]
-    use atmega2560_hal::port;
+    use crate::hal::port;
 
     /// Generic DDR that works for all ports
     pub struct DDR {
-        porta: crate::atmega2560::PORTA,
-        portb: crate::atmega2560::PORTB,
-        portc: crate::atmega2560::PORTC,
-        portd: crate::atmega2560::PORTD,
-        porte: crate::atmega2560::PORTE,
-        portf: crate::atmega2560::PORTF,
-        portg: crate::atmega2560::PORTG,
-        porth: crate::atmega2560::PORTH,
-        portj: crate::atmega2560::PORTJ,
-        portk: crate::atmega2560::PORTK,
-        portl: crate::atmega2560::PORTL,
+        porta: crate::pac::PORTA,
+        portb: crate::pac::PORTB,
+        portc: crate::pac::PORTC,
+        portd: crate::pac::PORTD,
+        porte: crate::pac::PORTE,
+        portf: crate::pac::PORTF,
+        portg: crate::pac::PORTG,
+        porth: crate::pac::PORTH,
+        portj: crate::pac::PORTJ,
+        portk: crate::pac::PORTK,
+        portl: crate::pac::PORTL,
     }
 
     /// Reexport of the Mega 2560's pins, with the names they have on the board
