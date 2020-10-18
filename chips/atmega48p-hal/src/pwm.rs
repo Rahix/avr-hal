@@ -43,7 +43,7 @@ avr_hal_generic::impl_pwm! {
     /// pd5.enable();
     /// ```
     pub struct Timer0Pwm {
-        timer: crate::atmega48p::TC0,
+        timer: crate::pac::TC0,
         init: |tim, prescaler| {
             tim.tccr0a.modify(|_, w| w.wgm0().pwm_fast());
             tim.tccr0b.modify(|_, w| match prescaler {
@@ -90,7 +90,7 @@ avr_hal_generic::impl_pwm! {
     /// pb1.enable();
     /// ```
     pub struct Timer1Pwm {
-        timer: crate::atmega48p::TC1,
+        timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a.modify(|_, w| w.wgm1().bits(0b01));
             tim.tccr1b.modify(|_, w| {
@@ -141,7 +141,7 @@ avr_hal_generic::impl_pwm! {
     /// pb3.enable();
     /// ```
     pub struct Timer2Pwm {
-        timer: crate::atmega48p::TC2,
+        timer: crate::pac::TC2,
         init: |tim, prescaler| {
             tim.tccr2a.modify(|_, w| w.wgm2().pwm_fast());
             tim.tccr2b.modify(|_, w| match prescaler {
