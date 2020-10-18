@@ -5,7 +5,8 @@
 //!
 #![no_std]
 
-pub use avr_device::atmega168;
+pub use avr_device::atmega168 as pac;
+
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
 pub use avr_device::entry;
@@ -30,7 +31,7 @@ pub mod i2c {
     avr_hal_generic::impl_twi_i2c! {
         /// I2C based on ATmega168's TWI peripheral
         pub struct I2c {
-            peripheral: crate::atmega168::TWI,
+            peripheral: crate::pac::TWI,
             pins: {
                 sda: portc::PC4,
                 scl: portc::PC5,
@@ -84,7 +85,7 @@ pub mod spi {
 
     avr_hal_generic::impl_spi! {
         pub struct Spi {
-            peripheral: crate::atmega168::SPI,
+            peripheral: crate::pac::SPI,
             pins: {
                 sclk: portb::PB5,
                 mosi: portb::PB3,
@@ -104,7 +105,7 @@ pub mod usart {
         ///
         /// Maximum baudrate seems to be 57600
         pub struct Usart0 {
-            peripheral: crate::atmega168::USART0,
+            peripheral: crate::pac::USART0,
             pins: {
                 rx: portd::PD0,
                 tx: portd::PD1,

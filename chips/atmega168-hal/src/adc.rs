@@ -2,12 +2,12 @@ extern crate avr_hal_generic as avr_hal;
 
 use crate::port::portc::{PC0, PC1, PC2, PC3, PC4, PC5};
 
-use crate::atmega168::adc::admux::MUX_A;
+use crate::pac::adc::admux::MUX_A;
 
 avr_hal_generic::impl_adc! {
     pub struct Adc {
         type ChannelID = MUX_A;
-        peripheral: crate::atmega168::ADC,
+        peripheral: crate::pac::ADC,
         set_mux: |peripheral, id| {
             peripheral.admux.modify(|_, w| w.mux().variant(id));
         },
@@ -27,7 +27,7 @@ avr_hal_generic::impl_adc! {
 /// This module contains ADC channels, additional to the direct pin channels.
 pub mod channel {
     use avr_hal_generic::hal::adc::Channel;
-    use crate::atmega168::adc::admux::MUX_A;
+    use crate::pac::adc::admux::MUX_A;
 
     /// Channel for the _Bandgap Reference Voltage_
     pub struct Vbg;
