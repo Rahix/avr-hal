@@ -27,7 +27,7 @@ avr_hal_generic::impl_wdt! {
     }
 
     pub struct Wdt {
-        mcu_status_register: crate::atmega328p::cpu::MCUSR,
-        peripheral: crate::atmega328p::WDT,
+        mcu_status_register: crate::pac::cpu::MCUSR,
+        peripheral: crate::pac::WDT,
     }
 }
