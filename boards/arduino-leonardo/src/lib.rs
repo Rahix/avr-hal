@@ -41,18 +41,20 @@
 
 #![no_std]
 
-pub extern crate atmega32u4_hal as hal;
+// Expose hal & pac crates
+pub use atmega32u4_hal as hal;
+pub use crate::hal::pac;
+
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
-pub use hal::entry;
+pub use crate::hal::entry;
+
+pub use crate::pac::Peripherals;
 
 mod pins;
 pub use crate::pins::*;
 
-pub use atmega32u4_hal::atmega32u4;
-pub use crate::atmega32u4::Peripherals;
-pub use atmega32u4_hal::prelude;
-
+pub use crate::hal::prelude;
 
 /// Busy-Delay
 ///
