@@ -1,14 +1,16 @@
 #![no_std]
 
-pub extern crate atmega1280_hal as hal;
+// Expose hal & pac crates
+pub use atmega1280_hal as hal;
+pub use crate::hal::pac;
+
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
-pub use hal::entry;
+pub use crate::hal::entry;
 
-pub use atmega1280_hal::atmega1280;
-pub use crate::atmega1280::Peripherals;
-pub use atmega1280_hal::prelude;
+pub use crate::pac::Peripherals;
+pub use crate::hal::prelude;
 
-pub type Delay = hal::delay::Delay<hal::clock::MHz16>;
-pub type Serial<IMODE> = atmega1280_hal::usart::Usart0<hal::clock::MHz16, IMODE>;
-pub type I2c<M> = hal::i2c::I2c<hal::clock::MHz16, M>;
+pub type Delay = crate::hal::delay::Delay<hal::clock::MHz16>;
+pub type Serial<IMODE> = crate::hal::usart::Usart0<hal::clock::MHz16, IMODE>;
+pub type I2c<M> = crate::hal::i2c::I2c<hal::clock::MHz16, M>;
