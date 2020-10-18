@@ -3,12 +3,12 @@ extern crate avr_hal_generic as avr_hal;
 use crate::port::portf::{PF0, PF1, PF2, PF3, PF4, PF5, PF6, PF7};
 use crate::port::portk::{PK0, PK1, PK2, PK3, PK4, PK5, PK6, PK7};
 
-use crate::atmega2560::adc::admux::MUX_A;
+use crate::pac::adc::admux::MUX_A;
 
 avr_hal_generic::impl_adc! {
     pub struct Adc {
         type ChannelID = MUX_A;
-        peripheral: crate::atmega2560::ADC,
+        peripheral: crate::pac::ADC,
         set_mux: |peripheral, id| {
             peripheral.admux.modify(|_, w| w.mux().variant(id));
             // n.b. the high bit of ADMUX[MUX] is in the ADCSRB register
@@ -40,7 +40,7 @@ avr_hal_generic::impl_adc! {
 /// This module contains ADC channels, additional to the direct pin channels.
 pub mod channel {
     use avr_hal_generic::hal::adc::Channel;
-    use crate::atmega2560::adc::admux::MUX_A;
+    use crate::pac::adc::admux::MUX_A;
 
     /// Channel for the _Bandgap Reference Voltage_
     pub struct Vbg;

@@ -30,7 +30,7 @@ use crate::port::portb;
 
 avr_hal_generic::impl_spi! {
     pub struct Spi {
-        peripheral: crate::atmega2560::SPI,
+        peripheral: crate::pac::SPI,
         pins: {
             sclk: portb::PB1,
             mosi: portb::PB2,
