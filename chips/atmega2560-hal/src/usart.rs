@@ -3,7 +3,7 @@ use crate::port::portd;
 use crate::port::porth;
 use crate::port::portj;
 
-crate::avr_hal::impl_usart! {
+avr_hal_generic::impl_usart! {
     pub struct Usart0 {
         peripheral: crate::atmega2560::USART0,
         pins: {
@@ -14,7 +14,7 @@ crate::avr_hal::impl_usart! {
     }
 }
 
-crate::avr_hal::impl_usart! {
+avr_hal_generic::impl_usart! {
     pub struct Usart1 {
         peripheral: crate::atmega2560::USART1,
         pins: {
@@ -25,7 +25,7 @@ crate::avr_hal::impl_usart! {
     }
 }
 
-crate::avr_hal::impl_usart! {
+avr_hal_generic::impl_usart! {
     pub struct Usart2 {
         peripheral: crate::atmega2560::USART2,
         pins: {
@@ -36,7 +36,7 @@ crate::avr_hal::impl_usart! {
     }
 }
 
-crate::avr_hal::impl_usart! {
+avr_hal_generic::impl_usart! {
     pub struct Usart3 {
         peripheral: crate::atmega2560::USART3,
         pins: {
