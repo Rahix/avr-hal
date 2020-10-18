@@ -14,10 +14,10 @@ pub trait PortExt {
 
 avr_hal_generic::impl_generic_pin! {
     pub enum Pin {
-        A(crate::attiny88::PORTA, porta, pina, ddra),
-        B(crate::attiny88::PORTB, portb, pinb, ddrb),
-        C(crate::attiny88::PORTC, portc, pinc, ddrc),
-        D(crate::attiny88::PORTD, portd, pind, ddrd),
+        A(crate::pac::PORTA, porta, pina, ddra),
+        B(crate::pac::PORTB, portb, pinb, ddrb),
+        C(crate::pac::PORTC, portc, pinc, ddrc),
+        D(crate::pac::PORTD, portd, pind, ddrd),
     }
 }
 
@@ -29,7 +29,7 @@ avr_hal_generic::impl_port! {
         #[generic_pin]
         use Pin::A;
 
-        impl PortExt for crate::attiny88::PORTA {
+        impl PortExt for crate::pac::PORTA {
             regs: (pina, ddra, porta),
             pa0: (PA0, 0),
             pa1: (PA1, 1),
@@ -47,7 +47,7 @@ avr_hal_generic::impl_port! {
         #[generic_pin]
         use Pin::B;
 
-        impl PortExt for crate::attiny88::PORTB {
+        impl PortExt for crate::pac::PORTB {
             regs: (pinb, ddrb, portb),
             pb0: (PB0, 0),
             pb1: (PB1, 1),
@@ -69,7 +69,7 @@ avr_hal_generic::impl_port! {
         #[generic_pin]
         use Pin::C;
 
-        impl PortExt for crate::attiny88::PORTC {
+        impl PortExt for crate::pac::PORTC {
             regs: (pinc, ddrc, portc),
             pc0: (PC0, 0),
             pc1: (PC1, 1),
@@ -91,7 +91,7 @@ avr_hal_generic::impl_port! {
         #[generic_pin]
         use Pin::D;
 
-        impl PortExt for crate::attiny88::PORTD {
+        impl PortExt for crate::pac::PORTD {
             regs: (pind, ddrd, portd),
             pd0: (PD0, 0),
             pd1: (PD1, 1),
