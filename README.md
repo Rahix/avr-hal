@@ -54,6 +54,11 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
 
    [dependencies.arduino-leonardo]
    git = "https://github.com/Rahix/avr-hal"
+   rev = "<insert latest git-commit hash here>"
+   # ^- Pin the dependency to a specific version.  You should use the latest
+   # commit hash from the avr-hal master branch.  You can find it here:
+   #
+   #    https://github.com/Rahix/avr-hal/commits/master
 
    # Configure the build for minimal size
    [profile.dev]
