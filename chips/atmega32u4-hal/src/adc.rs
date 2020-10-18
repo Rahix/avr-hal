@@ -31,7 +31,7 @@ pub enum AdcMux {
 avr_hal_generic::impl_adc! {
     pub struct Adc {
         type ChannelID = AdcMux;
-        peripheral: crate::atmega32u4::ADC,
+        peripheral: crate::pac::ADC,
         set_mux: |peripheral, id| {
             let id = id as u8;
             peripheral.admux.modify(|_, w| w.mux().bits(id & 0x1f));

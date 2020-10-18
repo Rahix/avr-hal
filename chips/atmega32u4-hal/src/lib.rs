@@ -1,6 +1,7 @@
 #![no_std]
 
-pub use avr_device::atmega32u4;
+/// Reexport of `atmega32u4` from `avr-device`
+pub use avr_device::atmega32u4 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -27,7 +28,7 @@ pub mod i2c {
     avr_hal_generic::impl_twi_i2c! {
         /// I2C based on ATmega32U4's TWI peripheral
         pub struct I2c {
-            peripheral: crate::atmega32u4::TWI,
+            peripheral: crate::pac::TWI,
             pins: {
                 sda: portd::PD1,
                 scl: portd::PD0,
@@ -80,7 +81,7 @@ pub mod spi {
 
     avr_hal_generic::impl_spi! {
         pub struct Spi {
-            peripheral: crate::atmega32u4::SPI,
+            peripheral: crate::pac::SPI,
             pins: {
                 sclk: portb::PB1,
                 mosi: portb::PB2,
@@ -100,7 +101,7 @@ pub mod usart {
         ///
         /// Maximum baudrate seems to be 57600
         pub struct Usart1 {
-            peripheral: crate::atmega32u4::USART1,
+            peripheral: crate::pac::USART1,
             pins: {
                 rx: portd::PD2,
                 tx: portd::PD3,
