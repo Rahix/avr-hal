@@ -85,7 +85,7 @@ macro_rules! impl_wdt {
                 //     2. Within the next four clock cycles, write the WDE and Watchdog prescaler
                 //        bits (WDP) as desired, but with the WDCE bit cleared. This must be done in
                 //        one operation.
-                avr_hal::avr_device::interrupt::free(|_| {
+                $crate::avr_device::interrupt::free(|_| {
                     // Reset the watchdog timer
                     self.feed();
                     // Enable watchdog configuration mode
@@ -116,7 +116,7 @@ macro_rules! impl_wdt {
                 //        previous value of the WDE bit.
                 //     2. Within the next four clock cycles, clear the WDE and WDCE bits.
                 //        This must be done in one operation.
-                avr_hal::avr_device::interrupt::free(|_| {
+                $crate::avr_device::interrupt::free(|_| {
                     // Reset the watchdog timer
                     self.feed();
                     // Enable watchdog configuration mode
