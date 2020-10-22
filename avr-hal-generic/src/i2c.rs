@@ -106,9 +106,9 @@ pub enum Error {
     AddressNack,
     /// Slave replied NACK to sent data
     DataNack,
-    /// A bus-error occured
+    /// A bus-error occurred
     BusError,
-    /// An unknown error occured.  The bus might be in an unknown state.
+    /// An unknown error occurred.  The bus might be in an unknown state.
     Unknown,
 }
 
