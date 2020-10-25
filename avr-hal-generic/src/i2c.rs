@@ -499,5 +499,82 @@ macro_rules! impl_twi_i2c {
                 Ok(())
             }
         }
+
+        $(#[$i2c_attr])*
+        pub struct Slave<CLOCK: $crate::clock::Clock, M> {
+            p: $I2C,
+            _clock: ::core::marker::PhantomData<CLOCK>,
+            sda: $sdamod::$SDA<M>,
+            scl: $sclmod::$SCL<M>,
+            address: u8,
+        }
+
+        impl<CLOCK> Slave<CLOCK, $crate::i2c::I2cPullUp>
+        where
+            CLOCK: $crate::clock::Clock,
+        {
+            /// Initialize the I2C bus
+            ///
+            /// `new()` will enable the internal pull-ups to comply with the I2C
+            /// specification.  If you have external pull-ups connected, please
+            /// use `new_with_external_pullup()` instead.
+            ///
+            /// TODO: verify whether we need the speed param (bitrate)
+            pub fn new(
+                p: $I2C,
+                sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
+                scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
+                speed: u32,
+                address: u8,
+            ) -> Slave<CLOCK, $crate::i2c::I2cPullUp> {
+                // Calculate TWBR
+                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
+                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+                // Disable prescaler
+                p.$twsr.write(|w| w.$twps().prescaler_1());
+
+                Slave {
+                    p,
+                    sda,
+                    scl,
+                    _clock: ::core::marker::PhantomData,
+                    address,
+                }
+            }
+        }
+
+        impl<CLOCK> Slave<CLOCK, $crate::i2c::I2cFloating>
+        where
+            CLOCK: $crate::clock::Clock,
+        {
+            /// Initialize the I2C bus, without enabling internal pull-ups
+            ///
+            /// This function should be used if your hardware design includes
+            /// pull-up resistors outside the MCU.  If you do not have these,
+            /// please use `new()` instead.
+            ///
+            /// TODO: verify whether we need the speed param (bitrate)
+            pub fn new_with_external_pullup(
+                p: $I2C,
+                sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::Floating>>,
+                scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::Floating>>,
+                speed: u32,
+                address: u8,
+            ) -> Slave<CLOCK, $crate::i2c::I2cFloating> {
+                // Calculate TWBR
+                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
+                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+                // Disable prescaler
+                p.$twsr.write(|w| w.$twps().prescaler_1());
+
+                Slave {
+                    p,
+                    sda,
+                    scl,
+                    _clock: ::core::marker::PhantomData,
+                    address,
+                }
+            }
+        }
     };
 }
