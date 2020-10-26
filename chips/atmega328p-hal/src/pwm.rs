@@ -172,3 +172,107 @@ avr_hal_generic::impl_pwm! {
         },
     }
 }
+
+#[cfg(feature = "atmega328pb")]
+avr_hal_generic::impl_pwm! {
+    /// Use `TC3` for PWM (pins `PD0`, `PD2`)
+    ///
+    /// # Example
+    /// ```
+    /// let mut portd = dp.PORTD.split();
+    /// let mut timer3 = Timer3Pwm::new(dp.TC3, pwm::Prescaler::Prescale64);
+    ///
+    /// let mut pb1 = portd.pd1.into_output(&mut portd.ddr).into_pwm(&mut timer3);
+    /// let mut pb2 = portd.pd2.into_output(&mut portd.ddr).into_pwm(&mut timer3);
+    ///
+    /// pd1.set_duty(128);
+    /// pd1.enable();
+    /// ```
+    pub struct Timer3Pwm {
+        timer: crate::pac::TC3,
+        init: |tim, prescaler| {
+            tim.tccr3a.modify(|_, w| w.wgm3().bits(0b01));
+            tim.tccr3b.modify(|_, w| {
+                //TODO: Figure out if svdtool can mark this as safe (as for Tc1)
+                unsafe { w.wgm3().bits(0b01) };
+                match prescaler {
+                    Prescaler::Direct => w.cs3().direct(),
+                    Prescaler::Prescale8 => w.cs3().prescale_8(),
+                    Prescaler::Prescale64 => w.cs3().prescale_64(),
+                    Prescaler::Prescale256 => w.cs3().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs3().prescale_1024(),
+                }
+            });
+        },
+        pins: {
+            portd::PD0: {
+                ocr: ocr3a,
+                into_pwm: |tim| if enable {
+                    tim.tccr3a.modify(|_, w| w.com3a().match_clear());
+                } else {
+                    tim.tccr3a.modify(|_, w| w.com3a().disconnected());
+                },
+            },
+            portd::PD2: {
+                ocr: ocr3b,
+                into_pwm3: |tim| if enable {
+                    tim.tccr3a.modify(|_, w| w.com3b().match_clear());
+                } else {
+                    tim.tccr3a.modify(|_, w| w.com3b().disconnected());
+                },
+            },
+        },
+    }
+}
+
+#[cfg(feature = "atmega328pb")]
+avr_hal_generic::impl_pwm! {
+    /// Use `TC4` for PWM (pins `PD1`, `PD2`)
+    ///
+    /// # Example
+    /// ```
+    /// let mut portd = dp.PORTD.split();
+    /// let mut timer4 = Timer4Pwm::new(dp.TC4, pwm::Prescaler::Prescale64);
+    ///
+    /// let mut pd1 = portd.pd1.into_output(&mut portd.ddr).into_pwm(&mut timer4);
+    /// let mut pd2 = portd.pd2.into_output(&mut portd.ddr).into_pwm(&mut timer4);
+    ///
+    /// pd1.set_duty(128);
+    /// pd1.enable();
+    /// ```
+    pub struct Timer4Pwm {
+        timer: crate::pac::TC4,
+        init: |tim, prescaler| {
+            tim.tccr4a.modify(|_, w| w.wgm4().bits(0b01));
+            tim.tccr4b.modify(|_, w| {
+                //TODO: Figure out if svdtool can mark this as safe (as for Tc1)
+                unsafe { w.wgm4().bits(0b01) };
+                match prescaler {
+                    Prescaler::Direct => w.cs4().direct(),
+                    Prescaler::Prescale8 => w.cs4().prescale_8(),
+                    Prescaler::Prescale64 => w.cs4().prescale_64(),
+                    Prescaler::Prescale256 => w.cs4().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs4().prescale_1024(),
+                }
+            });
+        },
+        pins: {
+            portd::PD1: {
+                ocr: ocr4a,
+                into_pwm: |tim| if enable {
+                    tim.tccr4a.modify(|_, w| w.com4a().match_clear());
+                } else {
+                    tim.tccr4a.modify(|_, w| w.com4a().disconnected());
+                },
+            },
+            portd::PD2: {
+                ocr: ocr4b,
+                into_pwm4: |tim| if enable {
+                    tim.tccr4a.modify(|_, w| w.com4b().match_clear());
+                } else {
+                    tim.tccr4a.modify(|_, w| w.com4b().disconnected());
+                },
+            },
+        },
+    }
+}
