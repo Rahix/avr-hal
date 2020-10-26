@@ -8,10 +8,12 @@ edition = "2018"
 rt = ["avr-device/rt"]
 # Package exposes the ADC6 and ADC7 pins (only 32TQFP, 32MLF, 32UFBGA)
 adc-pins = []
+device-selected = []
+atmega328p = ["avr-device/atmega328p", "device-selected"]
+atmega328pb = ["avr-device/atmega328pb", "device-selected"]
 
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
 version = "0.2.2"
-features = ["atmega328p"]
