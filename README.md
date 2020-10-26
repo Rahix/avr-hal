@@ -11,6 +11,8 @@ avr-hal [![Build Status](https://travis-ci.com/Rahix/avr-hal.svg?branch=master)]
 ## Quickstart
 You need nightly rust for compiling rust code for AVR.  Go into `./boards/arduino-leonardo` (or the directory for whatever board you want), and run the following commands:
 ```bash
+cd boards/arduino-leonardo
+
 # Now you are ready to build your first avr blink example!
 cargo +nightly build --example leonardo-blink
 
@@ -73,6 +75,7 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    lto = true
    opt-level = "s"
    ```
+   **Note**: If you at some point want to update to a newer version of `avr-hal`, you just need to put a later commit hash into the `rev =` field.  For any breaking changes which might require you to fix something in your code, read the [CHANGELOG](https://github.com/Rahix/avr-hal/blob/master/CHANGELOG.md).
 6. Start your project with this basic template:
    ```rust
    #![no_std]
