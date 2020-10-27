@@ -106,9 +106,9 @@ pub enum Error {
     AddressNack,
     /// Slave replied NACK to sent data
     DataNack,
-    /// A bus-error occured
+    /// A bus-error occurred
     BusError,
-    /// An unknown error occured.  The bus might be in an unknown state.
+    /// An unknown error occurred.  The bus might be in an unknown state.
     Unknown,
 }
 
@@ -174,7 +174,12 @@ pub type I2cFloating = crate::port::mode::Input<crate::port::mode::Floating>;
 #[doc(hidden)]
 pub type I2cPullUp = crate::port::mode::Input<crate::port::mode::PullUp>;
 
-/// Implement I2C traits for a TWI peripheral
+/// Implement I2C traits for a TWI peripheral.
+///
+/// Macro generates the following structs:
+///
+/// * I2c (master)
+/// * I2cSlave (slave)
 #[macro_export]
 macro_rules! impl_twi_i2c {
     (
@@ -201,7 +206,8 @@ macro_rules! impl_twi_i2c {
                 data: $twdr:ident,
             },
         }
-    ) => {
+    ) => {$crate::paste::paste! {
+        /// I2C Master
         $(#[$i2c_attr])*
         pub struct $I2c<CLOCK: $crate::clock::Clock, M> {
             p: $I2C,
@@ -499,5 +505,70 @@ macro_rules! impl_twi_i2c {
                 Ok(())
             }
         }
-    };
+
+        /// I2C Slave
+        ///
+        /// I2C Slave is similar to the I2C Master. The similarities are that both structs have the
+        /// `new()` and `new_with_external_pullup()` constructors. However the Slave constructors
+        /// do not need to pass the speed/bitrate as that is determined by the Master. However, the
+        /// Slave constructors do need to pass the slave address.
+        $(#[$i2c_attr])*
+        pub struct [<$I2c Slave>]<CLOCK: $crate::clock::Clock, M> {
+            p: $I2C,
+            _clock: ::core::marker::PhantomData<CLOCK>,
+            sda: $sdamod::$SDA<M>,
+            scl: $sclmod::$SCL<M>,
+            address: u8,
+        }
+
+        impl<CLOCK> [<$I2c Slave>]<CLOCK, $crate::i2c::I2cPullUp>
+        where
+            CLOCK: $crate::clock::Clock,
+        {
+            /// Initialize the I2C bus
+            ///
+            /// `new()` will enable the internal pull-ups to comply with the I2C
+            /// specification.  If you have external pull-ups connected, please
+            /// use `new_with_external_pullup()` instead.
+            pub fn new(
+                p: $I2C,
+                sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
+                scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
+                address: u8,
+            ) -> [<$I2c Slave>]<CLOCK, $crate::i2c::I2cPullUp> {
+                [<$I2c Slave>] {
+                    p,
+                    sda,
+                    scl,
+                    _clock: ::core::marker::PhantomData,
+                    address,
+                }
+            }
+        }
+
+        impl<CLOCK> [<$I2c Slave>]<CLOCK, $crate::i2c::I2cFloating>
+        where
+            CLOCK: $crate::clock::Clock,
+        {
+            /// Initialize the I2C bus, without enabling internal pull-ups
+            ///
+            /// This function should be used if your hardware design includes
+            /// pull-up resistors outside the MCU.  If you do not have these,
+            /// please use `new()` instead.
+            pub fn new_with_external_pullup(
+                p: $I2C,
+                sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::Floating>>,
+                scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::Floating>>,
+                address: u8,
+            ) -> [<$I2c Slave>]<CLOCK, $crate::i2c::I2cFloating> {
+                [<$I2c Slave>] {
+                    p,
+                    sda,
+                    scl,
+                    _clock: ::core::marker::PhantomData,
+                    address,
+                }
+            }
+        }
+    }};
 }
