@@ -570,5 +570,16 @@ macro_rules! impl_twi_i2c {
                 }
             }
         }
+
+        impl<CLOCK, M> [<$I2c Slave>]<CLOCK, M>
+        where
+            CLOCK: $crate::clock::Clock,
+        {
+            pub fn start(&mut self) {
+                // this does not compile
+                // self.p.$twar.write(|w| unsafe {w.bits(self.address)});
+            }
+        }
+
     }};
 }
