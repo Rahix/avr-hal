@@ -210,14 +210,14 @@ macro_rules! impl_twi_i2c {
     ) => {$crate::paste::paste! {
         /// I2C Master
         $(#[$i2c_attr])*
-        pub struct $I2c<CLOCK: $crate::clock::Clock, M> {
+        pub struct [<$I2c Master>]<CLOCK: $crate::clock::Clock, M> {
             p: $I2C,
             _clock: ::core::marker::PhantomData<CLOCK>,
             sda: $sdamod::$SDA<M>,
             scl: $sclmod::$SCL<M>,
         }
 
-        impl<CLOCK> $I2c<CLOCK, $crate::i2c::I2cPullUp>
+        impl<CLOCK> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp>
         where
             CLOCK: $crate::clock::Clock,
         {
@@ -231,7 +231,7 @@ macro_rules! impl_twi_i2c {
                 sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
                 scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
                 speed: u32,
-            ) -> $I2c<CLOCK, $crate::i2c::I2cPullUp> {
+            ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp> {
                 // Calculate TWBR
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
@@ -247,7 +247,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
-        impl<CLOCK> $I2c<CLOCK, $crate::i2c::I2cFloating>
+        impl<CLOCK> [<$I2c Master>]<CLOCK, $crate::i2c::I2cFloating>
         where
             CLOCK: $crate::clock::Clock,
         {
@@ -261,7 +261,7 @@ macro_rules! impl_twi_i2c {
                 sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::Floating>>,
                 scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::Floating>>,
                 speed: u32,
-            ) -> $I2c<CLOCK, $crate::i2c::I2cFloating> {
+            ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cFloating> {
                 // Calculate TWBR
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
@@ -277,7 +277,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
-        impl<CLOCK, M> $I2c<CLOCK, M>
+        impl<CLOCK, M> [<$I2c Master>]<CLOCK, M>
         where
             CLOCK: $crate::clock::Clock,
         {
@@ -434,7 +434,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
-        impl<CLOCK, M> $I2c<CLOCK, M>
+        impl<CLOCK, M> [<$I2c Master>]<CLOCK, M>
         where
             CLOCK: $crate::clock::Clock,
             $crate::delay::Delay<CLOCK>: $crate::hal::blocking::delay::DelayMs<u16>,
@@ -458,7 +458,7 @@ macro_rules! impl_twi_i2c {
         }
 
 
-        impl<CLOCK, M> $crate::hal::blocking::i2c::Write for $I2c<CLOCK, M>
+        impl<CLOCK, M> $crate::hal::blocking::i2c::Write for [<$I2c Master>]<CLOCK, M>
         where
             CLOCK: $crate::clock::Clock,
         {
@@ -472,7 +472,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
-        impl<CLOCK, M> $crate::hal::blocking::i2c::Read for $I2c<CLOCK, M>
+        impl<CLOCK, M> $crate::hal::blocking::i2c::Read for [<$I2c Master>]<CLOCK, M>
         where
             CLOCK: $crate::clock::Clock,
         {
@@ -486,7 +486,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
-        impl<CLOCK, M> $crate::hal::blocking::i2c::WriteRead for $I2c<CLOCK, M>
+        impl<CLOCK, M> $crate::hal::blocking::i2c::WriteRead for [<$I2c Master>]<CLOCK, M>
         where
             CLOCK: $crate::clock::Clock,
         {
