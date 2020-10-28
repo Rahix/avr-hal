@@ -577,8 +577,7 @@ macro_rules! impl_twi_i2c {
             CLOCK: $crate::clock::Clock,
         {
             pub fn start(&mut self) {
-                // this does not compile
-                // self.p.$twar.write(|w| unsafe {w.bits(self.address)});
+                self.p.$twar.write(|w| unsafe {w.bits(self.address)});
             }
         }
 
