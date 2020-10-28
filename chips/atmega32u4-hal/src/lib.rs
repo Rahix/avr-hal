@@ -47,6 +47,7 @@ pub mod i2c {
                 },
                 bitrate: twbr,
                 data: twdr,
+                address: twar,
             },
         }
     }

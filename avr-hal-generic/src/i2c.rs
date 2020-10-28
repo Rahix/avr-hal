@@ -204,6 +204,7 @@ macro_rules! impl_twi_i2c {
                 },
                 bitrate: $twbr:ident,
                 data: $twdr:ident,
+                address: $twar:ident,
             },
         }
     ) => {$crate::paste::paste! {
