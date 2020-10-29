@@ -238,7 +238,7 @@ macro_rules! impl_twi_i2c {
                 // Disable prescaler
                 p.$twsr.write(|w| w.$twps().prescaler_1());
 
-                $I2c {
+                [<$I2c Master>] {
                     p,
                     sda,
                     scl,
@@ -268,7 +268,7 @@ macro_rules! impl_twi_i2c {
                 // Disable prescaler
                 p.$twsr.write(|w| w.$twps().prescaler_1());
 
-                $I2c {
+                [<$I2c Master>] {
                     p,
                     sda,
                     scl,

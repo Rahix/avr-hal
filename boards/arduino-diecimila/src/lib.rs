@@ -17,4 +17,5 @@ pub use atmega168_hal::spi;
 
 pub type Delay = hal::delay::Delay<hal::clock::MHz16>;
 pub type Serial<IMODE> = hal::usart::Usart0<hal::clock::MHz16, IMODE>;
-pub type I2c<M> = hal::i2c::I2c<hal::clock::MHz16, M>;
+pub type I2cMaster<M> = hal::i2c::I2cMaster<hal::clock::MHz16, M>;
+pub type I2cSlave<M> = hal::i2c::I2cSlave<hal::clock::MHz16, M>;

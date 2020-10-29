@@ -216,7 +216,8 @@ pub type Serial<IMODE> = hal::usart::Usart0<hal::clock::MHz16, IMODE>;
 /// ```
 ///
 /// [ex-i2c]: https://github.com/Rahix/avr-hal/blob/master/boards/arduino-uno/examples/uno-i2cdetect.rs
-pub type I2c<M> = hal::i2c::I2c<hal::clock::MHz16, M>;
+pub type I2cMaster<M> = hal::i2c::I2cMaster<hal::clock::MHz16, M>;
+pub type I2cSlave<M> = hal::i2c::I2cSlave<hal::clock::MHz16, M>;
 
 /// Support for the WatchDog Timer
 ///
