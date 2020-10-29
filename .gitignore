@@ -1,3 +1,5 @@
 Cargo.lock
 /target
 **/*.rs.bk
+.idea
+rusty-tags.vi
