@@ -232,10 +232,27 @@ macro_rules! impl_twi_i2c {
                 scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
                 speed: u32,
             ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp> {
-                // Calculate TWBR
+                // Calculate the TWI Bit Rate Register (TWBR)
+                //
+                // (datasheet) 22.5.2 Bit Rate Generator Unit
+                //
+                //      This unit controls the period of SCL when operating in a Master mode. The SCL period is controlled by settings
+                //      in the TWI Bit Rate Register (TWBR) and the Prescaler bits in the TWI Status Register (TWSR). Slave operation
+                //      does not depend on Bit Rate or Prescaler settings, but the CPU clock frequency in the Slave must be at least 16
+                //      times higher than the SCL frequency. Note that slaves may prolong the SCL low period, thereby reducing the
+                //      average TWI bus clock period.
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+
                 // Disable prescaler
+                //
+                // (datasheet) 22.5.2 Bit Rate Generator Unit
+                //
+                //      SCL frequency = CPU Clock Frequency
+                //                     --------------------------------
+                //                     16 + 2(TWBR) * (Prescaler Value)
+                //
+                // Setting the prescaler to 1 makes the math easy.
                 p.$twsr.write(|w| w.$twps().prescaler_1());
 
                 [<$I2c Master>] {
@@ -263,9 +280,11 @@ macro_rules! impl_twi_i2c {
                 speed: u32,
             ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cFloating> {
                 // Calculate TWBR
+                // Same comments in new() above.
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
                 // Disable prescaler
+                // Same comments in new() above.
                 p.$twsr.write(|w| w.$twps().prescaler_1());
 
                 [<$I2c Master>] {
