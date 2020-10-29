@@ -217,6 +217,36 @@ macro_rules! impl_twi_i2c {
             scl: $sclmod::$SCL<M>,
         }
 
+        /*
+        fn initialize_i2c_master(
+            p: &$I2C,
+            speed: &u32,
+            ){
+            // Calculate the TWI Bit Rate Register (TWBR)
+            //
+            // (datasheet) 22.5.2 Bit Rate Generator Unit
+            //
+            //      This unit controls the period of SCL when operating in a Master mode. The SCL period is controlled by settings
+            //      in the TWI Bit Rate Register (TWBR) and the Prescaler bits in the TWI Status Register (TWSR). Slave operation
+            //      does not depend on Bit Rate or Prescaler settings, but the CPU clock frequency in the Slave must be at least 16
+            //      times higher than the SCL frequency. Note that slaves may prolong the SCL low period, thereby reducing the
+            //      average TWI bus clock period.
+            let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
+            p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+
+            // Disable prescaler
+            //
+            // (datasheet) 22.5.2 Bit Rate Generator Unit
+            //
+            //      SCL frequency = CPU Clock Frequency
+            //                     --------------------------------
+            //                     16 + 2(TWBR) * (Prescaler Value)
+            //
+            // Setting the prescaler to 1 makes the math easy.
+            p.$twsr.write(|w| w.$twps().prescaler_1());
+        }
+        */
+
         impl<CLOCK> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp>
         where
             CLOCK: $crate::clock::Clock,
@@ -232,27 +262,13 @@ macro_rules! impl_twi_i2c {
                 scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
                 speed: u32,
             ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp> {
+
+                // TODO: encapsuluate this common code in initialize_i2c_master(&p, &speed);
                 // Calculate the TWI Bit Rate Register (TWBR)
-                //
-                // (datasheet) 22.5.2 Bit Rate Generator Unit
-                //
-                //      This unit controls the period of SCL when operating in a Master mode. The SCL period is controlled by settings
-                //      in the TWI Bit Rate Register (TWBR) and the Prescaler bits in the TWI Status Register (TWSR). Slave operation
-                //      does not depend on Bit Rate or Prescaler settings, but the CPU clock frequency in the Slave must be at least 16
-                //      times higher than the SCL frequency. Note that slaves may prolong the SCL low period, thereby reducing the
-                //      average TWI bus clock period.
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
 
                 // Disable prescaler
-                //
-                // (datasheet) 22.5.2 Bit Rate Generator Unit
-                //
-                //      SCL frequency = CPU Clock Frequency
-                //                     --------------------------------
-                //                     16 + 2(TWBR) * (Prescaler Value)
-                //
-                // Setting the prescaler to 1 makes the math easy.
                 p.$twsr.write(|w| w.$twps().prescaler_1());
 
                 [<$I2c Master>] {
@@ -279,12 +295,13 @@ macro_rules! impl_twi_i2c {
                 scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::Floating>>,
                 speed: u32,
             ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cFloating> {
-                // Calculate TWBR
-                // Same comments in new() above.
+
+                // TODO: encapsuluate this common code in initialize_i2c_master(&p, &speed);
+                // Calculate the TWI Bit Rate Register (TWBR)
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+
                 // Disable prescaler
-                // Same comments in new() above.
                 p.$twsr.write(|w| w.$twps().prescaler_1());
 
                 [<$I2c Master>] {
@@ -325,11 +342,42 @@ macro_rules! impl_twi_i2c {
                 dir: $crate::i2c::Direction,
             ) -> Result<(), $crate::i2c::Error> {
                 // Write start condition
+                //
+                // (datsheet) 22.9.2 TWCR – TWI Control Register
+                //
+                //    Bit 2 – TWEN: TWI Enable Bit
+                //
+                //    The TWEN bit enables TWI operation and activates the TWI interface. When TWEN is written to one, the TWI
+                //    takes control over the I/O pins connected to the SCL and SDA pins, enabling the slew-rate limiters and spike
+                //    filters. If this bit is written to zero, the TWI is switched off and all TWI transmissions are terminated, regardless of
+                //    any ongoing operation.
+                //
+                //    Bit 7 – TWINT: TWI Interrupt Flag
+                //
+                //    This bit is set by hardware when the TWI has finished its current job and expects application software response.
+                //    If the I-bit in SREG and TWIE in TWCR are set, the MCU will jump to the TWI Interrupt Vector. While the TWINT
+                //    Flag is set, the SCL low period is stretched. The TWINT Flag must be cleared by software by writing a logic one
+                //    to it. Note that this flag is not automatically cleared by hardware when executing the interrupt routine. Also note
+                //    that clearing this flag starts the operation of the TWI, so all accesses to the TWI Address Register (TWAR), TWI
+                //    Status Register (TWSR), and TWI Data Register (TWDR) must be complete before clearing this flag.
+                //
+                //
+                //    Bit 5 – TWSTA: TWI START Condition Bit
+                //
+                //    The application writes the TWSTA bit to one when it desires to become a Master on the 2-wire Serial Bus. The
+                //    TWI hardware checks if the bus is available, and generates a START condition on the bus if it is free. However,
+                //    if the bus is not free, the TWI waits until a STOP condition is detected, and then generates a new START
+                //    condition to claim the bus Master status. TWSTA must be cleared by software when the START condition has
+                //    been transmitted.
+                //
+                //    NOTE: `twstart` macro token is defined as `twsta` in chips/[CHIP]/src/lib.rs
                 self.p.$twcr.write(|w| w
                     .$twen().set_bit()
                     .$twint().set_bit()
                     .$twstart().set_bit()
                 );
+                // NOTE: why do we need to wait here? `wait()` is just reading twcr.twint to see if
+                // the bit is set...but it was just set in the line above...
                 self.wait();
 
                 // Validate status
@@ -380,6 +428,45 @@ macro_rules! impl_twi_i2c {
             }
 
             fn wait(&mut self) {
+                // (datasheet) 22.9.2 TWCR – TWI Control Register
+                //
+                //    Bit 7 – TWINT: TWI Interrupt Flag
+                //
+                //    This bit is set by hardware when the TWI has finished its current job and expects application software response.
+                //    If the I-bit in SREG and TWIE in TWCR are set, the MCU will jump to the TWI Interrupt Vector. While the TWINT
+                //    Flag is set, the SCL low period is stretched. The TWINT Flag must be cleared by software by writing a logic one
+                //    to it. Note that this flag is not automatically cleared by hardware when executing the interrupt routine. Also note
+                //    that clearing this flag starts the operation of the TWI, so all accesses to the TWI Address Register (TWAR), TWI
+                //    Status Register (TWSR), and TWI Data Register (TWDR) must be complete before clearing this flag
+                //
+                // NOTE: In the start() fn above sets the `twint` flag, which `I think` is setting it to true:
+                //    
+                //      .$twint().set_bit()
+                //
+                // But 'true' === 1 which in the language of the spec here means `cleared`...
+                //
+                //    The TWINT Flag must be cleared by software by writing a logic one to it.
+                //
+                // Here in avr-device/src/generic.rs
+                //
+                //    impl<FI> FieldReader<bool, FI> {
+                //        /// Value of the field as raw bits.
+                //        #[inline(always)]
+                //        pub fn bit(&self) -> bool {
+                //            self.bits
+                //        }
+                //        /// Returns `true` if the bit is clear (0).
+                //        #[inline(always)]
+                //        pub fn bit_is_clear(&self) -> bool {
+                //            !self.bit()
+                //        }
+                //        /// Returns `true` if the bit is set (1).
+                //        #[inline(always)]
+                //        pub fn bit_is_set(&self) -> bool {
+                //            self.bit()
+                //        }
+                //    }
+                //
                 while self.p.$twcr.read().$twint().bit_is_clear() { }
             }
 
