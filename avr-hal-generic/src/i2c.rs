@@ -217,35 +217,38 @@ macro_rules! impl_twi_i2c {
             scl: $sclmod::$SCL<M>,
         }
 
-        /*
-        fn initialize_i2c_master(
-            p: &$I2C,
-            speed: &u32,
-            ){
-            // Calculate the TWI Bit Rate Register (TWBR)
-            //
-            // (datasheet) 22.5.2 Bit Rate Generator Unit
-            //
-            //      This unit controls the period of SCL when operating in a Master mode. The SCL period is controlled by settings
-            //      in the TWI Bit Rate Register (TWBR) and the Prescaler bits in the TWI Status Register (TWSR). Slave operation
-            //      does not depend on Bit Rate or Prescaler settings, but the CPU clock frequency in the Slave must be at least 16
-            //      times higher than the SCL frequency. Note that slaves may prolong the SCL low period, thereby reducing the
-            //      average TWI bus clock period.
-            let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-            p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+        impl<CLOCK, M> [<$I2c Master>]<CLOCK, M>
+        where
+            CLOCK: $crate::clock::Clock,
+        {
+            fn initialize_i2c(
+                p: &$I2C,
+                speed: &u32,
+                ){
+                // Calculate the TWI Bit Rate Register (TWBR)
+                //
+                // (datasheet) 22.5.2 Bit Rate Generator Unit
+                //
+                //      This unit controls the period of SCL when operating in a Master mode. The SCL period is controlled by settings
+                //      in the TWI Bit Rate Register (TWBR) and the Prescaler bits in the TWI Status Register (TWSR). Slave operation
+                //      does not depend on Bit Rate or Prescaler settings, but the CPU clock frequency in the Slave must be at least 16
+                //      times higher than the SCL frequency. Note that slaves may prolong the SCL low period, thereby reducing the
+                //      average TWI bus clock period.
+                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
+                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
 
-            // Disable prescaler
-            //
-            // (datasheet) 22.5.2 Bit Rate Generator Unit
-            //
-            //      SCL frequency = CPU Clock Frequency
-            //                     --------------------------------
-            //                     16 + 2(TWBR) * (Prescaler Value)
-            //
-            // Setting the prescaler to 1 makes the math easy.
-            p.$twsr.write(|w| w.$twps().prescaler_1());
+                // Disable prescaler
+                //
+                // (datasheet) 22.5.2 Bit Rate Generator Unit
+                //
+                //      SCL frequency = CPU Clock Frequency
+                //                     --------------------------------
+                //                     16 + 2(TWBR) * (Prescaler Value)
+                //
+                // Setting the prescaler to 1 makes the math easy.
+                p.$twsr.write(|w| w.$twps().prescaler_1());
+            }
         }
-        */
 
         impl<CLOCK> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp>
         where
@@ -263,13 +266,8 @@ macro_rules! impl_twi_i2c {
                 speed: u32,
             ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp> {
 
-                // TODO: encapsuluate this common code in initialize_i2c_master(&p, &speed);
-                // Calculate the TWI Bit Rate Register (TWBR)
-                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
-
-                // Disable prescaler
-                p.$twsr.write(|w| w.$twps().prescaler_1());
+                // init i2c
+                [<$I2c Master>]::<CLOCK, $crate::i2c::I2cPullUp>::initialize_i2c(&p, &speed);
 
                 [<$I2c Master>] {
                     p,
@@ -296,13 +294,8 @@ macro_rules! impl_twi_i2c {
                 speed: u32,
             ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cFloating> {
 
-                // TODO: encapsuluate this common code in initialize_i2c_master(&p, &speed);
-                // Calculate the TWI Bit Rate Register (TWBR)
-                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
-
-                // Disable prescaler
-                p.$twsr.write(|w| w.$twps().prescaler_1());
+                // init i2c
+                [<$I2c Master>]::<CLOCK, $crate::i2c::I2cFloating>::initialize_i2c(&p, &speed);
 
                 [<$I2c Master>] {
                     p,
