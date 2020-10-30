@@ -1,11 +1,22 @@
 //! I2C Implementations
 
+// datasheet : ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061B.pdf
+//
 /// TWI Status Codes
 pub mod twi_status {
     // The status codes defined in the C header are meant to be used with the
     // masked status value: (TWSR & TW_STATUS_MASK).  In our case, svd2rust
     // already added code to shift it to just the status value, so all status
     // codes need to be shifted to the right as well.
+    //
+    // See also: 
+    //
+    // (datasheet)  Table 22-2. Status codes for Master Transmitter Mode
+    //              Table 22-3. Status codes for Master Receiver Mode
+    //              Table 22-4. Status Codes for Slave Receiver Mode
+    //              Table 22-5. Status Codes for Slave Transmitter Mode
+    //              https://github.com/ToddG/static/blob/main/datasheets/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061B.pdf
+    //              https://github.com/ToddG/static/blob/main/datasheets/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061B.txt
 
     /// Start condition transmitted
     pub const TW_START: u8 = 0x08 >> 3;
@@ -217,23 +228,19 @@ macro_rules! impl_twi_i2c {
             scl: $sclmod::$SCL<M>,
         }
 
-        impl<CLOCK, M> [<$I2c Master>]<CLOCK, M>
-        where
-            CLOCK: $crate::clock::Clock,
-        {
-            fn initialize_i2c(
-                p: &$I2C,
-                speed: &u32,
-                ){
+        impl<CLOCK, M> [<$I2c Master>]<CLOCK, M> where CLOCK: $crate::clock::Clock, { fn
+            initialize_i2c( p: &$I2C, speed: &u32,){
                 // Calculate the TWI Bit Rate Register (TWBR)
                 //
                 // (datasheet) 22.5.2 Bit Rate Generator Unit
                 //
-                //      This unit controls the period of SCL when operating in a Master mode. The SCL period is controlled by settings
-                //      in the TWI Bit Rate Register (TWBR) and the Prescaler bits in the TWI Status Register (TWSR). Slave operation
-                //      does not depend on Bit Rate or Prescaler settings, but the CPU clock frequency in the Slave must be at least 16
-                //      times higher than the SCL frequency. Note that slaves may prolong the SCL low period, thereby reducing the
-                //      average TWI bus clock period.
+                //      This unit controls the period of SCL when operating in a Master mode. The
+                //      SCL period is controlled by settings in the TWI Bit Rate Register (TWBR)
+                //      and the Prescaler bits in the TWI Status Register (TWSR). Slave operation
+                //      does not depend on Bit Rate or Prescaler settings, but the CPU clock
+                //      frequency in the Slave must be at least 16 times higher than the SCL
+                //      frequency. Note that slaves may prolong the SCL low period, thereby
+                //      reducing the average TWI bus clock period.
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
 
@@ -329,39 +336,41 @@ macro_rules! impl_twi_i2c {
                 }
             }
 
-            fn start(
-                &mut self,
-                addr: u8,
-                dir: $crate::i2c::Direction,
-            ) -> Result<(), $crate::i2c::Error> {
+            fn start( &mut self, addr: u8, dir: $crate::i2c::Direction,) -> Result<(),
+            $crate::i2c::Error> {
                 // Write start condition
                 //
                 // (datsheet) 22.9.2 TWCR – TWI Control Register
                 //
                 //    Bit 2 – TWEN: TWI Enable Bit
                 //
-                //    The TWEN bit enables TWI operation and activates the TWI interface. When TWEN is written to one, the TWI
-                //    takes control over the I/O pins connected to the SCL and SDA pins, enabling the slew-rate limiters and spike
-                //    filters. If this bit is written to zero, the TWI is switched off and all TWI transmissions are terminated, regardless of
-                //    any ongoing operation.
+                //    The TWEN bit enables TWI operation and activates the TWI interface. When TWEN
+                //    is written to one, the TWI takes control over the I/O pins connected to the
+                //    SCL and SDA pins, enabling the slew-rate limiters and spike filters. If this
+                //    bit is written to zero, the TWI is switched off and all TWI transmissions are
+                //    terminated, regardless of any ongoing operation.
                 //
                 //    Bit 7 – TWINT: TWI Interrupt Flag
                 //
-                //    This bit is set by hardware when the TWI has finished its current job and expects application software response.
-                //    If the I-bit in SREG and TWIE in TWCR are set, the MCU will jump to the TWI Interrupt Vector. While the TWINT
-                //    Flag is set, the SCL low period is stretched. The TWINT Flag must be cleared by software by writing a logic one
-                //    to it. Note that this flag is not automatically cleared by hardware when executing the interrupt routine. Also note
-                //    that clearing this flag starts the operation of the TWI, so all accesses to the TWI Address Register (TWAR), TWI
-                //    Status Register (TWSR), and TWI Data Register (TWDR) must be complete before clearing this flag.
+                //    This bit is set by hardware when the TWI has finished its current job and
+                //    expects application software response.  If the I-bit in SREG and TWIE in TWCR
+                //    are set, the MCU will jump to the TWI Interrupt Vector. While the TWINT Flag
+                //    is set, the SCL low period is stretched. The TWINT Flag must be cleared by
+                //    software by writing a logic one to it. Note that this flag is not
+                //    automatically cleared by hardware when executing the interrupt routine. Also
+                //    note that clearing this flag starts the operation of the TWI, so all accesses
+                //    to the TWI Address Register (TWAR), TWI Status Register (TWSR), and TWI Data
+                //    Register (TWDR) must be complete before clearing this flag.
                 //
                 //
                 //    Bit 5 – TWSTA: TWI START Condition Bit
                 //
-                //    The application writes the TWSTA bit to one when it desires to become a Master on the 2-wire Serial Bus. The
-                //    TWI hardware checks if the bus is available, and generates a START condition on the bus if it is free. However,
-                //    if the bus is not free, the TWI waits until a STOP condition is detected, and then generates a new START
-                //    condition to claim the bus Master status. TWSTA must be cleared by software when the START condition has
-                //    been transmitted.
+                //    The application writes the TWSTA bit to one when it desires to become a
+                //    Master on the 2-wire Serial Bus. The TWI hardware checks if the bus is
+                //    available, and generates a START condition on the bus if it is free. However,
+                //    if the bus is not free, the TWI waits until a STOP condition is detected, and
+                //    then generates a new START condition to claim the bus Master status. TWSTA
+                //    must be cleared by software when the START condition has been transmitted.
                 //
                 //    NOTE: `twstart` macro token is defined as `twsta` in chips/[CHIP]/src/lib.rs
                 self.p.$twcr.write(|w| w
@@ -369,11 +378,68 @@ macro_rules! impl_twi_i2c {
                     .$twint().set_bit()
                     .$twstart().set_bit()
                 );
-                // NOTE: why do we need to wait here? `wait()` is just reading twcr.twint to see if
-                // the bit is set...but it was just set in the line above...
+
+                // QUESTION: why do we need to wait here? `wait()` is just reading twcr.twint to see if
+                // the bit is set...but it was just set in the line above... Is there some sort of
+                // timing issue here that is being papered over by the general wait()?
+                // I can see that below the TWDR is writeable when the TWINT is set (by hardware it
+                // says):
+                //
+                // (datsheet) 22.9.2 TWCR – TWI Control Register
+                // (datasheet) 22.9.4 TWDR – TWI Data Register Bit
+                //
+                //    TWDR In Transmit mode, TWDR contains the next byte to be transmitted. In
+                //    Receive mode, the TWDR contains the last byte received. It is writable while
+                //    the TWI is not in the process of shifting a byte. This occurs when the TWI
+                //    Interrupt Flag (TWINT) is set by hardware.
                 self.wait();
 
                 // Validate status
+                //
+                // NOTE: here's what this impl looks like in lpc8xx-hal, modeled as a state
+                // machine:
+                //
+                // https://github.com/lpc-rs/lpc8xx-hal/blob/4205de2cdb0d54ab17b6f8d37aab34c518b606a6/src/i2c/master.rs#L350
+                //
+                //    #[derive(Debug, Eq, PartialEq)]
+                //    pub enum State {
+                //        /// The peripheral is currently idle
+                //        ///
+                //        /// A new transaction can be started.
+                //        Idle,
+                //
+                //        /// Data has been received and is available to be read
+                //        ///
+                //        /// A read transaction has previously been initiated, and has been
+                //        /// acknowledged by the slave.
+                //        RxReady,
+                //
+                //        /// Data can be transmitted
+                //        ///
+                //        /// A write transaction has previously been initiated, and has been
+                //        /// acknowledged by the slave.
+                //        TxReady,
+                //
+                //        /// Slave has sent NACK in response to an address
+                //        NackAddress,
+                //
+                //        /// Slave has sent NACK in response to data
+                //        NackData,
+                //    }
+                //
+                //    ...
+                //
+                //    match state {
+                //        Variant::Val(MSTSTATE_A::IDLE) => Ok(Self::Idle),
+                //        Variant::Val(MSTSTATE_A::RECEIVE_READY) => Ok(Self::RxReady),
+                //        Variant::Val(MSTSTATE_A::TRANSMIT_READY) => Ok(Self::TxReady),
+                //        Variant::Val(MSTSTATE_A::NACK_ADDRESS) => Ok(Self::NackAddress),
+                //        Variant::Val(MSTSTATE_A::NACK_DATA) => Ok(Self::NackData),
+                //        Variant::Res(bits) => Err(bits),
+                //    }
+                //
+                // (datasheet) 22.9.3 TWSR – TWI Status Register
+                //
                 match self.p.$twsr.read().$tws().bits() {
                       $crate::i2c::twi_status::TW_START
                     | $crate::i2c::twi_status::TW_REP_START => (),
@@ -389,9 +455,32 @@ macro_rules! impl_twi_i2c {
                     },
                 }
 
-                // Send slave address
+                // Create rawaddr (address with direction bit)
                 let dirbit = if dir == $crate::i2c::Direction::Read { 1 } else { 0 };
                 let rawaddr = (addr << 1) | dirbit;
+
+                // Send slave address
+                //
+                // (datasheet) 22.9.4 TWDR – TWI Data Register
+                // 
+                //      Bit     7       6       5       4       3       2       1       0 
+                //              TWD7    TWD6    TWD5    TWD4    TWD3    TWD2    TWD1    TWD0 
+                //      R/W?    R/W     R/W     R/W     R/W     R/W     R/W     R/W     R/W 
+                //      Initial 
+                //      Value   1       1       1       1       1       1       1       1
+                //
+                //    TWDR In Transmit mode, TWDR contains the next byte to be transmitted. In
+                //    Receive mode, the TWDR contains the last byte received. It is writable while
+                //    the TWI is not in the process of shifting a byte. This occurs when the TWI
+                //    Interrupt Flag (TWINT) is set by hardware. Note that the Data Register cannot
+                //    be initialized by the user before the first interrupt occurs. The data in
+                //    TWDR remains stable as long as TWINT is set. While data is shifted out, data
+                //    on the bus is simultaneously shifted in. TWDR always contains the last byte
+                //    present on the bus, except after a wake up from a sleep mode by the TWI
+                //    interrupt. In this case, the contents of TWDR is undefined. In the case of a
+                //    lost bus arbitration, no data is lost in the transition from Master to Slave.
+                //    Handling of the ACK bit is controlled automatically by the TWI logic, the CPU
+                //    cannot access the ACK bit directly.
                 self.p.$twdr.write(|w| unsafe { w.bits(rawaddr) });
                 self.transact();
 
@@ -425,51 +514,57 @@ macro_rules! impl_twi_i2c {
                 //
                 //    Bit 7 – TWINT: TWI Interrupt Flag
                 //
-                //    This bit is set by hardware when the TWI has finished its current job and expects application software response.
-                //    If the I-bit in SREG and TWIE in TWCR are set, the MCU will jump to the TWI Interrupt Vector. While the TWINT
-                //    Flag is set, the SCL low period is stretched. The TWINT Flag must be cleared by software by writing a logic one
-                //    to it. Note that this flag is not automatically cleared by hardware when executing the interrupt routine. Also note
-                //    that clearing this flag starts the operation of the TWI, so all accesses to the TWI Address Register (TWAR), TWI
-                //    Status Register (TWSR), and TWI Data Register (TWDR) must be complete before clearing this flag
+                //    This bit is set by hardware when the TWI has finished its current job and
+                //    expects application software response.  If the I-bit in SREG and TWIE in TWCR
+                //    are set, the MCU will jump to the TWI Interrupt Vector. While the TWINT Flag
+                //    is set, the SCL low period is stretched. The TWINT Flag must be cleared by
+                //    software by writing a logic one to it. Note that this flag is not
+                //    automatically cleared by hardware when executing the interrupt routine. Also
+                //    note that clearing this flag starts the operation of the TWI, so all accesses
+                //    to the TWI Address Register (TWAR), TWI Status Register (TWSR), and TWI Data
+                //    Register (TWDR) must be complete before clearing this flag
                 //
-                // NOTE: In the start() fn above sets the `twint` flag, which `I think` is setting it to true:
+                // NOTE: the start() fn above sets the `twint` flag, setting it to `true`:
                 //    
                 //      .$twint().set_bit()
                 //
-                // But 'true' === 1 which in the language of the spec here means `cleared`...
+                // But in rust, a bool 'true' === 1. It's confusing that the datasheet says a bit
+                // is cleared by writing a logic one to it:
                 //
                 //    The TWINT Flag must be cleared by software by writing a logic one to it.
                 //
-                // Here in avr-device/src/generic.rs
+                // And the FieldReader also explicitly uses 'clear' to refer to 0 and 'set' to
+                // refer to 1:
                 //
-                //    impl<FI> FieldReader<bool, FI> {
-                //        /// Value of the field as raw bits.
-                //        #[inline(always)]
-                //        pub fn bit(&self) -> bool {
-                //            self.bits
-                //        }
-                //        /// Returns `true` if the bit is clear (0).
-                //        #[inline(always)]
-                //        pub fn bit_is_clear(&self) -> bool {
-                //            !self.bit()
-                //        }
-                //        /// Returns `true` if the bit is set (1).
-                //        #[inline(always)]
-                //        pub fn bit_is_set(&self) -> bool {
-                //            self.bit()
-                //        }
-                //    }
+                //    impl<FI> FieldReader<bool, FI> { /// Value of the field as raw bits.
+                //    #[inline(always)] pub fn bit(&self) -> bool { self.bits } /// Returns `true`
+                //    if the bit is clear (0).  #[inline(always)] pub fn bit_is_clear(&self) ->
+                //    bool { !self.bit() } /// Returns `true` if the bit is set (1).
+                //    #[inline(always)] pub fn bit_is_set(&self) -> bool { self.bit() } }
                 //
-                while self.p.$twcr.read().$twint().bit_is_clear() { }
-            }
+                // QUESTION: so is what I'm seeing a distinction between a _HARDWARE FLAG_ being 'cleared',
+                // (perhaps 'reset' is a better name?) vs. setting/clearing a _bit_ in a bitfield?
+                while self.p.$twcr.read().$twint().bit_is_clear() { } }
 
             fn transact(&mut self) {
+                // QUESTION: why are we setting TWEN here? It has already been set (above). Does it
+                // need to be set ? Why would it be unset? I looked through the datasheet and did
+                // not see any mention of this being turned off by hardware.
                 self.p.$twcr.write(|w| w.$twen().set_bit().$twint().set_bit());
+                // QUESTION: how do tight loops work on microcontrollers? Does this prevent the
+                // cpu from shutting down?
                 while self.p.$twcr.read().$twint().bit_is_clear() { }
             }
 
             fn write_data(&mut self, bytes: &[u8]) -> Result<(), $crate::i2c::Error> {
                 for byte in bytes {
+                    // (datasheet) 22.9.4 TWDR – TWI Data Register
+                    // 
+                    //      Bit     7       6       5       4       3       2       1       0 
+                    //              TWD7    TWD6    TWD5    TWD4    TWD3    TWD2    TWD1    TWD0 
+                    //      R/W?    R/W     R/W     R/W     R/W     R/W     R/W     R/W     R/W 
+                    //      Initial 
+                    //      Value   1       1       1       1       1       1       1       1
                     self.p.$twdr.write(|w| unsafe { w.bits(*byte) });
                     self.transact();
 
@@ -497,9 +592,27 @@ macro_rules! impl_twi_i2c {
                 let last = buffer.len() - 1;
                 for (i, byte) in buffer.iter_mut().enumerate() {
                     if i != last {
+                        // (datasheet)
+                        //
+                        //    Bit 6 – TWEA: TWI Enable Acknowledge Bit
+                        //
+                        //    The TWEA bit controls the generation of the acknowledge pulse. If the TWEA bit is written to one, the ACK
+                        //    pulse is generated on the TWI bus if the following conditions are met:
+                        //    1. The device’s own slave address has been received.
+                        //    2. A general call has been received, while the TWGCE bit in the TWAR is set.
+                        //    3. A data byte has been received in Master Receiver or Slave Receiver mode.
+                        //    By writing the TWEA bit to zero, the device can be virtually disconnected from the 2-wire Serial Bus temporarily.
+                        //    Address recognition can then be resumed by writing the TWEA bit to one again.
                         self.p.$twcr.write(|w| w.$twint().set_bit().$twen().set_bit().$twea().set_bit());
                         self.wait();
                     } else {
+                        // QUESTION: Why is this behaviour different for the last byte?
+                        //
+                        // (datasheet) 22.7.2 Master Receiver Mode
+                        //
+                        //    After the last byte has been received, the MR should inform the ST by sending
+                        //    a NACK after the last received data byte. The transfer is ended by generating a STOP condition or a repeated
+                        //    START condition.
                         self.p.$twcr.write(|w| w.$twint().set_bit().$twen().set_bit());
                         self.wait();
                     }
@@ -525,6 +638,8 @@ macro_rules! impl_twi_i2c {
 
             fn stop(&mut self) {
                 // Send stop
+                //
+                // QUESTION: again, wondering why $twen is being set here?
                 self.p.$twcr.write(|w| w
                     .$twen().set_bit()
                     .$twint().set_bit()
