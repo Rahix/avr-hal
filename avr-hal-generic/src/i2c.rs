@@ -207,7 +207,7 @@ macro_rules! impl_twi_i2c {
                     ack: $twea:ident,
                     int: $twint:ident,
                     start: $twsta:ident,
-                    stop: $twstop:ident,
+                    stop: $twsto:ident,
                 },
                 status: $twsr:ident {
                     prescaler: $twps:ident,
@@ -340,40 +340,6 @@ macro_rules! impl_twi_i2c {
             fn start( &mut self, addr: u8, dir: $crate::i2c::Direction,) -> Result<(),
             $crate::i2c::Error> {
                 // Write start condition
-                //
-                // (datsheet) 22.9.2 TWCR – TWI Control Register
-                //
-                //    Bit 2 – TWEN: TWI Enable Bit
-                //
-                //    The TWEN bit enables TWI operation and activates the TWI interface. When TWEN
-                //    is written to one, the TWI takes control over the I/O pins connected to the
-                //    SCL and SDA pins, enabling the slew-rate limiters and spike filters. If this
-                //    bit is written to zero, the TWI is switched off and all TWI transmissions are
-                //    terminated, regardless of any ongoing operation.
-                //
-                //    Bit 7 – TWINT: TWI Interrupt Flag
-                //
-                //    This bit is set by hardware when the TWI has finished its current job and
-                //    expects application software response.  If the I-bit in SREG and TWIE in TWCR
-                //    are set, the MCU will jump to the TWI Interrupt Vector. While the TWINT Flag
-                //    is set, the SCL low period is stretched. The TWINT Flag must be cleared by
-                //    software by writing a logic one to it. Note that this flag is not
-                //    automatically cleared by hardware when executing the interrupt routine. Also
-                //    note that clearing this flag starts the operation of the TWI, so all accesses
-                //    to the TWI Address Register (TWAR), TWI Status Register (TWSR), and TWI Data
-                //    Register (TWDR) must be complete before clearing this flag.
-                //
-                //
-                //    Bit 5 – TWSTA: TWI START Condition Bit
-                //
-                //    The application writes the TWSTA bit to one when it desires to become a
-                //    Master on the 2-wire Serial Bus. The TWI hardware checks if the bus is
-                //    available, and generates a START condition on the bus if it is free. However,
-                //    if the bus is not free, the TWI waits until a STOP condition is detected, and
-                //    then generates a new START condition to claim the bus Master status. TWSTA
-                //    must be cleared by software when the START condition has been transmitted.
-                //
-                //    NOTE: `twsta` macro token is defined as `twsta` in chips/[CHIP]/src/lib.rs
                 self.p.$twcr.write(|w| w
                     .$twen().set_bit()
                     .$twint().set_bit()
@@ -429,28 +395,15 @@ macro_rules! impl_twi_i2c {
             }
 
             fn wait(&mut self) {
-                // (datasheet) 22.9.2 TWCR – TWI Control Register
                 while self.p.$twcr.read().$twint().bit_is_clear() { } }
 
             fn transact(&mut self) {
-                // QUESTION: why are we setting TWEN here? It has already been set (above). Does it
-                // need to be set ? Why would it be unset? I looked through the datasheet and did
-                // not see any mention of this being turned off by hardware.
                 self.p.$twcr.write(|w| w.$twen().set_bit().$twint().set_bit());
-                // QUESTION: how do tight loops work on microcontrollers? Does this prevent the
-                // cpu from shutting down?
                 while self.p.$twcr.read().$twint().bit_is_clear() { }
             }
 
             fn write_data(&mut self, bytes: &[u8]) -> Result<(), $crate::i2c::Error> {
                 for byte in bytes {
-                    // (datasheet) 22.9.4 TWDR – TWI Data Register
-                    //
-                    //      Bit     7       6       5       4       3       2       1       0
-                    //              TWD7    TWD6    TWD5    TWD4    TWD3    TWD2    TWD1    TWD0
-                    //      R/W?    R/W     R/W     R/W     R/W     R/W     R/W     R/W     R/W
-                    //      Initial
-                    //      Value   1       1       1       1       1       1       1       1
                     self.p.$twdr.write(|w| unsafe { w.bits(*byte) });
                     self.transact();
 
@@ -475,30 +428,16 @@ macro_rules! impl_twi_i2c {
             }
 
             fn read_data(&mut self, buffer: &mut [u8]) -> Result<(), $crate::i2c::Error> {
+                // Caller must end transfer with either a STOP or repeated START condition.
                 let last = buffer.len() - 1;
                 for (i, byte) in buffer.iter_mut().enumerate() {
                     if i != last {
-                        // (datasheet)
-                        //
-                        //    Bit 6 – TWEA: TWI Enable Acknowledge Bit
-                        //
-                        //    The TWEA bit controls the generation of the acknowledge pulse. If the TWEA bit is written to one, the ACK
-                        //    pulse is generated on the TWI bus if the following conditions are met:
-                        //    1. The device’s own slave address has been received.
-                        //    2. A general call has been received, while the TWGCE bit in the TWAR is set.
-                        //    3. A data byte has been received in Master Receiver or Slave Receiver mode.
-                        //    By writing the TWEA bit to zero, the device can be virtually disconnected from the 2-wire Serial Bus temporarily.
-                        //    Address recognition can then be resumed by writing the TWEA bit to one again.
+                        // ACK each byte
                         self.p.$twcr.write(|w| w.$twint().set_bit().$twen().set_bit().$twea().set_bit());
                         self.wait();
                     } else {
-                        // QUESTION: Why is this behaviour different for the last byte?
-                        //
-                        // (datasheet) 22.7.2 Master Receiver Mode
-                        //
-                        //    After the last byte has been received, the MR should inform the ST by sending
-                        //    a NACK after the last received data byte. The transfer is ended by generating a STOP condition or a repeated
-                        //    START condition.
+                        // No ACK sent. The calling function must trigger a NACK with
+                        // either a STOP or repeated START condition.
                         self.p.$twcr.write(|w| w.$twint().set_bit().$twen().set_bit());
                         self.wait();
                     }
@@ -523,13 +462,10 @@ macro_rules! impl_twi_i2c {
             }
 
             fn stop(&mut self) {
-                // Send stop
-                //
-                // QUESTION: again, wondering why $twen is being set here?
                 self.p.$twcr.write(|w| w
                     .$twen().set_bit()
                     .$twint().set_bit()
-                    .$twstop().set_bit()
+                    .$twsto().set_bit()
                 );
             }
         }
@@ -612,7 +548,9 @@ macro_rules! impl_twi_i2c {
         /// I2C Slave is similar to the I2C Master. The similarities are that both structs have the
         /// `new()` and `new_with_external_pullup()` constructors. However the Slave constructors
         /// do not need to pass the speed/bitrate as that is determined by the Master. However, the
-        /// Slave constructors do need to pass the slave address.
+        /// Slave constructors do need to pass the slave address. 
+        ///
+        /// Note: Only the 7 LSB bits of the address field are used.
         $(#[$i2c_attr])*
         pub struct [<$I2c Slave>]<CLOCK: $crate::clock::Clock, M> {
             p: $I2C,
@@ -676,9 +614,57 @@ macro_rules! impl_twi_i2c {
         where
             CLOCK: $crate::clock::Clock,
         {
-            pub fn start(&mut self) {
+            /// Initialize the slave on the I2C bus.
+            ///
+            /// # Arguments
+            /// 
+            /// * `gce` - if `true`, then listen on the General Call Address.
+            ///
+            /// # Note
+            ///
+            /// The general use case is to pass `false` here and only listen
+            /// for messages addressed to this slave address.
+            pub fn start(&mut self, gce: bool) {
+                let gce_mask = if gce {1} else {0};
+                let rawaddr = (self.address << 1) | gce_mask; 
                 self.p.$twar.write(|w| unsafe {w.bits(self.address)});
+                self.p.$twcr.write(|w| w
+                    .$twen().set_bit()
+                    .$twea().set_bit()
+                    .$twsta().clear_bit()
+                    .$twsto().clear_bit()
+                    .$twint().set_bit()
+                );
             }
+
+//            fn wait(&mut self) {
+//                while self.p.$twcr.read().$twint().bit_is_clear() { }
+//                // TWINT has been triggered, check if 
+//                match self.p.$twsr.read().$tws().bits() {
+//                      $crate::i2c::twi_status::TW_MT_SLA_ACK
+//                    | $crate::i2c::twi_status::TW_MR_SLA_ACK => (),
+//                      $crate::i2c::twi_status::TW_MT_SLA_NACK
+//                    | $crate::i2c::twi_status::TW_MR_SLA_NACK => {
+//                        // Stop the transaction if it did not respond
+//                        self.stop();
+//                        return Err($crate::i2c::Error::AddressNack);
+//                    },
+//                      $crate::i2c::twi_status::TW_MT_ARB_LOST
+//                    | $crate::i2c::twi_status::TW_MR_ARB_LOST => {
+//                        return Err($crate::i2c::Error::ArbitrationLost);
+//                    },
+//                    $crate::i2c::twi_status::TW_BUS_ERROR => {
+//                        return Err($crate::i2c::Error::BusError);
+//                    },
+//                    _ => {
+//                        return Err($crate::i2c::Error::Unknown);
+//                    },
+//                }
+//
+//                Ok(())
+//            }
+
+
         }
 
     }};
