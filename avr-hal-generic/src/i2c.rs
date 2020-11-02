@@ -613,100 +613,111 @@ macro_rules! impl_twi_i2c {
 
 
         // Slave States
-        pub enum [<$I2c SlaveState>] {
+        pub enum [<$I2c SlaveState>]<M> {
             /// Uninitialized state machine
-            Uninitialized([<$I2c SlaveStateUninitialized>]),
+            Uninitialized([<$I2c SlaveStateUninitialized>]<M>),
 
             /// Initialized state machine
-            Initialized([<$I2c SlaveStateInitialized>]),
+            Initialized([<$I2c SlaveStateInitialized>]<M>),
 
             /// Address sent by master has been matched
-            AddressMatched([<$I2c SlaveStateAddressMatched>]),
+            AddressMatched([<$I2c SlaveStateAddressMatched>]<M>),
 
             /// Data has been received from master
-            RxReady([<$I2c SlaveStateRxReady>]),
+            RxReady([<$I2c SlaveStateRxReady>]<M>),
 
             /// Ready to transmit data to master
-            TxReady([<$I2c SlaveStateTxReady>]),
+            TxReady([<$I2c SlaveStateTxReady>]<M>),
 
             /// Error State
-            Error([<$I2c SlaveStateError>]),
+            Error([<$I2c SlaveStateError>]<M>),
         }
 
+        // impl <M>[<$I2c SlaveState>]<M>
+        // {
+        //     /// Create new slave state machine in the un-initialized state
+        //     ///
+        //     /// # Arguments
+        //     ///
+        //     /// * `slave` - slave instance
+        //     pub fn new(slave: [<$I2c Slave>]<M>) -> [<$I2c SlaveStateUninitialized>]<M>{
+        //         [<$I2c SlaveStateUninitialized>]::<M> {
+        //             slave: slave,
+        //         }
+        //     }
+        // }
 
-       pub struct [<$I2c SlaveStateUninitialized>];
 
-       // impl <M> [<$I2c SlaveStateUninitialized>]<M> {
-       //      /// Init the state machine
-       //      pub fn init(&self) -> [<$I2c SlaveStateMachine>]{
-       //          let gce_mask = if self.slave.twgce {1} else {0};
-       //          let rawaddr = (self.slave.address << 1) | gce_mask;
-       //          self.slave.p.$twar.write(|w| unsafe {w.bits(self.slave.address)});
-       //          self.slave.p.$twcr.write(|w| w
-       //              .$twen().set_bit()
-       //              .$twea().set_bit()
-       //              .$twsta().clear_bit()
-       //              .$twsto().clear_bit()
-       //              .$twint().set_bit()
-       //          );
-       //          [<$I2c SlaveStateMachine>] {
+       // impl [<$I2c SlaveStateUninitialized>] {
+       //      // Init the state machine
+       //      pub fn init(&self) -> [<$I2c SlaveStateMachine>]<M>{
+       //      //     let gce_mask = if self.slave.twgce {1} else {0};
+       //      //     let rawaddr = (self.slave.address << 1) | gce_mask;
+       //      //     self.slave.p.$twar.write(|w| unsafe {w.bits(self.slave.address)});
+       //      //     self.slave.p.$twcr.write(|w| w
+       //      //         .$twen().set_bit()
+       //      //         .$twea().set_bit()
+       //      //         .$twsta().clear_bit()
+       //      //         .$twsto().clear_bit()
+       //      //         .$twint().set_bit()
+       //      //     );
+       //          [<$I2c SlaveStateMachine>]::<M> {
+       //              slave: self.slave,
        //              state: [<$I2c SlaveState>]::Initialized([<$I2c SlaveStateInitialized>]),
-       //              slave: [<$I2c SlaveState>]<M>::self.slave
        //          }
        //      }
        // }
 
-       pub struct [<$I2c SlaveStateInitialized>];
-
-       pub struct [<$I2c SlaveStateAddressMatched>];
-
-       impl [<$I2c SlaveStateAddressMatched>]{
-           pub fn process() -> [<$I2c SlaveState>] {
-                // returns [<$I2c SlaveStateRxReady>] | [<$I2c SlaveStateTxReady>] | [<$I2c SlaveStateError>]
-                [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
-           }
+       pub struct [<$I2c SlaveStateUninitialized>]<M>{
+            slave: [<$I2c Slave>]<M>,
        }
 
-       pub struct [<$I2c SlaveStateRxReady>]{
+       pub struct [<$I2c SlaveStateInitialized>]<M>{
+            slave: [<$I2c Slave>]<M>,
+       }
+
+       pub struct [<$I2c SlaveStateAddressMatched>]<M>{
+            slave: [<$I2c Slave>]<M>,
+       }
+
+       // impl [<$I2c SlaveStateAddressMatched>]{
+       //     pub fn process() -> [<$I2c SlaveState>] {
+       //          // returns [<$I2c SlaveStateRxReady>] | [<$I2c SlaveStateTxReady>] | [<$I2c SlaveStateError>]
+       //          [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
+       //     }
+       // }
+
+       pub struct [<$I2c SlaveStateRxReady>]<M>{
            data: u8,
-       }
-
-       impl [<$I2c SlaveStateRxReady>]{
-           pub fn read() -> [<$I2c SlaveState>] {
-                // returns [<$I2c SlaveStateRxReady>] | [<$I2c SlaveStateError>]
-                [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
-           }
-       }
-       pub struct [<$I2c SlaveStateTxReady>];
-
-       impl [<$I2c SlaveStateTxReady>]{
-           pub fn write(_: u8) -> [<$I2c SlaveState>] {
-                // returns [<$I2c SlaveStateTxReady>] | [<$I2c SlaveStateError>]
-                [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
-           }
-       }
-       pub struct [<$I2c SlaveStateError>];
-
-        // Slave State Machine
-        pub struct [<$I2c SlaveStateMachine>]<M>{
            slave: [<$I2c Slave>]<M>,
-           state: [<$I2c SlaveState>],
-        }
+       }
 
-        impl <M>[<$I2c SlaveStateMachine>]<M>
-        {
-            /// Create new slave state machine in the un-initialized state
-            ///
-            /// # Arguments
-            ///
-            /// * `slave` - slave instance
-            pub fn new(slave: [<$I2c Slave>]<M>) -> [<$I2c SlaveStateMachine>]<M>{
-                [<$I2c SlaveStateMachine>]::<M> {
-                    slave: slave,
-                    state: [<$I2c SlaveState>]::Uninitialized([<$I2c SlaveStateUninitialized>]),
-                }
-            }
-        }
+       // impl [<$I2c SlaveStateRxReady>]{
+       //     pub fn read() -> [<$I2c SlaveState>] {
+       //          // returns [<$I2c SlaveStateRxReady>] | [<$I2c SlaveStateError>]
+       //          [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
+       //     }
+       // }
+
+       pub struct [<$I2c SlaveStateTxReady>]<M>{
+            slave: [<$I2c Slave>]<M>,
+       }
+
+       // impl [<$I2c SlaveStateTxReady>]{
+       //     pub fn write(_: u8) -> [<$I2c SlaveState>] {
+       //          // returns [<$I2c SlaveStateTxReady>] | [<$I2c SlaveStateError>]
+       //          [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
+       //     }
+       // }
+       pub struct [<$I2c SlaveStateError>]<M>{
+            slave: [<$I2c Slave>]<M>,
+       }
+
+        // // Slave State Machine
+        // pub struct [<$I2c SlaveStateMachine>]<M>{
+        //    slave: [<$I2c Slave>]<M>,
+        //    state: [<$I2c SlaveState>],
+        // }
 
 /*
         impl [<$I2c SlaveStateMachine>] {
