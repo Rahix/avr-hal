@@ -687,12 +687,12 @@ macro_rules! impl_twi_i2c {
        }
        pub struct [<$I2c SlaveStateError>];
 
-        // // Slave State Machine
-        // pub struct [<$I2c SlaveStateMachine>]<M>{
-        //    slave: [<$I2c Slave>]<M>,
-        //    state: [<$I2c SlaveState>],
-        // }
-        //
+        // Slave State Machine
+        pub struct [<$I2c SlaveStateMachine>]<M>{
+           slave: [<$I2c Slave>]<M>,
+           state: [<$I2c SlaveState>],
+        }
+
         // impl <M>[<$I2c SlaveStateMachine>]<M>
         // {
         //     /// Create new slave state machine in the un-initialized state
