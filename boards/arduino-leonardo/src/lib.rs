@@ -213,7 +213,7 @@ pub type Serial<IMODE> = hal::usart::Usart1<hal::clock::MHz16, IMODE>;
 ///
 /// [ex-i2c]: https://github.com/Rahix/avr-hal/blob/master/boards/arduino-leonardo/examples/leonardo-i2cdetect.rs
 pub type I2cMaster<M> = hal::i2c::I2cMaster<hal::clock::MHz16, M>;
-pub type I2cSlave<M> = hal::i2c::I2cSlave<hal::clock::MHz16, M>;
+pub type I2cSlave<M> = hal::i2c::I2cSlave<M>;
 
 /// Support for the Watchdog Timer
 ///

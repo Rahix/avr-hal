@@ -548,21 +548,18 @@ macro_rules! impl_twi_i2c {
         /// I2C Slave is similar to the I2C Master. The similarities are that both structs have the
         /// `new()` and `new_with_external_pullup()` constructors. However the Slave constructors
         /// do not need to pass the speed/bitrate as that is determined by the Master. However, the
-        /// Slave constructors do need to pass the slave address. 
+        /// Slave constructors do need to pass the slave address.
         ///
         /// Note: Only the 7 LSB bits of the address field are used.
         $(#[$i2c_attr])*
-        pub struct [<$I2c Slave>]<CLOCK: $crate::clock::Clock, M> {
+        pub struct [<$I2c Slave>]<M> {
             p: $I2C,
-            _clock: ::core::marker::PhantomData<CLOCK>,
             sda: $sdamod::$SDA<M>,
             scl: $sclmod::$SCL<M>,
             address: u8,
         }
 
-        impl<CLOCK> [<$I2c Slave>]<CLOCK, $crate::i2c::I2cPullUp>
-        where
-            CLOCK: $crate::clock::Clock,
+        impl [<$I2c Slave>]<$crate::i2c::I2cPullUp>
         {
             /// Initialize the I2C bus
             ///
@@ -574,20 +571,17 @@ macro_rules! impl_twi_i2c {
                 sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
                 scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
                 address: u8,
-            ) -> [<$I2c Slave>]<CLOCK, $crate::i2c::I2cPullUp> {
+            ) -> [<$I2c Slave>]<$crate::i2c::I2cPullUp> {
                 [<$I2c Slave>] {
                     p,
                     sda,
                     scl,
-                    _clock: ::core::marker::PhantomData,
                     address,
                 }
             }
         }
 
-        impl<CLOCK> [<$I2c Slave>]<CLOCK, $crate::i2c::I2cFloating>
-        where
-            CLOCK: $crate::clock::Clock,
+        impl [<$I2c Slave>]<$crate::i2c::I2cFloating>
         {
             /// Initialize the I2C bus, without enabling internal pull-ups
             ///
@@ -599,73 +593,137 @@ macro_rules! impl_twi_i2c {
                 sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::Floating>>,
                 scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::Floating>>,
                 address: u8,
-            ) -> [<$I2c Slave>]<CLOCK, $crate::i2c::I2cFloating> {
+            ) -> [<$I2c Slave>]<$crate::i2c::I2cFloating> {
                 [<$I2c Slave>] {
                     p,
                     sda,
                     scl,
-                    _clock: ::core::marker::PhantomData,
                     address,
                 }
             }
         }
 
-        impl<CLOCK, M> [<$I2c Slave>]<CLOCK, M>
-        where
-            CLOCK: $crate::clock::Clock,
-        {
-            /// Initialize the slave on the I2C bus.
-            ///
-            /// # Arguments
-            /// 
-            /// * `gce` - if `true`, then listen on the General Call Address.
-            ///
-            /// # Note
-            ///
-            /// The general use case is to pass `false` here and only listen
-            /// for messages addressed to this slave address.
-            pub fn start(&mut self, gce: bool) {
-                let gce_mask = if gce {1} else {0};
-                let rawaddr = (self.address << 1) | gce_mask; 
-                self.p.$twar.write(|w| unsafe {w.bits(self.address)});
-                self.p.$twcr.write(|w| w
-                    .$twen().set_bit()
-                    .$twea().set_bit()
-                    .$twsta().clear_bit()
-                    .$twsto().clear_bit()
-                    .$twint().set_bit()
-                );
-            }
 
-//            fn wait(&mut self) {
+        // Slave State Machine
+        //
+        // Idea cribbed from [lpc8xx-hal](https://github.com/lpc-rs/lpc8xx-hal/blob/4205de2cdb0d54ab17b6f8d37aab34c518b606a6/src/i2c/slave.rs#L112)
+        //
+        // Valid Transitions are:
+        //
+        //      [<$I2c Slave>].init()
+        //          -> Initialized
+        //              -> [AddressMatched | Error]
+        //                  -> [RxReady | TxReady | Error]
+        //                      -> [Initialized | Error]
+        //
+        //
+        // # Example
+        //
+        // ```rust
+        // 
+        // ```
+        pub enum [<$I2c SlaveState>] {
+            /// Intialized state machine
+            Initialized([<$I2c SlaveStateInitialized>]),
+
+            /// Address sent by master has been matched
+            AddressMatched([<$I2c SlaveStateAddressMatched>]),
+
+            /// Data has been received from master
+            RxReady([<$I2c SlaveStateRxReady>]),
+
+            /// Ready to transmit data to master
+            TxReady([<$I2c SlaveStateTxReady>]),
+
+            /// Error State
+            Error([<$I2c SlaveStateError>]),
+        }
+
+       pub struct [<$I2c SlaveStateInitialized>];
+
+       impl [<$I2c SlaveStateInitialized>] {
+            pub fn wait() -> [<$I2c SlaveState>] {
+                // returns [<$I2c SlaveStateAddressMatched>] | [<$I2c SlaveStateError>]
+                [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
+            }
+        }
+
+       pub struct [<$I2c SlaveStateAddressMatched>];
+
+       impl [<$I2c SlaveStateAddressMatched>]{
+           pub fn process() -> [<$I2c SlaveState>] {
+                // returns [<$I2c SlaveStateRxReady>] | [<$I2c SlaveStateTxReady>] | [<$I2c SlaveStateError>]
+                [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
+           }
+       }
+
+       pub struct [<$I2c SlaveStateRxReady>]{
+           data: u8,
+       }
+
+       impl [<$I2c SlaveStateRxReady>]{
+           pub fn read() -> [<$I2c SlaveState>] {
+                // returns [<$I2c SlaveStateRxReady>] | [<$I2c SlaveStateError>]
+                [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
+           }
+       }
+       pub struct [<$I2c SlaveStateTxReady>];
+
+       impl [<$I2c SlaveStateTxReady>]{
+           pub fn write(_: u8) -> [<$I2c SlaveState>] {
+                // returns [<$I2c SlaveStateTxReady>] | [<$I2c SlaveStateError>]
+                [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
+           }
+       }
+       pub struct [<$I2c SlaveStateError>];
+
+
+//       impl [<$I2c Slave>]
+//       {
+//            /// Initialize the slave on the I2C bus.
+//            ///
+//            /// # Arguments
+//            ///
+//            /// * `gce` - if `true`, then listen on the General Call Address.
+//            ///
+//            /// # NOTE 
+//            /// 
+//            /// The general use case is to pass `false` here and only listen
+//            /// for messages addressed to this slave address.
+//            pub fn init(&mut self, gce: bool) -> [<$I2c SlaveState>]{
+//                let gce_mask = if gce {1} else {0};
+//                let rawaddr = (self.address << 1) | gce_mask;
+//                self.p.$twar.write(|w| unsafe {w.bits(self.address)});
+//                self.p.$twcr.write(|w| w
+//                    .$twen().set_bit()
+//                    .$twea().set_bit()
+//                    .$twsta().clear_bit()
+//                    .$twsto().clear_bit()
+//                    .$twint().set_bit()
+//                );
+//                [<$I2c SlaveState>]::Initialized([<$I2c SlaveStateInitialized>])
+//            };
+//       }
+//
+//            fn wait(&mut self) -> (byte, $crate::i2c::Direction) {
 //                while self.p.$twcr.read().$twint().bit_is_clear() { }
-//                // TWINT has been triggered, check if 
+//                // TWINT has been triggered, check the read direction
+//                // and pass the data back to the listener
 //                match self.p.$twsr.read().$tws().bits() {
-//                      $crate::i2c::twi_status::TW_MT_SLA_ACK
-//                    | $crate::i2c::twi_status::TW_MR_SLA_ACK => (),
-//                      $crate::i2c::twi_status::TW_MT_SLA_NACK
-//                    | $crate::i2c::twi_status::TW_MR_SLA_NACK => {
-//                        // Stop the transaction if it did not respond
-//                        self.stop();
-//                        return Err($crate::i2c::Error::AddressNack);
-//                    },
-//                      $crate::i2c::twi_status::TW_MT_ARB_LOST
-//                    | $crate::i2c::twi_status::TW_MR_ARB_LOST => {
-//                        return Err($crate::i2c::Error::ArbitrationLost);
-//                    },
-//                    $crate::i2c::twi_status::TW_BUS_ERROR => {
-//                        return Err($crate::i2c::Error::BusError);
-//                    },
-//                    _ => {
-//                        return Err($crate::i2c::Error::Unknown);
-//                    },
+//                    //TW_SR_SLA_ACK: u8 = 0x60 >> 3;
+//                    $crate::i2c::twi_status::TW_SR_SLA_ACK =>
+//                        self.p.$twcr.write(|w| w
+//                            .$twsto().clear_bit()
+//                            .$twea().set_bit()
+//                            .$twin().set_bit();
+//
 //                }
 //
 //                Ok(())
 //            }
 
 
-        }
+//        }
 
     }};
 }

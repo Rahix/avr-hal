@@ -17,7 +17,7 @@ pub use crate::pins::*;
 pub type Delay = hal::delay::Delay<hal::clock::MHz16>;
 pub type Serial<IMODE> = atmega2560_hal::usart::Usart0<hal::clock::MHz16, IMODE>;
 pub type I2cMaster<M> = hal::i2c::I2cMaster<hal::clock::MHz16, M>;
-pub type I2cSlave<M> = hal::i2c::I2cSlave<hal::clock::MHz16, M>;
+pub type I2cSlave<M> = hal::i2c::I2cSlave<M>;
 
 /// Support for PWM pins
 ///
