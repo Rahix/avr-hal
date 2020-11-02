@@ -693,20 +693,20 @@ macro_rules! impl_twi_i2c {
            state: [<$I2c SlaveState>],
         }
 
-        // impl <M>[<$I2c SlaveStateMachine>]<M>
-        // {
-        //     /// Create new slave state machine in the un-initialized state
-        //     ///
-        //     /// # Arguments
-        //     ///
-        //     /// * `slave` - slave instance
-        //     pub fn new(slave: [<$I2c Slave>]<M>) -> [<$I2c SlaveStateMachine>]{
-        //         [<$I2c SlaveStateMachine>] {
-        //             slave: slave,
-        //             state: [<$I2c SlaveState>]::Uninitialized([<$I2c SlaveStateUninitialized>]),
-        //         }
-        //     }
-        // }
+        impl <M>[<$I2c SlaveStateMachine>]<M>
+        {
+            /// Create new slave state machine in the un-initialized state
+            ///
+            /// # Arguments
+            ///
+            /// * `slave` - slave instance
+            pub fn new(slave: [<$I2c Slave>]<M>) -> [<$I2c SlaveStateMachine>]<M>{
+                [<$I2c SlaveStateMachine>]::<M> {
+                    slave: slave,
+                    state: [<$I2c SlaveState>]::Uninitialized([<$I2c SlaveStateUninitialized>]),
+                }
+            }
+        }
 
 /*
         impl [<$I2c SlaveStateMachine>] {
