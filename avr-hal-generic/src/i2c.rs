@@ -694,22 +694,8 @@ macro_rules! impl_twi_i2c {
        impl <M>[<$I2c SlaveStateInitialized>]<M> {
             pub fn wait(self) -> [<$I2c SlaveStateAddressMatched>]<M>{
                 while self.slave.p.$twcr.read().$twint().bit_is_clear() { }
-                // // TWINT has been triggered, check the read direction
-                // // and pass the data back to the listener
-                // match self.p.$twsr.read().$tws().bits() {
-                //     $crate::i2c::twi_status::TW_SR_SLA_ACK
-                // |   $crate::i2c::twi_status::TW_SR_ARB_LOST_SLA_ACK
-                // |   $crate::i2c::twi_status::TW_SR_GCALL_ACK
-                // |   $crate::i2c::twi_status::TW_SR_ARB_LOST_GCALL_ACK =>
-                //         self.p.$twcr.write(|w| w
-                //             .$twsto().clear_bit()
-                //             .$twint().set_bit();
-                //             .$twea().set_bit()
-                //         );
-                // [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
-                // [<$I2c SlaveStateAddressMatched>]::<M> {
-                //     slave: self.slave,
-                // }
+                // TWINT has been triggered, meaning the address matched or
+                // we are responding to a general call address
                 [<$I2c SlaveStateAddressMatched>]::<M> {
                     slave: self.slave,
                 }
@@ -718,10 +704,10 @@ macro_rules! impl_twi_i2c {
 
        impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
             pub fn matchit(self) -> [<$I2c SlaveState>]<M>{
-                while self.slave.p.$twcr.read().$twint().bit_is_clear() { }
-                // // TWINT has been triggered, check the read direction
-                // // and pass the data back to the listener
-                // match self.p.$twsr.read().$tws().bits() {
+                // check the direction bit and transition either to
+                // RxReady or TxReady.
+
+                match self.slave.p.$twsr.read().$tws().bits() {
                 //     $crate::i2c::twi_status::TW_SR_SLA_ACK
                 // |   $crate::i2c::twi_status::TW_SR_ARB_LOST_SLA_ACK
                 // |   $crate::i2c::twi_status::TW_SR_GCALL_ACK
@@ -731,14 +717,11 @@ macro_rules! impl_twi_i2c {
                 //             .$twint().set_bit();
                 //             .$twea().set_bit()
                 //         );
-                // [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
-                // [<$I2c SlaveStateAddressMatched>]::<M> {
-                //     slave: self.slave,
-                // }
-                [<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
-                    slave: self.slave,
-                    data: 0,
-                })
+                    _ => [<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
+                        slave: self.slave,
+                        data: 0,
+                        })
+                }
             }
        }
 
