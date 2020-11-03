@@ -717,7 +717,7 @@ macro_rules! impl_twi_i2c {
        }
 
        impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
-            pub fn matchit(self) -> [<$I2c SlaveStateAddressMatched>]<M>{
+            pub fn matchit(self) -> [<$I2c SlaveState>]<M>{
                 while self.slave.p.$twcr.read().$twint().bit_is_clear() { }
                 // // TWINT has been triggered, check the read direction
                 // // and pass the data back to the listener
@@ -735,9 +735,10 @@ macro_rules! impl_twi_i2c {
                 // [<$I2c SlaveStateAddressMatched>]::<M> {
                 //     slave: self.slave,
                 // }
-                [<$I2c SlaveStateAddressMatched>]::<M> {
+                [<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
                     slave: self.slave,
-                }
+                    data: 0,
+                })
             }
        }
 
