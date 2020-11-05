@@ -25,6 +25,7 @@ pub use avr_device::entry;
 
 pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
+pub use avr_hal_generic;
 
 #[cfg(feature = "device-selected")]
 pub mod port;
