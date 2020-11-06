@@ -35,9 +35,9 @@
 //! | `PL5` | `.into_pwm(&mut timer5)` | |
 
 use crate::port::{portb, porte, portg, porth, portl};
-pub use avr_hal::pwm::*;
+pub use avr_hal_generic::pwm::*;
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC0` for PWM (pins `PB7`, `PG5`)
     ///
     /// # Example
@@ -53,7 +53,7 @@ avr_hal::impl_pwm! {
     /// pb7.enable();
     /// ```
     pub struct Timer0Pwm {
-        timer: crate::atmega2560::TC0,
+        timer: crate::pac::TC0,
         init: |tim, prescaler| {
             tim.tccr0a.modify(|_, w| w.wgm0().pwm_fast());
             tim.tccr0b.modify(|_, w| match prescaler {
@@ -85,7 +85,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC1` for PWM (pins `PB5`, `PB6`, `PB7`)
     ///
     /// # Example
@@ -103,7 +103,7 @@ avr_hal::impl_pwm! {
     ///
     /// **Note**: For `PB7` the method is called `into_pwm1()`!
     pub struct Timer1Pwm {
-        timer: crate::atmega2560::TC1,
+        timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a.modify(|_, w| w.wgm1().bits(0b01));
             tim.tccr1b.modify(|_, w|  {
@@ -146,7 +146,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC2` for PWM (pins `PB4`, `PH6`)
     ///
     /// # Example
@@ -162,7 +162,7 @@ avr_hal::impl_pwm! {
     /// pb4.enable();
     /// ```
     pub struct Timer2Pwm {
-        timer: crate::atmega2560::TC2,
+        timer: crate::pac::TC2,
         init: |tim, prescaler| {
             tim.tccr2a.modify(|_, w| w.wgm2().bits(0b01));
             tim.tccr2b.modify(|_, w| {
@@ -197,7 +197,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC3` for PWM (pins `PE3`, `PE4`, `PE5`)
     ///
     /// # Example
@@ -213,7 +213,7 @@ avr_hal::impl_pwm! {
     /// pe3.enable();
     /// ```
     pub struct Timer3Pwm {
-        timer: crate::atmega2560::TC3,
+        timer: crate::pac::TC3,
         init: |tim, prescaler| {
             tim.tccr3a.modify(|_, w| w.wgm3().bits(0b01));
             tim.tccr3b.modify(|_, w| {
@@ -256,7 +256,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC4` for PWM (pins `PH3`, `PH4`, `PH5`)
     ///
     /// # Example
@@ -272,7 +272,7 @@ avr_hal::impl_pwm! {
     /// ph3.enable();
     /// ```
     pub struct Timer4Pwm {
-        timer: crate::atmega2560::TC4,
+        timer: crate::pac::TC4,
         init: |tim, prescaler| {
             tim.tccr4a.modify(|_, w| w.wgm4().bits(0b01));
             tim.tccr4b.modify(|_, w| {
@@ -315,7 +315,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC5` for PWM (pins `PL3`, `PL4`, `PL5`)
     ///
     /// # Example
@@ -331,7 +331,7 @@ avr_hal::impl_pwm! {
     /// pl3.enable();
     /// ```
     pub struct Timer5Pwm {
-        timer: crate::atmega2560::TC5,
+        timer: crate::pac::TC5,
         init: |tim, prescaler| {
             tim.tccr5a.modify(|_, w| w.wgm5().bits(0b01));
             tim.tccr5b.modify(|_, w| {

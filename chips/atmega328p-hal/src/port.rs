@@ -4,7 +4,7 @@
 //!
 //! [1]: ../../avr_hal_generic/port/index.html
 
-pub use avr_hal::port::mode;
+pub use avr_hal_generic::port::mode;
 
 pub trait PortExt {
     type Parts;
@@ -12,15 +12,27 @@ pub trait PortExt {
     fn split(self) -> Self::Parts;
 }
 
-avr_hal::impl_generic_pin! {
+#[cfg(feature = "atmega328p")]
+avr_hal_generic::impl_generic_pin! {
     pub enum Pin {
-        B(crate::atmega328p::PORTB, portb, pinb, ddrb),
-        C(crate::atmega328p::PORTC, portc, pinc, ddrc),
-        D(crate::atmega328p::PORTD, portd, pind, ddrd),
+        B(crate::pac::PORTB, portb, pinb, ddrb),
+        C(crate::pac::PORTC, portc, pinc, ddrc),
+        D(crate::pac::PORTD, portd, pind, ddrd),
     }
 }
 
-avr_hal::impl_port! {
+#[cfg(feature = "atmega328pb")]
+avr_hal_generic::impl_generic_pin! {
+    pub enum Pin {
+        B(crate::pac::PORTB, portb, pinb, ddrb),
+        C(crate::pac::PORTC, portc, pinc, ddrc),
+        D(crate::pac::PORTD, portd, pind, ddrd),
+        E(crate::pac::PORTE, porte, pine, ddre),
+    }
+}
+
+
+avr_hal_generic::impl_port! {
     pub mod portb {
         #[port_ext]
         use super::PortExt;
@@ -28,7 +40,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::B;
 
-        impl PortExt for crate::atmega328p::PORTB {
+        impl PortExt for crate::pac::PORTB {
             regs: (pinb, ddrb, portb),
             pb0: (PB0, 0),
             pb1: (PB1, 1),
@@ -42,7 +54,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portc {
         #[port_ext]
         use super::PortExt;
@@ -50,7 +62,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::C;
 
-        impl PortExt for crate::atmega328p::PORTC {
+        impl PortExt for crate::pac::PORTC {
             regs: (pinc, ddrc, portc),
             pc0: (PC0, 0),
             pc1: (PC1, 1),
@@ -63,7 +75,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portd {
         #[port_ext]
         use super::PortExt;
@@ -71,7 +83,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::D;
 
-        impl PortExt for crate::atmega328p::PORTD {
+        impl PortExt for crate::pac::PORTD {
             regs: (pind, ddrd, portd),
             pd0: (PD0, 0),
             pd1: (PD1, 1),
@@ -85,3 +97,21 @@ avr_hal::impl_port! {
     }
 }
 
+#[cfg(feature = "atmega328pb")]
+avr_hal_generic::impl_port! {
+    pub mod porte {
+        #[port_ext]
+        use super::PortExt;
+
+        #[generic_pin]
+        use Pin::E;
+
+        impl PortExt for crate::pac::PORTE {
+            regs: (pine, ddre, porte),
+            pe0: (PE0, 0),
+            pe1: (PE1, 1),
+            pe2: (PE2, 2),
+            pe3: (PE3, 3),
+        }
+    }
+}

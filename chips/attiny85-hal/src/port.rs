@@ -4,7 +4,7 @@
 //!
 //! [1]: ../../avr_hal_generic/port/index.html
 
-pub use avr_hal::port::mode;
+pub use avr_hal_generic::port::mode;
 
 pub trait PortExt {
     type Parts;
@@ -12,12 +12,12 @@ pub trait PortExt {
     fn split(self) -> Self::Parts;
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portb {
         #[port_ext]
         use super::PortExt;
 
-        impl PortExt for crate::attiny85::PORTB {
+        impl PortExt for crate::pac::PORTB {
             regs: (pinb, ddrb, portb),
             pb0: (PB0, 0),
             pb1: (PB1, 1),

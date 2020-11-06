@@ -18,7 +18,7 @@ fn main() -> ! {
     let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
 
     let mut serial =
-        arduino_uno::Serial::new(dp.USART0, pins.d0, pins.d1.into_output(&mut pins.ddr), 9600);
+        arduino_uno::Serial::new(dp.USART0, pins.d0, pins.d1.into_output(&mut pins.ddr), 9600.into_baudrate());
 
     let mut adc = adc::Adc::new(dp.ADC, Default::default());
 

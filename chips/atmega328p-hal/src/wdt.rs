@@ -2,8 +2,7 @@
 
 pub use avr_hal_generic::wdt::*;
 
-avr_hal::impl_wdt! {
-
+avr_hal_generic::impl_wdt! {
     pub enum Timeout {
         /// 16 milliseconds
         Ms16 { wdpl().cycles_2k_512k() },
@@ -28,7 +27,7 @@ avr_hal::impl_wdt! {
     }
 
     pub struct Wdt {
-        mcu_status_register: crate::atmega328p::cpu::MCUSR,
-        peripheral: crate::atmega328p::WDT,
+        mcu_status_register: crate::pac::cpu::MCUSR,
+        peripheral: crate::pac::WDT,
     }
 }

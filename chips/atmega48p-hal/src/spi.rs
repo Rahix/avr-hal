@@ -23,11 +23,11 @@
 //! also instantiate a Settings object with the other options available.
 
 use crate::port::portb;
-pub use avr_hal::spi::*;
+pub use avr_hal_generic::spi::*;
 
-avr_hal::impl_spi! {
+avr_hal_generic::impl_spi! {
     pub struct Spi {
-        peripheral: crate::atmega48p::SPI,
+        peripheral: crate::pac::SPI,
         pins: {
             sclk: portb::PB5,
             mosi: portb::PB3,

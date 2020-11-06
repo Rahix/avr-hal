@@ -60,7 +60,7 @@ macro_rules! impl_adc {
         use $crate::hal::adc::{Channel, OneShot};
         use $crate::nb;
         use $crate::port::mode::Analog;
-        pub use avr_hal::adc::*;
+        pub use $crate::adc::*;
 
         pub struct $Adc {
             peripheral: $ADC,

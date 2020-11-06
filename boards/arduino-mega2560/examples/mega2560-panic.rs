@@ -34,7 +34,7 @@ fn main() -> ! {
         dp.USART0,
         porte.pe0,
         porte.pe1.into_output(&mut porte.ddr),
-        57600,
+        57600.into_baudrate(),
     );
 
     ufmt::uwriteln!(&mut serial, "Hello from MEGA2560!\r").void_unwrap();

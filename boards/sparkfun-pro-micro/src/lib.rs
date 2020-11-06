@@ -41,17 +41,21 @@
 
 #![no_std]
 
-pub extern crate atmega32u4_hal as hal;
+pub use atmega32u4_hal as hal;
+pub use crate::hal::pac;
+
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
-pub use hal::entry;
+pub use crate::hal::entry;
 
 mod pins;
 pub use crate::pins::*;
 
-pub use atmega32u4_hal::atmega32u4;
-pub use crate::atmega32u4::Peripherals;
-pub use atmega32u4_hal::prelude;
+pub use crate::pac::Peripherals;
+pub mod prelude {
+    pub use crate::hal::prelude::*;
+    pub use crate::hal::usart::BaudrateExt as _;
+}
 
 
 /// Busy-Delay
@@ -182,7 +186,7 @@ pub mod pwm {
 ///     dp.USART1,
 ///     pins.d0,
 ///     pins.d1.into_output(&mut pins.ddr),
-///     57600,
+///     57600.into_baudrate(),
 /// );
 ///
 /// ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").void_unwrap();

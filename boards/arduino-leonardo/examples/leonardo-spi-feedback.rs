@@ -25,7 +25,7 @@ fn main() -> ! {
         dp.USART1,
         pins.d0,
         pins.d1.into_output(&mut pins.ddr),
-        57600,
+        57600.into_baudrate(),
     );
 
     pins.led_rx.into_output(&mut pins.ddr); // SS must be set to output mode.

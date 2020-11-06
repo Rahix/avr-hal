@@ -55,17 +55,23 @@
 
 #![no_std]
 
-pub extern crate atmega328p_hal as hal;
+// Expose hal & pac crates
+pub use atmega328p_hal as hal;
+pub use crate::hal::pac;
+
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
-pub use hal::entry;
+pub use crate::hal::entry;
+
+pub use crate::pac::Peripherals;
 
 mod pins;
 pub use crate::pins::*;
 
-pub use atmega328p_hal::atmega328p;
-pub use crate::atmega328p::Peripherals;
-pub use atmega328p_hal::prelude;
+pub mod prelude {
+    pub use crate::hal::prelude::*;
+    pub use crate::hal::usart::BaudrateArduinoExt as _;
+}
 
 /// Busy-Delay
 ///
@@ -189,7 +195,7 @@ pub mod pwm {
 ///     dp.USART0,
 ///     pins.d0,
 ///     pins.d1.into_output(&mut pins.ddr),
-///     57600,
+///     57600.into_baudrate(),
 /// );
 ///
 /// ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").void_unwrap();

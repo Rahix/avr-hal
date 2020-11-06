@@ -4,7 +4,7 @@
 //!
 //! [1]: ../../avr_hal_generic/port/index.html
 
-pub use avr_hal::port::mode;
+pub use avr_hal_generic::port::mode;
 
 pub trait PortExt {
     type Parts;
@@ -12,23 +12,23 @@ pub trait PortExt {
     fn split(self) -> Self::Parts;
 }
 
-avr_hal::impl_generic_pin! {
+avr_hal_generic::impl_generic_pin! {
     pub enum Pin {
-        A(crate::atmega2560::PORTA, porta, pina, ddra),
-        B(crate::atmega2560::PORTB, portb, pinb, ddrb),
-        C(crate::atmega2560::PORTC, portc, pinc, ddrc),
-        D(crate::atmega2560::PORTD, portd, pind, ddrd),
-        E(crate::atmega2560::PORTE, porte, pine, ddre),
-        F(crate::atmega2560::PORTF, portf, pinf, ddrf),
-        G(crate::atmega2560::PORTG, portg, ping, ddrg),
-        H(crate::atmega2560::PORTH, porth, pinh, ddrh),
-        J(crate::atmega2560::PORTJ, portj, pinj, ddrj),
-        K(crate::atmega2560::PORTK, portk, pink, ddrk),
-        L(crate::atmega2560::PORTL, portl, pinl, ddrl),
+        A(crate::pac::PORTA, porta, pina, ddra),
+        B(crate::pac::PORTB, portb, pinb, ddrb),
+        C(crate::pac::PORTC, portc, pinc, ddrc),
+        D(crate::pac::PORTD, portd, pind, ddrd),
+        E(crate::pac::PORTE, porte, pine, ddre),
+        F(crate::pac::PORTF, portf, pinf, ddrf),
+        G(crate::pac::PORTG, portg, ping, ddrg),
+        H(crate::pac::PORTH, porth, pinh, ddrh),
+        J(crate::pac::PORTJ, portj, pinj, ddrj),
+        K(crate::pac::PORTK, portk, pink, ddrk),
+        L(crate::pac::PORTL, portl, pinl, ddrl),
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod porta {
         #[port_ext]
         use super::PortExt;
@@ -36,7 +36,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::A;
 
-        impl PortExt for crate::atmega2560::PORTA {
+        impl PortExt for crate::pac::PORTA {
             regs: (pina, ddra, porta),
             pa0: (PA0, 0),
             pa1: (PA1, 1),
@@ -50,7 +50,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portb {
         #[port_ext]
         use super::PortExt;
@@ -58,7 +58,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::B;
 
-        impl PortExt for crate::atmega2560::PORTB {
+        impl PortExt for crate::pac::PORTB {
             regs: (pinb, ddrb, portb),
             pb0: (PB0, 0),
             pb1: (PB1, 1),
@@ -72,7 +72,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portc {
         #[port_ext]
         use super::PortExt;
@@ -80,7 +80,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::C;
 
-        impl PortExt for crate::atmega2560::PORTC {
+        impl PortExt for crate::pac::PORTC {
             regs: (pinc, ddrc, portc),
             pc0: (PC0, 0),
             pc1: (PC1, 1),
@@ -94,7 +94,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portd {
         #[port_ext]
         use super::PortExt;
@@ -102,7 +102,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::D;
 
-        impl PortExt for crate::atmega2560::PORTD {
+        impl PortExt for crate::pac::PORTD {
             regs: (pind, ddrd, portd),
             pd0: (PD0, 0),
             pd1: (PD1, 1),
@@ -116,7 +116,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod porte {
         #[port_ext]
         use super::PortExt;
@@ -124,7 +124,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::E;
 
-        impl PortExt for crate::atmega2560::PORTE {
+        impl PortExt for crate::pac::PORTE {
             regs: (pine, ddre, porte),
             pe0: (PE0, 0),
             pe1: (PE1, 1),
@@ -138,7 +138,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portf {
         #[port_ext]
         use super::PortExt;
@@ -146,7 +146,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::F;
 
-        impl PortExt for crate::atmega2560::PORTF {
+        impl PortExt for crate::pac::PORTF {
             regs: (pinf, ddrf, portf),
             pf0: (PF0, 0),
             pf1: (PF1, 1),
@@ -160,7 +160,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portg {
         #[port_ext]
         use super::PortExt;
@@ -168,7 +168,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::G;
 
-        impl PortExt for crate::atmega2560::PORTG {
+        impl PortExt for crate::pac::PORTG {
             regs: (ping, ddrg, portg),
             pg0: (PG0, 0),
             pg1: (PG1, 1),
@@ -180,7 +180,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod porth {
         #[port_ext]
         use super::PortExt;
@@ -188,7 +188,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::H;
 
-        impl PortExt for crate::atmega2560::PORTH {
+        impl PortExt for crate::pac::PORTH {
             regs: (pinh, ddrh, porth),
             ph0: (PH0, 0),
             ph1: (PH1, 1),
@@ -202,7 +202,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portj {
         #[port_ext]
         use super::PortExt;
@@ -210,7 +210,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::J;
 
-        impl PortExt for crate::atmega2560::PORTJ {
+        impl PortExt for crate::pac::PORTJ {
             regs: (pinj, ddrj, portj),
             pj0: (PJ0, 0),
             pj1: (PJ1, 1),
@@ -224,7 +224,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portk {
         #[port_ext]
         use super::PortExt;
@@ -232,7 +232,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::K;
 
-        impl PortExt for crate::atmega2560::PORTK {
+        impl PortExt for crate::pac::PORTK {
             regs: (pink, ddrk, portk),
             pk0: (PK0, 0),
             pk1: (PK1, 1),
@@ -246,7 +246,7 @@ avr_hal::impl_port! {
     }
 }
 
-avr_hal::impl_port! {
+avr_hal_generic::impl_port! {
     pub mod portl {
         #[port_ext]
         use super::PortExt;
@@ -254,7 +254,7 @@ avr_hal::impl_port! {
         #[generic_pin]
         use Pin::L;
 
-        impl PortExt for crate::atmega2560::PORTL {
+        impl PortExt for crate::pac::PORTL {
             regs: (pinl, ddrl, portl),
             pl0: (PL0, 0),
             pl1: (PL1, 1),

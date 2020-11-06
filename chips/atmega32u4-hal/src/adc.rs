@@ -2,7 +2,7 @@ use crate::port::portb::{PB4, PB5, PB6};
 use crate::port::portd::{PD4, PD6, PD7};
 use crate::port::portf::{PF0, PF1, PF4, PF5, PF6, PF7};
 
-pub use crate::avr_hal::adc::*;
+pub use avr_hal_generic::adc::*;
 
 #[doc(hidden)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -28,10 +28,10 @@ pub enum AdcMux {
     AdcTemp = 0b100111,
 }
 
-avr_hal::impl_adc! {
+avr_hal_generic::impl_adc! {
     pub struct Adc {
         type ChannelID = AdcMux;
-        peripheral: crate::atmega32u4::ADC,
+        peripheral: crate::pac::ADC,
         set_mux: |peripheral, id| {
             let id = id as u8;
             peripheral.admux.modify(|_, w| w.mux().bits(id & 0x1f));
@@ -58,7 +58,7 @@ avr_hal::impl_adc! {
 ///
 /// This module contains ADC channels, additional to the direct pin channels.
 pub mod channel {
-    use avr_hal::hal::adc::Channel;
+    use avr_hal_generic::hal::adc::Channel;
     use super::AdcMux;
 
     /// Channel for the _Bandgap Reference Voltage_

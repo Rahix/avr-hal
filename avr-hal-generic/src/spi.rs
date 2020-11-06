@@ -78,10 +78,6 @@ macro_rules! impl_spi {
             }
         }
     ) => {
-        type SCLK = $sclkmod::$SCLK<$crate::port::mode::Output>;
-        type MOSI = $mosimod::$MOSI<$crate::port::mode::Output>;
-        type MISO<InputMode> = $misomod::$MISO<$crate::port::mode::Input<InputMode>>;
-
         /// Behavior for a SPI interface.
         ///
         /// Stores the SPI peripheral for register access.  In addition, it takes
@@ -90,9 +86,9 @@ macro_rules! impl_spi {
         $(#[$spi_attr])*
         pub struct $Spi<MisoInputMode: $crate::port::mode::InputMode> {
             peripheral: $SPI,
-            sclk: SCLK,
-            mosi: MOSI,
-            miso: MISO<MisoInputMode>,
+            sclk: $sclkmod::$SCLK<$crate::port::mode::Output>,
+            mosi: $mosimod::$MOSI<$crate::port::mode::Output>,
+            miso: $misomod::$MISO<$crate::port::mode::Input<MisoInputMode>>,
             settings: Settings,
             is_write_in_progress: bool,
         }
@@ -104,8 +100,14 @@ macro_rules! impl_spi {
             /// The pins are not actually used directly, but they are moved into the struct in
             /// order to enforce that they are in the correct mode, and cannot be used by anyone
             /// else while SPI is active.
-            pub fn new(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO<$crate::port::mode::PullUp>, settings: Settings) -> Self {
-                let spi = Spi {
+            pub fn new(
+                peripheral: $SPI,
+                sclk: $sclkmod::$SCLK<$crate::port::mode::Output>,
+                mosi: $mosimod::$MOSI<$crate::port::mode::Output>,
+                miso: $misomod::$MISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
+                settings: Settings
+            ) -> Self {
+                let spi = $Spi {
                     peripheral,
                     sclk,
                     mosi,
@@ -125,8 +127,14 @@ macro_rules! impl_spi {
             /// The pins are not actually used directly, but they are moved into the struct in
             /// order to enforce that they are in the correct mode, and cannot be used by anyone
             /// else while SPI is active.
-            pub fn with_external_pullup(peripheral: $SPI, sclk: SCLK, mosi: MOSI, miso: MISO<$crate::port::mode::Floating>, settings: Settings) -> Self {
-                let spi = Spi {
+            pub fn with_external_pullup(
+                peripheral: $SPI,
+                sclk: $sclkmod::$SCLK<$crate::port::mode::Output>,
+                mosi: $mosimod::$MOSI<$crate::port::mode::Output>,
+                miso: $misomod::$MISO<$crate::port::mode::Input<$crate::port::mode::Floating>>,
+                settings: Settings
+            ) -> Self {
+                let spi = $Spi {
                     peripheral,
                     sclk,
                     mosi,
@@ -143,7 +151,12 @@ macro_rules! impl_spi {
             /// Disable the SPI device and release ownership of the peripheral
             /// and pins.  Instance can no-longer be used after this is
             /// invoked.
-            pub fn release(self) -> ($SPI, SCLK, MOSI, MISO<MisoInputMode>) {
+            pub fn release(self) -> (
+                $SPI,
+                $sclkmod::$SCLK<$crate::port::mode::Output>,
+                $mosimod::$MOSI<$crate::port::mode::Output>,
+                $misomod::$MISO<$crate::port::mode::Input<MisoInputMode>>,
+            ) {
                 self.peripheral.spcr.write(|w| {
                     w.spe().clear_bit()
                 });

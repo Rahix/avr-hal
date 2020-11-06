@@ -10,7 +10,7 @@ rt = ["atmega328p-hal/rt"]
 arduino-nano = ["atmega328p-hal/adc-pins"]
 
 [dependencies]
-atmega328p-hal = { path = "../../chips/atmega328p-hal/" }
+atmega328p-hal = { path = "../../chips/atmega328p-hal/", features = ["atmega328p"] }
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dev-dependencies]

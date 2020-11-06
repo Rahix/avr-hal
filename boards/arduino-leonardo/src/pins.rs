@@ -1,16 +1,16 @@
-use atmega32u4_hal::port::PortExt;
+use crate::hal::port::PortExt;
 
 avr_hal_generic::impl_board_pins! {
     #[port_defs]
-    use atmega32u4_hal::port;
+    use crate::hal::port;
 
     /// Generic DDR that works for all ports
     pub struct DDR {
-        portb: crate::atmega32u4::PORTB,
-        portc: crate::atmega32u4::PORTC,
-        portd: crate::atmega32u4::PORTD,
-        porte: crate::atmega32u4::PORTE,
-        portf: crate::atmega32u4::PORTF,
+        portb: crate::pac::PORTB,
+        portc: crate::pac::PORTC,
+        portd: crate::pac::PORTD,
+        porte: crate::pac::PORTE,
+        portf: crate::pac::PORTF,
     }
 
     /// Reexport of the Leonardo's pins, with the names they have on the board

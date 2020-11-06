@@ -27,7 +27,7 @@ fn main() -> ! {
         dp.USART0,
         pins.d0,
         pins.d1.into_output(&mut pins.ddr),
-        57600,
+        57600.into_baudrate(),
     );
 
     ufmt::uwriteln!(&mut serial, "Reading analog inputs ...\r").void_unwrap();

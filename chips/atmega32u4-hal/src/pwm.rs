@@ -27,9 +27,9 @@
 //! | `PD7` | `.into_pwm(&mut timer4)` | |
 
 use crate::port::{portb, portc, portd};
-pub use avr_hal::pwm::*;
+pub use avr_hal_generic::pwm::*;
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC0` for PWM (pins `PB7`, `PD0`)
     ///
     /// # Example
@@ -45,7 +45,7 @@ avr_hal::impl_pwm! {
     /// pb7.enable();
     /// ```
     pub struct Timer0Pwm {
-        timer: crate::atmega32u4::TC0,
+        timer: crate::pac::TC0,
         init: |tim, prescaler| {
             tim.tccr0a.modify(|_, w| w.wgm0().pwm_fast());
             tim.tccr0b.modify(|_, w| match prescaler {
@@ -77,7 +77,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC1` for PWM (pins `PB5`, `PB6`, `PB7`)
     ///
     /// # Example
@@ -95,7 +95,7 @@ avr_hal::impl_pwm! {
     ///
     /// **Note**: For `PB7` the method is called `into_pwm1()`!
     pub struct Timer1Pwm {
-        timer: crate::atmega32u4::TC1,
+        timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a.modify(|_, w| w.wgm1().bits(0b01));
             tim.tccr1b.modify(|_, w| {
@@ -138,7 +138,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC3` for PWM (pin `PC6`)
     ///
     /// # Example
@@ -152,7 +152,7 @@ avr_hal::impl_pwm! {
     /// pc6.enable();
     /// ```
     pub struct Timer3Pwm {
-        timer: crate::atmega32u4::TC3,
+        timer: crate::pac::TC3,
         init: |tim, prescaler| {
             tim.tccr3a.modify(|_, w| w.wgm3().bits(0b01));
             tim.tccr3b.modify(|_, w| {
@@ -179,7 +179,7 @@ avr_hal::impl_pwm! {
     }
 }
 
-avr_hal::impl_pwm! {
+avr_hal_generic::impl_pwm! {
     /// Use `TC4` for PWM (pins `PB6`, `PC7`, `PD7`)
     ///
     /// # Example
@@ -199,7 +199,7 @@ avr_hal::impl_pwm! {
     ///
     /// **Note**: For `PB6` the method is called `into_pwm6()`!
     pub struct Timer4Pwm {
-        timer: crate::atmega32u4::TC4,
+        timer: crate::pac::TC4,
         init: |tim, prescaler| {
             tim.tccr4b.modify(|_, w| match prescaler {
                     Prescaler::Direct => w.cs4().direct(),

@@ -1,14 +1,14 @@
 #![no_std]
 
-extern crate avr_hal_generic as avr_hal;
+/// Reexport of `atmega32u4` from `avr-device`
+pub use avr_device::atmega32u4 as pac;
 
-pub use avr_device::atmega32u4;
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
 pub use avr_device::entry;
 
-pub use avr_hal::clock;
-pub use avr_hal::delay;
+pub use avr_hal_generic::clock;
+pub use avr_hal_generic::delay;
 
 pub mod adc;
 pub mod port;
@@ -16,19 +16,19 @@ pub mod pwm;
 pub mod wdt;
 
 pub mod prelude {
-    pub use crate::avr_hal::prelude::*;
+    pub use avr_hal_generic::prelude::*;
     pub use crate::port::PortExt as _;
 }
 
 /// I2C Bus
 pub mod i2c {
     use crate::port::portd;
-    pub use avr_hal::i2c::*;
+    pub use avr_hal_generic::i2c::*;
 
-    avr_hal::impl_twi_i2c! {
+    avr_hal_generic::impl_twi_i2c! {
         /// I2C based on ATmega32U4's TWI peripheral
         pub struct I2c {
-            peripheral: crate::atmega32u4::TWI,
+            peripheral: crate::pac::TWI,
             pins: {
                 sda: portd::PD1,
                 scl: portd::PD0,
@@ -76,12 +76,12 @@ pub mod spi {
     //! In the example above, all of the settings are left at the default.  You can
     //! also instantiate a Settings object with the other options available.
 
-    pub use avr_hal::spi::*;
+    pub use avr_hal_generic::spi::*;
     use crate::port::portb;
 
-    avr_hal::impl_spi! {
+    avr_hal_generic::impl_spi! {
         pub struct Spi {
-            peripheral: crate::atmega32u4::SPI,
+            peripheral: crate::pac::SPI,
             pins: {
                 sclk: portb::PB1,
                 mosi: portb::PB2,
@@ -94,14 +94,14 @@ pub mod spi {
 /// Serial interface using USART
 pub mod usart {
     use crate::port::portd;
-    pub use avr_hal::serial::*;
+    pub use avr_hal_generic::serial::*;
 
-    crate::avr_hal::impl_usart! {
+    avr_hal_generic::impl_usart! {
         /// Serial interface based on ATmega32U4's USART1 peripheral
         ///
         /// Maximum baudrate seems to be 57600
         pub struct Usart1 {
-            peripheral: crate::atmega32u4::USART1,
+            peripheral: crate::pac::USART1,
             pins: {
                 rx: portd::PD2,
                 tx: portd::PD3,
