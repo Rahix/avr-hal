@@ -680,7 +680,7 @@ macro_rules! impl_twi_i2c {
 
        /// Transitions from AddressMatched to RxReady | TxReady
        impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
-            pub fn matchit(self
+            pub fn next(self
             ) -> Result<[<$I2c SlaveState>]<M>, $crate::i2c::Error>{
                 match self.slave.p.$twsr.read().$tws().bits() {
                 // TODO: impl
@@ -702,20 +702,34 @@ macro_rules! impl_twi_i2c {
        }
 
 
-       //  /// Transitions from RxReady to Initialized
-       //  impl <M>[<$I2c SlaveStateRxReady>]<M>{
-       //     pub fn read(self) -> (u8, [<$I2c SlaveStateInitialized>])<M> {
-       //          // returns [<$I2c SlaveStateRxReady>] | [<$I2c SlaveStateError>]
-       //          [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
-       //     }
-       // }
+        /// Transitions from RxReady to Initialized
+        impl <M>[<$I2c SlaveStateRxReady>]<M>{
+           pub fn read(self
+           ) -> Result<u8, $crate::i2c::Error>{
+                Ok(self.data)
+           }
+           pub fn next(self
+           ) -> Result<[<$I2c SlaveStateInitialized>]<M>, $crate::i2c::Error>{
+                Ok([<$I2c SlaveStateInitialized>]::<M> {
+                    slave: self.slave,
+                })
+           }
+       }
 
-       // impl [<$I2c SlaveStateTxReady>]{
-       //     pub fn write(_: u8) -> [<$I2c SlaveState>] {
-       //          // returns [<$I2c SlaveStateTxReady>] | [<$I2c SlaveStateError>]
-       //          [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
-       //     }
-       // }
+        /// Transitions from TxReady to Initialized
+       impl<M>[<$I2c SlaveStateTxReady>]<M>{
+           pub fn write(self, data: u8
+           ) -> Result<(), $crate::i2c::Error> {
+                // TODO : impl
+                Ok(())
+           }
+           pub fn next(self
+           ) -> Result<[<$I2c SlaveStateInitialized>]<M>, $crate::i2c::Error>{
+                Ok([<$I2c SlaveStateInitialized>]::<M> {
+                    slave: self.slave,
+                })
+           }
+       }
         // // Slave State Machine
         // pub struct [<$I2c SlaveStateMachine>]<M>{
         //    slave: [<$I2c Slave>]<M>,
