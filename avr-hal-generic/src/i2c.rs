@@ -503,7 +503,8 @@ macro_rules! impl_twi_i2c {
         /// I2C Slave is similar to the I2C Master. The similarities are that both structs have the
         /// `new()` and `new_with_external_pullup()` constructors. However the Slave constructors
         /// do not need to pass the speed/bitrate as that is determined by the Master. However, the
-        /// Slave constructors do need to pass the slave address.
+        /// Slave constructors do need to pass the slave address and the flag to enable/disable the
+        /// General Call Address.
         $(#[$i2c_attr])*
         pub struct [<$I2c Slave>]<M> {
             /// Peripherals
@@ -651,27 +652,49 @@ macro_rules! impl_twi_i2c {
 
         /// Transitions from Initialized to AddressMatched
         impl <M>[<$I2c SlaveStateInitialized>]<M> {
+
+            /// Wait until TWINT has been triggered. TWINT is triggered if a message appears on
+            /// the I2C bus and the address matches this slave's address, or if a message appears
+            /// on the I2C bus and this slave has TWGCE enabled.
             pub fn wait(self
-            ) -> Result<[<$I2c SlaveStateAddressMatched>]<M>, $crate::i2c::Error>{
-                while self.slave.p.twcr.read().twint().bit_is_clear() { }
-                // TWINT has been triggered, meaning the address matched or
-                // we are responding to a general call address
-                Ok([<$I2c SlaveStateAddressMatched>]::<M> {
-                    slave: self.slave,
-                })
+            ) -> Result<[<$I2c SlaveState>]<M>, $crate::i2c::Error>{
+                while self.slave.p.twcr.read().twint().bit_is_clear() { };
+                match self.slave.p.twsr.read().tws().bits() {
+                    $crate::i2c::twi_status::TW_SR_SLA_ACK
+                |   $crate::i2c::twi_status::TW_SR_ARB_LOST_SLA_ACK
+                |   $crate::i2c::twi_status::TW_SR_ARB_LOST_GCALL_ACK
+                    => return Ok([<$I2c SlaveState>]::AddressMatched([<$I2c SlaveStateAddressMatched>]::<M> {
+                        slave: self.slave,
+                        })),
+                    $crate::i2c::twi_status::TW_SR_GCALL_ACK
+                    => {
+                        return if self.slave.twgce {
+                            Ok([<$I2c SlaveState>]::AddressMatched([<$I2c SlaveStateAddressMatched>]::<M> {
+                                slave: self.slave,
+                            }))
+                        }else{
+                            Ok([<$I2c SlaveState>]::Initialized([<$I2c SlaveStateInitialized>]::<M> {
+                                slave: self.slave,
+                            }))
+                        }
+                    },
+                    _ => {
+                        return Err($crate::i2c::Error::Unknown);
+                    },
+                }
             }
         }
 
         /// Transitions from AddressMatched to RxReady | TxReady
         impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
+
+            /// Transition to the next state based on the data direction bit
             pub fn next(self
             ) -> Result<[<$I2c SlaveState>]<M>, $crate::i2c::Error>{
                 match self.slave.p.twsr.read().tws().bits() {
-                // TODO: impl
-                //     $crate::i2c::twi_status::TW_SR_SLA_ACK
-                // |   $crate::i2c::twi_status::TW_SR_ARB_LOST_SLA_ACK
-                // |   $crate::i2c::twi_status::TW_SR_GCALL_ACK
-                // |   $crate::i2c::twi_status::TW_SR_ARB_LOST_GCALL_ACK =>
+                // |   $crate::i2c::twi_status::TW_SR_DATA_ACK
+                // |   $crate::i2c::twi_status::TW_SR_GCALL_DATA_ACK
+                // =>
                 //         self.p.twcr.write(|w| w
                 //             .twsto().clear_bit()
                 //             .twint().set_bit();
