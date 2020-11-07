@@ -636,17 +636,19 @@ macro_rules! impl_twi_i2c {
             /// # Arguments
             ///
             /// * `slave` - slave instance
-            pub fn new(slave: [<$I2c Slave>]<M>) -> [<$I2c SlaveStateUninitialized>]<M>{
-                [<$I2c SlaveStateUninitialized>]::<M> {
+            pub fn new(slave: [<$I2c Slave>]<M>
+            ) -> Result<[<$I2c SlaveStateUninitialized>]<M>, $crate::i2c::Error>{
+                Ok([<$I2c SlaveStateUninitialized>]::<M> {
                     slave: slave,
-                }
+                })
             }
         }
 
        /// Transitions from Uninitialized to Initialized
-       impl <M>[<$I2c SlaveStateUninitialized>]<M> {
+           impl <M>[<$I2c SlaveStateUninitialized>]<M> {
             /// Init the state machine
-            pub fn init(self) -> [<$I2c SlaveStateInitialized>]<M>{
+            pub fn init(self
+            ) -> Result<[<$I2c SlaveStateInitialized>]<M>, $crate::i2c::Error>{
                 let gce_mask = if self.slave.twgce {1} else {0};
                 let rawaddr = (self.slave.address << 1) | gce_mask;
                 self.slave.p.$twar.write(|w| unsafe {w.bits(self.slave.address)});
@@ -657,28 +659,31 @@ macro_rules! impl_twi_i2c {
                     .$twsto().clear_bit()
                     .$twint().set_bit()
                 );
-                [<$I2c SlaveStateInitialized>]::<M> {
+                Ok([<$I2c SlaveStateInitialized>]::<M> {
                     slave: self.slave,
-                }
+                })
             }
        }
 
        /// Transitions from Initialized to AddressMatched
        impl <M>[<$I2c SlaveStateInitialized>]<M> {
-            pub fn wait(self) -> [<$I2c SlaveStateAddressMatched>]<M>{
+            pub fn wait(self
+            ) -> Result<[<$I2c SlaveStateAddressMatched>]<M>, $crate::i2c::Error>{
                 while self.slave.p.$twcr.read().$twint().bit_is_clear() { }
                 // TWINT has been triggered, meaning the address matched or
                 // we are responding to a general call address
-                [<$I2c SlaveStateAddressMatched>]::<M> {
+                Ok([<$I2c SlaveStateAddressMatched>]::<M> {
                     slave: self.slave,
-                }
+                })
             }
        }
 
        /// Transitions from AddressMatched to RxReady | TxReady
        impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
-            pub fn matchit(self) -> [<$I2c SlaveState>]<M>{
+            pub fn matchit(self
+            ) -> Result<[<$I2c SlaveState>]<M>, $crate::i2c::Error>{
                 match self.slave.p.$twsr.read().$tws().bits() {
+                // TODO: impl
                 //     $crate::i2c::twi_status::TW_SR_SLA_ACK
                 // |   $crate::i2c::twi_status::TW_SR_ARB_LOST_SLA_ACK
                 // |   $crate::i2c::twi_status::TW_SR_GCALL_ACK
@@ -688,24 +693,18 @@ macro_rules! impl_twi_i2c {
                 //             .$twint().set_bit();
                 //             .$twea().set_bit()
                 //         );
-                    _ => [<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
+                    _ => Ok([<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
                         slave: self.slave,
                         data: 0,
-                        })
+                        }))
                 }
             }
        }
 
 
-       // impl [<$I2c SlaveStateAddressMatched>]{
-       //     pub fn process() -> [<$I2c SlaveState>] {
-       //          // returns [<$I2c SlaveStateRxReady>] | [<$I2c SlaveStateTxReady>] | [<$I2c SlaveStateError>]
-       //          [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
-       //     }
-       // }
-
-       // impl [<$I2c SlaveStateRxReady>]{
-       //     pub fn read() -> [<$I2c SlaveState>] {
+       //  /// Transitions from RxReady to Initialized
+       //  impl <M>[<$I2c SlaveStateRxReady>]<M>{
+       //     pub fn read(self) -> (u8, [<$I2c SlaveStateInitialized>])<M> {
        //          // returns [<$I2c SlaveStateRxReady>] | [<$I2c SlaveStateError>]
        //          [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
        //     }
