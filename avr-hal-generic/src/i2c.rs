@@ -672,6 +672,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
+       /// Transitions from Uninitialized to Initialized
        impl <M>[<$I2c SlaveStateUninitialized>]<M> {
             /// Init the state machine
             pub fn init(self) -> [<$I2c SlaveStateInitialized>]<M>{
@@ -691,6 +692,7 @@ macro_rules! impl_twi_i2c {
             }
        }
 
+       /// Transitions from Initialized to AddressMatched
        impl <M>[<$I2c SlaveStateInitialized>]<M> {
             pub fn wait(self) -> [<$I2c SlaveStateAddressMatched>]<M>{
                 while self.slave.p.$twcr.read().$twint().bit_is_clear() { }
@@ -702,11 +704,9 @@ macro_rules! impl_twi_i2c {
             }
        }
 
+       /// Transitions from AddressMatched to RxReady | TxReady
        impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
             pub fn matchit(self) -> [<$I2c SlaveState>]<M>{
-                // check the direction bit and transition either to
-                // RxReady or TxReady.
-
                 match self.slave.p.$twsr.read().$tws().bits() {
                 //     $crate::i2c::twi_status::TW_SR_SLA_ACK
                 // |   $crate::i2c::twi_status::TW_SR_ARB_LOST_SLA_ACK
