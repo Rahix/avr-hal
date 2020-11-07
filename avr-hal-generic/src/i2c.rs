@@ -730,63 +730,6 @@ macro_rules! impl_twi_i2c {
                 })
            }
        }
-        // // Slave State Machine
-        // pub struct [<$I2c SlaveStateMachine>]<M>{
-        //    slave: [<$I2c Slave>]<M>,
-        //    state: [<$I2c SlaveState>],
-        // }
-
-/*
-        impl [<$I2c SlaveStateMachine>] {
-        {
-            /// Initialize the Slave State Machine with a slave instance.
-            ///
-            /// # Arguments
-            ///
-            /// * `slave` - slave instance
-            pub fn init(slave: [<$I2c Slave>]<M>) -> [<$I2c SlaveStateMachine>]{
-                let gce_mask = if slave.twgce {1} else {0};
-                let rawaddr = (slave.address << 1) | gce_mask;
-                self.p.$twar.write(|w| unsafe {w.bits(slave.address)});
-                self.p.$twcr.write(|w| w
-                    .$twen().set_bit()
-                    .$twea().set_bit()
-                    .$twsta().clear_bit()
-                    .$twsto().clear_bit()
-                    .$twint().set_bit()
-                );
-                [<$I2c SlaveStateMachine>] {
-                    _slave: slave,
-                    state: [<$I2c SlaveState>]::Initialized([<$I2c SlaveStateInitialized>]),
-                }
-            }
-       }
-
-
-       impl [<$I2c SlaveStateInitialized>] {
-            pub fn wait() -> [<$I2c SlaveState>] {
-                // returns [<$I2c SlaveStateAddressMatched>] | [<$I2c SlaveStateError>]
-                while self.p.$twcr.read().$twint().bit_is_clear() { }
-                // TWINT has been triggered, check the read direction
-                // and pass the data back to the listener
-                match self.p.$twsr.read().$tws().bits() {
-                    $crate::i2c::twi_status::TW_SR_SLA_ACK
-                |   $crate::i2c::twi_status::TW_SR_ARB_LOST_SLA_ACK
-                |   $crate::i2c::twi_status::TW_SR_GCALL_ACK
-                |   $crate::i2c::twi_status::TW_SR_ARB_LOST_GCALL_ACK =>
-                        self.p.$twcr.write(|w| w
-                            .$twsto().clear_bit()
-                            .$twint().set_bit();
-                            .$twea().set_bit()
-                        );
-                [<$I2c SlaveState>]::Error([<$I2c SlaveStateError>])
-            }
-          }
-       }
-
- */
-
-
     }
     };
 }
