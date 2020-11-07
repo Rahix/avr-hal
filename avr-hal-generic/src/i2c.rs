@@ -644,7 +644,7 @@ macro_rules! impl_twi_i2c {
             }
         }
 
-       /// Transitions from Uninitialized to Initialized
+        /// Transitions from Uninitialized to Initialized
            impl <M>[<$I2c SlaveStateUninitialized>]<M> {
             /// Init the state machine
             pub fn init(self
@@ -663,10 +663,10 @@ macro_rules! impl_twi_i2c {
                     slave: self.slave,
                 })
             }
-       }
+        }
 
-       /// Transitions from Initialized to AddressMatched
-       impl <M>[<$I2c SlaveStateInitialized>]<M> {
+        /// Transitions from Initialized to AddressMatched
+        impl <M>[<$I2c SlaveStateInitialized>]<M> {
             pub fn wait(self
             ) -> Result<[<$I2c SlaveStateAddressMatched>]<M>, $crate::i2c::Error>{
                 while self.slave.p.$twcr.read().$twint().bit_is_clear() { }
@@ -676,10 +676,10 @@ macro_rules! impl_twi_i2c {
                     slave: self.slave,
                 })
             }
-       }
+        }
 
-       /// Transitions from AddressMatched to RxReady | TxReady
-       impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
+        /// Transitions from AddressMatched to RxReady | TxReady
+        impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
             pub fn next(self
             ) -> Result<[<$I2c SlaveState>]<M>, $crate::i2c::Error>{
                 match self.slave.p.$twsr.read().$tws().bits() {
@@ -699,37 +699,35 @@ macro_rules! impl_twi_i2c {
                         }))
                 }
             }
-       }
-
+        }
 
         /// Transitions from RxReady to Initialized
         impl <M>[<$I2c SlaveStateRxReady>]<M>{
-           pub fn read(self
-           ) -> Result<u8, $crate::i2c::Error>{
+            pub fn read(self
+            ) -> Result<u8, $crate::i2c::Error>{
                 Ok(self.data)
-           }
-           pub fn next(self
-           ) -> Result<[<$I2c SlaveStateInitialized>]<M>, $crate::i2c::Error>{
+            }
+            pub fn next(self
+            ) -> Result<[<$I2c SlaveStateInitialized>]<M>, $crate::i2c::Error>{
                 Ok([<$I2c SlaveStateInitialized>]::<M> {
                     slave: self.slave,
                 })
-           }
+            }
        }
 
         /// Transitions from TxReady to Initialized
-       impl<M>[<$I2c SlaveStateTxReady>]<M>{
-           pub fn write(self, data: u8
-           ) -> Result<(), $crate::i2c::Error> {
+        impl<M>[<$I2c SlaveStateTxReady>]<M>{
+            pub fn write(self, data: u8
+            ) -> Result<(), $crate::i2c::Error> {
                 // TODO : impl
                 Ok(())
-           }
-           pub fn next(self
-           ) -> Result<[<$I2c SlaveStateInitialized>]<M>, $crate::i2c::Error>{
+            }
+            pub fn next(self
+            ) -> Result<[<$I2c SlaveStateInitialized>]<M>, $crate::i2c::Error>{
                 Ok([<$I2c SlaveStateInitialized>]::<M> {
                     slave: self.slave,
                 })
-           }
-       }
-    }
-    };
+            }
+        }
+    }};
 }
