@@ -2,6 +2,7 @@ use crate::port::porte;
 use crate::port::portd;
 use crate::port::porth;
 use crate::port::portj;
+pub use avr_hal_generic::serial::*;
 
 avr_hal_generic::impl_usart! {
     pub struct Usart0 {

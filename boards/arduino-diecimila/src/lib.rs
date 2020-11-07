@@ -13,7 +13,10 @@ mod pins;
 pub use crate::pac::Peripherals;
 pub use crate::pins::*;
 pub use crate::hal::adc;
-pub use crate::hal::prelude;
+pub mod prelude {
+    pub use crate::hal::prelude::*;
+    pub use crate::hal::usart::BaudrateArduinoExt as _;
+}
 pub use crate::hal::pwm;
 pub use crate::hal::spi;
 

@@ -13,7 +13,7 @@ fn main() -> ! {
         dp.USART0,
         porte.pe0,
         porte.pe1.into_output(&mut porte.ddr),
-        57600,
+        57600.into_baudrate(),
     );
 
     // The following would also work, but needs +600% more bytes

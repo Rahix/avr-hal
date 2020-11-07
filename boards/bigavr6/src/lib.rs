@@ -9,7 +9,10 @@ pub use crate::hal::pac;
 pub use crate::hal::entry;
 
 pub use crate::pac::Peripherals;
-pub use crate::hal::prelude;
+pub mod prelude {
+    pub use crate::hal::prelude::*;
+    pub use crate::hal::usart::BaudrateExt as _;
+}
 
 pub type Delay = crate::hal::delay::Delay<hal::clock::MHz16>;
 pub type Serial<IMODE> = crate::hal::usart::Usart0<hal::clock::MHz16, IMODE>;

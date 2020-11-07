@@ -13,7 +13,10 @@ pub use crate::pac::Peripherals;
 mod pins;
 pub use crate::pins::*;
 
-pub use crate::hal::prelude;
+pub mod prelude {
+    pub use crate::hal::prelude::*;
+    pub use crate::hal::usart::BaudrateExt as _;
+}
 
 pub use crate::hal::spi;
 pub use crate::hal::adc;
