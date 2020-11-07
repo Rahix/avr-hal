@@ -8,8 +8,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 proper releases yet.  Instead, the CHANGELOG will document changes over time so
 people already using the crates have a reference what is changing upstream.
 
-## [2020-10-26 - 2020-11-01][2020-44]
+## [2020-11-02 - 2020-11-08][2020-45]
+### Added
+- Serial/USART: The `Baudrate` type for more precise control over the baudrate
+  selection ([#88]).
+
 ### Changed
+- The constructor for the `Serial`/USART driver must now be called with
+  a `Baudrate` value, not an integer ([#88]).  In practice, the easiest way to
+  do this is using the `.into_baudrate()` conversion method.  As an example, the
+  needed change might look like this:
+  ```diff
+   let mut serial = arduino_uno::Serial::new(
+       dp.USART0,
+       pins.d0,
+       pins.d1.into_output(&mut pins.ddr),
+  -    57600,
+  +    57600.into_baudrate(),
+   );
+  ```
+
+[#88]: https://github.com/Rahix/avr-hal/pull/88
+
+
+## [2020-10-26 - 2020-11-01][2020-44]
+### Added
+- Support for `ATmega328PB` ([#96]).
+
+### Changed
+- `atmega328p-hal`: You must now select a chip via either the `atmega328p` or
+  `atmega328pb` features.  Selecting no or more than one chip will lead to
+  a compile-error.  As an example:
+  ```toml
+  [dependencies.atmega328p-hal]
+  git = "https://github.com/Rahix/avr-hal.git"
+  rev = "<latest git commit hash>"
+  features = ["atmega328p"]
+  ```
 - In HAL crates, the `avr-hal-generic` crate is no longer renamed to `avr-hal`
   as this will just lead to confusion and problems down the line ([#89]).
 - In HAL crates, the peripheral access crate (submodule of `avr-device`) is
@@ -20,6 +55,7 @@ people already using the crates have a reference what is changing upstream.
   reexported as `hal` and the PAC crates as `pac` ([#89]).
 
 [#89]: https://github.com/Rahix/avr-hal/pull/89
+[#96]: https://github.com/Rahix/avr-hal/pull/96
 
 
 ## [2020-10-12 - 2020-10-18][2020-42]
@@ -98,6 +134,7 @@ Please look at the git log for changes before this point :)
 
 
 
+[2020-45]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-01%7D...master@%7B2020-11-08%7D
 [2020-44]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-10-25%7D...master@%7B2020-11-01%7D
 [2020-42]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-10-11%7D...master@%7B2020-10-18%7D
 [2020-41]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-10-04%7D...master@%7B2020-10-11%7D
