@@ -192,22 +192,6 @@ macro_rules! impl_twi_i2c {
                 sda: $sdamod:ident::$SDA:ident,
                 scl: $sclmod:ident::$SCL:ident,
             },
-            registers: {
-                control: $twcr:ident {
-                    enable: $twen:ident,
-                    ack: $twea:ident,
-                    int: $twint:ident,
-                    start: $twsta:ident,
-                    stop: $twsto:ident,
-                },
-                status: $twsr:ident {
-                    prescaler: $twps:ident,
-                    status: $tws:ident,
-                },
-                bitrate: $twbr:ident,
-                data: $twdr:ident,
-                address: $twar:ident,
-            },
         }
     ) => {$crate::paste::paste! {
         /// I2C Master
@@ -283,10 +267,10 @@ macro_rules! impl_twi_i2c {
             pub fn initialize_i2c( p: &$I2C, speed: &u32,){
                 // calculate the bit rate
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+                p.twbr.write(|w| unsafe { w.bits(twbr as u8) });
 
                 // disable the prescaler
-                p.$twsr.write(|w| w.$twps().prescaler_1());
+                p.twsr.write(|w| w.twps().prescaler_1());
             }
 
             /// Check whether a slave answers ACK for a given address
@@ -311,15 +295,15 @@ macro_rules! impl_twi_i2c {
             fn start( &mut self, addr: u8, dir: $crate::i2c::Direction,) -> Result<(),
             $crate::i2c::Error> {
                 // Write start condition
-                self.p.$twcr.write(|w| w
-                    .$twen().set_bit()
-                    .$twint().set_bit()
-                    .$twsta().set_bit()
+                self.p.twcr.write(|w| w
+                    .twen().set_bit()
+                    .twint().set_bit()
+                    .twsta().set_bit()
                 );
                 self.wait();
 
                 // Validate status
-                match self.p.$twsr.read().$tws().bits() {
+                match self.p.twsr.read().tws().bits() {
                       $crate::i2c::twi_status::TW_START
                     | $crate::i2c::twi_status::TW_REP_START => (),
                       $crate::i2c::twi_status::TW_MT_ARB_LOST
@@ -337,11 +321,11 @@ macro_rules! impl_twi_i2c {
                 // Create and write rawaddr (address with direction bit)
                 let dirbit = if dir == $crate::i2c::Direction::Read { 1 } else { 0 };
                 let rawaddr = (addr << 1) | dirbit;
-                self.p.$twdr.write(|w| unsafe { w.bits(rawaddr) });
+                self.p.twdr.write(|w| unsafe { w.bits(rawaddr) });
                 self.transact();
 
                 // Check if the slave responded
-                match self.p.$twsr.read().$tws().bits() {
+                match self.p.twsr.read().tws().bits() {
                       $crate::i2c::twi_status::TW_MT_SLA_ACK
                     | $crate::i2c::twi_status::TW_MR_SLA_ACK => (),
                       $crate::i2c::twi_status::TW_MT_SLA_NACK
@@ -366,19 +350,19 @@ macro_rules! impl_twi_i2c {
             }
 
             fn wait(&mut self) {
-                while self.p.$twcr.read().$twint().bit_is_clear() { } }
+                while self.p.twcr.read().twint().bit_is_clear() { } }
 
             fn transact(&mut self) {
-                self.p.$twcr.write(|w| w.$twen().set_bit().$twint().set_bit());
-                while self.p.$twcr.read().$twint().bit_is_clear() { }
+                self.p.twcr.write(|w| w.twen().set_bit().twint().set_bit());
+                while self.p.twcr.read().twint().bit_is_clear() { }
             }
 
             fn write_data(&mut self, bytes: &[u8]) -> Result<(), $crate::i2c::Error> {
                 for byte in bytes {
-                    self.p.$twdr.write(|w| unsafe { w.bits(*byte) });
+                    self.p.twdr.write(|w| unsafe { w.bits(*byte) });
                     self.transact();
 
-                    match self.p.$twsr.read().$tws().bits() {
+                    match self.p.twsr.read().tws().bits() {
                         $crate::i2c::twi_status::TW_MT_DATA_ACK => (),
                         $crate::i2c::twi_status::TW_MT_DATA_NACK => {
                             self.stop();
@@ -404,16 +388,16 @@ macro_rules! impl_twi_i2c {
                 for (i, byte) in buffer.iter_mut().enumerate() {
                     if i != last {
                         // ACK each byte
-                        self.p.$twcr.write(|w| w.$twint().set_bit().$twen().set_bit().$twea().set_bit());
+                        self.p.twcr.write(|w| w.twint().set_bit().twen().set_bit().twea().set_bit());
                         self.wait();
                     } else {
                         // No ACK sent. The calling function must trigger a NACK with
                         // either a STOP or repeated START condition.
-                        self.p.$twcr.write(|w| w.$twint().set_bit().$twen().set_bit());
+                        self.p.twcr.write(|w| w.twint().set_bit().twen().set_bit());
                         self.wait();
                     }
 
-                    match self.p.$twsr.read().$tws().bits() {
+                    match self.p.twsr.read().tws().bits() {
                           $crate::i2c::twi_status::TW_MR_DATA_ACK
                         | $crate::i2c::twi_status::TW_MR_DATA_NACK => (),
                         $crate::i2c::twi_status::TW_MR_ARB_LOST => {
@@ -427,16 +411,16 @@ macro_rules! impl_twi_i2c {
                         },
                     }
 
-                    *byte = self.p.$twdr.read().bits();
+                    *byte = self.p.twdr.read().bits();
                 }
                 Ok(())
             }
 
             fn stop(&mut self) {
-                self.p.$twcr.write(|w| w
-                    .$twen().set_bit()
-                    .$twint().set_bit()
-                    .$twsto().set_bit()
+                self.p.twcr.write(|w| w
+                    .twen().set_bit()
+                    .twint().set_bit()
+                    .twsto().set_bit()
                 );
             }
         }
@@ -651,13 +635,13 @@ macro_rules! impl_twi_i2c {
             ) -> Result<[<$I2c SlaveStateInitialized>]<M>, $crate::i2c::Error>{
                 let gce_mask = if self.slave.twgce {1} else {0};
                 let rawaddr = (self.slave.address << 1) | gce_mask;
-                self.slave.p.$twar.write(|w| unsafe {w.bits(self.slave.address)});
-                self.slave.p.$twcr.write(|w| w
-                    .$twen().set_bit()
-                    .$twea().set_bit()
-                    .$twsta().clear_bit()
-                    .$twsto().clear_bit()
-                    .$twint().set_bit()
+                self.slave.p.twar.write(|w| unsafe {w.bits(self.slave.address)});
+                self.slave.p.twcr.write(|w| w
+                    .twen().set_bit()
+                    .twea().set_bit()
+                    .twsta().clear_bit()
+                    .twsto().clear_bit()
+                    .twint().set_bit()
                 );
                 Ok([<$I2c SlaveStateInitialized>]::<M> {
                     slave: self.slave,
@@ -669,7 +653,7 @@ macro_rules! impl_twi_i2c {
         impl <M>[<$I2c SlaveStateInitialized>]<M> {
             pub fn wait(self
             ) -> Result<[<$I2c SlaveStateAddressMatched>]<M>, $crate::i2c::Error>{
-                while self.slave.p.$twcr.read().$twint().bit_is_clear() { }
+                while self.slave.p.twcr.read().twint().bit_is_clear() { }
                 // TWINT has been triggered, meaning the address matched or
                 // we are responding to a general call address
                 Ok([<$I2c SlaveStateAddressMatched>]::<M> {
@@ -682,16 +666,16 @@ macro_rules! impl_twi_i2c {
         impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
             pub fn next(self
             ) -> Result<[<$I2c SlaveState>]<M>, $crate::i2c::Error>{
-                match self.slave.p.$twsr.read().$tws().bits() {
+                match self.slave.p.twsr.read().tws().bits() {
                 // TODO: impl
                 //     $crate::i2c::twi_status::TW_SR_SLA_ACK
                 // |   $crate::i2c::twi_status::TW_SR_ARB_LOST_SLA_ACK
                 // |   $crate::i2c::twi_status::TW_SR_GCALL_ACK
                 // |   $crate::i2c::twi_status::TW_SR_ARB_LOST_GCALL_ACK =>
-                //         self.p.$twcr.write(|w| w
-                //             .$twsto().clear_bit()
-                //             .$twint().set_bit();
-                //             .$twea().set_bit()
+                //         self.p.twcr.write(|w| w
+                //             .twsto().clear_bit()
+                //             .twint().set_bit();
+                //             .twea().set_bit()
                 //         );
                     _ => Ok([<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
                         slave: self.slave,
