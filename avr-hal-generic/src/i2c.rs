@@ -1,20 +1,11 @@
 //! I2C Implementations
 
-// datasheet : ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061B.pdf
-//
 /// TWI Status Codes
 pub mod twi_status {
     // The status codes defined in the C header are meant to be used with the
     // masked status value: (TWSR & TW_STATUS_MASK).  In our case, svd2rust
     // already added code to shift it to just the status value, so all status
     // codes need to be shifted to the right as well.
-    //
-    // See also:
-    //
-    // (datasheet)  Table 22-2. Status codes for Master Transmitter Mode
-    //              Table 22-3. Status codes for Master Receiver Mode
-    //              Table 22-4. Status Codes for Slave Receiver Mode
-    //              Table 22-5. Status Codes for Slave Transmitter Mode
 
     /// Start condition transmitted
     pub const TW_START: u8 = 0x08 >> 3;
@@ -231,29 +222,11 @@ macro_rules! impl_twi_i2c {
         impl<CLOCK, M> [<$I2c Master>]<CLOCK, M>
             where CLOCK: $crate::clock::Clock, {
             fn initialize_i2c( p: &$I2C, speed: &u32,){
-                // Calculate the TWI Bit Rate Register (TWBR)
-                //
-                // (datasheet) 22.5.2 Bit Rate Generator Unit
-                //
-                //      This unit controls the period of SCL when operating in a Master mode. The
-                //      SCL period is controlled by settings in the TWI Bit Rate Register (TWBR)
-                //      and the Prescaler bits in the TWI Status Register (TWSR). Slave operation
-                //      does not depend on Bit Rate or Prescaler settings, but the CPU clock
-                //      frequency in the Slave must be at least 16 times higher than the SCL
-                //      frequency. Note that slaves may prolong the SCL low period, thereby
-                //      reducing the average TWI bus clock period.
+                // calculate the bit rate
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
 
-                // Disable prescaler
-                //
-                // (datasheet) 22.5.2 Bit Rate Generator Unit
-                //
-                //      SCL frequency = CPU Clock Frequency
-                //                     --------------------------------
-                //                     16 + 2(TWBR) * (Prescaler Value)
-                //
-                // Setting the prescaler to 1 makes the math easy.
+                // disable the prescaler
                 p.$twsr.write(|w| w.$twps().prescaler_1());
             }
         }
