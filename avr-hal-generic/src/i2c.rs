@@ -219,18 +219,6 @@ macro_rules! impl_twi_i2c {
             scl: $sclmod::$SCL<M>,
         }
 
-        impl<CLOCK, M> [<$I2c Master>]<CLOCK, M>
-            where CLOCK: $crate::clock::Clock, {
-            fn initialize_i2c( p: &$I2C, speed: &u32,){
-                // calculate the bit rate
-                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
-
-                // disable the prescaler
-                p.$twsr.write(|w| w.$twps().prescaler_1());
-            }
-        }
-
         impl<CLOCK> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp>
         where
             CLOCK: $crate::clock::Clock,
@@ -291,6 +279,16 @@ macro_rules! impl_twi_i2c {
         where
             CLOCK: $crate::clock::Clock,
         {
+            /// Initialize I2C
+            pub fn initialize_i2c( p: &$I2C, speed: &u32,){
+                // calculate the bit rate
+                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
+                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+
+                // disable the prescaler
+                p.$twsr.write(|w| w.$twps().prescaler_1());
+            }
+
             /// Check whether a slave answers ACK for a given address
             ///
             /// Note that some devices might not respond to both read and write
