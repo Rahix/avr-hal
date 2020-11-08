@@ -575,7 +575,7 @@ macro_rules! impl_twi_i2c {
 
         impl <M>[<$I2c Slave>]<M>{
             /// Start the slave listening for messages on the I2C bus
-            pub fun start(self) -> Result<[<$I2c SlaveStateUninitialized>]<M>, $crate::i2c::Error>{
+            pub fn start(self) -> Result<[<$I2c SlaveStateUninitialized>]<M>, $crate::i2c::Error>{
                 [<$I2c SlaveState>]::new(self)
             }
 
