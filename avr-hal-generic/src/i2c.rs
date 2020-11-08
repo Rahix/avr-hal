@@ -505,6 +505,12 @@ macro_rules! impl_twi_i2c {
         /// do not need to pass the speed/bitrate as that is determined by the Master. However, the
         /// Slave constructors do need to pass the slave address and the flag to enable/disable the
         /// General Call Address.
+        ///
+        /// Example (pseudocode):
+        ///
+        ///     let s = [<$I2c Slave>]::new(...)
+        ///     s.start()
+        ///     TODO: need feedback from Rahix on how they want this API to look
         $(#[$i2c_attr])*
         pub struct [<$I2c Slave>]<M> {
             /// Peripherals
@@ -568,7 +574,12 @@ macro_rules! impl_twi_i2c {
         }
 
         impl <M>[<$I2c Slave>]<M>{
-            pub fn ack(self) -> [<$I2c Slave>]<M>{
+            /// Start the slave listening for messages on the I2C bus
+            pub fun start(self) -> Result<[<$I2c SlaveStateUninitialized>]<M>, $crate::i2c::Error>{
+                [<$I2c SlaveState>]::new(self)
+            }
+
+            fn ack(self) -> [<$I2c Slave>]<M>{
                 self.p.twcr.write(|w| w
                     .twea().set_bit()
                     .twsto().clear_bit()
@@ -578,7 +589,7 @@ macro_rules! impl_twi_i2c {
                 self
             }
 
-            pub fn nack(self) -> [<$I2c Slave>]<M> {
+            fn nack(self) -> [<$I2c Slave>]<M> {
                 self.p.twcr.write(|w| w
                     .twea().set_bit()
                     .twsto().clear_bit()
