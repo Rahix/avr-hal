@@ -567,7 +567,27 @@ macro_rules! impl_twi_i2c {
             }
         }
 
+        impl <M>[<$I2c Slave>]<M>{
+            pub fn ack(&mut self) -> Result<(), Error> {
+                self.p.twcr.write(|w| w
+                    .twea().set_bit()
+                    .twsto().clear_bit()
+                    .twint().set_bit()
+                    .twen().set_bit()
+                );
+                Ok(())
+            }
 
+            pub fn nack(&mut self) -> Result<(), Error> {
+                self.p.twcr.write(|w| w
+                    .twea().set_bit()
+                    .twsto().clear_bit()
+                    .twint().set_bit()
+                    .twen().clear_bit()
+                );
+                Ok(())
+            }
+        }
         // Slave States
         pub enum [<$I2c SlaveState>]<M> {
             /// Uninitialized state machine
@@ -602,7 +622,6 @@ macro_rules! impl_twi_i2c {
         }
 
         pub struct [<$I2c SlaveStateRxReady>]<M>{
-           data: u8,
            slave: [<$I2c Slave>]<M>,
         }
 
@@ -660,7 +679,7 @@ macro_rules! impl_twi_i2c {
             ) -> Result<[<$I2c SlaveState>]<M>, $crate::i2c::Error>{
                 while self.slave.p.twcr.read().twint().bit_is_clear() { };
                 match self.slave.p.twsr.read().tws().bits() {
-                    $crate::i2c::twi_status::TW_SR_SLA_ACK
+                |   $crate::i2c::twi_status::TW_SR_SLA_ACK
                 |   $crate::i2c::twi_status::TW_SR_ARB_LOST_SLA_ACK
                 |   $crate::i2c::twi_status::TW_SR_ARB_LOST_GCALL_ACK
                     => return Ok([<$I2c SlaveState>]::AddressMatched([<$I2c SlaveStateAddressMatched>]::<M> {
@@ -688,34 +707,71 @@ macro_rules! impl_twi_i2c {
         /// Transitions from AddressMatched to RxReady | TxReady
         impl <M>[<$I2c SlaveStateAddressMatched>]<M> {
 
-            /// Transition to the next state based on the data direction bit
+            /// Return the received address
+            pub fn address(&self) -> Result<u8, Error> {
+                let address = self.slave.p.twdr.read().bits() >> 1;
+                Ok(address)
+            }
+
+            pub fn ack(&mut self) -> Result<(), Error> {
+                self.slave.ack()
+            }
+
+            pub fn nack(&mut self) -> Result<(), Error> {
+                self.slave.nack()
+            }
+
             pub fn next(self
             ) -> Result<[<$I2c SlaveState>]<M>, $crate::i2c::Error>{
-                match self.slave.p.twsr.read().tws().bits() {
-                // |   $crate::i2c::twi_status::TW_SR_DATA_ACK
-                // |   $crate::i2c::twi_status::TW_SR_GCALL_DATA_ACK
-                // =>
-                //         self.p.twcr.write(|w| w
-                //             .twsto().clear_bit()
-                //             .twint().set_bit();
-                //             .twea().set_bit()
-                //         );
-                    _ => Ok([<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
+                let byte = self.slave.p.twdr.read().bits();
+                if byte & 1  == 1 {
+                    // read
+                    Ok([<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
                         slave: self.slave,
-                        data: 0,
-                        }))
+                    }))
+                }else{
+                    // write
+                    Ok([<$I2c SlaveState>]::TxReady([<$I2c SlaveStateTxReady>]::<M> {
+                        slave: self.slave,
+                    }))
                 }
             }
         }
+                // match self.slave.p.twsr.read().tws().bits() {
+                // |   $crate::i2c::twi_status::TW_SR_DATA_ACK
+                // |   $crate::i2c::twi_status::TW_SR_GCALL_DATA_ACK
+                //     => return Ok([<$I2c SlaveState>]::AddressMatched([<$I2c SlaveStateRxReady>]::<M> {
+                //         slave: self.slave,
+                //         })),
+                // |   $crate::i2c::twi_status::TW_SR_DATA_NACK
+                // |   $crate::i2c::twi_status::TW_SR_GCALL_DATA_NACK
+                //     _ => Ok([<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
+                //         slave: self.slave,
+                //         data: 0,
+                //         }))
+                // }
 
         /// Transitions from RxReady to Initialized
         impl <M>[<$I2c SlaveStateRxReady>]<M>{
+
+            pub fn ack(&mut self) -> Result<(), Error> {
+                self.slave.ack()
+            }
+
+            pub fn nack(&mut self) -> Result<(), Error> {
+                self.slave.nack()
+            }
+
             pub fn read(self
             ) -> Result<u8, $crate::i2c::Error>{
-                Ok(self.data)
+                Ok(0)
             }
             pub fn next(self
             ) -> Result<[<$I2c SlaveStateInitialized>]<M>, $crate::i2c::Error>{
+                while self.slave.p.twcr.read().twint().bit_is_clear() { };
+                // match self.slave.p.twsr.read().tws().bits() {
+                //
+                // }
                 Ok([<$I2c SlaveStateInitialized>]::<M> {
                     slave: self.slave,
                 })
@@ -724,6 +780,14 @@ macro_rules! impl_twi_i2c {
 
         /// Transitions from TxReady to Initialized
         impl<M>[<$I2c SlaveStateTxReady>]<M>{
+            pub fn ack(&mut self) -> Result<(), Error> {
+                self.slave.ack()
+            }
+
+            pub fn nack(&mut self) -> Result<(), Error> {
+                self.slave.nack()
+            }
+            
             pub fn write(self, data: u8
             ) -> Result<(), $crate::i2c::Error> {
                 // TODO : impl
