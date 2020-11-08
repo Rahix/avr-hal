@@ -791,8 +791,14 @@ macro_rules! impl_twi_i2c {
                 while slave.p.twcr.read().twint().bit_is_clear() { };
                 match slave.p.twsr.read().tws().bits() {
                 |   $crate::i2c::twi_status::TW_ST_SLA_ACK
-                |   $crate::i2c::twi_status::TW_SR_GCALL_DATA_ACK
+                |   $crate::i2c::twi_status::TW_ST_ARB_LOST_SLA_ACK
+                |   $crate::i2c::twi_status::TW_ST_DATA_ACK
                     => return Ok([<$I2c SlaveState>]::TxReady([<$I2c SlaveStateTxReady>]::<M> {
+                        slave: slave,
+                        })),
+                |   $crate::i2c::twi_status::TW_ST_DATA_NACK
+                |   $crate::i2c::twi_status::TW_ST_LAST_DATA
+                    => return Ok([<$I2c SlaveState>]::Initialized([<$I2c SlaveStateInitialized>]::<M> {
                         slave: slave,
                         })),
                     _ => {
