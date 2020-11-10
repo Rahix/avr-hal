@@ -231,7 +231,7 @@ pub mod spi {
 pub mod usart {
     #[allow(unused_imports)]
     use crate::port::{portb, portd};
-    pub use avr_hal_generic::serial::*;
+    pub use avr_hal_generic::usart::*;
 
     avr_hal_generic::impl_usart! {
         /// Serial interface based on ATmega328P's USART0 peripheral

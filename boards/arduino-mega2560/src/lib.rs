@@ -25,7 +25,7 @@ pub type Delay = crate::hal::delay::Delay<hal::clock::MHz16>;
 pub type Serial<IMODE> = crate::usart::Usart0<IMODE>;
 
 pub mod usart {
-    pub use avr_hal_generic::serial::*;
+    pub use avr_hal_generic::usart::*;
 
     pub type Usart0<IMODE> = crate::hal::usart::Usart0<crate::hal::clock::MHz16, IMODE>;
     pub type Usart1<IMODE> = crate::hal::usart::Usart1<crate::hal::clock::MHz16, IMODE>;

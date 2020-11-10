@@ -17,7 +17,7 @@ pub extern crate avr_device;
 pub mod clock;
 pub mod delay;
 pub mod port;
-pub mod serial;
+pub mod usart;
 pub mod i2c;
 pub mod spi;
 pub mod adc;

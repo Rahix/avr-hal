@@ -57,7 +57,7 @@ pub mod i2c {
 /// Serial interface using USART
 pub mod usart {
     use crate::port::portd;
-    pub use avr_hal_generic::serial::*;
+    pub use avr_hal_generic::usart::*;
 
     avr_hal_generic::impl_usart! {
         /// Serial interface based on ATmega48P's USART0 peripheral
