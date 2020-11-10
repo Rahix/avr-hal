@@ -140,7 +140,7 @@ macro_rules! impl_usart {
                 p: $USART,
                 rx: $rxmod::$RX<$crate::port::mode::Input<RX_MODE>>,
                 tx: $txmod::$TX<$crate::port::mode::Output>,
-                baud: Baudrate<CLOCK>,
+                baud: $crate::usart::Baudrate<CLOCK>,
             ) -> $Usart<CLOCK, RX_MODE> {
                 let mut usart = $Usart {
                     p,
@@ -152,7 +152,7 @@ macro_rules! impl_usart {
                 usart
             }
 
-            fn initialize(&mut self, baud: Baudrate<CLOCK>) {
+            fn initialize(&mut self, baud: $crate::usart::Baudrate<CLOCK>) {
                 self.p.[<ubrr $n>].write(|w| unsafe { w.bits(baud.ubrr) });
                 self.p.[<ucsr $n a>].write(|w| w.[<u2x $n>]().bit(baud.u2x));
 
