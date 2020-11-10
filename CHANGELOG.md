@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 proper releases yet.  Instead, the CHANGELOG will document changes over time so
 people already using the crates have a reference what is changing upstream.
 
+## [2020-11-09 - 2020-11-15][2020-46]
+### Added
+- `arduino-mega2560`: A `usart` module with type aliases for all other USART
+  peripherals apart from `Usart0` ([#100]).
+
+### Changed
+- The `avr-hal-generic::serial` module was renamed to `avr-hal-generic::usart`
+  for consistency ([`493546530eb8`]).
+
+[#100]: https://github.com/Rahix/avr-hal/pull/100
+[`493546530eb8`]: https://github.com/Rahix/avr-hal/commit/493546530eb87d47ae1eee507e9309be590688d4
+
+
 ## [2020-11-02 - 2020-11-08][2020-45]
 ### Added
 - Serial/USART: The `Baudrate` type for more precise control over the baudrate
@@ -134,6 +147,7 @@ Please look at the git log for changes before this point :)
 
 
 
+[2020-46]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-08%7D...master@%7B2020-11-15%7D
 [2020-45]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-01%7D...master@%7B2020-11-08%7D
 [2020-44]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-10-25%7D...master@%7B2020-11-01%7D
 [2020-42]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-10-11%7D...master@%7B2020-10-18%7D
