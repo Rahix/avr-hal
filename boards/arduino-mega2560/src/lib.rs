@@ -22,7 +22,17 @@ pub use crate::hal::spi;
 pub use crate::hal::adc;
 
 pub type Delay = crate::hal::delay::Delay<hal::clock::MHz16>;
-pub type Serial<IMODE> = crate::hal::usart::Usart0<hal::clock::MHz16, IMODE>;
+pub type Serial<IMODE> = crate::usart::Usart0<IMODE>;
+
+pub mod usart {
+    pub use avr_hal_generic::serial::*;
+
+    pub type Usart0<IMODE> = crate::hal::usart::Usart0<crate::hal::clock::MHz16, IMODE>;
+    pub type Usart1<IMODE> = crate::hal::usart::Usart1<crate::hal::clock::MHz16, IMODE>;
+    pub type Usart2<IMODE> = crate::hal::usart::Usart2<crate::hal::clock::MHz16, IMODE>;
+    pub type Usart3<IMODE> = crate::hal::usart::Usart3<crate::hal::clock::MHz16, IMODE>;
+}
+
 pub type I2c<M> = crate::hal::i2c::I2c<hal::clock::MHz16, M>;
 
 /// Support for PWM pins
