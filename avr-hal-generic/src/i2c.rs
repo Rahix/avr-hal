@@ -526,7 +526,23 @@ macro_rules! impl_twi_i2c {
         }
 
         use core::sync::atomic;
+
+        /// I2C_SLAVE_TRIGGER: true == set; false == clear
         static I2C_SLAVE_TRIGGER: atomic::AtomicBool = atomic::AtomicBool::new(false);
+
+        fn is_i2c_slave_trigger_set()->bool{
+           avr_device::interrupt::free(|_cs| {
+                if I2C_SLAVE_TRIGGER.load(atomic::Ordering::SeqCst) {
+                    true
+                }else{
+                    false
+                }
+            })
+        }
+
+        fn is_i2c_slave_trigger_clear()->bool{
+            !is_i2c_slave_trigger_set()
+        }
 
         fn clear_i2c_slave_trigger(){
            avr_device::interrupt::free(|_cs| {
