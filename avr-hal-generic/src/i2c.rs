@@ -210,18 +210,15 @@ macro_rules! impl_twi_i2c {
                 scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
                 speed: u32,
             ) -> $I2c<CLOCK, $crate::i2c::I2cPullUp> {
-                // Calculate TWBR
-                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.twbr.write(|w| unsafe { w.bits(twbr as u8) });
-                // Disable prescaler
-                p.twsr.write(|w| w.twps().prescaler_1());
-
-                $I2c {
+                let mut i2c = $I2c {
                     p,
                     sda,
                     scl,
                     _clock: ::core::marker::PhantomData,
-                }
+                };
+
+                i2c.set_speed(speed);
+                i2c
             }
         }
 
@@ -240,18 +237,15 @@ macro_rules! impl_twi_i2c {
                 scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::Floating>>,
                 speed: u32,
             ) -> $I2c<CLOCK, $crate::i2c::I2cFloating> {
-                // Calculate TWBR
-                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.twbr.write(|w| unsafe { w.bits(twbr as u8) });
-                // Disable prescaler
-                p.twsr.write(|w| w.twps().prescaler_1());
-
-                $I2c {
+                let mut i2c = $I2c {
                     p,
                     sda,
                     scl,
                     _clock: ::core::marker::PhantomData,
-                }
+                };
+
+                i2c.set_speed(speed);
+                i2c
             }
         }
 
@@ -259,6 +253,15 @@ macro_rules! impl_twi_i2c {
         where
             CLOCK: $crate::clock::Clock,
         {
+            fn set_speed(&mut self, speed: u32){
+                // Calculate TWBR register value
+                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
+                self.p.twbr.write(|w| unsafe { w.bits(twbr as u8) });
+
+                // Disable prescaler
+                self.p.twsr.write(|w| w.twps().prescaler_1());
+            }
+
             /// Check whether a slave answers ACK for a given address
             ///
             /// Note that some devices might not respond to both read and write
