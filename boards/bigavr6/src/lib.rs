@@ -16,4 +16,7 @@ pub mod prelude {
 
 pub type Delay = crate::hal::delay::Delay<hal::clock::MHz16>;
 pub type Serial<IMODE> = crate::hal::usart::Usart0<hal::clock::MHz16, IMODE>;
-pub type I2c<M> = crate::hal::i2c::I2c<hal::clock::MHz16, M>;
+pub type I2cMaster<M> = crate::hal::i2c::I2cMaster<hal::clock::MHz16, M>;
+#[doc(hidden)]
+#[deprecated = "Please use `I2cMaster` instead of `I2c`"]
+pub type I2c<M> = I2cMaster<M>;

@@ -15,7 +15,7 @@ fn main() -> ! {
         pins.d1.into_output(&mut pins.ddr),
         57600.into_baudrate(),
     );
-    let mut i2c = sparkfun_pro_micro::I2c::new(
+    let mut i2c = sparkfun_pro_micro::I2cMaster::new(
         dp.TWI,
         pins.d2.into_pull_up_input(&mut pins.ddr),
         pins.d3.into_pull_up_input(&mut pins.ddr),

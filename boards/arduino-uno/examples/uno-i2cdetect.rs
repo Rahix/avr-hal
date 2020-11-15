@@ -15,7 +15,7 @@ fn main() -> ! {
         pins.d1.into_output(&mut pins.ddr),
         57600.into_baudrate(),
     );
-    let mut i2c = arduino_uno::I2c::new(
+    let mut i2c = arduino_uno::I2cMaster::new(
         dp.TWI,
         pins.a4.into_pull_up_input(&mut pins.ddr),
         pins.a5.into_pull_up_input(&mut pins.ddr),

@@ -212,7 +212,7 @@ pub type Serial<IMODE> = hal::usart::Usart0<hal::clock::MHz16, IMODE>;
 ///
 /// let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
 ///
-/// let mut i2c = arduino_uno::I2c::new(
+/// let mut i2c = arduino_uno::I2cMaster::new(
 ///     dp.TWI,
 ///     pins.a4.into_pull_up_input(&mut pins.ddr),
 ///     pins.a5.into_pull_up_input(&mut pins.ddr),
@@ -221,7 +221,10 @@ pub type Serial<IMODE> = hal::usart::Usart0<hal::clock::MHz16, IMODE>;
 /// ```
 ///
 /// [ex-i2c]: https://github.com/Rahix/avr-hal/blob/master/boards/arduino-uno/examples/uno-i2cdetect.rs
-pub type I2c<M> = hal::i2c::I2c<hal::clock::MHz16, M>;
+pub type I2cMaster<M> = hal::i2c::I2cMaster<hal::clock::MHz16, M>;
+#[doc(hidden)]
+#[deprecated = "Please use `I2cMaster` instead of `I2c`"]
+pub type I2c<M> = I2cMaster<M>;
 
 /// Support for the WatchDog Timer
 ///

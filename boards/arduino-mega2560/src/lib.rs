@@ -33,7 +33,10 @@ pub mod usart {
     pub type Usart3<IMODE> = crate::hal::usart::Usart3<crate::hal::clock::MHz16, IMODE>;
 }
 
-pub type I2c<M> = crate::hal::i2c::I2c<hal::clock::MHz16, M>;
+pub type I2cMaster<M> = crate::hal::i2c::I2cMaster<hal::clock::MHz16, M>;
+#[doc(hidden)]
+#[deprecated = "Please use `I2cMaster` instead of `I2c`"]
+pub type I2c<M> = I2cMaster<M>;
 
 /// Support for PWM pins
 ///

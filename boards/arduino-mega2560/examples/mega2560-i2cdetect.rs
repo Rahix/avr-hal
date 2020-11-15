@@ -19,7 +19,7 @@ fn main() -> ! {
         porte.pe1.into_output(&mut porte.ddr),
         57600.into_baudrate(),
     );
-    let mut i2c = arduino_mega2560::I2c::new(
+    let mut i2c = arduino_mega2560::I2cMaster::new(
         dp.TWI,
         portd.pd1.into_pull_up_input(&mut portd.ddr),
         portd.pd0.into_pull_up_input(&mut portd.ddr),

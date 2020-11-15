@@ -204,7 +204,7 @@ pub type Serial<IMODE> = hal::usart::Usart1<hal::clock::MHz16, IMODE>;
 ///
 /// let mut pins = sparkfun_pro_micro::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF);
 ///
-/// let mut i2c = sparkfun_pro_micro::I2c::new(
+/// let mut i2c = sparkfun_pro_micro::I2cMaster::new(
 ///     dp.TWI,
 ///     pins.d2.into_pull_up_input(&mut pins.ddr),
 ///     pins.d3.into_pull_up_input(&mut pins.ddr),
@@ -213,4 +213,7 @@ pub type Serial<IMODE> = hal::usart::Usart1<hal::clock::MHz16, IMODE>;
 /// ```
 ///
 /// [ex-i2c]: https://github.com/Rahix/avr-hal/blob/master/boards/sparkfun-pro-micro/examples/pro-micro-i2cdetect.rs
-pub type I2c<M> = hal::i2c::I2c<hal::clock::MHz16, M>;
+pub type I2cMaster<M> = hal::i2c::I2cMaster<hal::clock::MHz16, M>;
+#[doc(hidden)]
+#[deprecated = "Please use `I2cMaster` instead of `I2c`"]
+pub type I2c<M> = I2cMaster<M>;
