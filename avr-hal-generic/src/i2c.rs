@@ -525,6 +525,25 @@ macro_rules! impl_twi_i2c {
             twgce: bool,
         }
 
+        use core::sync::atomic;
+        static I2C_SLAVE_TRIGGER: atomic::AtomicBool = atomic::AtomicBool::new(false);
+
+        fn clear_i2c_slave_trigger(){
+           avr_device::interrupt::free(|_cs| {
+                if I2C_SLAVE_TRIGGER.load(atomic::Ordering::SeqCst) {
+                    I2C_SLAVE_TRIGGER.store(false, atomic::Ordering::SeqCst)
+                }
+            });
+        }
+
+        fn set_i2c_slave_trigger(){
+           avr_device::interrupt::free(|_cs| {
+                if !I2C_SLAVE_TRIGGER.load(atomic::Ordering::SeqCst) {
+                    I2C_SLAVE_TRIGGER.store(true, atomic::Ordering::SeqCst);
+                }
+            })
+        }
+
         impl [<$I2c Slave>]<$crate::i2c::I2cPullUp>
         {
             /// Initialize the I2C bus
@@ -682,7 +701,6 @@ macro_rules! impl_twi_i2c {
 
         /// Transitions from Initialized to AddressMatched
         impl <M>[<$I2c SlaveStateInitialized>]<M> {
-
             /// Wait until TWINT has been triggered. TWINT is triggered if a message appears on
             /// the I2C bus and the address matches this slave's address, or if a message appears
             /// on the I2C bus and this slave has TWGCE enabled.
@@ -766,9 +784,11 @@ macro_rules! impl_twi_i2c {
                 match slave.p.twsr.read().tws().bits() {
                 |   $crate::i2c::twi_status::TW_SR_DATA_ACK
                 |   $crate::i2c::twi_status::TW_SR_GCALL_DATA_ACK
-                    => return Ok([<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
-                        slave: slave,
-                        })),
+                    => {
+                        set_i2c_slave_trigger();
+                        return Ok([<$I2c SlaveState>]::RxReady([<$I2c SlaveStateRxReady>]::<M> {
+                            slave: slave,
+                            }))},
                 |   $crate::i2c::twi_status::TW_SR_DATA_NACK
                 |   $crate::i2c::twi_status::TW_SR_GCALL_DATA_NACK
                 |   $crate::i2c::twi_status::TW_SR_STOP
@@ -804,9 +824,11 @@ macro_rules! impl_twi_i2c {
                 |   $crate::i2c::twi_status::TW_ST_SLA_ACK
                 |   $crate::i2c::twi_status::TW_ST_ARB_LOST_SLA_ACK
                 |   $crate::i2c::twi_status::TW_ST_DATA_ACK
-                    => return Ok([<$I2c SlaveState>]::TxReady([<$I2c SlaveStateTxReady>]::<M> {
-                        slave: slave,
-                        })),
+                    => {
+                        set_i2c_slave_trigger();
+                        return Ok([<$I2c SlaveState>]::TxReady([<$I2c SlaveStateTxReady>]::<M> {
+                            slave: slave,
+                            }))},
                 |   $crate::i2c::twi_status::TW_ST_DATA_NACK
                 |   $crate::i2c::twi_status::TW_ST_LAST_DATA
                     => return Ok([<$I2c SlaveState>]::Initialized([<$I2c SlaveStateInitialized>]::<M> {
