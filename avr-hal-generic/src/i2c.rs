@@ -185,21 +185,6 @@ macro_rules! impl_twi_i2c {
                 sda: $sdamod:ident::$SDA:ident,
                 scl: $sclmod:ident::$SCL:ident,
             },
-            registers: {
-                control: $twcr:ident {
-                    enable: $twen:ident,
-                    ack: $twea:ident,
-                    int: $twint:ident,
-                    start: $twstart:ident,
-                    stop: $twstop:ident,
-                },
-                status: $twsr:ident {
-                    prescaler: $twps:ident,
-                    status: $tws:ident,
-                },
-                bitrate: $twbr:ident,
-                data: $twdr:ident,
-            },
         }
     ) => {
         $(#[$i2c_attr])*
@@ -227,9 +212,9 @@ macro_rules! impl_twi_i2c {
             ) -> $I2c<CLOCK, $crate::i2c::I2cPullUp> {
                 // Calculate TWBR
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+                p.twbr.write(|w| unsafe { w.bits(twbr as u8) });
                 // Disable prescaler
-                p.$twsr.write(|w| w.$twps().prescaler_1());
+                p.twsr.write(|w| w.twps().prescaler_1());
 
                 $I2c {
                     p,
@@ -257,9 +242,9 @@ macro_rules! impl_twi_i2c {
             ) -> $I2c<CLOCK, $crate::i2c::I2cFloating> {
                 // Calculate TWBR
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                p.$twbr.write(|w| unsafe { w.bits(twbr as u8) });
+                p.twbr.write(|w| unsafe { w.bits(twbr as u8) });
                 // Disable prescaler
-                p.$twsr.write(|w| w.$twps().prescaler_1());
+                p.twsr.write(|w| w.twps().prescaler_1());
 
                 $I2c {
                     p,
@@ -299,15 +284,15 @@ macro_rules! impl_twi_i2c {
                 dir: $crate::i2c::Direction,
             ) -> Result<(), $crate::i2c::Error> {
                 // Write start condition
-                self.p.$twcr.write(|w| w
-                    .$twen().set_bit()
-                    .$twint().set_bit()
-                    .$twstart().set_bit()
+                self.p.twcr.write(|w| w
+                    .twen().set_bit()
+                    .twint().set_bit()
+                    .twsta().set_bit()
                 );
                 self.wait();
 
                 // Validate status
-                match self.p.$twsr.read().$tws().bits() {
+                match self.p.twsr.read().tws().bits() {
                       $crate::i2c::twi_status::TW_START
                     | $crate::i2c::twi_status::TW_REP_START => (),
                       $crate::i2c::twi_status::TW_MT_ARB_LOST
@@ -325,11 +310,11 @@ macro_rules! impl_twi_i2c {
                 // Send slave address
                 let dirbit = if dir == $crate::i2c::Direction::Read { 1 } else { 0 };
                 let rawaddr = (addr << 1) | dirbit;
-                self.p.$twdr.write(|w| unsafe { w.bits(rawaddr) });
+                self.p.twdr.write(|w| unsafe { w.bits(rawaddr) });
                 self.transact();
 
                 // Check if the slave responded
-                match self.p.$twsr.read().$tws().bits() {
+                match self.p.twsr.read().tws().bits() {
                       $crate::i2c::twi_status::TW_MT_SLA_ACK
                     | $crate::i2c::twi_status::TW_MR_SLA_ACK => (),
                       $crate::i2c::twi_status::TW_MT_SLA_NACK
@@ -354,20 +339,20 @@ macro_rules! impl_twi_i2c {
             }
 
             fn wait(&mut self) {
-                while self.p.$twcr.read().$twint().bit_is_clear() { }
+                while self.p.twcr.read().twint().bit_is_clear() { }
             }
 
             fn transact(&mut self) {
-                self.p.$twcr.write(|w| w.$twen().set_bit().$twint().set_bit());
-                while self.p.$twcr.read().$twint().bit_is_clear() { }
+                self.p.twcr.write(|w| w.twen().set_bit().twint().set_bit());
+                while self.p.twcr.read().twint().bit_is_clear() { }
             }
 
             fn write_data(&mut self, bytes: &[u8]) -> Result<(), $crate::i2c::Error> {
                 for byte in bytes {
-                    self.p.$twdr.write(|w| unsafe { w.bits(*byte) });
+                    self.p.twdr.write(|w| unsafe { w.bits(*byte) });
                     self.transact();
 
-                    match self.p.$twsr.read().$tws().bits() {
+                    match self.p.twsr.read().tws().bits() {
                         $crate::i2c::twi_status::TW_MT_DATA_ACK => (),
                         $crate::i2c::twi_status::TW_MT_DATA_NACK => {
                             self.stop();
@@ -391,14 +376,14 @@ macro_rules! impl_twi_i2c {
                 let last = buffer.len() - 1;
                 for (i, byte) in buffer.iter_mut().enumerate() {
                     if i != last {
-                        self.p.$twcr.write(|w| w.$twint().set_bit().$twen().set_bit().$twea().set_bit());
+                        self.p.twcr.write(|w| w.twint().set_bit().twen().set_bit().twea().set_bit());
                         self.wait();
                     } else {
-                        self.p.$twcr.write(|w| w.$twint().set_bit().$twen().set_bit());
+                        self.p.twcr.write(|w| w.twint().set_bit().twen().set_bit());
                         self.wait();
                     }
 
-                    match self.p.$twsr.read().$tws().bits() {
+                    match self.p.twsr.read().tws().bits() {
                           $crate::i2c::twi_status::TW_MR_DATA_ACK
                         | $crate::i2c::twi_status::TW_MR_DATA_NACK => (),
                         $crate::i2c::twi_status::TW_MR_ARB_LOST => {
@@ -412,17 +397,16 @@ macro_rules! impl_twi_i2c {
                         },
                     }
 
-                    *byte = self.p.$twdr.read().bits();
+                    *byte = self.p.twdr.read().bits();
                 }
                 Ok(())
             }
 
             fn stop(&mut self) {
-                // Send stop
-                self.p.$twcr.write(|w| w
-                    .$twen().set_bit()
-                    .$twint().set_bit()
-                    .$twstop().set_bit()
+                self.p.twcr.write(|w| w
+                    .twen().set_bit()
+                    .twint().set_bit()
+                    .twsto().set_bit()
                 );
             }
         }

@@ -32,21 +32,6 @@ pub mod i2c {
                 sda: portd::PD1,
                 scl: portd::PD0,
             },
-            registers: {
-                control: twcr {
-                    enable: twen,
-                    ack: twea,
-                    int: twint,
-                    start: twsta,
-                    stop: twsto,
-                },
-                status: twsr {
-                    prescaler: twps,
-                    status: tws,
-                },
-                bitrate: twbr,
-                data: twdr,
-            },
         }
     }
 }
