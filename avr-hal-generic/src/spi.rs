@@ -83,18 +83,31 @@ macro_rules! impl_spi {
         /// Wrapper for the CS pin
         ///
         /// Used to contain the chip-select pin during operation to prevent its mode from being
-        /// changed from Output.  Implements
-        /// [`OutputPin`](https://docs.rs/embedded-hal/latest/embedded_hal/digital/v2/trait.OutputPin.html)
-        /// so that it can still be controlled.
+        /// changed from Output. This is necessary because the SPI state machine would otherwise
+        /// reset itself to SPI slave mode immediately. This wrapper can be used just like an
+        /// output pin, because it implements all the same traits from embedded-hal.
         pub struct ChipSelectPin($csmod::$CS<$crate::port::mode::Output>);
-
         impl $crate::hal::digital::v2::OutputPin for ChipSelectPin {
-            type Error = <$csmod::$CS<$crate::port::mode::Output> as $crate::hal::digital::v2::OutputPin>::Error;
+            type Error = $crate::void::Void;
             fn set_low(&mut self) -> Result<(), Self::Error> {
                 self.0.set_low()
             }
             fn set_high(&mut self) -> Result<(), Self::Error> {
                 self.0.set_high()
+            }
+        }
+        impl $crate::hal::digital::v2::StatefulOutputPin for ChipSelectPin {
+            fn is_set_low(&self) -> Result<bool, Self::Error> {
+                self.0.is_set_low()
+            }
+            fn is_set_high(&self) -> Result<bool, Self::Error> {
+                self.0.is_set_high()
+            }
+        }
+        impl $crate::hal::digital::v2::ToggleableOutputPin for ChipSelectPin {
+            type Error = $crate::void::Void;
+            fn toggle(&mut self) -> Result<(), Self::Error> {
+                self.0.toggle()
             }
         }
 
