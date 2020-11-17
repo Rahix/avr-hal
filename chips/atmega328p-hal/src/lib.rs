@@ -169,6 +169,7 @@ pub mod spi {
                 sclk: portb::PB5,
                 mosi: portb::PB3,
                 miso: portb::PB4,
+                cs: portb::PB2,
             }
         }
     }
