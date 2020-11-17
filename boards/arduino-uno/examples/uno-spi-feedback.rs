@@ -32,14 +32,13 @@ fn main() -> ! {
         57600.into_baudrate(),
     );
 
-    pins.d10.into_output(&mut pins.ddr); // SS must be set to output mode.
-
     // Create SPI interface.
-    let mut spi = spi::Spi::new(
+    let (mut spi, _) = spi::Spi::new(
         dp.SPI,
         pins.d13.into_output(&mut pins.ddr),
         pins.d11.into_output(&mut pins.ddr),
         pins.d12.into_pull_up_input(&mut pins.ddr),
+        pins.d10.into_output(&mut pins.ddr),
         spi::Settings::default(),
     );
 

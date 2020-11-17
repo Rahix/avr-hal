@@ -62,13 +62,13 @@ pub mod spi {
     //! or passed into a driver.  Example usage:
     //!
     //! ```
-    //! pins.d10.into_output(&mut pins.ddr);// SS must be set to output mode
     //! // create SPI interface
-    //! let mut spi = Spi::new(
+    //! let (mut spi, mut cs) = Spi::new(
     //!     dp.SPI,// SPI peripheral
     //!     pins.d13.into_output(&mut pins.ddr),// SCLK
     //!     pins.d11.into_output(&mut pins.ddr),// MOSI output pin
     //!     pins.d12.into_pull_up_input(&mut pins.ddr),// MISO input pin
+    //!     pins.d10.into_output(&mut pins.ddr),// CS pin
     //!     Settings::default(),
     //! );
     //!
@@ -90,6 +90,7 @@ pub mod spi {
                 sclk: portb::PB5,
                 mosi: portb::PB3,
                 miso: portb::PB4,
+                cs: portb::PB2,
             }
         }
     }

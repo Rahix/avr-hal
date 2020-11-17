@@ -106,14 +106,13 @@ pub fn delay_us(us: u16) {
 ///
 /// let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
 ///
-/// pins.d10.into_output(&mut pins.ddr); // Chip Select must be set to output mode.
-///
 /// // Create SPI interface.
-/// let mut spi = arduino_uno::spi::Spi::new(
+/// let (mut spi, mut cs) = arduino_uno::spi::Spi::new(
 ///     dp.SPI,
 ///     pins.d13.into_output(&mut pins.ddr),
 ///     pins.d11.into_output(&mut pins.ddr),
 ///     pins.d12.into_pull_up_input(&mut pins.ddr),
+///     pins.d10.into_output(&mut pins.ddr),
 ///     arduino_uno::spi::Settings::default(),
 /// );
 /// ```

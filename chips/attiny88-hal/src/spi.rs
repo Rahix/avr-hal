@@ -4,13 +4,13 @@
 //! or passed into a driver.  Example usage:
 //!
 //! ```
-//! portb::PB2.into_output(&mut pins.ddr);// SS must be set to output mode
 //! // create SPI interface
-//! let mut spi = Spi::new(
+//! let (mut spi, mut cs) = Spi::new(
 //!     dp.SPI,// SPI peripheral
 //!     portb::PB5.into_output(&mut pins.ddr),// SCLK
 //!     portb::PB3.into_output(&mut pins.ddr),// MOSI output pin
 //!     portb::PB4.into_pull_up_input(&mut pins.ddr),// MISO input pin
+//!     portb::PB2.into_output(&mut pins.ddr),// CS pin
 //!     Settings::default(),
 //! );
 //!
@@ -32,6 +32,7 @@ avr_hal_generic::impl_spi! {
             sclk: portb::PB5,
             mosi: portb::PB3,
             miso: portb::PB4,
+            cs: portb::PB2,
         }
     }
 }

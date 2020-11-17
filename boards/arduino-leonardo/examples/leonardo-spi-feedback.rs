@@ -28,14 +28,13 @@ fn main() -> ! {
         57600.into_baudrate(),
     );
 
-    pins.led_rx.into_output(&mut pins.ddr); // SS must be set to output mode.
-
     // Create SPI interface.
-    let mut spi = spi::Spi::new(
+    let (mut spi, _) = spi::Spi::new(
         dp.SPI,
         pins.sck.into_output(&mut pins.ddr),
         pins.mosi.into_output(&mut pins.ddr),
         pins.miso.into_pull_up_input(&mut pins.ddr),
+        pins.led_rx.into_output(&mut pins.ddr),
         spi::Settings::default(),
     );
 
