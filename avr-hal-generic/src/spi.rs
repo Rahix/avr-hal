@@ -75,9 +75,42 @@ macro_rules! impl_spi {
                 sclk: $sclkmod:ident::$SCLK:ident,
                 mosi: $mosimod:ident::$MOSI:ident,
                 miso: $misomod:ident::$MISO:ident,
+                cs: $csmod:ident::$CS:ident,
             }
         }
     ) => {
+
+        /// Wrapper for the CS pin
+        ///
+        /// Used to contain the chip-select pin during operation to prevent its mode from being
+        /// changed from Output. This is necessary because the SPI state machine would otherwise
+        /// reset itself to SPI slave mode immediately. This wrapper can be used just like an
+        /// output pin, because it implements all the same traits from embedded-hal.
+        pub struct ChipSelectPin($csmod::$CS<$crate::port::mode::Output>);
+        impl $crate::hal::digital::v2::OutputPin for ChipSelectPin {
+            type Error = $crate::void::Void;
+            fn set_low(&mut self) -> Result<(), Self::Error> {
+                self.0.set_low()
+            }
+            fn set_high(&mut self) -> Result<(), Self::Error> {
+                self.0.set_high()
+            }
+        }
+        impl $crate::hal::digital::v2::StatefulOutputPin for ChipSelectPin {
+            fn is_set_low(&self) -> Result<bool, Self::Error> {
+                self.0.is_set_low()
+            }
+            fn is_set_high(&self) -> Result<bool, Self::Error> {
+                self.0.is_set_high()
+            }
+        }
+        impl $crate::hal::digital::v2::ToggleableOutputPin for ChipSelectPin {
+            type Error = $crate::void::Void;
+            fn toggle(&mut self) -> Result<(), Self::Error> {
+                self.0.toggle()
+            }
+        }
+
         /// Behavior for a SPI interface.
         ///
         /// Stores the SPI peripheral for register access.  In addition, it takes
@@ -94,19 +127,21 @@ macro_rules! impl_spi {
         }
 
         impl $Spi<$crate::port::mode::PullUp> {
-            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings,
+            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO/CS pins, and settings,
             /// with the internal pull-up enabled on the MISO pin.
             ///
             /// The pins are not actually used directly, but they are moved into the struct in
             /// order to enforce that they are in the correct mode, and cannot be used by anyone
-            /// else while SPI is active.
+            /// else while SPI is active.  CS is placed into a `ChipSelectPin` instance and given
+            /// back so that its output state can be changed as needed.
             pub fn new(
                 peripheral: $SPI,
                 sclk: $sclkmod::$SCLK<$crate::port::mode::Output>,
                 mosi: $mosimod::$MOSI<$crate::port::mode::Output>,
                 miso: $misomod::$MISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
+                cs: $csmod::$CS<$crate::port::mode::Output>,
                 settings: Settings
-            ) -> Self {
+            ) -> (Self, ChipSelectPin) {
                 let spi = $Spi {
                     peripheral,
                     sclk,
@@ -116,17 +151,18 @@ macro_rules! impl_spi {
                     is_write_in_progress: false,
                 };
                 spi.setup();
-                spi
+                (spi, ChipSelectPin(cs))
             }
         }
 
         impl $Spi<$crate::port::mode::Floating> {
-            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO pins, and settings,
+            /// Instantiate an SPI with the registers, SCLK/MOSI/MISO/CS pins, and settings,
             /// with an external pull-up on the MISO pin.
             ///
             /// The pins are not actually used directly, but they are moved into the struct in
             /// order to enforce that they are in the correct mode, and cannot be used by anyone
-            /// else while SPI is active.
+            /// else while SPI is active.  CS is placed into a `ChipSelectPin` instance and given
+            /// back so that its output state can be changed as needed.
             pub fn with_external_pullup(
                 peripheral: $SPI,
                 sclk: $sclkmod::$SCLK<$crate::port::mode::Output>,
@@ -151,16 +187,17 @@ macro_rules! impl_spi {
             /// Disable the SPI device and release ownership of the peripheral
             /// and pins.  Instance can no-longer be used after this is
             /// invoked.
-            pub fn release(self) -> (
+            pub fn release(self, cs: ChipSelectPin) -> (
                 $SPI,
                 $sclkmod::$SCLK<$crate::port::mode::Output>,
                 $mosimod::$MOSI<$crate::port::mode::Output>,
                 $misomod::$MISO<$crate::port::mode::Input<MisoInputMode>>,
+                $csmod::$CS<$crate::port::mode::Output>,
             ) {
                 self.peripheral.spcr.write(|w| {
                     w.spe().clear_bit()
                 });
-                (self.peripheral, self.sclk, self.mosi, self.miso)
+                (self.peripheral, self.sclk, self.mosi, self.miso, cs.0)
             }
 
             /// Write a byte to the data register, which begins transmission

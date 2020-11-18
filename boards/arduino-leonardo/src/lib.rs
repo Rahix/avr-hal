@@ -93,14 +93,13 @@ pub fn delay_us(us: u16) {
 ///
 /// let mut pins = arduino_leonardo::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE);
 ///
-/// pins.led_rx.into_output(&mut pins.ddr); // Chip Select must be set to output mode.
-///
 /// // Create SPI interface.
 /// let mut spi = arduino_leonardo::spi::Spi::new(
 ///     dp.SPI,
 ///     pins.sck.into_output(&mut pins.ddr),
 ///     pins.mosi.into_output(&mut pins.ddr),
 ///     pins.miso.into_pull_up_input(&mut pins.ddr),
+///     pins.led_rx.into_output(&mut pins.ddr),
 ///     arduino_leonardo::spi::Settings::default(),
 /// );
 /// ```
