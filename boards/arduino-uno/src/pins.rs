@@ -11,7 +11,7 @@ avr_hal_generic::impl_board_pins! {
         portd: crate::pac::PORTD,
     }
 
-    /// Reexport of the Leonardo's pins, with the names they have on the board
+    /// Reexport of the Uno's pins, with the names they have on the board
     pub struct Pins {
         /// `A0`
         ///
