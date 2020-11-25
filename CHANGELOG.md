@@ -8,6 +8,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 proper releases yet.  Instead, the CHANGELOG will document changes over time so
 people already using the crates have a reference what is changing upstream.
 
+## [2020-11-23 - 2020-11-29][2020-48]
+### Added
+- An example implementation of the Arduino `millis()` function:
+  [`uno-millis.rs`][uno-millis].  There is also a blog post with a code
+  walkthrough: <https://blog.rahix.de/005-avr-hal-millis>
+
+### Changed
+- `I2c` was renamed to `I2cMaster`.  There is a (deprecated) alias for the old
+  name but where possible, the new one should be used ([#102]).
+
+[uno-millis]: https://github.com/Rahix/avr-hal/blob/master/boards/arduino-uno/examples/uno-millis.rs
+[#102]: https://github.com/Rahix/avr-hal/pull/102
+
+
+## [2020-11-16 - 2020-11-22][2020-47]
+### Changed
+- The SPI driver now wraps the chip-select (CS) pin to enforce proper usage
+  ([#103]).  Downstream code must change slightly to use the new API (example
+  for Arduino Uno):
+  ```diff
+  -    let mut cs_pin = pins.d10.into_output(&mut pins.ddr);
+
+  -    let mut spi = spi::Spi::new(
+  +    let (mut spi, mut cs_pin) = spi::Spi::new(
+           dp.SPI,
+           pins.d13.into_output(&mut pins.ddr),
+           pins.d11.into_output(&mut pins.ddr),
+           pins.d12.into_pull_up_input(&mut pins.ddr),
+  +        pins.d10.into_output(&mut pins.ddr),
+           spi::Settings::default(),
+       );
+  ```
+
+### Fixed
+- Fixed a soundness issue in the SPI driver.  The hardware requires proper setup
+  of the CS pin which was not guaranteed.  An API change was made to enforce the
+  necessary invariant ([#103]).
+
+[#103]: https://github.com/Rahix/avr-hal/pull/103
+
+
 ## [2020-11-09 - 2020-11-15][2020-46]
 ### Added
 - `arduino-mega2560`: A `usart` module with type aliases for all other USART
@@ -147,6 +188,8 @@ Please look at the git log for changes before this point :)
 
 
 
+[2020-48]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-22%7D...master@%7B2020-11-29%7D
+[2020-47]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-15%7D...master@%7B2020-11-22%7D
 [2020-46]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-08%7D...master@%7B2020-11-15%7D
 [2020-45]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-01%7D...master@%7B2020-11-08%7D
 [2020-44]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-10-25%7D...master@%7B2020-11-01%7D
