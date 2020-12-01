@@ -73,21 +73,6 @@ pub mod i2c {
                 sda: portc::PC4,
                 scl: portc::PC5,
             },
-            registers: {
-                control: twcr {
-                    enable: twen,
-                    ack: twea,
-                    int: twint,
-                    start: twsta,
-                    stop: twsto,
-                },
-                status: twsr {
-                    prescaler: twps,
-                    status: tws,
-                },
-                bitrate: twbr,
-                data: twdr,
-            },
         }
     }
 
@@ -98,21 +83,6 @@ pub mod i2c {
             pins: {
                 sda: porte::PE0,
                 scl: porte::PE1,
-            },
-            registers: {
-                control: twcr {
-                    enable: twen,
-                    ack: twea,
-                    int: twint,
-                    start: twsta,
-                    stop: twsto,
-                },
-                status: twsr {
-                    prescaler: twps,
-                    status: tws,
-                },
-                bitrate: twbr,
-                data: twdr,
             },
         }
     }
