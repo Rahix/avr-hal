@@ -139,7 +139,7 @@ pub mod spi {
     //!
     //! ```
     //! // create SPI interface
-    //! let (mut spi, mut cs) = Spi0::new(
+    //! let (mut spi, mut cs) = port0::Spi0::new(
     //!     dp.SPI,// SPI peripheral
     //!     pins.d13.into_output(&mut pins.ddr),// SCLK
     //!     pins.d11.into_output(&mut pins.ddr),// MOSI output pin
@@ -156,29 +156,36 @@ pub mod spi {
     //! In the example above, all of the settings are left at the default.  You can
     //! also instantiate a Settings object with the other options available.
 
-    use crate::port::{portb, portc, porte};
-    pub use avr_hal_generic::spi::*;
+    mod port0 {
+        use crate::port::{portb, portc, porte};
+        pub use avr_hal_generic::spi::*;
 
-    avr_hal_generic::impl_spi! {
-        pub struct Spi0 {
-            peripheral: crate::pac::SPI0,
-            pins: {
-                sclk: portb::PB5,
-                mosi: portb::PB3,
-                miso: portb::PB4,
-                cs: portb::PB2,
+        avr_hal_generic::impl_spi! {
+            pub struct Spi0 {
+                peripheral: crate::pac::SPI0,
+                pins: {
+                    sclk: portb::PB5,
+                    mosi: portb::PB3,
+                    miso: portb::PB4,
+                    cs: portb::PB2,
+                }
             }
         }
     }
 
-    avr_hal_generic::impl_spi! {
-        pub struct Spi1 {
-            peripheral: crate::pac::SPI1,
-            pins: {
-                sclk: portc::PC1,
-                mosi: porte::PE3,
-                miso: portc::PC0,
-                cs: portc::PE2,
+    mod port1 {
+        use crate::port::{portb, portc, porte};
+        pub use avr_hal_generic::spi::*;
+
+        avr_hal_generic::impl_spi! {
+            pub struct Spi1 {
+                peripheral: crate::pac::SPI1,
+                pins: {
+                    sclk: portc::PC1,
+                    mosi: porte::PE3,
+                    miso: portc::PC0,
+                    cs: porte::PE2,
+                }
             }
         }
     }
