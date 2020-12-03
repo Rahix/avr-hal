@@ -8,7 +8,7 @@ compile_error!(
 
     *   atmega328p
     *   atmega328pb
-	"
+    "
 );
 
 
@@ -169,6 +169,7 @@ pub mod spi {
                 cs: portb::PB2,
             }
         }
+        pub struct ChipSelectSpi0;
     }
 
     avr_hal_generic::impl_spi! {
@@ -178,9 +179,10 @@ pub mod spi {
                 sclk: portc::PC1,
                 mosi: porte::PE3,
                 miso: portc::PC0,
-                cs: portc::PE2,
+                cs: porte::PE2,
             }
         }
+        pub struct ChipSelectSpi1;
     }
 }
 
