@@ -266,6 +266,14 @@ macro_rules! impl_spi {
                     SerialClockRate::OscfOver128 => w.spi2x().clear_bit(),
                 });
             }
+            // to reconfigure the peripheral after initializing
+            pub fn reconfigure(&mut self, settings: Settings) -> $crate::nb::Result<(), $crate::void::Void> {
+                // wait for any in-flight writes to complete
+                self.flush()?;
+                self.settings = settings;
+                self.setup();
+                Ok(())
+            }
         }
 
         /// FullDuplex trait implementation, allowing this struct to be provided to
