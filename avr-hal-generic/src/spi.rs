@@ -64,6 +64,7 @@ impl Default for Settings {
     }
 }
 
+
 /// Implement traits for a SPI interface
 #[macro_export]
 macro_rules! impl_spi {
@@ -79,6 +80,37 @@ macro_rules! impl_spi {
             }
         }
     ) => {
+        /// First match was without a 'ChipSelectPin' 
+        /// we set it here to a default name and then 
+        /// recusiv expand to the real inplementation 
+        $crate::impl_spi! {
+            pub struct $Spi {
+                peripheral: $SPI,
+                pins: {
+                    sclk: $sclkmod::$SCLK,
+                    mosi: $mosimod::$MOSI,
+                    miso: $misomod::$MISO,
+                    cs: $csmod::$CS,
+                }
+            }
+            pub struct ChipSelectPin;
+        }
+    };
+    
+
+    (
+        $(#[$spi_attr:meta])*
+        pub struct $Spi:ident {
+            peripheral: $SPI:ty,
+            pins: {
+                sclk: $sclkmod:ident::$SCLK:ident,
+                mosi: $mosimod:ident::$MOSI:ident,
+                miso: $misomod:ident::$MISO:ident,
+                cs: $csmod:ident::$CS:ident,
+            }
+        }
+        pub struct $ChipSelectPin:ident;
+    ) => {
 
         /// Wrapper for the CS pin
         ///
@@ -86,8 +118,8 @@ macro_rules! impl_spi {
         /// changed from Output. This is necessary because the SPI state machine would otherwise
         /// reset itself to SPI slave mode immediately. This wrapper can be used just like an
         /// output pin, because it implements all the same traits from embedded-hal.
-        pub struct ChipSelectPin($csmod::$CS<$crate::port::mode::Output>);
-        impl $crate::hal::digital::v2::OutputPin for ChipSelectPin {
+        pub struct $ChipSelectPin($csmod::$CS<$crate::port::mode::Output>);
+        impl $crate::hal::digital::v2::OutputPin for $ChipSelectPin {
             type Error = $crate::void::Void;
             fn set_low(&mut self) -> Result<(), Self::Error> {
                 self.0.set_low()
@@ -96,7 +128,7 @@ macro_rules! impl_spi {
                 self.0.set_high()
             }
         }
-        impl $crate::hal::digital::v2::StatefulOutputPin for ChipSelectPin {
+        impl $crate::hal::digital::v2::StatefulOutputPin for $ChipSelectPin {
             fn is_set_low(&self) -> Result<bool, Self::Error> {
                 self.0.is_set_low()
             }
@@ -104,7 +136,7 @@ macro_rules! impl_spi {
                 self.0.is_set_high()
             }
         }
-        impl $crate::hal::digital::v2::ToggleableOutputPin for ChipSelectPin {
+        impl $crate::hal::digital::v2::ToggleableOutputPin for $ChipSelectPin {
             type Error = $crate::void::Void;
             fn toggle(&mut self) -> Result<(), Self::Error> {
                 self.0.toggle()
@@ -141,7 +173,7 @@ macro_rules! impl_spi {
                 miso: $misomod::$MISO<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
                 cs: $csmod::$CS<$crate::port::mode::Output>,
                 settings: Settings
-            ) -> (Self, ChipSelectPin) {
+            ) -> (Self, $ChipSelectPin) {
                 let spi = $Spi {
                     peripheral,
                     sclk,
@@ -151,7 +183,7 @@ macro_rules! impl_spi {
                     is_write_in_progress: false,
                 };
                 spi.setup();
-                (spi, ChipSelectPin(cs))
+                (spi, $ChipSelectPin(cs))
             }
         }
 
@@ -187,7 +219,7 @@ macro_rules! impl_spi {
             /// Disable the SPI device and release ownership of the peripheral
             /// and pins.  Instance can no-longer be used after this is
             /// invoked.
-            pub fn release(self, cs: ChipSelectPin) -> (
+            pub fn release(self, cs: $ChipSelectPin) -> (
                 $SPI,
                 $sclkmod::$SCLK<$crate::port::mode::Output>,
                 $mosimod::$MOSI<$crate::port::mode::Output>,
