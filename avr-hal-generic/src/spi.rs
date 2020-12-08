@@ -66,9 +66,38 @@ impl Default for Settings {
 
 
 /// Implement traits for a SPI interface
-#[doc(hidden)]
 #[macro_export]
-macro_rules! impl_spi_internal {
+macro_rules! impl_spi {
+    (
+        $(#[$spi_attr:meta])*
+        pub struct $Spi:ident {
+            peripheral: $SPI:ty,
+            pins: {
+                sclk: $sclkmod:ident::$SCLK:ident,
+                mosi: $mosimod:ident::$MOSI:ident,
+                miso: $misomod:ident::$MISO:ident,
+                cs: $csmod:ident::$CS:ident,
+            }
+        }
+    ) => {
+        /// First match was without a 'ChipSelectPin' 
+        /// we set it here to a default name and then 
+        /// recusiv expand to the real inplementation 
+        $crate::impl_spi! {
+            pub struct $Spi {
+                peripheral: $SPI,
+                pins: {
+                    sclk: $sclkmod::$SCLK,
+                    mosi: $mosimod::$MOSI,
+                    miso: $misomod::$MISO,
+                    cs: $csmod::$CS,
+                }
+            }
+            pub struct ChipSelectPin;
+        }
+    };
+    
+
     (
         $(#[$spi_attr:meta])*
         pub struct $Spi:ident {
@@ -81,8 +110,7 @@ macro_rules! impl_spi_internal {
             }
         }
         pub struct $ChipSelectPin:ident;
-    )
-    => {
+    ) => {
 
         /// Wrapper for the CS pin
         ///
@@ -136,7 +164,7 @@ macro_rules! impl_spi_internal {
             ///
             /// The pins are not actually used directly, but they are moved into the struct in
             /// order to enforce that they are in the correct mode, and cannot be used by anyone
-            /// else while SPI is active.  CS is placed into a `$ChipSelectPin` instance and given
+            /// else while SPI is active.  CS is placed into a `ChipSelectPin` instance and given
             /// back so that its output state can be changed as needed.
             pub fn new(
                 peripheral: $SPI,
@@ -165,7 +193,7 @@ macro_rules! impl_spi_internal {
             ///
             /// The pins are not actually used directly, but they are moved into the struct in
             /// order to enforce that they are in the correct mode, and cannot be used by anyone
-            /// else while SPI is active.  CS is placed into a `$ChipSelectPin` instance and given
+            /// else while SPI is active.  CS is placed into a `ChipSelectPin` instance and given
             /// back so that its output state can be changed as needed.
             pub fn with_external_pullup(
                 peripheral: $SPI,
@@ -300,66 +328,6 @@ macro_rules! impl_spi_internal {
         /// Default Write trait implementation. Only 8-bit word size is supported for now.
         impl<MisoInputMode: $crate::port::mode::InputMode> $crate::hal::blocking::spi::write::Default<u8> for $Spi<MisoInputMode>
         {
-        }
-    };
-}
-
-
-/// Implement traits for a SPI interface
-#[macro_export]
-macro_rules! impl_spi {
-    (
-        $(#[$spi_attr:meta])*
-        pub struct $Spi:ident {
-            peripheral: $SPI:ty,
-            pins: {
-                sclk: $sclkmod:ident::$SCLK:ident,
-                mosi: $mosimod:ident::$MOSI:ident,
-                miso: $misomod:ident::$MISO:ident,
-                cs: $csmod:ident::$CS:ident,
-            }
-        }
-    ) => {
-        $crate::impl_spi_internal! {
-            pub struct $Spi {
-                peripheral: $SPI,
-                pins: {
-                    sclk: $sclkmod::$SCLK,
-                    mosi: $mosimod::$MOSI,
-                    miso: $misomod::$MISO,
-                    cs: $csmod::$CS,
-                }
-            }
-            pub struct ChipSelectPin;
-        }
-    };
-
-
-
-    (
-        $(#[$spi_attr:meta])*
-        pub struct $Spi:ident {
-            peripheral: $SPI:ty,
-            pins: {
-                sclk: $sclkmod:ident::$SCLK:ident,
-                mosi: $mosimod:ident::$MOSI:ident,
-                miso: $misomod:ident::$MISO:ident,
-                cs: $csmod:ident::$CS:ident,
-            }
-        }
-        pub struct $ChipSelectPin:ident;
-    ) => {
-        $crate::impl_spi_internal! {
-            pub struct $Spi {
-                peripheral: $SPI,
-                pins: {
-                    sclk: $sclkmod::$SCLK,
-                    mosi: $mosimod::$MOSI,
-                    miso: $misomod::$MISO,
-                    cs: $csmod::$CS,
-                }
-            }
-            pub struct $ChipSelectPin;
         }
     };
 }
