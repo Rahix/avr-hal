@@ -24,31 +24,20 @@ fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
 
     let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
-    // set up serial interface for text output
-    let mut serial = arduino_uno::Serial::new(
-        dp.USART0,
-        pins.d0,
-        pins.d1.into_output(&mut pins.ddr),
-        57600.into_baudrate(),
-    );
-
     // Create SPI interface.
     let (mut spi, _) = spi::Spi::new(
         dp.SPI,
-        pins.d13.into_output(&mut pins.ddr),
-        pins.d11.into_output(&mut pins.ddr),
-        pins.d12.into_pull_up_input(&mut pins.ddr),
-        pins.d10.into_output(&mut pins.ddr),
+        pins.d13.into_output(&mut pins.ddr),        //sclk
+        pins.d11.into_output(&mut pins.ddr),        //mosi
+        pins.d12.into_pull_up_input(&mut pins.ddr), //miso
+        pins.d10.into_output(&mut pins.ddr),        //cs
         spi::Settings::default(),
     );
 
     loop {
-        // Send a byte
-        nb::block!(spi.send(0b00001111)).void_unwrap();
-        // Because MISO is connected to MOSI, the read data should be the same
+        // echo
         let data = nb::block!(spi.read()).void_unwrap();
-
-        ufmt::uwriteln!(&mut serial, "data: {}\r", data).void_unwrap();
         arduino_uno::delay_ms(1000);
+        nb::block!(spi.send(data)).void_unwrap();
     }
 }

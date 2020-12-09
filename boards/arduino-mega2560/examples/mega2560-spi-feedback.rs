@@ -25,19 +25,10 @@ fn main() -> ! {
     let dp = arduino_mega2560::Peripherals::take().unwrap();
     let mut delay = arduino_mega2560::Delay::new();
     let mut pins = arduino_mega2560::Pins::new(
-        dp.PORTA,
-        dp.PORTB,
-        dp.PORTC,
-        dp.PORTD,
-        dp.PORTE,
-        dp.PORTF,
-        dp.PORTG,
-        dp.PORTH,
-        dp.PORTJ,
-        dp.PORTK,
-        dp.PORTL,
+        dp.PORTA, dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF, dp.PORTG, dp.PORTH, dp.PORTJ,
+        dp.PORTK, dp.PORTL,
     );
-    // set up serial interface for text output
+
     let mut serial = arduino_mega2560::Serial::new(
         dp.USART0,
         pins.d0,
@@ -56,12 +47,16 @@ fn main() -> ! {
     );
 
     loop {
-        // Send a byte
-        block!(spi.send(0b00001111)).void_unwrap();
-        // Because MISO is connected to MOSI, the read data should be the same
+        let to_send = 0b00001111;
+        ufmt::uwriteln!(&mut serial, "Sendig {}!\r", to_send).void_unwrap();
+        // Send to Uno
+        block!(spi.send(to_send)).void_unwrap();
+        delay.delay_ms(1000u16);
+        // receive from Uno
         let data = block!(spi.read()).void_unwrap();
 
-        ufmt::uwriteln!(&mut serial, "data: {}\r", data).void_unwrap();
+        // Echo to PC
+        ufmt::uwriteln!(&mut serial, "Got {}!\r", data).void_unwrap();
         delay.delay_ms(1000u16);
     }
 }
