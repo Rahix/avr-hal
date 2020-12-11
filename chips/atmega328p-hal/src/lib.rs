@@ -193,32 +193,31 @@ pub mod usart {
     use crate::port::{portb, portd};
     pub use avr_hal_generic::usart::*;
 
-    avr_hal_generic::impl_usart! {
-        /// Serial interface based on ATmega328P's USART0 peripheral
-        ///
-        /// Maximum baudrate seems to be 57600
-        pub struct Usart0 {
-            peripheral: crate::pac::USART0,
-            pins: {
-                rx: portd::PD0,
-                tx: portd::PD1,
-            },
-            register_suffix: 0,
-        }
-    }
-
+    pub type Usart0<CLOCK, IMODE> = Usart<
+        crate::pac::USART0,
+        portd::PD0<crate::port::mode::Input<IMODE>>,
+        portd::PD1<crate::port::mode::Output>,
+        CLOCK,
+    >;
     #[cfg(feature = "atmega328pb")]
-    avr_hal_generic::impl_usart! {
-        /// Serial interface based on ATmega328PB's USART0 peripheral
-        ///
-        /// Maximum baudrate seems to be 57600
-        pub struct Usart1 {
-            peripheral: crate::pac::USART1,
-            pins: {
-                rx: portb::PB4,
-                tx: portb::PB3,
-            },
-            register_suffix: 1,
-        }
+    pub type Usart1<CLOCK, IMODE> = Usart<
+        crate::pac::USART1,
+        portb::PB4<crate::port::mode::Input<IMODE>>,
+        portb::PB3<crate::port::mode::Output>,
+        CLOCK,
+    >;
+
+    avr_hal_generic::impl_usart_traditional! {
+        peripheral: crate::pac::USART0,
+        register_suffix: 0,
+        rx: portd::PD0,
+        tx: portd::PD1,
+    }
+    #[cfg(feature = "atmega328pb")]
+    avr_hal_generic::impl_usart_traditional! {
+        peripheral: crate::pac::USART1,
+        register_suffix: 1,
+        rx: portb::PB4,
+        tx: portb::PB3,
     }
 }
