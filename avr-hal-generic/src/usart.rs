@@ -102,6 +102,12 @@ impl BaudrateArduinoExt for u32 {
     }
 }
 
+#[repr(u8)]
+pub enum Event {
+    RxComplete,
+    DataRegisterEmpty,
+}
+
 pub trait UsartOps<RX, TX> {
     /// Enable & initialize this USART peripheral to the given baudrate.
     fn init<CLOCK>(&mut self, baudrate: Baudrate<CLOCK>);
@@ -123,6 +129,9 @@ pub trait UsartOps<RX, TX> {
     /// This operation must be non-blocking and return [`nb::Error::WouldBlock`] if no incoming
     /// byte is available.
     fn read(&mut self) -> nb::Result<u8, void::Void>;
+
+    /// Enable/Disable a certain interrupt.
+    fn interrupt(&mut self, event: Event, state: bool);
 }
 
 pub struct Usart<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
@@ -159,6 +168,14 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
 
     pub fn read_byte(&mut self) -> u8 {
         nb::block!(self.p.read()).void_unwrap()
+    }
+
+    pub fn listen(&mut self, event: Event) {
+        self.p.interrupt(event, true);
+    }
+
+    pub fn unlisten(&mut self, event: Event) {
+        self.p.interrupt(event, false);
     }
 }
 
@@ -256,6 +273,15 @@ macro_rules! impl_usart_traditional {
                     }
 
                     Ok(self.[<udr $n>].read().bits())
+                }
+
+                fn interrupt(&mut self, event: $crate::usart::Event, state: bool) {
+                    match event {
+                        $crate::usart::Event::RxComplete =>
+                            self.[<ucsr $n b>].modify(|_, w| w.[<rxcie $n>]().bit(state)),
+                        $crate::usart::Event::DataRegisterEmpty =>
+                            self.[<ucsr $n b>].modify(|_, w| w.[<txcie $n>]().bit(state)),
+                    }
                 }
             }
         }
