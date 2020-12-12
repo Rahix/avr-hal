@@ -18,16 +18,12 @@
 extern crate panic_halt;
 use arduino_mega2560::prelude::*;
 use arduino_mega2560::spi::{Settings, Spi};
-use nb::block;
 
 #[arduino_mega2560::entry]
 fn main() -> ! {
     let dp = arduino_mega2560::Peripherals::take().unwrap();
     let mut delay = arduino_mega2560::Delay::new();
-    let mut pins = arduino_mega2560::Pins::new(
-        dp.PORTA, dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF, dp.PORTG, dp.PORTH, dp.PORTJ,
-        dp.PORTK, dp.PORTL,
-    );
+    let mut pins = arduino_mega2560::Pins::new(dp.PORTD);
 
     let mut serial = arduino_mega2560::Serial::new(
         dp.USART0,
@@ -39,10 +35,10 @@ fn main() -> ! {
     // Create SPI interface.
     let (mut spi, _) = Spi::new(
         dp.SPI,
-        pins.d52.into_output(&mut pins.ddr),
-        pins.d51.into_output(&mut pins.ddr),
-        pins.d50.into_pull_up_input(&mut pins.ddr),
-        pins.d53.into_output(&mut pins.ddr),
+        pins.d52.into_output(&mut pins.ddr),        //sclk
+        pins.d51.into_output(&mut pins.ddr),        //mosi
+        pins.d50.into_pull_up_input(&mut pins.ddr), //miso
+        pins.d53.into_output(&mut pins.ddr),        //cs
         Settings::default(),
     );
 
@@ -50,13 +46,14 @@ fn main() -> ! {
         let to_send = 0b00001111;
         ufmt::uwriteln!(&mut serial, "Sendig {}!\r", to_send).void_unwrap();
         // Send to Uno
-        block!(spi.send(to_send)).void_unwrap();
+        spi.send(to_send).unwrap();
         delay.delay_ms(1000u16);
         // receive from Uno
-        let data = block!(spi.read()).void_unwrap();
+        let data = spi.read().unwrap();
 
         // Echo to PC
         ufmt::uwriteln!(&mut serial, "Got {}!\r", data).void_unwrap();
+
         delay.delay_ms(1000u16);
     }
 }

@@ -22,7 +22,6 @@ use panic_halt as _;
 #[arduino_uno::entry]
 fn main() -> ! {
     let dp = arduino_uno::Peripherals::take().unwrap();
-
     let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
     // Create SPI interface.
     let (mut spi, _) = spi::Spi::new(
@@ -36,8 +35,7 @@ fn main() -> ! {
 
     loop {
         // echo
-        let data = nb::block!(spi.read()).void_unwrap();
-        arduino_uno::delay_ms(1000);
-        nb::block!(spi.send(data)).void_unwrap();
+        let data = spi.read().unwrap();
+        spi.send(data).unwrap();
     }
 }
