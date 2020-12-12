@@ -50,14 +50,16 @@ impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
 
         Baudrate {
             ubrr: ubrr as u16,
-            u2x: u2x,
+            u2x,
             _clock: ::core::marker::PhantomData,
         }
     }
 
     pub fn with_exact(u2x: bool, ubrr: u16) -> Baudrate<CLOCK> {
         Baudrate {
-            ubrr, u2x, _clock: ::core::marker::PhantomData,
+            ubrr,
+            u2x,
+            _clock: ::core::marker::PhantomData,
         }
     }
 
