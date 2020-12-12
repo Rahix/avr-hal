@@ -177,6 +177,28 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
     pub fn unlisten(&mut self, event: Event) {
         self.p.interrupt(event, false);
     }
+
+    pub fn split(
+        self,
+    ) -> (
+        UsartReader<USART, RX, TX, CLOCK>,
+        UsartWriter<USART, RX, TX, CLOCK>,
+    ) {
+        (
+            UsartReader {
+                p: unsafe { core::ptr::read(&self.p) },
+                rx: self.rx,
+                _tx: marker::PhantomData,
+                _clock: marker::PhantomData,
+            },
+            UsartWriter {
+                p: self.p,
+                tx: self.tx,
+                _rx: marker::PhantomData,
+                _clock: marker::PhantomData,
+            },
+        )
+    }
 }
 
 impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> ufmt::uWrite for Usart<USART, RX, TX, CLOCK> {
@@ -205,6 +227,77 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
 }
 
 impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8> for Usart<USART, RX, TX, CLOCK> {
+    type Error = void::Void;
+
+    fn read(&mut self) -> nb::Result<u8, Self::Error> {
+        self.p.read()
+    }
+}
+
+pub struct UsartWriter<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
+    p: USART,
+    tx: TX,
+    _rx: marker::PhantomData<RX>,
+    _clock: marker::PhantomData<CLOCK>,
+}
+
+pub struct UsartReader<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
+    p: USART,
+    rx: RX,
+    _tx: marker::PhantomData<TX>,
+    _clock: marker::PhantomData<CLOCK>,
+}
+
+impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> UsartWriter<USART, RX, TX, CLOCK> {
+    pub fn reunite(self, other: UsartReader<USART, RX, TX, CLOCK>) -> Usart<USART, RX, TX, CLOCK> {
+        Usart {
+            p: self.p,
+            rx: other.rx,
+            tx: self.tx,
+            _clock: marker::PhantomData,
+        }
+    }
+}
+
+impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> UsartReader<USART, RX, TX, CLOCK> {
+    pub fn reunite(self, other: UsartWriter<USART, RX, TX, CLOCK>) -> Usart<USART, RX, TX, CLOCK> {
+        Usart {
+            p: self.p,
+            rx: self.rx,
+            tx: other.tx,
+            _clock: marker::PhantomData,
+        }
+    }
+}
+
+impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> ufmt::uWrite for UsartWriter<USART, RX, TX, CLOCK> {
+    type Error = void::Void;
+
+    fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
+        for b in s.as_bytes().iter() {
+            nb::block!(self.p.write(*b)).void_unwrap()
+        }
+        Ok(())
+    }
+}
+
+impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
+    for UsartWriter<USART, RX, TX, CLOCK>
+{
+    type Error = void::Void;
+
+    fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
+        self.p.write(byte)
+    }
+
+    fn flush(&mut self) -> nb::Result<(), Self::Error> {
+        self.p.flush()
+    }
+}
+
+impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
+    for UsartReader<USART, RX, TX, CLOCK>
+{
     type Error = void::Void;
 
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
