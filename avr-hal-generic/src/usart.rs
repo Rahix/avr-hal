@@ -1,15 +1,23 @@
-//! Serial Implementations
+//! HAL abstractions for USART/Serial
+//!
+//! Check the documentation of [`Usart`] for details.
 
 use core::cmp::Ordering;
 use core::marker;
 use void::ResultVoidExt;
 
-// Clock is needed because the calculations needs to take core clock into account
+/// Representation of a USART baudrate
+///
+/// Precalculated parameters for configuring a certain USART baudrate.
 #[derive(Debug, Clone, Copy)]
 pub struct Baudrate<CLOCK> {
+    /// Value of the `UBRR#` register
     pub ubrr: u16,
+    /// Value of the `U2X#` bit
     pub u2x: bool,
-    pub _clock: ::core::marker::PhantomData<CLOCK>,
+    /// The baudrate calculation depends on the configured clock rate, thus a `CLOCK` generic
+    /// parameter is needed.
+    pub _clock: marker::PhantomData<CLOCK>,
 }
 
 impl<CLOCK: crate::clock::Clock> PartialEq for Baudrate<CLOCK> {
@@ -39,6 +47,7 @@ impl<CLOCK: crate::clock::Clock> From<u32> for Baudrate<CLOCK> {
 }
 
 impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
+    /// Calculate parameters for a certain baudrate at a certain `CLOCK` speed.
     pub fn new(baud: u32) -> Baudrate<CLOCK> {
         let mut ubrr = (CLOCK::FREQ / 4 / baud - 1) / 2;
         let mut u2x = true;
@@ -55,6 +64,9 @@ impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
         }
     }
 
+    /// Construct a `Baudrate` from given `UBRR#` and `U2X#` values.
+    ///
+    /// This provides exact control over the resulting clock speed.
     pub fn with_exact(u2x: bool, ubrr: u16) -> Baudrate<CLOCK> {
         Baudrate {
             ubrr,
@@ -72,7 +84,22 @@ impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
     }
 }
 
+/// Provide a `into_baudrate()` method for integers.
+///
+/// This extension trait allows conveniently initializing a baudrate by using
+///
+/// ```
+/// let mut serial = arduino_uno::Serial::new(
+///     dp.USART0,
+///     pins.d0,
+///     pins.d1.into_output(&mut pins.ddr),
+///     57600.into_baudrate(),
+/// );
+/// ```
+///
+/// instead of having to call [`Baudrate::new(57600)`](Baudrate::new).
 pub trait BaudrateExt {
+    /// Calculate baudrate parameters from this number.
     fn into_baudrate<CLOCK: crate::clock::Clock>(self) -> Baudrate<CLOCK>;
 }
 
@@ -82,7 +109,15 @@ impl BaudrateExt for u32 {
     }
 }
 
+/// Same as [`BaudrateExt`] but accounts for an errata of certain Arduino boards:
+///
+/// The affected boards where this trait should be used instead are:
+///
+/// - Duemilanove
+/// - Uno
+/// - Mega 2560
 pub trait BaudrateArduinoExt {
+    /// Calculate baudrate parameters from this number (with Arduino errata).
     fn into_baudrate<CLOCK: crate::clock::Clock>(self) -> Baudrate<CLOCK>;
 }
 
@@ -104,12 +139,27 @@ impl BaudrateArduinoExt for u32 {
     }
 }
 
+/// Events/Interrupts for USART peripherals
 #[repr(u8)]
 pub enum Event {
+    /// A complete byte was received.
+    ///
+    /// Corresponds to the `USART_RX` or `USART#_RX` interrupt.  Please refer to the datasheet for
+    /// your MCU for details.
     RxComplete,
+
+    /// All data from the USART data register was transmitted.
+    ///
+    /// Corresponds to the `USART_UDRE` or `USART#_UDRE` interrupt.  Please refer to the datasheet
+    /// for your MCU for details.
     DataRegisterEmpty,
 }
 
+/// Internal trait for low-level USART peripherals.
+///
+/// This trait defines the common interface for all USART peripheral variants.  It is used as an
+/// intermediate abstraction ontop of which the [`Usart`] API is built.  **Prefer using the
+/// [`Usart`] API instead of this trait.**
 pub trait UsartOps<RX, TX> {
     /// Enable & initialize this USART peripheral to the given baudrate.
     fn init<CLOCK>(&mut self, baudrate: Baudrate<CLOCK>);
@@ -136,6 +186,27 @@ pub trait UsartOps<RX, TX> {
     fn interrupt(&mut self, event: Event, state: bool);
 }
 
+/// USART/Serial driver
+///
+/// # Example
+/// (This example is taken from Arduino Uno)
+/// ```
+/// let dp = arduino_uno::Peripherals::take().unwrap();
+/// let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
+/// let mut serial = arduino_uno::Serial::new(
+///     dp.USART0,
+///     pins.d0,
+///     pins.d1.into_output(&mut pins.ddr),
+///     57600.into_baudrate(),
+/// );
+///
+/// ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").void_unwrap();
+///
+/// loop {
+///     let b = nb::block!(serial.read()).void_unwrap();
+///     ufmt::uwriteln!(&mut serial, "Got {}!\r", b).void_unwrap();
+/// }
+/// ```
 pub struct Usart<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
     p: USART,
     rx: RX,
@@ -144,6 +215,10 @@ pub struct Usart<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
 }
 
 impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
+    /// Initialize a USART peripheral on the given pins.
+    ///
+    /// Note that the RX and TX pins are hardwired for each USART peripheral and you *must* pass
+    /// the correct ones.  This is enforced at compile time.
     pub fn new(p: USART, rx: RX, tx: TX, baudrate: Baudrate<CLOCK>) -> Self {
         let mut usart = Self {
             p,
@@ -155,31 +230,45 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
         usart
     }
 
+    /// Deinitialize/disable this peripheral and release the pins.
     pub fn release(mut self) -> (USART, RX, TX) {
         self.p.deinit();
         (self.p, self.rx, self.tx)
     }
 
+    /// Block until all remaining data has been transmitted.
     pub fn flush(&mut self) {
         nb::block!(self.p.flush()).void_unwrap()
     }
 
+    /// Transmit a byte.
+    ///
+    /// This method will block until the byte has been enqueued for transmission but **not** until
+    /// it was entirely sent.
     pub fn write_byte(&mut self, byte: u8) {
         nb::block!(self.p.write(byte)).void_unwrap()
     }
 
+    /// Receive a byte.
+    ///
+    /// This method will block until a byte could be received.
     pub fn read_byte(&mut self) -> u8 {
         nb::block!(self.p.read()).void_unwrap()
     }
 
+    /// Enable the interrupt for [`Event`].
     pub fn listen(&mut self, event: Event) {
         self.p.interrupt(event, true);
     }
 
+    /// Disable the interrupt for [`Event`].
     pub fn unlisten(&mut self, event: Event) {
         self.p.interrupt(event, false);
     }
 
+    /// Split this USART into a [`UsartReader`] and a [`UsartWriter`].
+    ///
+    /// This allows concurrently receiving and transmitting data from different contexts.
     pub fn split(
         self,
     ) -> (
@@ -236,6 +325,13 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8> for Usart<USA
     }
 }
 
+/// Writer half of a [`Usart`] peripheral.
+///
+/// Created by calling [`Usart::split`].  Splitting a peripheral into reader and writer allows
+/// concurrently receiving and transmitting data from different contexts.
+///
+/// The writer half most notably implements [`embedded_hal::serial::Write`] and [`ufmt::uWrite`]
+/// for transmitting data.
 pub struct UsartWriter<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
     p: USART,
     tx: TX,
@@ -243,6 +339,12 @@ pub struct UsartWriter<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
     _clock: marker::PhantomData<CLOCK>,
 }
 
+/// Reader half of a [`Usart`] peripheral.
+///
+/// Created by calling [`Usart::split`].  Splitting a peripheral into reader and writer allows
+/// concurrently receiving and transmitting data from different contexts.
+///
+/// The reader half most notably implements [`embedded_hal::serial::Read`] for receiving data.
 pub struct UsartReader<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
     p: USART,
     rx: RX,
@@ -251,6 +353,7 @@ pub struct UsartReader<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
 }
 
 impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> UsartWriter<USART, RX, TX, CLOCK> {
+    /// Merge this `UsartWriter` with a [`UsartReader`] back into a single [`Usart`] peripheral.
     pub fn reunite(self, other: UsartReader<USART, RX, TX, CLOCK>) -> Usart<USART, RX, TX, CLOCK> {
         Usart {
             p: self.p,
@@ -262,6 +365,7 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> UsartWriter<USART, RX, TX, CLOCK> {
 }
 
 impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> UsartReader<USART, RX, TX, CLOCK> {
+    /// Merge this `UsartReader` with a [`UsartWriter`] back into a single [`Usart`] peripheral.
     pub fn reunite(self, other: UsartWriter<USART, RX, TX, CLOCK>) -> Usart<USART, RX, TX, CLOCK> {
         Usart {
             p: self.p,
