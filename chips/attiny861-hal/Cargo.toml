@@ -11,5 +11,6 @@ rt = ["avr-device/rt"]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-version = "0.2.3"
+#version = "0.2.3"
+path = "../../../avr-device/"
 features = ["attiny861"]
