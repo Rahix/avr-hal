@@ -11,5 +11,6 @@ rt = ["avr-device/rt"]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-version = "0.2.2"
+#version = "0.2.2"
+git = "https://github.com/Rahix/avr-device"
 features = ["attiny841"]
