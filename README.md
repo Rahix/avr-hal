@@ -9,16 +9,23 @@ avr-hal [![Build Status](https://travis-ci.com/Rahix/avr-hal.svg?branch=master)]
   - [Supported Boards](#supported-boards)
 
 ## Quickstart
-You need nightly rust for compiling rust code for AVR.  Go into `./boards/arduino-leonardo` (or the directory for whatever board you want), and run the following commands:
+You need a nightly Rust compiler for compiling Rust code for AVR.  **Note**: Due to a regression, versions after `nightly-2021-01-07` are currently broken (see [#124](https://github.com/Rahix/avr-hal/issues/124)).  Please use that version of the compiler for now.  You can install it using
+
+```bash
+rustup toolchain install nightly-2021-01-07
+```
+
+Go into `./boards/arduino-leonardo` (or the directory for whatever board you want), and run the following commands:
+
 ```bash
 cd boards/arduino-leonardo
 
 # Now you are ready to build your first avr blink example!
-cargo +nightly build --example leonardo-blink
+cargo +nightly-2021-01-07 build --example leonardo-blink
 
 # For some boards, you can even run it directly (this will attempt to flash it
 # onto a connected board):
-cargo +nightly run --example leonardo-blink
+cargo +nightly-2021-01-07 run --example leonardo-blink
 
 # For others, you can find the binary file in
 ls ../../target/avr-atmega32u4/debug/examples/leonardo-blink.elf
