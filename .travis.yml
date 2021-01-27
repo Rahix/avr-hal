@@ -1,6 +1,6 @@
 language: rust
 rust:
-  - nightly
+  - nightly-2021-01-07
 
 cache:
   - cargo
