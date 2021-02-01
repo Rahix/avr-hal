@@ -7,14 +7,14 @@ case "$(uname -s)" in
     *)          OS="Unknown";;
 esac
 
-if ! command -v numfmt &> /dev/null
+if ! command -v numfmt > /dev/null 2>&1
 then
     echo "numfmt is needed for human-readable sizes." >&2
     echo "please install https://command-not-found.com/numfmt" >&2
     alias numfmt=true
 fi
 
-if ! command -v avrdude &> /dev/null
+if ! command -v avrdude > /dev/null 2>&1
 then
     echo "required avrdude could not be found!" >&2
     echo "please install https://command-not-found.com/avrdude" >&2
