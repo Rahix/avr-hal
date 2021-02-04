@@ -82,17 +82,18 @@ pub mod usart {
     use crate::port::portd;
     pub use avr_hal_generic::usart::*;
 
-    avr_hal_generic::impl_usart! {
-        /// Serial interface based on ATmega32U4's USART1 peripheral
-        ///
-        /// Maximum baudrate seems to be 57600
-        pub struct Usart1 {
-            peripheral: crate::pac::USART1,
-            pins: {
-                rx: portd::PD2,
-                tx: portd::PD3,
-            },
-            register_suffix: 1,
-        }
+    /// Serial interface based on ATmega32U4's USART1 peripheral
+    pub type Usart1<CLOCK, IMODE> = Usart<
+        crate::pac::USART1,
+        portd::PD2<crate::port::mode::Input<IMODE>>,
+        portd::PD3<crate::port::mode::Output>,
+        CLOCK,
+    >;
+
+    avr_hal_generic::impl_usart_traditional! {
+        peripheral: crate::pac::USART1,
+        register_suffix: 1,
+        rx: portd::PD2,
+        tx: portd::PD3,
     }
 }

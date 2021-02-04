@@ -44,17 +44,17 @@ pub mod usart {
     use crate::port::portd;
     pub use avr_hal_generic::usart::*;
 
-    avr_hal_generic::impl_usart! {
-        /// Serial interface based on ATmega48P's USART0 peripheral
-        ///
-        /// Maximum baudrate seems to be 57600
-        pub struct Usart0 {
-            peripheral: crate::pac::USART0,
-            pins: {
-                rx: portd::PD0,
-                tx: portd::PD1,
-            },
-            register_suffix: 0,
-        }
+    pub type Usart0<CLOCK, IMODE> = Usart<
+        crate::pac::USART0,
+        portd::PD0<crate::port::mode::Input<IMODE>>,
+        portd::PD1<crate::port::mode::Output>,
+        CLOCK,
+    >;
+
+    avr_hal_generic::impl_usart_traditional! {
+        peripheral: crate::pac::USART0,
+        register_suffix: 0,
+        rx: portd::PD0,
+        tx: portd::PD1,
     }
 }
