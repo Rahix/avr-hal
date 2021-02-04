@@ -162,28 +162,40 @@ pub enum Event {
 /// [`Usart`] API instead of this trait.**
 pub trait UsartOps<RX, TX> {
     /// Enable & initialize this USART peripheral to the given baudrate.
-    fn init<CLOCK>(&mut self, baudrate: Baudrate<CLOCK>);
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_init<CLOCK>(&mut self, baudrate: Baudrate<CLOCK>);
     /// Disable this USART peripheral such that the pins can be used for other purposes again.
-    fn deinit(&mut self);
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_deinit(&mut self);
 
     /// Flush all remaining data in the TX buffer.
     ///
     /// This operation must be non-blocking and return [`nb::Error::WouldBlock`] if not all data
     /// was flushed yet.
-    fn flush(&mut self) -> nb::Result<(), void::Void>;
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_flush(&mut self) -> nb::Result<(), void::Void>;
     /// Write a byte to the TX buffer.
     ///
     /// This operation must be non-blocking and return [`nb::Error::WouldBlock`] until the byte is
     /// enqueued.  The operation should not wait for the byte to have actually been sent.
-    fn write(&mut self, byte: u8) -> nb::Result<(), void::Void>;
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_write(&mut self, byte: u8) -> nb::Result<(), void::Void>;
     /// Read a byte from the RX buffer.
     ///
     /// This operation must be non-blocking and return [`nb::Error::WouldBlock`] if no incoming
     /// byte is available.
-    fn read(&mut self) -> nb::Result<u8, void::Void>;
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_read(&mut self) -> nb::Result<u8, void::Void>;
 
     /// Enable/Disable a certain interrupt.
-    fn interrupt(&mut self, event: Event, state: bool);
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_interrupt(&mut self, event: Event, state: bool);
 }
 
 /// USART/Serial driver
@@ -226,19 +238,19 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
             tx,
             _clock: marker::PhantomData,
         };
-        usart.p.init(baudrate);
+        usart.p.raw_init(baudrate);
         usart
     }
 
     /// Deinitialize/disable this peripheral and release the pins.
     pub fn release(mut self) -> (USART, RX, TX) {
-        self.p.deinit();
+        self.p.raw_deinit();
         (self.p, self.rx, self.tx)
     }
 
     /// Block until all remaining data has been transmitted.
     pub fn flush(&mut self) {
-        nb::block!(self.p.flush()).void_unwrap()
+        nb::block!(self.p.raw_flush()).void_unwrap()
     }
 
     /// Transmit a byte.
@@ -246,24 +258,24 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
     /// This method will block until the byte has been enqueued for transmission but **not** until
     /// it was entirely sent.
     pub fn write_byte(&mut self, byte: u8) {
-        nb::block!(self.p.write(byte)).void_unwrap()
+        nb::block!(self.p.raw_write(byte)).void_unwrap()
     }
 
     /// Receive a byte.
     ///
     /// This method will block until a byte could be received.
     pub fn read_byte(&mut self) -> u8 {
-        nb::block!(self.p.read()).void_unwrap()
+        nb::block!(self.p.raw_read()).void_unwrap()
     }
 
     /// Enable the interrupt for [`Event`].
     pub fn listen(&mut self, event: Event) {
-        self.p.interrupt(event, true);
+        self.p.raw_interrupt(event, true);
     }
 
     /// Disable the interrupt for [`Event`].
     pub fn unlisten(&mut self, event: Event) {
-        self.p.interrupt(event, false);
+        self.p.raw_interrupt(event, false);
     }
 
     /// Split this USART into a [`UsartReader`] and a [`UsartWriter`].
@@ -309,11 +321,11 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
     type Error = void::Void;
 
     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
-        self.p.write(byte)
+        self.p.raw_write(byte)
     }
 
     fn flush(&mut self) -> nb::Result<(), Self::Error> {
-        self.p.flush()
+        self.p.raw_flush()
     }
 }
 
@@ -321,7 +333,7 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8> for Usart<USA
     type Error = void::Void;
 
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
-        self.p.read()
+        self.p.raw_read()
     }
 }
 
@@ -381,7 +393,7 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> ufmt::uWrite for UsartWriter<USART,
 
     fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
         for b in s.as_bytes().iter() {
-            nb::block!(self.p.write(*b)).void_unwrap()
+            nb::block!(self.p.raw_write(*b)).void_unwrap()
         }
         Ok(())
     }
@@ -393,11 +405,11 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
     type Error = void::Void;
 
     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
-        self.p.write(byte)
+        self.p.raw_write(byte)
     }
 
     fn flush(&mut self) -> nb::Result<(), Self::Error> {
-        self.p.flush()
+        self.p.raw_flush()
     }
 }
 
@@ -407,7 +419,7 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
     type Error = void::Void;
 
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
-        self.p.read()
+        self.p.raw_read()
     }
 }
 
@@ -424,7 +436,7 @@ macro_rules! impl_usart_traditional {
                 $rxmod::$RX<$crate::port::mode::Input<$crate::port::mode::Floating>>,
                 $txmod::$TX<$crate::port::mode::Output>,
             > for $USART {
-                fn init<CLOCK>(&mut self, baudrate: $crate::usart::Baudrate<CLOCK>) {
+                fn raw_init<CLOCK>(&mut self, baudrate: $crate::usart::Baudrate<CLOCK>) {
                     self.[<ubrr $n>].write(|w| unsafe { w.bits(baudrate.ubrr) });
                     self.[<ucsr $n a>].write(|w| w.[<u2x $n>]().bit(baudrate.u2x));
 
@@ -444,13 +456,13 @@ macro_rules! impl_usart_traditional {
                     );
                 }
 
-                fn deinit(&mut self) {
+                fn raw_deinit(&mut self) {
                     // Wait for any ongoing transfer to finish.
-                    $crate::nb::block!(self.flush()).ok();
+                    $crate::nb::block!(self.raw_flush()).ok();
                     self.[<ucsr $n b>].reset();
                 }
 
-                fn flush(&mut self) -> $crate::nb::Result<(), $crate::void::Void> {
+                fn raw_flush(&mut self) -> $crate::nb::Result<(), $crate::void::Void> {
                     if self.[<ucsr $n a>].read().[<udre $n>]().bit_is_clear() {
                         Err($crate::nb::Error::WouldBlock)
                     } else {
@@ -458,15 +470,15 @@ macro_rules! impl_usart_traditional {
                     }
                 }
 
-                fn write(&mut self, byte: u8) -> $crate::nb::Result<(), $crate::void::Void> {
+                fn raw_write(&mut self, byte: u8) -> $crate::nb::Result<(), $crate::void::Void> {
                     // Call flush to make sure the data-register is empty
-                    self.flush()?;
+                    self.raw_flush()?;
 
                     self.[<udr $n>].write(|w| unsafe { w.bits(byte) });
                     Ok(())
                 }
 
-                fn read(&mut self) -> $crate::nb::Result<u8, $crate::void::Void> {
+                fn raw_read(&mut self) -> $crate::nb::Result<u8, $crate::void::Void> {
                     if self.[<ucsr $n a>].read().[<rxc $n>]().bit_is_clear() {
                         return Err($crate::nb::Error::WouldBlock);
                     }
@@ -474,7 +486,7 @@ macro_rules! impl_usart_traditional {
                     Ok(self.[<udr $n>].read().bits())
                 }
 
-                fn interrupt(&mut self, event: $crate::usart::Event, state: bool) {
+                fn raw_interrupt(&mut self, event: $crate::usart::Event, state: bool) {
                     match event {
                         $crate::usart::Event::RxComplete =>
                             self.[<ucsr $n b>].modify(|_, w| w.[<rxcie $n>]().bit(state)),
