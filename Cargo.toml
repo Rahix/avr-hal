@@ -24,6 +24,8 @@ members = [
     "chips/atmega48p-hal",
     "chips/attiny85-hal",
     "chips/attiny88-hal",
+    "chips/attiny841-hal",
+    "chips/attiny861-hal",
 
     # The board crates
     "boards/arduino-diecimila",
