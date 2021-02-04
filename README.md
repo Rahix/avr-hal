@@ -15,26 +15,26 @@ You need a nightly Rust compiler for compiling Rust code for AVR.  **Note**: Due
 rustup toolchain install nightly-2021-01-07
 ```
 
-Go into `./boards/arduino-leonardo` (or the directory for whatever board you want), and run the following commands:
+Go into `./boards/arduino-uno` (or the directory for whatever board you want), and run the following commands:
 
 ```bash
-cd boards/arduino-leonardo
+cd boards/arduino-uno
 
 # Now you are ready to build your first avr blink example!
-cargo +nightly-2021-01-07 build --example leonardo-blink
+cargo +nightly-2021-01-07 build --example uno-blink
 
 # For some boards, you can even run it directly (this will attempt to flash it
 # onto a connected board):
-cargo +nightly-2021-01-07 run --example leonardo-blink
+cargo +nightly-2021-01-07 run --example uno-blink
 
 # For others, you can find the binary file in
-ls ../../target/avr-atmega32u4/debug/examples/leonardo-blink.elf
+ls ../../target/avr-atmega328p/debug/examples/uno-blink.elf
 # and e.g. create an ihex file using
-avr-objcopy -S -j .text -j .data -O ihex leonardo-blink.elf leonardo-blink.hex
+avr-objcopy -S -j .text -j .data -O ihex uno-blink.elf uno-blink.hex
 ```
 
 ## Starting your own project
-This is a step-by-step guide for creating a new project targeting Arduino Leonardo (`ATmega32U4`).  You can of course apply the same steps for any other microcontroller.
+This is a step-by-step guide for creating a new project targeting Arduino Uno (`ATmega328P`).  You can of course apply the same steps for any other microcontroller.
 
 1. Start by creating a new project:
    ```bash
@@ -45,11 +45,11 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    ```bash
    rustup override set nightly
    ```
-3. Copy the target description for your MCU (e.g. [`avr-atmega32u4.json`](avr-specs/avr-atmega32u4.json)) into your project.
+3. Copy the target description for your MCU from [`avr-specs/`](./avr-specs) (e.g. [`avr-atmega328p.json`](avr-specs/avr-atmega328p.json)) into your project.
 4. Create a file `.cargo/config.toml` with the following content:
    ```toml
    [build]
-   target = "avr-atmega32u4.json"
+   target = "avr-atmega328p.json"
 
    [unstable]
    build-std = ["core"]
@@ -61,13 +61,13 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    # The `leonardo-panic` example shows a more elaborate version.
    panic-halt = "0.2.0"
 
-   [dependencies.arduino-leonardo]
-   git = "https://github.com/Rahix/avr-hal"
+   [dependencies.arduino-uno]
+   git = "https://github.com/rahix/avr-hal"
    rev = "<insert latest git-commit hash here>"
    # ^- Pin the dependency to a specific version.  You should use the latest
    # commit hash from the avr-hal master branch.  You can find it here:
    #
-   #    https://github.com/Rahix/avr-hal/commits/master
+   #    https://github.com/rahix/avr-hal/commits/master
 
    # Configure the build for minimal size
    [profile.dev]
@@ -91,11 +91,11 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    // Pull in the panic handler from panic-halt
    extern crate panic_halt;
 
-   use arduino_leonardo::prelude::*;
+   use arduino_uno::prelude::*;
 
-   #[arduino_leonardo::entry]
+   #[arduino_uno::entry]
    fn main() -> ! {
-       let dp = arduino_leonardo::Peripherals::take().unwrap();
+       let dp = arduino_uno::Peripherals::take().unwrap();
 
        unimplemented!()
    }
@@ -106,12 +106,12 @@ This is a step-by-step guide for creating a new project targeting Arduino Leonar
    # or
    cargo build --release
    ```
-   and find your binary in `target/avr-atmega32u4/debug/` (or `target/avr-atmega32u4/release`).
+   and find your binary in `target/avr-atmega328p/debug/` (or `target/avr-atmega328p/release`).
 
-8. (**Optional**): To make development as smooth as possible, you can configure a cargo runner for your board.  This repository contains a few example scripts (e.g. [`leonardo-runner.sh`][leonardo-runner], [`uno-runner.sh`][uno-runner]) which you can copy into your project.  You'll then need to add the following section to your `.cargo/config.toml`:
+8. (**Optional**): To make development as smooth as possible, you can configure a cargo runner for your board.  This repository contains a few example scripts (e.g. [`uno-runner.sh`][uno-runner], [`leonardo-runner.sh`][leonardo-runner]) which you can copy into your project.  You'll then need to add the following section to your `.cargo/config.toml`:
    ```toml
    [target.'cfg(target_arch = "avr")']
-   runner = "./leonardo-runner.sh"
+   runner = "./uno-runner.sh"
    ```
    And that's it, now you can build an run your project in a single command!
    ```bash
