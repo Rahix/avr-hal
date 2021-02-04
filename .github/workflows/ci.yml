@@ -1,0 +1,35 @@
+name: Continuous Integration
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  board-ci:
+    name: "Board: ${{ matrix.board }}"
+    strategy:
+      fail-fast: true
+      matrix:
+        board:
+          - arduino-uno
+          - arduino-leonardo
+
+          - arduino-mega2560
+          - bigavr6
+          - trinket
+          - sparkfun-pro-micro
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly-2021-01-07
+          override: true
+          components: rust-src
+      - name: Install avr-gcc, binutils, and libc
+        run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
+      - name: Compile board crate and examples
+        run: cd "boards/${{ matrix.board }}" && cargo build --examples

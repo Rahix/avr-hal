@@ -1,4 +1,4 @@
-avr-hal [![Build Status](https://travis-ci.com/Rahix/avr-hal.svg?branch=master)](https://travis-ci.com/Rahix/avr-hal)
+avr-hal ![Continuous Integration](https://github.com/Rahix/avr-hal/workflows/Continuous%20Integration/badge.svg)
 =======
 `embedded-hal` implementations for AVR microcontrollers.  Based on the register definitions from [`avr-device`](https://github.com/Rahix/avr-device).
 
