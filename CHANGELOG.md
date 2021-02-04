@@ -8,6 +8,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 proper releases yet.  Instead, the CHANGELOG will document changes over time so
 people already using the crates have a reference what is changing upstream.
 
+## [2021-02-01 - 2021-02-07][2021-05]
+### Changed
+- Large refactor of the USART implementation ([#116]).  The user-facing API is
+  _mostly_ the same though there might be some small details which have changed.
+  Especially the user-facing interrupt methods look different now.
+
+### Fixed
+- Removed a bashism in the runner scripts ([#126]).
+
+[#116]: https://github.com/Rahix/avr-hal/pull/116
+[#126]: https://github.com/Rahix/avr-hal/pull/126
+
+
+## [2020-11-30 - 2021-01-31][2021-01]
+### Added
+- A method to reconfigure an SPI peripheral ([#112]).
+
+### Fixed
+- Fixed I2C implementation for ATmega328PB ([#107]).
+- Fixed SPI implementation for ATmega328PB ([#111]).
+
+[#107]: https://github.com/Rahix/avr-hal/pull/107
+[#111]: https://github.com/Rahix/avr-hal/pull/111
+[#112]: https://github.com/Rahix/avr-hal/pull/112
+
+
 ## [2020-11-23 - 2020-11-29][2020-48]
 ### Added
 - An example implementation of the Arduino `millis()` function:
@@ -188,6 +214,8 @@ Please look at the git log for changes before this point :)
 
 
 
+[2021-05]: https://github.com/Rahix/avr-hal/compare/master@%7B2021-01-31%7D...master@%7B2021-02-07%7D
+[2021-01]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-29%7D...master@%7B2021-01-31%7D
 [2020-48]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-22%7D...master@%7B2020-11-29%7D
 [2020-47]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-15%7D...master@%7B2020-11-22%7D
 [2020-46]: https://github.com/Rahix/avr-hal/compare/master@%7B2020-11-08%7D...master@%7B2020-11-15%7D
