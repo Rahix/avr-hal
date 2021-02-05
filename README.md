@@ -41,9 +41,9 @@ This is a step-by-step guide for creating a new project targeting Arduino Uno (`
    cargo new --bin avr-example
    cd avr-example
    ```
-2. If you're using rustup, you probably want to set an override for this directory, to use the nightly toolchain:
+2. If you're using rustup, you probably want to set an override for this directory, to use the nightly toolchain (as mentioned above, use `nightly-2021-01-07` for the time being):
    ```bash
-   rustup override set nightly
+   rustup override set nightly-2021-01-07
    ```
 3. Copy the target description for your MCU from [`avr-specs/`](./avr-specs) (e.g. [`avr-atmega328p.json`](avr-specs/avr-atmega328p.json)) into your project.
 4. Create a file `.cargo/config.toml` with the following content:
