@@ -35,3 +35,9 @@ pub mod prelude {
     pub use void::ResultVoidErrExt as _;
     pub use ufmt::uWrite as _;
 }
+
+// For making certain traits unimplementable from outside this crate.
+mod sealed {
+    pub trait Sealed {}
+}
+pub(crate) use sealed::Sealed;
