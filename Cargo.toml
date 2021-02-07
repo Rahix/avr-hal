@@ -28,6 +28,9 @@ members = [
     # MCU HAL crates
     "mcu/atmega-hal",
 
+    # Higher level crates
+    "arduino-hal",
+
     # The board crates
     "boards/arduino-diecimila",
     "boards/arduino-leonardo",
