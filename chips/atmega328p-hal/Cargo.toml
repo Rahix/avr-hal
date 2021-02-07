@@ -16,4 +16,4 @@ atmega328pb = ["avr-device/atmega328pb", "device-selected"]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-version = "0.2.2"
+version = "0.3"
