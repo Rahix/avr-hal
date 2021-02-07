@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - next
       - wip
   pull_request:
 
@@ -16,11 +17,6 @@ jobs:
         board:
           - arduino-uno
           - arduino-leonardo
-
-          - arduino-mega2560
-          - bigavr6
-          - trinket
-          - sparkfun-pro-micro
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -35,4 +31,4 @@ jobs:
       - name: Install avr-gcc, binutils, and libc
         run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
       - name: Compile board crate and examples
-        run: cd "boards/${{ matrix.board }}" && cargo build --examples
+        run: cd "examples/${{ matrix.board }}" && cargo build --bins
