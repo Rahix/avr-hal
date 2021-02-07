@@ -13,12 +13,19 @@ people already using the crates have a reference what is changing upstream.
 - Large refactor of the USART implementation ([#116]).  The user-facing API is
   _mostly_ the same though there might be some small details which have changed.
   Especially the user-facing interrupt methods look different now.
+- Updated the target specs to be in sync with upstream again.  There were no
+  major changes so it shouldn't be necessary to update downstream copies for now.
+- Upgraded to [`avr-device` 0.3] ([#128]).  As there can only ever be one
+  version of `avr-device` in the dependency graph, you'll need to update all
+  local dependencies which still point to 0.2 as well!
 
 ### Fixed
 - Removed a bashism in the runner scripts ([#126]).
 
 [#116]: https://github.com/Rahix/avr-hal/pull/116
 [#126]: https://github.com/Rahix/avr-hal/pull/126
+[#128]: https://github.com/Rahix/avr-hal/pull/128
+[`avr-device` 0.3]: https://github.com/Rahix/avr-device/releases/tag/v0.3.0
 
 
 ## [2020-11-30 - 2021-01-31][2021-01]
