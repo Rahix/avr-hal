@@ -1,0 +1,28 @@
+[package]
+name = "atmega-hal"
+version = "0.1.0"
+authors = ["Rahix <rahix@rahix.de>"]
+edition = "2018"
+
+[features]
+rt = ["avr-device/rt"]
+device-selected = []
+atmega328p = ["avr-device/atmega328p", "device-selected"]
+atmega328pb = ["avr-device/atmega328pb", "device-selected"]
+
+# Allow certain downstream crates to overwrite the device selection error by themselves.
+disable-device-selection-error = []
+
+[dependencies]
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+
+[dependencies.avr-device]
+version = "0.3"
+
+# Because this crate has its own check that at least one device is selected, we
+# can safely "circumvent" the check in `avr-device`.
+#
+# Why would we want that?  Otherwise, as `avr-device` is compiled first, its
+# error will be shown and ours won't which leads to a degraded user experience
+# as the displayed error message does not really tell what needs to be done...
+features = ["device-selected"]

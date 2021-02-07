@@ -25,6 +25,9 @@ members = [
     "chips/attiny85-hal",
     "chips/attiny88-hal",
 
+    # MCU HAL crates
+    "mcu/atmega-hal",
+
     # The board crates
     "boards/arduino-diecimila",
     "boards/arduino-leonardo",
