@@ -31,6 +31,9 @@ members = [
     # Higher level crates
     "arduino-hal",
 
+    # Examples
+    "examples/arduino-uno",
+
     # The board crates
     "boards/arduino-diecimila",
     "boards/arduino-leonardo",
