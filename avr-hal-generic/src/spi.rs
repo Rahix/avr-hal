@@ -278,13 +278,13 @@ macro_rules! impl_spi {
                     };
                     // set up clock rate control bit
                     match self.settings.clock {
-                        SerialClockRate::OscfOver2 => w.spr().val_0x00(),
-                        SerialClockRate::OscfOver4 => w.spr().val_0x00(),
-                        SerialClockRate::OscfOver8 => w.spr().val_0x01(),
-                        SerialClockRate::OscfOver16 => w.spr().val_0x01(),
-                        SerialClockRate::OscfOver32 => w.spr().val_0x02(),
-                        SerialClockRate::OscfOver64 => w.spr().val_0x02(),
-                        SerialClockRate::OscfOver128 => w.spr().val_0x03(),
+                        SerialClockRate::OscfOver2 => w.spr().fosc_4_2(),
+                        SerialClockRate::OscfOver4 => w.spr().fosc_4_2(),
+                        SerialClockRate::OscfOver8 => w.spr().fosc_16_8(),
+                        SerialClockRate::OscfOver16 => w.spr().fosc_16_8(),
+                        SerialClockRate::OscfOver32 => w.spr().fosc_64_32(),
+                        SerialClockRate::OscfOver64 => w.spr().fosc_64_32(),
+                        SerialClockRate::OscfOver128 => w.spr().fosc_128_64(),
                     }
                 });
                 // set up 2x clock rate status bit
