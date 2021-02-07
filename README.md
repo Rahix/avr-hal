@@ -2,6 +2,11 @@ avr-hal ![Continuous Integration](https://github.com/Rahix/avr-hal/workflows/Con
 =======
 `embedded-hal` implementations for AVR microcontrollers.  Based on the register definitions from [`avr-device`](https://github.com/Rahix/avr-device).
 
+## Warning
+**This branch is currently undergoing a big architectural refactor!  There are many parts still WiP and probably lots of code/crates which cannot compile.**  If you want to work on the future of avr-hal you're in the right place.  If you just want to _use_ avr-hal for a project, please use the "stable" version on the `master` branch instead.
+
+Also note that the following documentation is **not** up to date for the state in this branch!
+
 - [Quickstart](#quickstart)
 - [Starting your own project](#starting-your-own-project)
 - [Repository Structure](#repository-structure)
