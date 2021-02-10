@@ -45,6 +45,7 @@ avr_hal_generic::impl_pwm! {
     /// pb7.enable();
     /// ```
     pub struct Timer0Pwm {
+        type Duty: u8,
         timer: crate::pac::TC0,
         init: |tim, prescaler| {
             tim.tccr0a.modify(|_, w| w.wgm0().pwm_fast());
@@ -95,6 +96,7 @@ avr_hal_generic::impl_pwm! {
     ///
     /// **Note**: For `PB7` the method is called `into_pwm1()`!
     pub struct Timer1Pwm {
+        type Duty: u16,
         timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a.modify(|_, w| w.wgm1().bits(0b01));
@@ -152,6 +154,7 @@ avr_hal_generic::impl_pwm! {
     /// pc6.enable();
     /// ```
     pub struct Timer3Pwm {
+        type Duty: u16,
         timer: crate::pac::TC3,
         init: |tim, prescaler| {
             tim.tccr3a.modify(|_, w| w.wgm3().bits(0b01));
@@ -199,6 +202,7 @@ avr_hal_generic::impl_pwm! {
     ///
     /// **Note**: For `PB6` the method is called `into_pwm6()`!
     pub struct Timer4Pwm {
+        type Duty: u8,
         timer: crate::pac::TC4,
         init: |tim, prescaler| {
             tim.tccr4b.modify(|_, w| match prescaler {

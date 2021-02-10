@@ -36,6 +36,7 @@ macro_rules! impl_pwm {
     (
         $(#[$timer_pwm_attr:meta])*
         pub struct $TimerPwm:ident {
+            type Duty: $Duty:ty,
             timer: $TIMER:ty,
             init: |$init_timer:ident, $prescaler:ident| $init_block:block,
             pins: {$(
@@ -76,7 +77,7 @@ macro_rules! impl_pwm {
             }
 
             impl $crate::hal::PwmPin for $port::$PXi<$crate::port::mode::Pwm<$TimerPwm>> {
-                type Duty = u8;
+                type Duty = $Duty;
 
                 fn enable(&mut self) {
                     // SAFETY: This block will usually result in a read-modify-write sequence which
@@ -103,7 +104,7 @@ macro_rules! impl_pwm {
                 }
 
                 fn get_max_duty(&self) -> Self::Duty {
-                    u8::MAX
+                    Self::Duty::MAX
                 }
 
                 fn set_duty(&mut self, duty: Self::Duty) {
