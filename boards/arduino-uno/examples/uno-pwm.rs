@@ -21,7 +21,7 @@ fn main() -> ! {
     loop {
         for i in 0..=255u16 {
             let duty: u16 = i * i / 256;
-            pin.set_duty(duty as u8);
+            pin.set_duty(duty);
             arduino_uno::delay_ms(10);
         }
     }
