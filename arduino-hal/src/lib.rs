@@ -65,6 +65,8 @@ pub struct Peripherals {
     pub pins: Pins,
     #[cfg(feature = "arduino-uno")]
     pub USART0: hal::RawPeripheral<pac::USART0>,
+    #[cfg(feature = "arduino-leonardo")]
+    pub USART1: hal::RawPeripheral<pac::USART1>,
 }
 
 #[cfg(feature = "board-selected")]
@@ -73,8 +75,11 @@ impl Peripherals {
         Self {
             #[cfg(feature = "atmega-hal")]
             pins: Pins::with_mcu_pins(dp.pins),
+
             #[cfg(feature = "arduino-uno")]
             USART0: dp.USART0,
+            #[cfg(feature = "arduino-leonardo")]
+            USART1: dp.USART1,
         }
     }
 
