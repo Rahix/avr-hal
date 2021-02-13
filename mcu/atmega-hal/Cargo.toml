@@ -10,6 +10,7 @@ device-selected = []
 atmega328p = ["avr-device/atmega328p", "device-selected"]
 atmega328pb = ["avr-device/atmega328pb", "device-selected"]
 atmega32u4 = ["avr-device/atmega32u4", "device-selected"]
+atmega2560 = ["avr-device/atmega2560", "device-selected"]
 
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []

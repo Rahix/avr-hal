@@ -10,9 +10,14 @@ compile_error!(
     Please select one of the following
 
     * atmega328p
+    * atmega32u4
+    * atmega2560
     "
 );
 
+/// Reexport of `atmega2560` from `avr-device`
+#[cfg(feature = "atmega2560")]
+pub use avr_device::atmega2560 as pac;
 /// Reexport of `atmega328p` from `avr-device`
 #[cfg(feature = "atmega328p")]
 pub use avr_device::atmega328p as pac;
@@ -47,6 +52,14 @@ pub struct Peripherals {
     pub USART0: RawPeripheral<pac::USART0>,
     #[cfg(feature = "atmega32u4")]
     pub USART1: RawPeripheral<pac::USART1>,
+    #[cfg(feature = "atmega2560")]
+    pub USART0: RawPeripheral<pac::USART0>,
+    #[cfg(feature = "atmega2560")]
+    pub USART1: RawPeripheral<pac::USART1>,
+    #[cfg(feature = "atmega2560")]
+    pub USART2: RawPeripheral<pac::USART2>,
+    #[cfg(feature = "atmega2560")]
+    pub USART3: RawPeripheral<pac::USART3>,
 }
 
 #[cfg(feature = "device-selected")]
@@ -57,11 +70,24 @@ impl Peripherals {
             pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD),
             #[cfg(feature = "atmega32u4")]
             pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF),
+            #[cfg(feature = "atmega2560")]
+            pins: Pins::new(
+                dp.PORTA, dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF, dp.PORTG, dp.PORTH,
+                dp.PORTJ, dp.PORTK, dp.PORTL,
+            ),
 
             #[cfg(feature = "atmega328p")]
             USART0: RawPeripheral(dp.USART0),
             #[cfg(feature = "atmega32u4")]
             USART1: RawPeripheral(dp.USART1),
+            #[cfg(feature = "atmega2560")]
+            USART0: RawPeripheral(dp.USART0),
+            #[cfg(feature = "atmega2560")]
+            USART1: RawPeripheral(dp.USART1),
+            #[cfg(feature = "atmega2560")]
+            USART2: RawPeripheral(dp.USART2),
+            #[cfg(feature = "atmega2560")]
+            USART3: RawPeripheral(dp.USART3),
         }
     }
 
