@@ -16,6 +16,9 @@ compile_error!(
 /// Reexport of `atmega328p` from `avr-device`
 #[cfg(feature = "atmega328p")]
 pub use avr_device::atmega328p as pac;
+/// Reexport of `atmega32u4` from `avr-device`
+#[cfg(feature = "atmega32u4")]
+pub use avr_device::atmega32u4 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -42,6 +45,8 @@ pub struct Peripherals {
     pub pins: Pins,
     #[cfg(feature = "atmega328p")]
     pub USART0: RawPeripheral<pac::USART0>,
+    #[cfg(feature = "atmega32u4")]
+    pub USART1: RawPeripheral<pac::USART1>,
 }
 
 #[cfg(feature = "device-selected")]
@@ -50,8 +55,13 @@ impl Peripherals {
         Self {
             #[cfg(feature = "atmega328p")]
             pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD),
+            #[cfg(feature = "atmega32u4")]
+            pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF),
+
             #[cfg(feature = "atmega328p")]
             USART0: RawPeripheral(dp.USART0),
+            #[cfg(feature = "atmega32u4")]
+            USART1: RawPeripheral(dp.USART1),
         }
     }
 
