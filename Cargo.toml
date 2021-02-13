@@ -32,6 +32,7 @@ members = [
     "arduino-hal",
 
     # Examples
+    "examples/arduino-leonardo",
     "examples/arduino-uno",
 
     # The board crates
