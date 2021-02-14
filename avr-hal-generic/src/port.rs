@@ -771,6 +771,7 @@ macro_rules! impl_port_traditional {
 #[macro_export]
 macro_rules! impl_port_new {
     (
+        init: |$portmux_var:ident, $clkctrl_var:ident,$cpu_var:ident| $init:block,
         enum Ports {
             $($PortName:ident: $Port:ty,)+
         }
@@ -793,8 +794,15 @@ macro_rules! impl_port_new {
 
         impl Pins {
             pub fn new(
+                portmux: &crate::pac::PORTMUX,
+                clkctrl: &crate::pac::CLKCTRL,
+                cpu: &crate::pac::CPU,
                 $(_: $Port,)+
             ) -> Self {
+                let $portmux_var = portmux;
+                let $clkctrl_var = clkctrl;
+                let $cpu_var = cpu;
+                $init;
                 Self {
                     $($pin: $crate::port::Pin::new(
                         $Pin { _private: (), }

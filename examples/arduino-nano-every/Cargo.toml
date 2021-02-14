@@ -11,6 +11,14 @@ ufmt = "0.1.0"
 nb = "0.1.2"
 embedded-hal = "0.2.3"
 
+
+[dependencies.arduino-hal]
+path = "../../arduino-hal/"
+features = ["nano-every"]
+
 [dependencies.atxmega-hal]
-path = "../../mcu/atxmega-hal/"
-features = ["atmega4809", "rt"]
+path = "../../mcu/atxmega-hal"
+
+
+[dependencies.avr-device]
+path = "../../../avr-device"

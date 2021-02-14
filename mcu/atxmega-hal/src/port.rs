@@ -1,5 +1,20 @@
+use avr_device::atmega4809::clkctrl;
+use avr_hal_generic::port;
+
+fn init(portmux: &crate::pac::PORTMUX, clkctrl: &crate::pac::CLKCTRL, cpu: &crate::pac::CPU) {
+    portmux.usartroutea.write(|w| w.usart1().alt1().usart3().alt1());
+      // PORTMUX setting for TCA -> all outputs [0:2] point to PORTB pins [0:2] timer
+    portmux.tcaroutea.write(|w|w.tca0().portb());
+
+    portmux.tcbroutea.write(|w|w.tcb0().set_bit().tcb1().set_bit());
+
+    cpu.ccp.write(|w|w.ccp().ioreg());
+    clkctrl.mclkctrlb.write(|w|w.pen().clear_bit());
+}
+
 #[cfg(feature = "atmega4809")]
 avr_hal_generic::impl_port_new! {
+    init: |portmux,clkctrl,cpu|{init(portmux,clkctrl, cpu)},
     enum Ports {
         PORTA: crate::pac::PORTA,
         PORTB: crate::pac::PORTB,
