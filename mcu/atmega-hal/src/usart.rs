@@ -17,14 +17,14 @@ avr_hal_generic::impl_usart_traditional! {
     tx: port::PD1,
 }
 
-#[cfg(feature = "atmega32u4")]
+#[cfg(feature = "atmega32u4", feature = "atmega2560")]
 pub type Usart1<CLOCK, IMODE> = Usart<
     crate::RawPeripheral<crate::pac::USART1>,
     port::Pin<port::mode::Input<IMODE>, port::PD2>,
     port::Pin<port::mode::Output, port::PD3>,
     CLOCK,
 >;
-#[cfg(feature = "atmega32u4")]
+#[cfg(feature = "atmega32u4", feature = "atmega2560")]
 avr_hal_generic::impl_usart_traditional! {
     peripheral: crate::RawPeripheral<crate::pac::USART1>,
     register_suffix: 1,
@@ -45,21 +45,6 @@ avr_hal_generic::impl_usart_traditional! {
     register_suffix: 0,
     rx: port::PE0,
     tx: port::PE1,
-}
-
-#[cfg(feature = "atmega2560")]
-pub type Usart1<CLOCK, IMODE> = Usart<
-    crate::RawPeripheral<crate::pac::USART1>,
-    port::Pin<port::mode::Input<IMODE>, port::PD2>,
-    port::Pin<port::mode::Output, port::PD3>,
-    CLOCK,
->;
-#[cfg(feature = "atmega2560")]
-avr_hal_generic::impl_usart_traditional! {
-    peripheral: crate::RawPeripheral<crate::pac::USART1>,
-    register_suffix: 1,
-    rx: port::PD2,
-    tx: port::PD3,
 }
 
 #[cfg(feature = "atmega2560")]

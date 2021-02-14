@@ -48,13 +48,9 @@ pub struct RawPeripheral<P>(pub(crate) P);
 #[cfg(feature = "device-selected")]
 pub struct Peripherals {
     pub pins: Pins,
-    #[cfg(feature = "atmega328p")]
+    #[cfg(any(feature = "atmega328p", feature = "atmega2560")]
     pub USART0: RawPeripheral<pac::USART0>,
-    #[cfg(feature = "atmega32u4")]
-    pub USART1: RawPeripheral<pac::USART1>,
-    #[cfg(feature = "atmega2560")]
-    pub USART0: RawPeripheral<pac::USART0>,
-    #[cfg(feature = "atmega2560")]
+    #[cfg(any(feature = "atmega32u4", feature = "atmega2560")]
     pub USART1: RawPeripheral<pac::USART1>,
     #[cfg(feature = "atmega2560")]
     pub USART2: RawPeripheral<pac::USART2>,
@@ -76,13 +72,9 @@ impl Peripherals {
                 dp.PORTJ, dp.PORTK, dp.PORTL,
             ),
 
-            #[cfg(feature = "atmega328p")]
+            #[cfg(any(feature = "atmega328p", feature = "atmega2560"))]
             USART0: RawPeripheral(dp.USART0),
-            #[cfg(feature = "atmega32u4")]
-            USART1: RawPeripheral(dp.USART1),
-            #[cfg(feature = "atmega2560")]
-            USART0: RawPeripheral(dp.USART0),
-            #[cfg(feature = "atmega2560")]
+            #[cfg(any(feature = "atmega32u4", feature = "atmega2560"))]
             USART1: RawPeripheral(dp.USART1),
             #[cfg(feature = "atmega2560")]
             USART2: RawPeripheral(dp.USART2),
