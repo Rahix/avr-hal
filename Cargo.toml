@@ -28,6 +28,7 @@ members = [
     "examples/arduino-leonardo",
     "examples/arduino-mega2560",
     "examples/arduino-nano",
+    "examples/arduino-nano-every",
     "examples/arduino-uno",
     "examples/nano168",
     "examples/sparkfun-promicro",
