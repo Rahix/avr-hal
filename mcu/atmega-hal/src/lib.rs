@@ -48,9 +48,9 @@ pub struct RawPeripheral<P>(pub(crate) P);
 #[cfg(feature = "device-selected")]
 pub struct Peripherals {
     pub pins: Pins,
-    #[cfg(any(feature = "atmega328p", feature = "atmega2560")]
+    #[cfg(any(feature = "atmega328p", feature = "atmega2560"))]
     pub USART0: RawPeripheral<pac::USART0>,
-    #[cfg(any(feature = "atmega32u4", feature = "atmega2560")]
+    #[cfg(any(feature = "atmega32u4", feature = "atmega2560"))]
     pub USART1: RawPeripheral<pac::USART1>,
     #[cfg(feature = "atmega2560")]
     pub USART2: RawPeripheral<pac::USART2>,
