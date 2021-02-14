@@ -80,8 +80,8 @@ avr_hal_generic::impl_usart_traditional! {
 #[cfg(feature = "atmega2560")]
 pub type Usart3<CLOCK, IMODE> = Usart<
     crate::RawPeripheral<crate::pac::USART3>,
-    port::Pin<port::mode::Input<IMODE>, port::PH0>,
-    port::Pin<port::mode::Output, port::PH1>,
+    port::Pin<port::mode::Input<IMODE>, port::PJ0>,
+    port::Pin<port::mode::Output, port::PJ1>,
     CLOCK,
 >;
 #[cfg(feature = "atmega2560")]
@@ -91,4 +91,3 @@ avr_hal_generic::impl_usart_traditional! {
     rx: port::PJ0,
     tx: port::PJ1,
 }
-
