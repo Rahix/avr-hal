@@ -27,12 +27,14 @@ members = [
 
     # MCU HAL crates
     "mcu/atmega-hal",
+    "mcu/atxmega-hal",
 
     # Higher level crates
     "arduino-hal",
 
     # Examples
     "examples/arduino-leonardo",
+    "examples/arduino-nano-every",
     "examples/arduino-uno",
 
     # The board crates
