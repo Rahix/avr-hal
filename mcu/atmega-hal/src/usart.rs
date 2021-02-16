@@ -1,6 +1,6 @@
-pub use avr_hal_generic::usart::*;
 #[allow(unused_imports)]
 use crate::port;
+pub use avr_hal_generic::usart::*;
 
 #[cfg(feature = "atmega328p")]
 pub type Usart0<CLOCK, IMODE> = Usart<
@@ -72,7 +72,7 @@ pub type Usart3<CLOCK, IMODE> = Usart<
 #[cfg(feature = "atmega2560")]
 avr_hal_generic::impl_usart_traditional! {
     peripheral: crate::RawPeripheral<crate::pac::USART3>,
-    register_suffix: 2,
+    register_suffix: 3,
     rx: port::PJ0,
     tx: port::PJ1,
 }
