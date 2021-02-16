@@ -1,8 +1,10 @@
 pub use avr_hal_generic::clock::*;
 
 pub(crate) mod default {
-    #[cfg(feature = "arduino-uno")]
-    pub type DefaultClock = avr_hal_generic::clock::MHz16;
-    #[cfg(feature = "arduino-leonardo")]
+    #[cfg(any(
+        feature = "arduino-uno",
+        feature = "arduino-leonardo",
+        feature = "arduino-mega"
+    ))]
     pub type DefaultClock = avr_hal_generic::clock::MHz16;
 }

@@ -7,6 +7,8 @@ compile_error!(
     Please select one of the following
 
     * arduino-uno
+    * arduino-leonardo
+    * arduino-mega
     "
 );
 
@@ -63,10 +65,14 @@ pub mod prelude {
 #[cfg(feature = "board-selected")]
 pub struct Peripherals {
     pub pins: Pins,
-    #[cfg(feature = "arduino-uno")]
+    #[cfg(any(feature = "arduino-uno", feature = "arduino-mega"))]
     pub USART0: hal::RawPeripheral<pac::USART0>,
-    #[cfg(feature = "arduino-leonardo")]
+    #[cfg(any(feature = "arduino-leonardo", feature = "arduino-mega"))]
     pub USART1: hal::RawPeripheral<pac::USART1>,
+    #[cfg(feature = "arduino-mega")]
+    pub USART2: hal::RawPeripheral<pac::USART2>,
+    #[cfg(feature = "arduino-mega")]
+    pub USART3: hal::RawPeripheral<pac::USART3>,
 }
 
 #[cfg(feature = "board-selected")]
@@ -76,10 +82,14 @@ impl Peripherals {
             #[cfg(feature = "atmega-hal")]
             pins: Pins::with_mcu_pins(dp.pins),
 
-            #[cfg(feature = "arduino-uno")]
+            #[cfg(any(feature = "arduino-uno", feature = "arduino-mega"))]
             USART0: dp.USART0,
-            #[cfg(feature = "arduino-leonardo")]
+            #[cfg(any(feature = "arduino-leonardo", feature = "arduino-mega"))]
             USART1: dp.USART1,
+            #[cfg(feature = "arduino-mega")]
+            USART2: dp.USART2,
+            #[cfg(feature = "arduino-mega")]
+            USART3: dp.USART3,
         }
     }
 

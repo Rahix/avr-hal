@@ -6,3 +6,7 @@ pub use leonardo::*;
 mod uno;
 #[cfg(feature = "arduino-uno")]
 pub use uno::*;
+#[cfg(feature = "arduino-uno")]
+mod mega;
+#[cfg(feature = "arduino-mega")]
+pub use mega::*;

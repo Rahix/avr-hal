@@ -12,6 +12,7 @@ board-selected = []
 mcu-atmega=[]
 arduino-uno = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
 arduino-leonardo = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
+arduino-mega = ["mcu-atmega", "atmega-hal/atmega2560", "board-selected"]
 
 [dependencies]
 cfg-if = "1"
