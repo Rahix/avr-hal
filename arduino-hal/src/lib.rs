@@ -47,6 +47,7 @@ pub mod usart {
 #[cfg(feature = "board-selected")]
 pub use usart::Usart;
 
+#[cfg(feature = "board-selected")]
 pub mod prelude {
     cfg_if::cfg_if! {
         if #[cfg(feature = "arduino-uno")] {
