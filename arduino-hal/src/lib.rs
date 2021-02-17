@@ -8,7 +8,7 @@ compile_error!(
 
     * arduino-uno
     * arduino-leonardo
-    * arduino-mega
+    * arduino-mega2560
     "
 );
 
@@ -56,22 +56,22 @@ pub mod prelude {
         }
     }
 
-    pub use void::ResultVoidExt as _;
-    pub use void::ResultVoidErrExt as _;
     pub use ufmt::uWrite as _;
+    pub use void::ResultVoidErrExt as _;
+    pub use void::ResultVoidExt as _;
 }
 
 #[allow(non_snake_case)]
 #[cfg(feature = "board-selected")]
 pub struct Peripherals {
     pub pins: Pins,
-    #[cfg(any(feature = "arduino-uno", feature = "arduino-mega"))]
+    #[cfg(any(feature = "arduino-uno", feature = "arduino-mega2560"))]
     pub USART0: hal::RawPeripheral<pac::USART0>,
-    #[cfg(any(feature = "arduino-leonardo", feature = "arduino-mega"))]
+    #[cfg(any(feature = "arduino-leonardo", feature = "arduino-mega2560"))]
     pub USART1: hal::RawPeripheral<pac::USART1>,
-    #[cfg(feature = "arduino-mega")]
+    #[cfg(feature = "arduino-mega2560")]
     pub USART2: hal::RawPeripheral<pac::USART2>,
-    #[cfg(feature = "arduino-mega")]
+    #[cfg(feature = "arduino-mega2560")]
     pub USART3: hal::RawPeripheral<pac::USART3>,
 }
 
@@ -82,13 +82,13 @@ impl Peripherals {
             #[cfg(feature = "atmega-hal")]
             pins: Pins::with_mcu_pins(dp.pins),
 
-            #[cfg(any(feature = "arduino-uno", feature = "arduino-mega"))]
+            #[cfg(any(feature = "arduino-uno", feature = "arduino-mega2560"))]
             USART0: dp.USART0,
-            #[cfg(any(feature = "arduino-leonardo", feature = "arduino-mega"))]
+            #[cfg(any(feature = "arduino-leonardo", feature = "arduino-mega2560"))]
             USART1: dp.USART1,
-            #[cfg(feature = "arduino-mega")]
+            #[cfg(feature = "arduino-mega2560")]
             USART2: dp.USART2,
-            #[cfg(feature = "arduino-mega")]
+            #[cfg(feature = "arduino-mega2560")]
             USART3: dp.USART3,
         }
     }
