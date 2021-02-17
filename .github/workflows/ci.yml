@@ -17,6 +17,7 @@ jobs:
         board:
           - arduino-uno
           - arduino-leonardo
+          - arduino-mega2560
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

@@ -34,6 +34,7 @@ members = [
     # Examples
     "examples/arduino-leonardo",
     "examples/arduino-uno",
+    "examples/arduino-mega2560",
 
     # The board crates
     "boards/arduino-diecimila",

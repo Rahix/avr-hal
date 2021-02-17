@@ -7,6 +7,6 @@ mod uno;
 #[cfg(feature = "arduino-uno")]
 pub use uno::*;
 #[cfg(feature = "arduino-mega2560")]
-mod mega;
+mod mega2560;
 #[cfg(feature = "arduino-mega2560")]
-pub use mega::*;
+pub use mega2560::*;
