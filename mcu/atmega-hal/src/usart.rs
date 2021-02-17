@@ -1,6 +1,6 @@
-pub use avr_hal_generic::usart::*;
 #[allow(unused_imports)]
 use crate::port;
+pub use avr_hal_generic::usart::*;
 
 #[cfg(feature = "atmega328p")]
 pub type Usart0<CLOCK, IMODE> = Usart<
