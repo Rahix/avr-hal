@@ -33,3 +33,24 @@ jobs:
         run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
       - name: Compile board crate and examples
         run: cd "examples/${{ matrix.board }}" && cargo build --bins
+  mcu-ci:
+    name: "MCU: ${{ matrix.mcu.name }}"
+    strategy:
+      fail-fast: true
+      matrix:
+        mcu:
+          - name: atmega1280
+            crate: atmega-hal
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly-2021-01-07
+          override: true
+          components: rust-src
+      - name: Test-compile HAL crate for an MCU
+        run: cd "mcu/${{ matrix.mcu.crate }}" && cargo build --features "${{ matrix.mcu.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.mcu.name }}.json"
