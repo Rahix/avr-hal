@@ -73,7 +73,7 @@ avr_hal_generic::impl_port_traditional! {
     }
 }
 
-#[cfg(feature = "atmega2560")]
+#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {
         PORTA: (crate::pac::PORTA, porta, pina, ddra),
