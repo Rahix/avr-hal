@@ -9,6 +9,7 @@ compile_error!(
 
     Please select one of the following
 
+    * atmega168
     * atmega328p
     * atmega32u4
     * atmega1280
@@ -19,6 +20,9 @@ compile_error!(
 /// Reexport of `atmega1280` from `avr-device`
 #[cfg(feature = "atmega1280")]
 pub use avr_device::atmega1280 as pac;
+/// Reexport of `atmega168` from `avr-device`
+#[cfg(feature = "atmega168")]
+pub use avr_device::atmega168 as pac;
 /// Reexport of `atmega2560` from `avr-device`
 #[cfg(feature = "atmega2560")]
 pub use avr_device::atmega2560 as pac;
@@ -52,7 +56,12 @@ pub struct RawPeripheral<P>(pub(crate) P);
 #[cfg(feature = "device-selected")]
 pub struct Peripherals {
     pub pins: Pins,
-    #[cfg(any(feature = "atmega328p", feature = "atmega1280", feature = "atmega2560"))]
+    #[cfg(any(
+        feature = "atmega168",
+        feature = "atmega328p",
+        feature = "atmega1280",
+        feature = "atmega2560"
+    ))]
     pub USART0: RawPeripheral<pac::USART0>,
     #[cfg(any(feature = "atmega32u4", feature = "atmega1280", feature = "atmega2560"))]
     pub USART1: RawPeripheral<pac::USART1>,
@@ -66,7 +75,7 @@ pub struct Peripherals {
 impl Peripherals {
     fn new(dp: pac::Peripherals) -> Self {
         Self {
-            #[cfg(feature = "atmega328p")]
+            #[cfg(any(feature = "atmega168", feature = "atmega328p"))]
             pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD),
             #[cfg(feature = "atmega32u4")]
             pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF),
@@ -76,7 +85,12 @@ impl Peripherals {
                 dp.PORTJ, dp.PORTK, dp.PORTL,
             ),
 
-            #[cfg(any(feature = "atmega328p", feature = "atmega1280", feature = "atmega2560"))]
+            #[cfg(any(
+                feature = "atmega168",
+                feature = "atmega328p",
+                feature = "atmega1280",
+                feature = "atmega2560"
+            ))]
             USART0: RawPeripheral(dp.USART0),
             #[cfg(any(feature = "atmega32u4", feature = "atmega1280", feature = "atmega2560"))]
             USART1: RawPeripheral(dp.USART1),

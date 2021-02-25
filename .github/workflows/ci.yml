@@ -40,6 +40,7 @@ jobs:
       matrix:
         mcu:
           - name: atmega1280
+          - name: atmega168
             crate: atmega-hal
     runs-on: ubuntu-latest
     steps:
