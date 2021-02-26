@@ -41,9 +41,9 @@ avr_hal_generic::impl_board_pins! {
         pub a4: portc::pc4::PC4,
         /// `A5`
         ///
-        /// ADC5 (ADC input channel 5)
-        /// SCL (2-wire serial bus clock line)
-        /// PCINT13 (pin change interrupt 13)
+        /// * ADC5 (ADC input channel 5)
+        /// * SCL (2-wire serial bus clock line)
+        /// * PCINT13 (pin change interrupt 13)
         pub a5: portc::pc5::PC5,
 
         /// `D0` / `RX`
