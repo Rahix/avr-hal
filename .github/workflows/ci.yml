@@ -41,6 +41,8 @@ jobs:
         mcu:
           - name: atmega1280
             crate: atmega-hal
+          - name: atmega168
+            crate: atmega-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
