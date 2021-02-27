@@ -43,6 +43,8 @@ jobs:
             crate: atmega-hal
           - name: atmega168
             crate: atmega-hal
+          - name: atmega328pb
+            crate: atmega-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

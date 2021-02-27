@@ -2,19 +2,34 @@
 use crate::port;
 pub use avr_hal_generic::usart::*;
 
-#[cfg(any(feature = "atmega168", feature = "atmega328p"))]
+#[cfg(any(feature = "atmega168", feature = "atmega328p", feature = "atmega328pb"))]
 pub type Usart0<CLOCK, IMODE> = Usart<
     crate::RawPeripheral<crate::pac::USART0>,
     port::Pin<port::mode::Input<IMODE>, port::PD0>,
     port::Pin<port::mode::Output, port::PD1>,
     CLOCK,
 >;
-#[cfg(any(feature = "atmega168", feature = "atmega328p"))]
+#[cfg(any(feature = "atmega168", feature = "atmega328p", feature = "atmega328pb"))]
 avr_hal_generic::impl_usart_traditional! {
     peripheral: crate::RawPeripheral<crate::pac::USART0>,
     register_suffix: 0,
     rx: port::PD0,
     tx: port::PD1,
+}
+
+#[cfg(feature = "atmega328pb")]
+pub type Usart1<CLOCK, IMODE> = Usart<
+    crate::RawPeripheral<crate::pac::USART1>,
+    port::Pin<port::mode::Input<IMODE>, port::PB4>,
+    port::Pin<port::mode::Output, port::PB3>,
+    CLOCK,
+>;
+#[cfg(feature = "atmega328pb")]
+avr_hal_generic::impl_usart_traditional! {
+    peripheral: crate::RawPeripheral<crate::pac::USART1>,
+    register_suffix: 1,
+    rx: port::PB4,
+    tx: port::PB3,
 }
 
 #[cfg(any(feature = "atmega32u4", feature = "atmega1280", feature = "atmega2560"))]
