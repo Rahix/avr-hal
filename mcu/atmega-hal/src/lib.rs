@@ -11,6 +11,7 @@ compile_error!(
 
     * atmega168
     * atmega328p
+    * atmega328pb
     * atmega32u4
     * atmega1280
     * atmega2560
@@ -29,6 +30,9 @@ pub use avr_device::atmega2560 as pac;
 /// Reexport of `atmega328p` from `avr-device`
 #[cfg(feature = "atmega328p")]
 pub use avr_device::atmega328p as pac;
+/// Reexport of `atmega328pb` from `avr-device`
+#[cfg(feature = "atmega328pb")]
+pub use avr_device::atmega328pb as pac;
 /// Reexport of `atmega32u4` from `avr-device`
 #[cfg(feature = "atmega32u4")]
 pub use avr_device::atmega32u4 as pac;
@@ -59,11 +63,17 @@ pub struct Peripherals {
     #[cfg(any(
         feature = "atmega168",
         feature = "atmega328p",
+        feature = "atmega328pb",
         feature = "atmega1280",
         feature = "atmega2560"
     ))]
     pub USART0: RawPeripheral<pac::USART0>,
-    #[cfg(any(feature = "atmega32u4", feature = "atmega1280", feature = "atmega2560"))]
+    #[cfg(any(
+        feature = "atmega328pb",
+        feature = "atmega32u4",
+        feature = "atmega1280",
+        feature = "atmega2560"
+    ))]
     pub USART1: RawPeripheral<pac::USART1>,
     #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
     pub USART2: RawPeripheral<pac::USART2>,
@@ -77,6 +87,8 @@ impl Peripherals {
         Self {
             #[cfg(any(feature = "atmega168", feature = "atmega328p"))]
             pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD),
+            #[cfg(feature = "atmega328pb")]
+            pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE),
             #[cfg(feature = "atmega32u4")]
             pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF),
             #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
@@ -88,11 +100,17 @@ impl Peripherals {
             #[cfg(any(
                 feature = "atmega168",
                 feature = "atmega328p",
+                feature = "atmega328pb",
                 feature = "atmega1280",
                 feature = "atmega2560"
             ))]
             USART0: RawPeripheral(dp.USART0),
-            #[cfg(any(feature = "atmega32u4", feature = "atmega1280", feature = "atmega2560"))]
+            #[cfg(any(
+                feature = "atmega328pb",
+                feature = "atmega32u4",
+                feature = "atmega1280",
+                feature = "atmega2560"
+            ))]
             USART1: RawPeripheral(dp.USART1),
             #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
             USART2: RawPeripheral(dp.USART2),

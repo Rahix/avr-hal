@@ -40,8 +40,13 @@ jobs:
       matrix:
         mcu:
           - name: atmega1280
+            spec: atmega1280
             crate: atmega-hal
           - name: atmega168
+            spec: atmega168
+            crate: atmega-hal
+          - name: atmega328pb
+            spec: atmega328p
             crate: atmega-hal
     runs-on: ubuntu-latest
     steps:
@@ -55,4 +60,4 @@ jobs:
           override: true
           components: rust-src
       - name: Test-compile HAL crate for an MCU
-        run: cd "mcu/${{ matrix.mcu.crate }}" && cargo build --features "${{ matrix.mcu.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.mcu.name }}.json"
+        run: cd "mcu/${{ matrix.mcu.crate }}" && cargo build --features "${{ matrix.mcu.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.mcu.spec }}.json"
