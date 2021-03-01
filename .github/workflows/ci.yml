@@ -48,6 +48,9 @@ jobs:
           - name: atmega328pb
             spec: atmega328p
             crate: atmega-hal
+          - name: atmega48p
+            spec: atmega48p
+            crate: atmega-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

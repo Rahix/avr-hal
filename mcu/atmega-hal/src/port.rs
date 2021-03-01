@@ -1,4 +1,4 @@
-#[cfg(any(feature = "atmega168", feature = "atmega328p"))]
+#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {
         PORTB: (crate::pac::PORTB, portb, pinb, ddrb),

@@ -9,6 +9,7 @@ compile_error!(
 
     Please select one of the following
 
+    * atmega48p
     * atmega168
     * atmega328p
     * atmega328pb
@@ -36,6 +37,9 @@ pub use avr_device::atmega328pb as pac;
 /// Reexport of `atmega32u4` from `avr-device`
 #[cfg(feature = "atmega32u4")]
 pub use avr_device::atmega32u4 as pac;
+/// Reexport of `atmega48p` from `avr-device`
+#[cfg(feature = "atmega48p")]
+pub use avr_device::atmega48p as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -61,6 +65,7 @@ pub struct RawPeripheral<P>(pub(crate) P);
 pub struct Peripherals {
     pub pins: Pins,
     #[cfg(any(
+        feature = "atmega48p",
         feature = "atmega168",
         feature = "atmega328p",
         feature = "atmega328pb",
@@ -85,7 +90,7 @@ pub struct Peripherals {
 impl Peripherals {
     fn new(dp: pac::Peripherals) -> Self {
         Self {
-            #[cfg(any(feature = "atmega168", feature = "atmega328p"))]
+            #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
             pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD),
             #[cfg(feature = "atmega328pb")]
             pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE),
@@ -98,6 +103,7 @@ impl Peripherals {
             ),
 
             #[cfg(any(
+                feature = "atmega48p",
                 feature = "atmega168",
                 feature = "atmega328p",
                 feature = "atmega328pb",
