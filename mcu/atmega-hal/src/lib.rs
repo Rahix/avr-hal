@@ -45,6 +45,9 @@ pub use avr_device::atmega48p as pac;
 #[cfg(feature = "rt")]
 pub use avr_device::entry;
 
+#[cfg(feature = "device-selected")]
+pub use pac::Peripherals;
+
 pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
 
@@ -60,72 +63,34 @@ pub use usart::Usart;
 
 pub struct RawPeripheral<P>(pub(crate) P);
 
-#[allow(non_snake_case)]
-#[cfg(feature = "device-selected")]
-pub struct Peripherals {
-    pub pins: Pins,
-    #[cfg(any(
-        feature = "atmega48p",
-        feature = "atmega168",
-        feature = "atmega328p",
-        feature = "atmega328pb",
-        feature = "atmega1280",
-        feature = "atmega2560"
-    ))]
-    pub USART0: RawPeripheral<pac::USART0>,
-    #[cfg(any(
-        feature = "atmega328pb",
-        feature = "atmega32u4",
-        feature = "atmega1280",
-        feature = "atmega2560"
-    ))]
-    pub USART1: RawPeripheral<pac::USART1>,
-    #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
-    pub USART2: RawPeripheral<pac::USART2>,
-    #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
-    pub USART3: RawPeripheral<pac::USART3>,
+#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD)
+    };
 }
-
-#[cfg(feature = "device-selected")]
-impl Peripherals {
-    fn new(dp: pac::Peripherals) -> Self {
-        Self {
-            #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
-            pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD),
-            #[cfg(feature = "atmega328pb")]
-            pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE),
-            #[cfg(feature = "atmega32u4")]
-            pins: Pins::new(dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF),
-            #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
-            pins: Pins::new(
-                dp.PORTA, dp.PORTB, dp.PORTC, dp.PORTD, dp.PORTE, dp.PORTF, dp.PORTG, dp.PORTH,
-                dp.PORTJ, dp.PORTK, dp.PORTL,
-            ),
-
-            #[cfg(any(
-                feature = "atmega48p",
-                feature = "atmega168",
-                feature = "atmega328p",
-                feature = "atmega328pb",
-                feature = "atmega1280",
-                feature = "atmega2560"
-            ))]
-            USART0: RawPeripheral(dp.USART0),
-            #[cfg(any(
-                feature = "atmega328pb",
-                feature = "atmega32u4",
-                feature = "atmega1280",
-                feature = "atmega2560"
-            ))]
-            USART1: RawPeripheral(dp.USART1),
-            #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
-            USART2: RawPeripheral(dp.USART2),
-            #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
-            USART3: RawPeripheral(dp.USART3),
-        }
-    }
-
-    pub fn take() -> Option<Self> {
-        pac::Peripherals::take().map(Self::new)
-    }
+#[cfg(feature = "atmega328pb")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE)
+    };
+}
+#[cfg(feature = "atmega32u4")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF)
+    };
+}
+#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new(
+            $p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF, $p.PORTG, $p.PORTH,
+            $p.PORTJ, $p.PORTK, $p.PORTL,
+        )
+    };
 }
