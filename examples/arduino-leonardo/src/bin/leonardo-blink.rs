@@ -6,11 +6,12 @@ use panic_halt as _;
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
+    let pins = arduino_hal::pins!(dp);
 
     let mut leds = [
-        dp.pins.led_rx.into_output().downgrade(),
-        dp.pins.led_tx.into_output().downgrade(),
-        dp.pins.d13.into_output().downgrade(),
+        pins.led_rx.into_output().downgrade(),
+        pins.led_tx.into_output().downgrade(),
+        pins.d13.into_output().downgrade(),
     ];
 
     // RX & TX LEDs are active low and the LED on D13 is active high.  Thus invert LED13 here so
