@@ -446,9 +446,9 @@ macro_rules! impl_port_traditional {
                         w.bits(r.bits() & !(1 << $pin_num))
                     });
                     if pull_up {
-                        self.out_clear()
-                    } else {
                         self.out_set()
+                    } else {
+                        self.out_clear()
                     }
                 }
             }
