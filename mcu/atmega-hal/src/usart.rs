@@ -10,9 +10,9 @@ pub type UsartReader<USART, RX, TX, CLOCK> =
     avr_hal_generic::usart::UsartReader<crate::Atmega, USART, RX, TX, CLOCK>;
 
 #[cfg(any(feature = "atmega168", feature = "atmega328p", feature = "atmega328pb"))]
-pub type Usart0<CLOCK, IMODE> = Usart<
+pub type Usart0<CLOCK> = Usart<
     crate::pac::USART0,
-    port::Pin<port::mode::Input<IMODE>, port::PD0>,
+    port::Pin<port::mode::Input, port::PD0>,
     port::Pin<port::mode::Output, port::PD1>,
     CLOCK,
 >;
@@ -26,9 +26,9 @@ avr_hal_generic::impl_usart_traditional! {
 }
 
 #[cfg(feature = "atmega328pb")]
-pub type Usart1<CLOCK, IMODE> = Usart<
+pub type Usart1<CLOCK> = Usart<
     crate::pac::USART1,
-    port::Pin<port::mode::Input<IMODE>, port::PB4>,
+    port::Pin<port::mode::Input, port::PB4>,
     port::Pin<port::mode::Output, port::PB3>,
     CLOCK,
 >;
@@ -42,9 +42,9 @@ avr_hal_generic::impl_usart_traditional! {
 }
 
 #[cfg(any(feature = "atmega32u4", feature = "atmega1280", feature = "atmega2560"))]
-pub type Usart1<CLOCK, IMODE> = Usart<
+pub type Usart1<CLOCK> = Usart<
     crate::pac::USART1,
-    port::Pin<port::mode::Input<IMODE>, port::PD2>,
+    port::Pin<port::mode::Input, port::PD2>,
     port::Pin<port::mode::Output, port::PD3>,
     CLOCK,
 >;
@@ -58,9 +58,9 @@ avr_hal_generic::impl_usart_traditional! {
 }
 
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
-pub type Usart0<CLOCK, IMODE> = Usart<
+pub type Usart0<CLOCK> = Usart<
     crate::pac::USART0,
-    port::Pin<port::mode::Input<IMODE>, port::PE0>,
+    port::Pin<port::mode::Input, port::PE0>,
     port::Pin<port::mode::Output, port::PE1>,
     CLOCK,
 >;
@@ -74,9 +74,9 @@ avr_hal_generic::impl_usart_traditional! {
 }
 
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
-pub type Usart2<CLOCK, IMODE> = Usart<
+pub type Usart2<CLOCK> = Usart<
     crate::pac::USART2,
-    port::Pin<port::mode::Input<IMODE>, port::PH0>,
+    port::Pin<port::mode::Input, port::PH0>,
     port::Pin<port::mode::Output, port::PH1>,
     CLOCK,
 >;
@@ -90,9 +90,9 @@ avr_hal_generic::impl_usart_traditional! {
 }
 
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
-pub type Usart3<CLOCK, IMODE> = Usart<
+pub type Usart3<CLOCK> = Usart<
     crate::pac::USART3,
-    port::Pin<port::mode::Input<IMODE>, port::PJ0>,
+    port::Pin<port::mode::Input, port::PJ0>,
     port::Pin<port::mode::Output, port::PJ1>,
     CLOCK,
 >;
