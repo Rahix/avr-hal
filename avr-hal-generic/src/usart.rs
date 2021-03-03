@@ -6,6 +6,8 @@ use core::cmp::Ordering;
 use core::marker;
 use void::ResultVoidExt;
 
+use crate::port;
+
 /// Representation of a USART baudrate
 ///
 /// Precalculated parameters for configuring a certain USART baudrate.
@@ -227,15 +229,32 @@ pub struct Usart<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> {
     _h: marker::PhantomData<H>,
 }
 
-impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK> {
+impl<H, USART, RXPIN, TXPIN, CLOCK>
+    Usart<
+        H,
+        USART,
+        port::Pin<port::mode::Input, RXPIN>,
+        port::Pin<port::mode::Output, TXPIN>,
+        CLOCK,
+    >
+where
+    USART: UsartOps<H, port::Pin<port::mode::Input, RXPIN>, port::Pin<port::mode::Output, TXPIN>>,
+    RXPIN: port::PinOps,
+    TXPIN: port::PinOps,
+{
     /// Initialize a USART peripheral on the given pins.
     ///
     /// Note that the RX and TX pins are hardwired for each USART peripheral and you *must* pass
     /// the correct ones.  This is enforced at compile time.
-    pub fn new(p: USART, rx: RX, tx: TX, baudrate: Baudrate<CLOCK>) -> Self {
+    pub fn new<IMODE: port::mode::InputMode>(
+        p: USART,
+        rx: port::Pin<port::mode::Input<IMODE>, RXPIN>,
+        tx: port::Pin<port::mode::Output, TXPIN>,
+        baudrate: Baudrate<CLOCK>,
+    ) -> Self {
         let mut usart = Self {
             p,
-            rx,
+            rx: rx.forget_imode(),
             tx,
             _clock: marker::PhantomData,
             _h: marker::PhantomData,
@@ -243,7 +262,9 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK
         usart.p.raw_init(baudrate);
         usart
     }
+}
 
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK> {
     /// Deinitialize/disable this peripheral and release the pins.
     pub fn release(mut self) -> (USART, RX, TX) {
         self.p.raw_deinit();
@@ -453,7 +474,7 @@ macro_rules! impl_usart_traditional {
         $crate::paste::paste! {
             impl $crate::usart::UsartOps<
                 $HAL,
-                $crate::port::Pin<$crate::port::mode::Input<$crate::port::mode::Floating>, $rxpin>,
+                $crate::port::Pin<$crate::port::mode::Input, $rxpin>,
                 $crate::port::Pin<$crate::port::mode::Output, $txpin>,
             > for $USART {
                 fn raw_init<CLOCK>(&mut self, baudrate: $crate::usart::Baudrate<CLOCK>) {
