@@ -9,11 +9,12 @@ use embedded_hal::serial::Read;
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
+    let pins = arduino_hal::pins!(dp);
 
     let mut serial = arduino_hal::Usart::new(
         dp.USART0,
-        dp.pins.d0,
-        dp.pins.d1.into_output(),
+        pins.d0,
+        pins.d1.into_output(),
         57600.into_baudrate(),
     );
 
