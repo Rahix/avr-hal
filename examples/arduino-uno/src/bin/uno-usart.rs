@@ -10,13 +10,7 @@ use embedded_hal::serial::Read;
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
     let pins = arduino_hal::pins!(dp);
-
-    let mut serial = arduino_hal::Usart::new(
-        dp.USART0,
-        pins.d0,
-        pins.d1.into_output(),
-        57600.into_baudrate(),
-    );
+    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
     ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").void_unwrap();
 
