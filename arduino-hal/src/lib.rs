@@ -72,3 +72,40 @@ macro_rules! pins {
         $crate::Pins::with_mcu_pins($crate::hal::pins!($p))
     };
 }
+
+#[cfg(any(feature = "arduino-uno"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART0,
+            $pins.d0,
+            $pins.d1.into_output(),
+            $crate::hal::usart::BaudrateArduinoExt::into_baudrate($baud),
+        )
+    };
+}
+#[cfg(any(feature = "arduino-leonardo"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART1,
+            $pins.d0,
+            $pins.d1.into_output(),
+            $crate::hal::usart::BaudrateExt::into_baudrate($baud),
+        )
+    };
+}
+#[cfg(any(feature = "arduino-mega2560"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART0,
+            $pins.d0,
+            $pins.d1.into_output(),
+            $crate::hal::usart::BaudrateExt::into_baudrate($baud),
+        )
+    };
+}
