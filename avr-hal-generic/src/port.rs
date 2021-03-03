@@ -76,8 +76,9 @@ pub trait PinOps {
 /// use atmega_hal::port::{Pin, mode, self};
 ///
 /// let dp = atmega_hal::Peripherals::take().unwrap();
+/// let pins = atmega_hal::pins!(dp);
 ///
-/// let output: Pin<mode::Output, port::PD3> = dp.pins.pd3.into_output();
+/// let output: Pin<mode::Output, port::PD3> = pins.pd3.into_output();
 /// ```
 pub struct Pin<MODE, PIN> {
     pub(crate) pin: PIN,
@@ -141,9 +142,10 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
 /// use atmega_hal::port::{Pin, mode};
 ///
 /// let dp = atmega_hal::Peripherals::take().unwrap();
+/// let pins = atmega_hal::pins!(dp);
 ///
-/// let any_output_pin1: Pin<mode::Output> = dp.pins.pd0.into_output().downgrade();
-/// let any_output_pin2: Pin<mode::Output> = dp.pins.pd1.into_output().downgrade();
+/// let any_output_pin1: Pin<mode::Output> = pins.pd0.into_output().downgrade();
+/// let any_output_pin2: Pin<mode::Output> = pins.pd1.into_output().downgrade();
 ///
 /// // Because they now have the same type, you can, for example, stuff them into an array:
 /// let pins: [Pin<mode::Output>; 2] = [any_output_pin1, any_output_pin2];
