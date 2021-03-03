@@ -38,6 +38,15 @@ pub mod port;
 pub use port::Pins;
 
 #[cfg(feature = "board-selected")]
+pub mod i2c {
+    pub use crate::hal::i2c::*;
+
+    pub type I2c = crate::hal::i2c::I2c<crate::DefaultClock>;
+}
+#[cfg(feature = "board-selected")]
+pub use i2c::I2c;
+
+#[cfg(feature = "board-selected")]
 pub mod usart {
     pub use crate::hal::usart::{Baudrate, UsartOps};
 
