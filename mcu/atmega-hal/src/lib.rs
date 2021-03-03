@@ -61,7 +61,7 @@ pub mod usart;
 #[cfg(feature = "device-selected")]
 pub use usart::Usart;
 
-pub struct RawPeripheral<P>(pub(crate) P);
+pub struct Atmega;
 
 #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
 #[macro_export]
