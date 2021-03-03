@@ -17,7 +17,7 @@ pub mod mode {
 
     pub trait InputMode: crate::Sealed {}
 
-    pub struct Input<IMODE> {
+    pub struct Input<IMODE = AnyInput> {
         pub(crate) _imode: PhantomData<IMODE>,
     }
     impl<IMODE: InputMode> super::PinMode for Input<IMODE> {}
@@ -31,6 +31,10 @@ pub mod mode {
     pub struct PullUp;
     impl InputMode for PullUp {}
     impl crate::Sealed for PullUp {}
+
+    pub struct AnyInput;
+    impl InputMode for AnyInput {}
+    impl crate::Sealed for AnyInput {}
 }
 
 pub trait PinOps {
@@ -157,6 +161,44 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
     pub fn downgrade(self) -> Pin<MODE, PIN::Dynamic> {
         Pin {
             pin: self.pin.into_dynamic(),
+            _mode: PhantomData,
+        }
+    }
+}
+
+/// # Input-Mode Downgrading
+/// There is a second kind of downgrading: In some cases it is not important whether an input pin
+/// is configured as [`mode::PullUp`] or [`mode::Floating`].  For this, you can "forget" the
+/// concrete input mode, leaving you with a type that is the same for pull-up or floating inputs:
+///
+/// ```ignore
+/// use atmega_hal::port::{Pin, mode};
+///
+/// let dp = atmega_hal::Peripherals::take().unwrap();
+/// let pins = atmega_hal::pins!(dp);
+///
+/// // This demo uses downgraded pins, but it works just as well
+/// // with non-downgraded ones!
+/// let input_pin1: Pin<mode::Input<mode::Floating>> = pins.pd0
+///     .into_floating_input()
+///     .downgrade();
+/// let input_pin2: Pin<mode::Input<mode::Floating>> = pins.pd1
+///     .into_pull_up_input()
+///     .downgrade();
+///
+/// // With the input mode "forgotten", they have the same type now,
+/// // even if electically different.
+/// let any_inputs: [Pin<mode::Input>; 2] = [
+///     input_pin1.forget_imode(),
+///     input_pin2.forget_imode(),
+/// ];
+/// ```
+impl<PIN: PinOps, IMODE> Pin<mode::Input<IMODE>, PIN> {
+    /// "Erase" type-level information about whether the pin is currently a pull-up or a floating
+    /// input.
+    pub fn forget_imode(self) -> Pin<mode::Input, PIN> {
+        Pin {
+            pin: self.pin,
             _mode: PhantomData,
         }
     }
