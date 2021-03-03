@@ -160,7 +160,7 @@ pub enum Event {
 /// This trait defines the common interface for all USART peripheral variants.  It is used as an
 /// intermediate abstraction ontop of which the [`Usart`] API is built.  **Prefer using the
 /// [`Usart`] API instead of this trait.**
-pub trait UsartOps<RX, TX> {
+pub trait UsartOps<H, RX, TX> {
     /// Enable & initialize this USART peripheral to the given baudrate.
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
@@ -219,14 +219,15 @@ pub trait UsartOps<RX, TX> {
 ///     ufmt::uwriteln!(&mut serial, "Got {}!\r", b).void_unwrap();
 /// }
 /// ```
-pub struct Usart<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
+pub struct Usart<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> {
     p: USART,
     rx: RX,
     tx: TX,
     _clock: marker::PhantomData<CLOCK>,
+    _h: marker::PhantomData<H>,
 }
 
-impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK> {
     /// Initialize a USART peripheral on the given pins.
     ///
     /// Note that the RX and TX pins are hardwired for each USART peripheral and you *must* pass
@@ -237,6 +238,7 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
             rx,
             tx,
             _clock: marker::PhantomData,
+            _h: marker::PhantomData,
         };
         usart.p.raw_init(baudrate);
         usart
@@ -284,8 +286,8 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
     pub fn split(
         self,
     ) -> (
-        UsartReader<USART, RX, TX, CLOCK>,
-        UsartWriter<USART, RX, TX, CLOCK>,
+        UsartReader<H, USART, RX, TX, CLOCK>,
+        UsartWriter<H, USART, RX, TX, CLOCK>,
     ) {
         (
             UsartReader {
@@ -293,18 +295,20 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> Usart<USART, RX, TX, CLOCK> {
                 rx: self.rx,
                 _tx: marker::PhantomData,
                 _clock: marker::PhantomData,
+                _h: marker::PhantomData,
             },
             UsartWriter {
                 p: self.p,
                 tx: self.tx,
                 _rx: marker::PhantomData,
                 _clock: marker::PhantomData,
+                _h: marker::PhantomData,
             },
         )
     }
 }
 
-impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> ufmt::uWrite for Usart<USART, RX, TX, CLOCK> {
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite for Usart<H, USART, RX, TX, CLOCK> {
     type Error = void::Void;
 
     fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
@@ -315,8 +319,8 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> ufmt::uWrite for Usart<USART, RX, T
     }
 }
 
-impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
-    for Usart<USART, RX, TX, CLOCK>
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
+    for Usart<H, USART, RX, TX, CLOCK>
 {
     type Error = void::Void;
 
@@ -329,7 +333,9 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
     }
 }
 
-impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8> for Usart<USART, RX, TX, CLOCK> {
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
+    for Usart<H, USART, RX, TX, CLOCK>
+{
     type Error = void::Void;
 
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
@@ -344,11 +350,12 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8> for Usart<USA
 ///
 /// The writer half most notably implements [`embedded_hal::serial::Write`] and [`ufmt::uWrite`]
 /// for transmitting data.
-pub struct UsartWriter<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
+pub struct UsartWriter<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> {
     p: USART,
     tx: TX,
     _rx: marker::PhantomData<RX>,
     _clock: marker::PhantomData<CLOCK>,
+    _h: marker::PhantomData<H>,
 }
 
 /// Reader half of a [`Usart`] peripheral.
@@ -357,38 +364,49 @@ pub struct UsartWriter<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
 /// concurrently receiving and transmitting data from different contexts.
 ///
 /// The reader half most notably implements [`embedded_hal::serial::Read`] for receiving data.
-pub struct UsartReader<USART: UsartOps<RX, TX>, RX, TX, CLOCK> {
+pub struct UsartReader<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> {
     p: USART,
     rx: RX,
     _tx: marker::PhantomData<TX>,
     _clock: marker::PhantomData<CLOCK>,
+    _h: marker::PhantomData<H>,
 }
 
-impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> UsartWriter<USART, RX, TX, CLOCK> {
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> UsartWriter<H, USART, RX, TX, CLOCK> {
     /// Merge this `UsartWriter` with a [`UsartReader`] back into a single [`Usart`] peripheral.
-    pub fn reunite(self, other: UsartReader<USART, RX, TX, CLOCK>) -> Usart<USART, RX, TX, CLOCK> {
+    pub fn reunite(
+        self,
+        other: UsartReader<H, USART, RX, TX, CLOCK>,
+    ) -> Usart<H, USART, RX, TX, CLOCK> {
         Usart {
             p: self.p,
             rx: other.rx,
             tx: self.tx,
             _clock: marker::PhantomData,
+            _h: marker::PhantomData,
         }
     }
 }
 
-impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> UsartReader<USART, RX, TX, CLOCK> {
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> UsartReader<H, USART, RX, TX, CLOCK> {
     /// Merge this `UsartReader` with a [`UsartWriter`] back into a single [`Usart`] peripheral.
-    pub fn reunite(self, other: UsartWriter<USART, RX, TX, CLOCK>) -> Usart<USART, RX, TX, CLOCK> {
+    pub fn reunite(
+        self,
+        other: UsartWriter<H, USART, RX, TX, CLOCK>,
+    ) -> Usart<H, USART, RX, TX, CLOCK> {
         Usart {
             p: self.p,
             rx: self.rx,
             tx: other.tx,
             _clock: marker::PhantomData,
+            _h: marker::PhantomData,
         }
     }
 }
 
-impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> ufmt::uWrite for UsartWriter<USART, RX, TX, CLOCK> {
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite
+    for UsartWriter<H, USART, RX, TX, CLOCK>
+{
     type Error = void::Void;
 
     fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
@@ -399,8 +417,8 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> ufmt::uWrite for UsartWriter<USART,
     }
 }
 
-impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
-    for UsartWriter<USART, RX, TX, CLOCK>
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
+    for UsartWriter<H, USART, RX, TX, CLOCK>
 {
     type Error = void::Void;
 
@@ -413,8 +431,8 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
     }
 }
 
-impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
-    for UsartReader<USART, RX, TX, CLOCK>
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
+    for UsartReader<H, USART, RX, TX, CLOCK>
 {
     type Error = void::Void;
 
@@ -426,6 +444,7 @@ impl<USART: UsartOps<RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
 #[macro_export]
 macro_rules! impl_usart_traditional {
     (
+        hal: $HAL:ty,
         peripheral: $USART:ty,
         register_suffix: $n:expr,
         rx: $rxpin:ty,
@@ -433,6 +452,7 @@ macro_rules! impl_usart_traditional {
     ) => {
         $crate::paste::paste! {
             impl $crate::usart::UsartOps<
+                $HAL,
                 $crate::port::Pin<$crate::port::mode::Input<$crate::port::mode::Floating>, $rxpin>,
                 $crate::port::Pin<$crate::port::mode::Output, $txpin>,
             > for $USART {
