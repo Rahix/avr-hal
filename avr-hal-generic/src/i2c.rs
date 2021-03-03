@@ -1,4 +1,9 @@
 //! I2C Implementations
+//!
+//! Check the documentation of [`I2c`] for details.
+
+use crate::port;
+use core::marker::PhantomData;
 
 /// TWI Status Codes
 pub mod twi_status {
@@ -99,6 +104,7 @@ pub mod twi_status {
 
 /// I2C Error
 #[derive(ufmt::derive::uDebug, Debug, Clone, Copy, Eq, PartialEq)]
+#[repr(u8)]
 pub enum Error {
     /// Lost arbitration while trying to acquire bus
     ArbitrationLost,
@@ -114,6 +120,7 @@ pub enum Error {
 
 /// I2C Transfer Direction
 #[derive(ufmt::derive::uDebug, Debug, Clone, Copy, Eq, PartialEq)]
+#[repr(u8)]
 pub enum Direction {
     /// Write to a slave (LSB is 0)
     Write,
@@ -121,370 +128,419 @@ pub enum Direction {
     Read,
 }
 
-#[doc(hidden)]
-pub fn i2cdetect<W: ufmt::uWrite, F>(s: &mut W, mut f: F) -> Result<(), W::Error>
-where
-    // Detection function
-    F: FnMut(u8) -> Result<bool, Error>,
-{
-    s.write_str("\
--    0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\r\n\
-00:      ")?;
+/// Internal trait for low-level I2C peripherals.
+///
+/// This trait defines the common interface for all I2C peripheral variants.  It is used as an
+/// intermediate abstraction ontop of which the [`I2c`] API is built.  **Prefer using the
+/// [`I2c`] API instead of this trait.**
+pub trait I2cOps<H, SDA, SCL> {
+    /// Setup the bus for operation at a certain speed.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_setup<CLOCK: crate::clock::Clock>(&mut self, speed: u32);
 
-    fn u4_to_hex(b: u8) -> char {
-        match b {
-            x if x < 0xa => (0x30 + x).into(),
-            x if x < 0x10 => (0x57 + x).into(),
-            _ => '?',
-        }
-    }
+    /// Start a bus transaction to a certain `address` in either read or write mode.
+    ///
+    /// If a previous transaction was not stopped via `raw_stop()`, this should generate a repeated
+    /// start condition.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_start(&mut self, address: u8, direction: Direction) -> Result<(), Error>;
 
-    for addr in 0x02..=0x77 {
-        let (ah, al) = (u4_to_hex(addr >> 4), u4_to_hex(addr & 0xf));
+    /// Write some bytes to the bus.
+    ///
+    /// This method must only be called after a transaction in write mode was successfully started.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_write(&mut self, bytes: &[u8]) -> Result<(), Error>;
 
-        if addr % 0x10 == 0 {
-            s.write_str("\r\n")?;
-            s.write_char(ah)?;
-            s.write_str("0:")?;
-        }
+    /// Read some bytes from the bus.
+    ///
+    /// This method must only be called after a transaction in read mode was successfully started.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_read(&mut self, buffer: &mut [u8]) -> Result<(), Error>;
 
-        match f(addr) {
-            Ok(true) => {
-                s.write_char(' ')?;
-                s.write_char(ah)?;
-                s.write_char(al)?;
-            },
-            Ok(false) => {
-                s.write_str(" --")?;
-            },
-            Err(e) => {
-                s.write_str(" E")?;
-                s.write_char(u4_to_hex(e as u8))?;
-            },
-        }
-    }
-
-    s.write_str("\r\n")?;
-
-    Ok(())
+    /// Send a stop-condition and release the bus.
+    ///
+    /// This method must only be called after successfully starting a bus transaction.  This method
+    /// does not need to block until the stop condition has actually occured.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_stop(&mut self) -> Result<(), Error>;
 }
 
-#[doc(hidden)]
-pub type I2cFloating = crate::port::mode::Input<crate::port::mode::Floating>;
-#[doc(hidden)]
-pub type I2cPullUp = crate::port::mode::Input<crate::port::mode::PullUp>;
+/// I2C driver
+///
+/// # Example
+/// (for Arduino Uno)
+/// ```
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+///
+/// let mut i2c = arduino_hal::I2c::new(
+///     dp.TWI,
+///     pins.a4.into_pull_up_input(),
+///     pins.a5.into_pull_up_input(),
+///     50000,
+/// );
+///
+/// // i2c implements the embedded-hal traits so it can be used with generic drivers.
+/// ```
+pub struct I2c<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> {
+    p: I2C,
+    #[allow(dead_code)]
+    sda: SDA,
+    #[allow(dead_code)]
+    scl: SCL,
+    _clock: PhantomData<CLOCK>,
+    _h: PhantomData<H>,
+}
 
-/// Implement I2C traits for a TWI peripheral
-#[macro_export]
-macro_rules! impl_twi_i2c {
-    (
-        $(#[$i2c_attr:meta])*
-        pub struct $I2c:ident {
-            peripheral: $I2C:ty,
-            pins: {
-                sda: $sdamod:ident::$SDA:ident,
-                scl: $sclmod:ident::$SCL:ident,
-            },
+impl<H, I2C, SDAPIN, SCLPIN, CLOCK>
+    I2c<H, I2C, port::Pin<port::mode::Input, SDAPIN>, port::Pin<port::mode::Input, SCLPIN>, CLOCK>
+where
+    I2C: I2cOps<H, port::Pin<port::mode::Input, SDAPIN>, port::Pin<port::mode::Input, SCLPIN>>,
+    SDAPIN: port::PinOps,
+    SCLPIN: port::PinOps,
+    CLOCK: crate::clock::Clock,
+{
+    /// Initialize an I2C peripheral on the given pins.
+    ///
+    /// Note that the SDA and SCL pins are hardwired for each I2C peripheral and you *must* pass
+    /// the correct ones.  This is enforced at compile time.
+    ///
+    /// This method expects the internal pull-ups to be configured for both pins to comply with the
+    /// I2C specification.  If you have external pull-ups connected, use
+    /// [`I2c::with_external_pullup`] instead.
+    pub fn new(
+        p: I2C,
+        sda: port::Pin<port::mode::Input<port::mode::PullUp>, SDAPIN>,
+        scl: port::Pin<port::mode::Input<port::mode::PullUp>, SCLPIN>,
+        speed: u32,
+    ) -> Self {
+        let mut i2c = Self {
+            p,
+            sda: sda.forget_imode(),
+            scl: scl.forget_imode(),
+            _clock: PhantomData,
+            _h: PhantomData,
+        };
+        i2c.p.raw_setup::<CLOCK>(speed);
+        i2c
+    }
+
+    /// Initialize an I2C peripheral on the given pins.
+    ///
+    /// Note that the SDA and SCL pins are hardwired for each I2C peripheral and you *must* pass
+    /// the correct ones.  This is enforced at compile time.
+    ///
+    /// This method expects that external resistors pull up SDA and SCL.
+    pub fn with_external_pullup(
+        p: I2C,
+        sda: port::Pin<port::mode::Input<port::mode::Floating>, SDAPIN>,
+        scl: port::Pin<port::mode::Input<port::mode::Floating>, SCLPIN>,
+        speed: u32,
+    ) -> Self {
+        let mut i2c = Self {
+            p,
+            sda: sda.forget_imode(),
+            scl: scl.forget_imode(),
+            _clock: PhantomData,
+            _h: PhantomData,
+        };
+        i2c.p.raw_setup::<CLOCK>(speed);
+        i2c
+    }
+}
+
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> I2c<H, I2C, SDA, SCL, CLOCK>
+where
+    CLOCK: crate::clock::Clock,
+    crate::delay::Delay<CLOCK>: hal::blocking::delay::DelayMs<u16>,
+{
+    /// Test whether a device answers on a certain address.
+    pub fn ping_device(&mut self, address: u8, direction: Direction) -> Result<bool, Error> {
+        match self.p.raw_start(address, direction) {
+            Ok(_) => {
+                self.p.raw_stop()?;
+                Ok(true)
+            }
+            Err(Error::AddressNack) => Ok(false),
+            Err(e) => Err(e),
         }
-    ) => {$crate::paste::paste! {
-        $(#[$i2c_attr])*
-        pub struct [<$I2c Master>]<CLOCK: $crate::clock::Clock, M> {
-            p: $I2C,
-            _clock: ::core::marker::PhantomData<CLOCK>,
-            sda: $sdamod::$SDA<M>,
-            scl: $sclmod::$SCL<M>,
-        }
+    }
 
-        impl<CLOCK> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp>
-        where
-            CLOCK: $crate::clock::Clock,
-        {
-            /// Initialize the I2C bus
-            ///
-            /// `new()` will enable the internal pull-ups to comply with the I2C
-            /// specification.  If you have external pull-ups connected, please
-            /// use `new_with_external_pullup()` instead.
-            pub fn new(
-                p: $I2C,
-                sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
-                scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::PullUp>>,
-                speed: u32,
-            ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cPullUp> {
-                let mut i2c = [<$I2c Master>] {
-                    p,
-                    sda,
-                    scl,
-                    _clock: ::core::marker::PhantomData,
-                };
+    /// Scan the bus for connected devices.  This method will output an summary in the format known
+    /// from [`i2cdetect(8)`][i2cdetect-linux] on the selected serial connection.  For example:
+    ///
+    /// ```text
+    /// -    0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+    /// 00:       -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    /// 10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    /// 20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    /// 30: -- -- -- -- -- -- -- -- 38 39 -- -- -- -- -- --
+    /// 40: -- -- -- -- -- -- -- -- 48 -- -- -- -- -- -- --
+    /// 50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    /// 60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    /// 70: -- -- -- -- -- -- -- --
+    /// ```
+    ///
+    /// [i2cdetect-linux]: https://man.archlinux.org/man/community/i2c-tools/i2cdetect.8.en
+    pub fn i2cdetect<W: ufmt::uWrite>(
+        &mut self,
+        w: &mut W,
+        direction: Direction,
+    ) -> Result<(), W::Error> {
+        use hal::blocking::delay::DelayMs;
+        let mut delay = crate::delay::Delay::<CLOCK>::new();
 
-                i2c.set_speed(speed);
-                i2c
+        w.write_str(
+            "\
+-    0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\r\n\
+00:      ",
+        )?;
+
+        fn u4_to_hex(b: u8) -> char {
+            match b {
+                x if x < 0xa => (0x30 + x).into(),
+                x if x < 0x10 => (0x57 + x).into(),
+                _ => '?',
             }
         }
 
-        impl<CLOCK> [<$I2c Master>]<CLOCK, $crate::i2c::I2cFloating>
-        where
-            CLOCK: $crate::clock::Clock,
-        {
-            /// Initialize the I2C bus, without enabling internal pull-ups
-            ///
-            /// This function should be used if your hardware design includes
-            /// pull-up resistors outside the MCU.  If you do not have these,
-            /// please use `new()` instead.
-            pub fn new_with_external_pullup(
-                p: $I2C,
-                sda: $sdamod::$SDA<$crate::port::mode::Input<$crate::port::mode::Floating>>,
-                scl: $sclmod::$SCL<$crate::port::mode::Input<$crate::port::mode::Floating>>,
-                speed: u32,
-            ) -> [<$I2c Master>]<CLOCK, $crate::i2c::I2cFloating> {
-                let mut i2c = [<$I2c Master>] {
-                    p,
-                    sda,
-                    scl,
-                    _clock: ::core::marker::PhantomData,
-                };
+        for address in 0x02..=0x77 {
+            let (ah, al) = (u4_to_hex(address >> 4), u4_to_hex(address & 0xf));
 
-                i2c.set_speed(speed);
-                i2c
-            }
-        }
-
-        impl<CLOCK, M> [<$I2c Master>]<CLOCK, M>
-        where
-            CLOCK: $crate::clock::Clock,
-        {
-            fn set_speed(&mut self, speed: u32){
-                // Calculate TWBR register value
-                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                self.p.twbr.write(|w| unsafe { w.bits(twbr as u8) });
-
-                // Disable prescaler
-                self.p.twsr.write(|w| w.twps().prescaler_1());
+            if address % 0x10 == 0 {
+                w.write_str("\r\n")?;
+                w.write_char(ah)?;
+                w.write_str("0:")?;
             }
 
-            /// Check whether a slave answers ACK for a given address
-            ///
-            /// Note that some devices might not respond to both read and write
-            /// operations.
-            pub fn ping_slave(
-                &mut self,
-                addr: u8,
-                dir: $crate::i2c::Direction,
-            ) -> Result<bool, $crate::i2c::Error> {
-                match self.start(addr, dir) {
-                    Err($crate::i2c::Error::AddressNack) => Ok(false),
-                    Err(e) => Err(e),
-                    Ok(()) => {
-                        self.stop();
-                        Ok(true)
-                    },
+            match self.ping_device(address, direction) {
+                Ok(true) => {
+                    w.write_char(' ')?;
+                    w.write_char(ah)?;
+                    w.write_char(al)?;
+                }
+                Ok(false) => {
+                    w.write_str(" --")?;
+                }
+                Err(e) => {
+                    w.write_str(" E")?;
+                    w.write_char(u4_to_hex(e as u8))?;
                 }
             }
 
-            fn start(
-                &mut self,
-                addr: u8,
-                dir: $crate::i2c::Direction,
-            ) -> Result<(), $crate::i2c::Error> {
+            delay.delay_ms(10u16);
+        }
+
+        w.write_str("\r\n")?;
+
+        Ok(())
+    }
+}
+
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::Write
+    for I2c<H, I2C, SDA, SCL, CLOCK>
+{
+    type Error = Error;
+
+    fn write(&mut self, address: u8, bytes: &[u8]) -> Result<(), Self::Error> {
+        self.p.raw_start(address, Direction::Write)?;
+        self.p.raw_write(bytes)?;
+        self.p.raw_stop()?;
+        Ok(())
+    }
+}
+
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::Read
+    for I2c<H, I2C, SDA, SCL, CLOCK>
+{
+    type Error = Error;
+
+    fn read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error> {
+        self.p.raw_start(address, Direction::Read)?;
+        self.p.raw_read(buffer)?;
+        self.p.raw_stop()?;
+        Ok(())
+    }
+}
+
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::WriteRead
+    for I2c<H, I2C, SDA, SCL, CLOCK>
+{
+    type Error = Error;
+
+    fn write_read(
+        &mut self,
+        address: u8,
+        bytes: &[u8],
+        buffer: &mut [u8],
+    ) -> Result<(), Self::Error> {
+        self.p.raw_start(address, Direction::Write)?;
+        self.p.raw_write(bytes)?;
+        self.p.raw_start(address, Direction::Read)?;
+        self.p.raw_read(buffer)?;
+        self.p.raw_stop()?;
+        Ok(())
+    }
+}
+
+#[macro_export]
+macro_rules! impl_i2c_twi {
+    (
+        hal: $HAL:ty,
+        peripheral: $I2C:ty,
+        sda: $sdapin:ty,
+        scl: $sclpin:ty,
+    ) => {
+        impl
+            $crate::i2c::I2cOps<
+                $HAL,
+                $crate::port::Pin<$crate::port::mode::Input, $sdapin>,
+                $crate::port::Pin<$crate::port::mode::Input, $sclpin>,
+            > for $I2C
+        {
+            #[inline]
+            fn raw_setup<CLOCK: crate::clock::Clock>(&mut self, speed: u32) {
+                // Calculate TWBR register value
+                let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
+                self.twbr.write(|w| unsafe { w.bits(twbr as u8) });
+
+                // Disable prescaler
+                self.twsr.write(|w| w.twps().prescaler_1());
+            }
+
+            #[inline]
+            fn raw_start(&mut self, address: u8, direction: Direction) -> Result<(), Error> {
                 // Write start condition
-                self.p.twcr.write(|w| w
-                    .twen().set_bit()
-                    .twint().set_bit()
-                    .twsta().set_bit()
-                );
-                self.wait();
+                self.twcr
+                    .write(|w| w.twen().set_bit().twint().set_bit().twsta().set_bit());
+                // wait()
+                while self.twcr.read().twint().bit_is_clear() {}
 
                 // Validate status
-                match self.p.twsr.read().tws().bits() {
-                      $crate::i2c::twi_status::TW_START
-                    | $crate::i2c::twi_status::TW_REP_START => (),
-                      $crate::i2c::twi_status::TW_MT_ARB_LOST
+                match self.twsr.read().tws().bits() {
+                    $crate::i2c::twi_status::TW_START | $crate::i2c::twi_status::TW_REP_START => (),
+                    $crate::i2c::twi_status::TW_MT_ARB_LOST
                     | $crate::i2c::twi_status::TW_MR_ARB_LOST => {
                         return Err($crate::i2c::Error::ArbitrationLost);
-                    },
+                    }
                     $crate::i2c::twi_status::TW_BUS_ERROR => {
                         return Err($crate::i2c::Error::BusError);
-                    },
+                    }
                     _ => {
                         return Err($crate::i2c::Error::Unknown);
-                    },
+                    }
                 }
 
                 // Send slave address
-                let dirbit = if dir == $crate::i2c::Direction::Read { 1 } else { 0 };
-                let rawaddr = (addr << 1) | dirbit;
-                self.p.twdr.write(|w| unsafe { w.bits(rawaddr) });
-                self.transact();
+                let dirbit = if direction == $crate::i2c::Direction::Read {
+                    1
+                } else {
+                    0
+                };
+                let rawaddr = (address << 1) | dirbit;
+                self.twdr.write(|w| unsafe { w.bits(rawaddr) });
+                // transact()
+                self.twcr.write(|w| w.twen().set_bit().twint().set_bit());
+                while self.twcr.read().twint().bit_is_clear() {}
 
                 // Check if the slave responded
-                match self.p.twsr.read().tws().bits() {
-                      $crate::i2c::twi_status::TW_MT_SLA_ACK
+                match self.twsr.read().tws().bits() {
+                    $crate::i2c::twi_status::TW_MT_SLA_ACK
                     | $crate::i2c::twi_status::TW_MR_SLA_ACK => (),
-                      $crate::i2c::twi_status::TW_MT_SLA_NACK
+                    $crate::i2c::twi_status::TW_MT_SLA_NACK
                     | $crate::i2c::twi_status::TW_MR_SLA_NACK => {
                         // Stop the transaction if it did not respond
-                        self.stop();
+                        self.raw_stop()?;
                         return Err($crate::i2c::Error::AddressNack);
-                    },
-                      $crate::i2c::twi_status::TW_MT_ARB_LOST
+                    }
+                    $crate::i2c::twi_status::TW_MT_ARB_LOST
                     | $crate::i2c::twi_status::TW_MR_ARB_LOST => {
                         return Err($crate::i2c::Error::ArbitrationLost);
-                    },
+                    }
                     $crate::i2c::twi_status::TW_BUS_ERROR => {
                         return Err($crate::i2c::Error::BusError);
-                    },
+                    }
                     _ => {
                         return Err($crate::i2c::Error::Unknown);
-                    },
+                    }
                 }
 
                 Ok(())
             }
 
-            fn wait(&mut self) {
-                while self.p.twcr.read().twint().bit_is_clear() { }
-            }
-
-            fn transact(&mut self) {
-                self.p.twcr.write(|w| w.twen().set_bit().twint().set_bit());
-                while self.p.twcr.read().twint().bit_is_clear() { }
-            }
-
-            fn write_data(&mut self, bytes: &[u8]) -> Result<(), $crate::i2c::Error> {
+            #[inline]
+            fn raw_write(&mut self, bytes: &[u8]) -> Result<(), Error> {
                 for byte in bytes {
-                    self.p.twdr.write(|w| unsafe { w.bits(*byte) });
-                    self.transact();
+                    self.twdr.write(|w| unsafe { w.bits(*byte) });
+                    // transact()
+                    self.twcr.write(|w| w.twen().set_bit().twint().set_bit());
+                    while self.twcr.read().twint().bit_is_clear() {}
 
-                    match self.p.twsr.read().tws().bits() {
+                    match self.twsr.read().tws().bits() {
                         $crate::i2c::twi_status::TW_MT_DATA_ACK => (),
                         $crate::i2c::twi_status::TW_MT_DATA_NACK => {
-                            self.stop();
+                            self.raw_stop()?;
                             return Err($crate::i2c::Error::DataNack);
-                        },
+                        }
                         $crate::i2c::twi_status::TW_MT_ARB_LOST => {
                             return Err($crate::i2c::Error::ArbitrationLost);
-                        },
+                        }
                         $crate::i2c::twi_status::TW_BUS_ERROR => {
                             return Err($crate::i2c::Error::BusError);
-                        },
+                        }
                         _ => {
                             return Err($crate::i2c::Error::Unknown);
-                        },
+                        }
                     }
                 }
                 Ok(())
             }
 
-            fn read_data(&mut self, buffer: &mut [u8]) -> Result<(), $crate::i2c::Error> {
+            #[inline]
+            fn raw_read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
                 let last = buffer.len() - 1;
                 for (i, byte) in buffer.iter_mut().enumerate() {
                     if i != last {
-                        self.p.twcr.write(|w| w.twint().set_bit().twen().set_bit().twea().set_bit());
-                        self.wait();
+                        self.twcr
+                            .write(|w| w.twint().set_bit().twen().set_bit().twea().set_bit());
+                        // wait()
+                        while self.twcr.read().twint().bit_is_clear() {}
                     } else {
-                        self.p.twcr.write(|w| w.twint().set_bit().twen().set_bit());
-                        self.wait();
+                        self.twcr.write(|w| w.twint().set_bit().twen().set_bit());
+                        // wait()
+                        while self.twcr.read().twint().bit_is_clear() {}
                     }
 
-                    match self.p.twsr.read().tws().bits() {
-                          $crate::i2c::twi_status::TW_MR_DATA_ACK
+                    match self.twsr.read().tws().bits() {
+                        $crate::i2c::twi_status::TW_MR_DATA_ACK
                         | $crate::i2c::twi_status::TW_MR_DATA_NACK => (),
                         $crate::i2c::twi_status::TW_MR_ARB_LOST => {
                             return Err($crate::i2c::Error::ArbitrationLost);
-                        },
+                        }
                         $crate::i2c::twi_status::TW_BUS_ERROR => {
                             return Err($crate::i2c::Error::BusError);
-                        },
+                        }
                         _ => {
                             return Err($crate::i2c::Error::Unknown);
-                        },
+                        }
                     }
 
-                    *byte = self.p.twdr.read().bits();
+                    *byte = self.twdr.read().bits();
                 }
                 Ok(())
             }
 
-            fn stop(&mut self) {
-                self.p.twcr.write(|w| w
-                    .twen().set_bit()
-                    .twint().set_bit()
-                    .twsto().set_bit()
-                );
-            }
-        }
-
-        impl<CLOCK, M> [<$I2c Master>]<CLOCK, M>
-        where
-            CLOCK: $crate::clock::Clock,
-            $crate::delay::Delay<CLOCK>: $crate::hal::blocking::delay::DelayMs<u16>,
-        {
-            /// Output an `i2cdetect`-like summary of connected slaves to a serial device
-            ///
-            /// Note that output for `Read` and `Write` might differ.
-            pub fn i2cdetect<W: $crate::ufmt::uWrite>(
-                &mut self,
-                w: &mut W,
-                dir: $crate::i2c::Direction,
-            ) -> Result<(), W::Error> {
-                let mut delay = $crate::delay::Delay::<CLOCK>::new();
-                $crate::i2c::i2cdetect(w, |a| {
-                    use $crate::prelude::*;
-
-                    delay.delay_ms(10u16);
-                    self.ping_slave(a, dir)
-                })
-            }
-        }
-
-
-        impl<CLOCK, M> $crate::hal::blocking::i2c::Write for [<$I2c Master>]<CLOCK, M>
-        where
-            CLOCK: $crate::clock::Clock,
-        {
-            type Error = $crate::i2c::Error;
-
-            fn write(&mut self, address: u8, bytes: &[u8]) -> Result<(), Self::Error> {
-                self.start(address, $crate::i2c::Direction::Write)?;
-                self.write_data(bytes)?;
-                self.stop();
+            #[inline]
+            fn raw_stop(&mut self) -> Result<(), Error> {
+                self.twcr
+                    .write(|w| w.twen().set_bit().twint().set_bit().twsto().set_bit());
                 Ok(())
             }
         }
-
-        impl<CLOCK, M> $crate::hal::blocking::i2c::Read for [<$I2c Master>]<CLOCK, M>
-        where
-            CLOCK: $crate::clock::Clock,
-        {
-            type Error = $crate::i2c::Error;
-
-            fn read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error> {
-                self.start(address, $crate::i2c::Direction::Read)?;
-                self.read_data(buffer)?;
-                self.stop();
-                Ok(())
-            }
-        }
-
-        impl<CLOCK, M> $crate::hal::blocking::i2c::WriteRead for [<$I2c Master>]<CLOCK, M>
-        where
-            CLOCK: $crate::clock::Clock,
-        {
-            type Error = $crate::i2c::Error;
-
-            fn write_read(
-                &mut self,
-                address: u8,
-                bytes: &[u8],
-                buffer: &mut [u8],
-            ) -> Result<(), Self::Error> {
-                self.start(address, $crate::i2c::Direction::Write)?;
-                self.write_data(bytes)?;
-                self.start(address, $crate::i2c::Direction::Read)?;
-                self.read_data(buffer)?;
-                self.stop();
-                Ok(())
-            }
-        }
-    }};
+    };
 }
