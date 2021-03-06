@@ -20,22 +20,19 @@ You need a nightly Rust compiler for compiling Rust code for AVR.  **Note**: Due
 rustup toolchain install nightly-2021-01-07
 ```
 
-Go into `./boards/arduino-uno` (or the directory for whatever board you want), and run the following commands:
+Next, install ["ravedude"](./ravedude):
 
 ```bash
-cd boards/arduino-uno
+cargo +stable install --path ./ravedude
+```
 
-# Now you are ready to build your first avr blink example!
-cargo +nightly-2021-01-07 build --example uno-blink
+Go into `./examples/arduino-uno` (or the directory for whatever board you want), and run the following commands:
 
-# For some boards, you can even run it directly (this will attempt to flash it
-# onto a connected board):
-cargo +nightly-2021-01-07 run --example uno-blink
+```bash
+cd examples/arduino-uno
 
-# For others, you can find the binary file in
-ls ../../target/avr-atmega328p/debug/examples/uno-blink.elf
-# and e.g. create an ihex file using
-avr-objcopy -S -j .text -j .data -O ihex uno-blink.elf uno-blink.hex
+# Build an run it on a connected board
+cargo +nightly-2021-01-07 run --bin uno-blink
 ```
 
 ## Starting your own project
