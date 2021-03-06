@@ -13,3 +13,10 @@ a project for Arduino Uno, place the following into your `.cargo/config.toml`
 [target.'cfg(target_arch = "avr")']
 runner = "ravedude uno --open-console --baudrate 57600"
 ```
+
+## Installation
+Install the latest version from crates.io with the following command:
+
+```bash
+cargo install ravedude
+```
