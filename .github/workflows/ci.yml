@@ -56,3 +56,23 @@ jobs:
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
         run: cd "mcu/${{ matrix.m.crate }}" && cargo build --features "${{ matrix.m.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"
+
+  ravedude:
+    name: "ravedude"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Install libudev
+        run: sudo apt-get install -y libudev-dev
+      - name: Check ravedude
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --manifest-path ravedude/Cargo.toml
