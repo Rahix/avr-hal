@@ -1,0 +1,16 @@
+[package]
+name = "ravedude"
+version = "0.1.0"
+authors = ["Rahix <rahix@rahix.de>"]
+edition = "2018"
+
+[dependencies]
+colored = "2.0.0"
+tempfile = "3.2.0"
+serialport = "4.0.0"
+anyhow = "1.0.38"
+
+[dependencies.structopt]
+version = "0.3.21"
+default-features = false
+features = ["color"]

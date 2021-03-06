@@ -45,6 +45,10 @@ members = [
     "boards/sparkfun-pro-micro",
     "boards/trinket",
 ]
+exclude = [
+    # The RAVEDUDE! Yeah!
+    "ravedude",
+]
 
 [patch.crates-io]
 # XXX: Temporary fix for avr-rust/rust#148
