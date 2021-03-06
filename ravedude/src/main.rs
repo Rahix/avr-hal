@@ -39,6 +39,7 @@ struct Args {
     ///
     /// * uno
     /// * nano
+    /// * leonardo
     #[structopt(name = "BOARD", verbatim_doc_comment)]
     board: String,
 
