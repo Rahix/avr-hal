@@ -2,7 +2,7 @@
 target = "../../avr-specs/avr-atmega32u4.json"
 
 [target.'cfg(target_arch = "avr")']
-runner = "../../boards/arduino-leonardo/leonardo-runner.sh"
+runner = "ravedude leonardo"
 
 [unstable]
 build-std = ["core"]
