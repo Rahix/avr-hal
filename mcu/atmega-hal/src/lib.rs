@@ -9,6 +9,7 @@ compile_error!(
 
     Please select one of the following
 
+    * attiny85
     * atmega48p
     * atmega168
     * atmega328p
@@ -40,6 +41,9 @@ pub use avr_device::atmega32u4 as pac;
 /// Reexport of `atmega48p` from `avr-device`
 #[cfg(feature = "atmega48p")]
 pub use avr_device::atmega48p as pac;
+/// Reexport of `attiny85` from `avr-device`
+#[cfg(feature = "attiny85")]
+pub use avr_device::attiny85 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -68,6 +72,13 @@ pub use i2c::I2c;
 
 pub struct Atmega;
 
+#[cfg(feature = "attiny85")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTB)
+    };
+}
 #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
 #[macro_export]
 macro_rules! pins {
