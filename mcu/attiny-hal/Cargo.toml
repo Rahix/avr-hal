@@ -1,5 +1,5 @@
 [package]
-name = "atmega-hal"
+name = "attiny-hal"
 version = "0.1.0"
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2018"
@@ -7,13 +7,7 @@ edition = "2018"
 [features]
 rt = ["avr-device/rt"]
 device-selected = []
-atmega48p = ["avr-device/atmega48p", "device-selected"]
-atmega168 = ["avr-device/atmega168", "device-selected"]
-atmega328p = ["avr-device/atmega328p", "device-selected"]
-atmega328pb = ["avr-device/atmega328pb", "device-selected"]
-atmega32u4 = ["avr-device/atmega32u4", "device-selected"]
-atmega2560 = ["avr-device/atmega2560", "device-selected"]
-atmega1280 = ["avr-device/atmega1280", "device-selected"]
+attiny85 = ["avr-device/attiny85", "device-selected"]
 
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
