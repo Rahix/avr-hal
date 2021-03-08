@@ -1,0 +1,16 @@
+[package]
+name = "atmega8u2-hal"
+version = "0.1.0"
+authors = ["David Morrison <drmorr@evokewonder.com>"]
+edition = "2018"
+
+[features]
+rt = ["avr-device/rt"]
+
+[dependencies]
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+
+[dependencies.avr-device]
+git = "https://github.com/drmorr0/avr-device"
+rev = "746dd40"
+features = ["atmega8u2"]

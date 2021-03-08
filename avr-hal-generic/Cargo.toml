@@ -9,7 +9,6 @@ cfg-if = "0.1.7"
 nb = "0.1.2"
 ufmt = "0.1.0"
 paste = "1.0.0"
-avr-device = "0.3"
 
 [dependencies.embedded-hal]
 version = "0.2.3"
@@ -18,3 +17,8 @@ features = ["unproven"]
 [dependencies.void]
 version = "1.0.2"
 default-features = false
+
+[dependencies.avr-device]
+git = "https://github.com/drmorr0/avr-device"
+rev = "746dd40"
+features = ["atmega8u2"]
