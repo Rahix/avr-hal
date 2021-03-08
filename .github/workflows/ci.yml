@@ -40,11 +40,11 @@ jobs:
           - type: mcu
             name: attiny85
             spec: attiny85
-            crate: atmega-hal
+            crate: attiny-hal
           - type: mcu
             name: attiny88
             spec: attiny88
-            crate: atmega-hal
+            crate: attiny-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

@@ -27,6 +27,7 @@ members = [
 
     # MCU HAL crates
     "mcu/atmega-hal",
+    "mcu/attiny-hal",
 
     # Higher level crates
     "arduino-hal",
