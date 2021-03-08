@@ -37,6 +37,10 @@ jobs:
             name: atmega48p
             spec: atmega48p
             crate: atmega-hal
+          - type: mcu
+            name: attiny85
+            spec: attiny85
+            crate: attiny-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
