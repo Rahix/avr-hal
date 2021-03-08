@@ -32,7 +32,7 @@ pub mod port;
 #[cfg(feature = "device-selected")]
 pub use port::Pins;
 
-pub struct ATtiny;
+pub struct Attiny;
 
 #[cfg(feature = "attiny85")]
 #[macro_export]
