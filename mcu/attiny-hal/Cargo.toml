@@ -8,6 +8,7 @@ edition = "2018"
 rt = ["avr-device/rt"]
 device-selected = []
 attiny85 = ["avr-device/attiny85", "device-selected"]
+attiny88 = ["avr-device/attiny88", "device-selected"]
 
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []

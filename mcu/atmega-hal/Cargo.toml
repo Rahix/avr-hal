@@ -7,8 +7,6 @@ edition = "2018"
 [features]
 rt = ["avr-device/rt"]
 device-selected = []
-attiny85 = ["avr-device/attiny85", "device-selected"]
-attiny88 = ["avr-device/attiny88", "device-selected"]
 atmega48p = ["avr-device/atmega48p", "device-selected"]
 atmega168 = ["avr-device/atmega168", "device-selected"]
 atmega328p = ["avr-device/atmega328p", "device-selected"]
