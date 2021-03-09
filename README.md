@@ -34,6 +34,23 @@ avr-objcopy -S -j .text -j .data -O ihex uno-blink.elf uno-blink.hex
 ```
 
 ## Starting your own project
+
+### Automated way
+1. Install [cargo-generate](https://github.com/ashleygwilliams/cargo-generate)
+2. Init new project:
+   ```
+   cargo generate --git https://github.com/rustwasm/wasm-pack-template.git
+   <answer questions>
+   cd <your-project-name>
+   ```
+3. If you're using rustup, you probably want to set an override for this directory, to use the nightly toolchain (as mentioned above, use `nightly-2021-01-07` for the time being):
+   ```bash
+   rustup override set nightly-2021-01-07
+   ```
+4. Put your code in `src/main.rs` ([see examples](https://github.com/Rahix/avr-hal/blob/master/boards/arduino-uno/examples))
+5. Run your code using `cargo run` 🎉
+
+### Manual way, just arduino uno
 This is a step-by-step guide for creating a new project targeting Arduino Uno (`ATmega328P`).  You can of course apply the same steps for any other microcontroller.
 
 1. Start by creating a new project:
