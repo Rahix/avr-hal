@@ -45,6 +45,10 @@ jobs:
             name: attiny88
             spec: attiny88
             crate: attiny-hal
+          - type: mcu
+            name: atmega8u2
+            spec: atmega8u2
+            crate: atmega-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

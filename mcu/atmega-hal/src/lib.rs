@@ -9,6 +9,7 @@ compile_error!(
 
     Please select one of the following
 
+    * atmega8u2
     * atmega48p
     * atmega168
     * atmega328p
@@ -40,6 +41,9 @@ pub use avr_device::atmega32u4 as pac;
 /// Reexport of `atmega48p` from `avr-device`
 #[cfg(feature = "atmega48p")]
 pub use avr_device::atmega48p as pac;
+/// Reexport of `atmega8u2` from `avr-device`
+#[cfg(feature = "atmega8u2")]
+pub use avr_device::atmega8u2 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -78,7 +82,12 @@ pub use usart::Usart;
 
 pub struct Atmega;
 
-#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
+#[cfg(any(
+    feature = "atmega8u2",
+    feature = "atmega48p",
+    feature = "atmega168",
+    feature = "atmega328p"
+))]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
