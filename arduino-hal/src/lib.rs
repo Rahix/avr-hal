@@ -47,6 +47,18 @@ pub mod i2c {
 pub use i2c::I2c;
 
 #[cfg(feature = "board-selected")]
+pub mod adc {
+    pub use crate::hal::adc::{
+        channel, AdcChannel, AdcOps, AdcSettings, ClockDivider, ReferenceVoltage,
+    };
+
+    /// Check the [`avr_hal_generic::adc::Adc`] documentation.
+    pub type Adc = crate::hal::Adc<crate::DefaultClock>;
+}
+#[cfg(feature = "board-selected")]
+pub use adc::Adc;
+
+#[cfg(feature = "board-selected")]
 pub mod usart {
     pub use crate::hal::usart::{Baudrate, UsartOps};
 
