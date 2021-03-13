@@ -66,6 +66,11 @@ pub mod i2c;
 #[cfg(feature = "device-selected")]
 pub use i2c::I2c;
 
+#[cfg(feature = "device-selected")]
+pub mod adc;
+#[cfg(feature = "device-selected")]
+pub use adc::Adc;
+
 pub struct Atmega;
 
 #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
