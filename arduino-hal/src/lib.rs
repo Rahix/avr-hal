@@ -49,7 +49,7 @@ pub use i2c::I2c;
 #[cfg(feature = "board-selected")]
 pub mod adc {
     pub use crate::hal::adc::{
-        channel, AdcChannel, AdcOps, AdcSettings, ClockDivider, ReferenceVoltage,
+        channel, AdcChannel, AdcOps, AdcSettings, Channel, ClockDivider, ReferenceVoltage,
     };
 
     /// Check the [`avr_hal_generic::adc::Adc`] documentation.

@@ -99,6 +99,51 @@ pub trait AdcChannel<H, ADC: AdcOps<H>> {
     fn channel(&self) -> ADC::Channel;
 }
 
+/// Representation of any ADC Channel.
+///
+/// Typically, distinct types are used per channel, like for example `Pin<mode::Analog, PC0>`.  In
+/// some situations, however, a type is needed which can represent _any_ channel.  This is required
+/// to, for example, store multiple channels in an array.
+///
+/// `Channel` is such a type.  It can be created by calling the [`into_channel()`][into-channel]
+/// method of a distinct type:
+///
+/// ```
+/// let a0 = pins.a0.into_analog_input(&mut adc);
+/// let a1 = pins.a1.into_analog_input(&mut adc);
+///
+/// let channels: [atmega_hal::adc::Channel; 2] = [
+///     a0.into_channel(),
+///     a1.into_channel(),
+/// ];
+///
+/// for ch in channels.iter() {
+///     adc.read_blocking(ch);
+/// }
+/// ```
+///
+/// [into-channel]: crate::port::Pin::into_channel
+pub struct Channel<H, ADC: AdcOps<H>> {
+    ch: ADC::Channel,
+    _h: PhantomData<H>,
+}
+
+impl<H, ADC: AdcOps<H>> Channel<H, ADC> {
+    pub fn new<CH: AdcChannel<H, ADC>>(ch: CH) -> Self {
+        Self {
+            ch: ch.channel(),
+            _h: PhantomData,
+        }
+    }
+}
+
+impl<H, ADC: AdcOps<H>> AdcChannel<H, ADC> for Channel<H, ADC> {
+    #[inline]
+    fn channel(&self) -> ADC::Channel {
+        self.ch
+    }
+}
+
 /// Analog-to-Digital Converter
 /// ```
 /// let dp = atmega_hal::Peripherals::take().unwrap();
@@ -277,6 +322,18 @@ macro_rules! impl_adc {
             #[inline]
             fn channel(&self) -> $Channel {
                 $channel
+            }
+        }
+
+        /// Convert this channel into a generic "[`Channel`][adc-channel]" type.
+        ///
+        /// The generic channel type can be used to store multiple channels in an array.
+        ///
+        /// [adc-channel]: crate::adc::Channel
+        $(#[$channel_attr])*
+        impl $channel_ty {
+            pub fn into_channel(self) -> $crate::adc::Channel<$HAL, $ADC> {
+                crate::adc::Channel::new(self)
             }
         }
         )*)?

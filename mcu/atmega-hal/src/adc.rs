@@ -6,6 +6,9 @@ pub use avr_hal_generic::adc::{AdcChannel, AdcOps, AdcSettings, ClockDivider, Re
 /// Check the [`avr_hal_generic::adc::Adc`] documentation.
 pub type Adc<CLOCK> = avr_hal_generic::adc::Adc<crate::Atmega, crate::pac::ADC, CLOCK>;
 
+/// Check the [`avr_hal_generic::adc::Channel`] documentation.
+pub type Channel = avr_hal_generic::adc::Channel<crate::Atmega, crate::pac::ADC>;
+
 /// Additional channels
 ///
 /// Some channels are not directly connected to pins.  This module provides types which can be used

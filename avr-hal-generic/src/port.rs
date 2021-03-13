@@ -304,6 +304,19 @@ impl<PIN: PinOps> Pin<mode::Analog, PIN> {
     {
         adc.read_blocking(self)
     }
+
+    /// Convert this pin into a generic [`Channel`][adc-channel] type.
+    ///
+    /// The generic channel type can be used to store multiple channels in an array.
+    ///
+    /// [adc-channel]: crate::adc::Channel
+    pub fn into_channel<H, ADC>(self) -> crate::adc::Channel<H, ADC>
+    where
+        Pin<mode::Analog, PIN>: crate::adc::AdcChannel<H, ADC>,
+        ADC: crate::adc::AdcOps<H>,
+    {
+        crate::adc::Channel::new(self)
+    }
 }
 
 #[macro_export]
