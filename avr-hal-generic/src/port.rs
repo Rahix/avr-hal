@@ -35,6 +35,8 @@ pub mod mode {
     pub struct AnyInput;
     impl InputMode for AnyInput {}
     impl crate::Sealed for AnyInput {}
+
+    pub struct Analog;
 }
 
 pub trait PinOps {
@@ -135,6 +137,27 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
             pin: self.pin,
             _mode: PhantomData,
         }
+    }
+
+    /// Convert this pin into an analog input (ADC channel).  See [Analog Input](#analog-input).
+    ///
+    /// Some pins can be repurposed as ADC channels.  For those pins, the `into_analog_input()`
+    /// method is available.
+    pub fn into_analog_input<H, ADC, CLOCK>(
+        self,
+        adc: &mut crate::adc::Adc<H, ADC, CLOCK>,
+    ) -> Pin<mode::Analog, PIN>
+    where
+        Pin<mode::Analog, PIN>: crate::adc::AdcChannel<H, ADC>,
+        ADC: crate::adc::AdcOps<H>,
+        CLOCK: crate::clock::Clock,
+    {
+        let new = Pin {
+            pin: self.pin,
+            _mode: PhantomData,
+        };
+        adc.enable_pin(&new);
+        new
     }
 }
 
@@ -253,6 +276,33 @@ impl<PIN: PinOps, IMODE: mode::InputMode> Pin<mode::Input<IMODE>, PIN> {
     #[inline]
     pub fn is_low(&self) -> bool {
         !unsafe { self.pin.in_get() }
+    }
+}
+
+/// # Analog Input
+///
+/// Some pins can be configured as ADC channels.  For those pins, `analog_read()` can be used to
+/// read the voltage.  `analog_read()` corresponds to a blocking ADC read:
+///
+/// ```
+/// let dp = atmega_hal::Peripherals::take().unwrap();
+/// let pins = atmega_hal::pins!(dp);
+/// let mut adc = atmega_hal::Adc::new(dp.ADC, Default::default());
+///
+/// let a0 = dp.pc0.into_analog_input(&mut adc);
+///
+/// let voltage = a0.analog_read(&mut adc);
+/// // ^- this is equivalent to -v
+/// let voltage = adc.read_blocking(&a0);
+/// ```
+impl<PIN: PinOps> Pin<mode::Analog, PIN> {
+    pub fn analog_read<H, ADC, CLOCK>(&self, adc: &mut crate::adc::Adc<H, ADC, CLOCK>) -> u16
+    where
+        Pin<mode::Analog, PIN>: crate::adc::AdcChannel<H, ADC>,
+        ADC: crate::adc::AdcOps<H>,
+        CLOCK: crate::clock::Clock,
+    {
+        adc.read_blocking(self)
     }
 }
 
