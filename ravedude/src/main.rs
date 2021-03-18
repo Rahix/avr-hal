@@ -71,7 +71,11 @@ fn ravedude() -> anyhow::Result<()> {
     }
 
     let port = args.port.map_or_else(
-        || board.guess_port().context("no matching serial port found"),
+        || {
+            board.guess_port().context(
+                "no matching serial port found, use -P or set RAVEDUDE_PORT in your environment",
+            )
+        },
         Ok,
     )?;
 
