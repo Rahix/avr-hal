@@ -85,7 +85,7 @@ fn ravedude() -> anyhow::Result<()> {
         Ok,
     )?;
 
-    if let Some(bin) = args.bin {
+    if let Some(bin) = args.bin.as_ref() {
         task_message!(
             "Programming",
             "{} {} {}",
@@ -94,7 +94,7 @@ fn ravedude() -> anyhow::Result<()> {
             port.display()
         );
 
-        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), &port, &bin)?;
+        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), &port, bin)?;
         avrdude.wait()?;
 
         task_message!("Programmed", "{}", bin.display());
@@ -113,6 +113,8 @@ fn ravedude() -> anyhow::Result<()> {
 
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
         console::open(&port, baudrate)?;
+    } else if args.bin.is_none() {
+        warning!("you probably meant to add -c/--open-console?");
     }
 
     Ok(())
