@@ -5,6 +5,7 @@ use structopt::clap::AppSettings;
 mod avrdude;
 mod board;
 mod console;
+mod ui;
 
 /// ravedude is a rust wrapper around avrdude for providing the smoothest possible development
 /// experience with rust on AVR microcontrollers.
@@ -50,21 +51,7 @@ fn main() {
     match ravedude() {
         Ok(()) => (),
         Err(e) => {
-            eprintln!(
-                "{}{}{}",
-                "Error".red().bold(),
-                ": ".bold(),
-                e.to_string().bold()
-            );
-            eprintln!("");
-            for cause in e.chain().skip(1) {
-                eprintln!(
-                    "{}{}{}",
-                    "Caused by".yellow().bold(),
-                    ": ".bold(),
-                    cause.to_string().bold()
-                );
-            }
+            ui::print_error(e);
             std::process::exit(1);
         }
     }
@@ -75,14 +62,10 @@ fn ravedude() -> anyhow::Result<()> {
 
     let board = board::get_board(&args.board).expect("board not found");
 
-    eprintln!("{:>12} {}", "Board".green().bold(), board.display_name());
+    task_message!("Board", "{}", board.display_name());
 
     if board.needs_reset() {
-        eprintln!(
-            "{}{}",
-            "Warning".yellow().bold(),
-            ": this board cannot reset itself.".bold()
-        );
+        warning!("this board cannot reset itself.");
         eprint!("Press the reset-button and then ENTER here: ");
         std::io::stdin().read_line(&mut String::new())?;
     }
@@ -93,9 +76,9 @@ fn ravedude() -> anyhow::Result<()> {
     )?;
 
     if let Some(bin) = args.bin {
-        eprintln!(
-            "{:>12} {} {} {}",
-            "Programming".green().bold(),
+        task_message!(
+            "Programming",
+            "{} {} {}",
             bin.display(),
             "=>".blue().bold(),
             port.display()
@@ -104,11 +87,11 @@ fn ravedude() -> anyhow::Result<()> {
         let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), &port, &bin)?;
         avrdude.wait()?;
 
-        eprintln!("{:>12} {}", "Programmed".green().bold(), bin.display());
+        task_message!("Programmed", "{}", bin.display());
     } else {
-        eprintln!(
-            "{:>12} {}",
+        task_message!(
             "",
+            "{}",
             "(Skip flashing because no binary was given)".dimmed()
         );
     }
@@ -118,12 +101,7 @@ fn ravedude() -> anyhow::Result<()> {
             .baudrate
             .context("-b/--baudrate is needed for the serial console")?;
 
-        eprintln!(
-            "{:>12} {} at {} baud",
-            "Console".green().bold(),
-            port.display(),
-            baudrate
-        );
+        task_message!("Console", "{} at {} baud", port.display(), baudrate);
         console::open(&port, baudrate)?;
     }
 

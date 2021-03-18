@@ -6,7 +6,7 @@ pub fn open(port: &std::path::Path, baudrate: u32) -> anyhow::Result<()> {
     let mut rx = serialport::new(port.to_string_lossy(), baudrate)
         .timeout(std::time::Duration::from_secs(2))
         .open_native()
-        .with_context(|| format!("failed to open serial port {}", port.display()))?;
+        .with_context(|| format!("failed to open serial port `{}`", port.display()))?;
     let mut tx = rx.try_clone_native()?;
 
     let mut stdin = std::io::stdin();
