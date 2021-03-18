@@ -15,6 +15,7 @@ colored = "2.0.0"
 tempfile = "3.2.0"
 serialport = "4.0.0"
 anyhow = "1.0.38"
+git-version = "0.3.4"
 
 [dependencies.structopt]
 version = "0.3.21"

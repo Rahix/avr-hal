@@ -14,7 +14,13 @@ mod ui;
 #[derive(structopt::StructOpt, Debug)]
 #[structopt(name = "ravedude",
     setting = AppSettings::ColoredHelp,
-    setting = AppSettings::DeriveDisplayOrder)]
+    setting = AppSettings::DeriveDisplayOrder,
+    version = git_version::git_version!(
+        args = ["--always", "--dirty", "--abbrev=12"],
+        cargo_prefix = "v",
+        cargo_suffix = " (no git)",
+        fallback = "unknown"
+    ))]
 struct Args {
     /// After sucessfully flashing the program, open a serial console to see output sent by the
     /// board and possibly interact with it.
