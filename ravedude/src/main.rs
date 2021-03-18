@@ -20,10 +20,6 @@ struct Args {
     #[structopt(short = "c", long = "open-console")]
     open_console: bool,
 
-    /// Do not actually flash the program, just pretend to do it.
-    #[structopt(short = "n", long = "no-program")]
-    no_program: bool,
-
     /// Baudrate which should be used for the serial console.
     #[structopt(short = "b", long = "baudrate")]
     baudrate: Option<u32>,
@@ -44,8 +40,10 @@ struct Args {
     board: String,
 
     /// The binary to be flashed.
+    ///
+    /// If no binary is given, flashing will be skipped.
     #[structopt(name = "BINARY", parse(from_os_str))]
-    bin: std::path::PathBuf,
+    bin: Option<std::path::PathBuf>,
 }
 
 fn main() {
@@ -94,26 +92,26 @@ fn ravedude() -> anyhow::Result<()> {
         Ok,
     )?;
 
-    eprintln!(
-        "{:>12} {} {} {}",
-        "Programming".green().bold(),
-        args.bin.display(),
-        "=>".blue().bold(),
-        port.display()
-    );
-
-    if args.no_program {
+    if let Some(bin) = args.bin {
         eprintln!(
-            "{}{}",
-            "Warning".yellow().bold(),
-            ": skipped due to --no-progam".bold()
+            "{:>12} {} {} {}",
+            "Programming".green().bold(),
+            bin.display(),
+            "=>".blue().bold(),
+            port.display()
         );
-    } else {
-        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), &port, &args.bin)?;
-        avrdude.wait()?;
-    }
 
-    eprintln!("{:>12} {}", "Programmed".green().bold(), args.bin.display());
+        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), &port, &bin)?;
+        avrdude.wait()?;
+
+        eprintln!("{:>12} {}", "Programmed".green().bold(), bin.display());
+    } else {
+        eprintln!(
+            "{:>12} {}",
+            "",
+            "(Skip flashing because no binary was given)".dimmed()
+        );
+    }
 
     if args.open_console {
         let baudrate = args
