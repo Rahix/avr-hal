@@ -9,8 +9,8 @@ pub trait Board {
 
 pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
     Some(match board {
-        "uno" => Box::new(ArduinoUno::new(UnoVariant::Uno)),
-        "nano" => Box::new(ArduinoUno::new(UnoVariant::Nano)),
+        "uno" => Box::new(ArduinoUno),
+        "nano" => Box::new(ArduinoNano),
         "leonardo" => Box::new(ArduinoLeonardo),
         _ => return None,
     })
@@ -37,27 +37,11 @@ fn find_port_from_vid_pid_list(list: &[(u16, u16)]) -> Option<std::path::PathBuf
 
 // ----------------------------------------------------------------------------
 
-enum UnoVariant {
-    Uno,
-    Nano,
-}
-
-struct ArduinoUno {
-    variant: UnoVariant,
-}
-
-impl ArduinoUno {
-    pub fn new(variant: UnoVariant) -> Self {
-        ArduinoUno { variant }
-    }
-}
+struct ArduinoUno;
 
 impl Board for ArduinoUno {
     fn display_name(&self) -> &str {
-        match self.variant {
-            UnoVariant::Uno => "Arduino Uno",
-            UnoVariant::Nano => "Arduino Nano",
-        }
+        "Arduino Uno"
     }
 
     fn needs_reset(&self) -> bool {
@@ -79,6 +63,30 @@ impl Board for ArduinoUno {
             (0x2A03, 0x0043),
             (0x2341, 0x0243),
         ])
+    }
+}
+
+struct ArduinoNano;
+
+impl Board for ArduinoNano {
+    fn display_name(&self) -> &str {
+        "Arduino Nano"
+    }
+
+    fn needs_reset(&self) -> bool {
+        false
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "arduino",
+            partno: "atmega328p",
+            baudrate: Some(57600),
+        }
+    }
+
+    fn guess_port(&self) -> Option<std::path::PathBuf> {
+        None
     }
 }
 
