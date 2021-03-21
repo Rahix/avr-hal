@@ -1,5 +1,0 @@
-[build]
-target = "../../avr-specs/avr-atmega1280.json"
-
-[unstable]
-build-std = ["core"]

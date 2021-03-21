@@ -1,5 +1,0 @@
-[build]
-target = "../../avr-specs/avr-atmega32u4.json"
-
-[unstable]
-build-std = ["core"]

@@ -15,16 +15,6 @@ members = [
     # The generic hal definitions
     "avr-hal-generic",
 
-    # The chip definitions
-    "chips/atmega1280-hal",
-    "chips/atmega168-hal",
-    "chips/atmega2560-hal",
-    "chips/atmega328p-hal",
-    "chips/atmega32u4-hal",
-    "chips/atmega48p-hal",
-    "chips/attiny85-hal",
-    "chips/attiny88-hal",
-
     # MCU HAL crates
     "mcu/atmega-hal",
     "mcu/attiny-hal",
@@ -36,15 +26,6 @@ members = [
     "examples/arduino-leonardo",
     "examples/arduino-uno",
     "examples/arduino-mega2560",
-
-    # The board crates
-    "boards/arduino-diecimila",
-    "boards/arduino-leonardo",
-    "boards/arduino-uno",
-    "boards/arduino-mega2560",
-    "boards/bigavr6",
-    "boards/sparkfun-pro-micro",
-    "boards/trinket",
 ]
 exclude = [
     # The RAVEDUDE! Yeah!
