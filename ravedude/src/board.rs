@@ -12,6 +12,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "uno" => Box::new(ArduinoUno),
         "nano" => Box::new(ArduinoNano),
         "leonardo" => Box::new(ArduinoLeonardo),
+        "mega2560" => Box::new(ArduinoMega2560),
         _ => return None,
     })
 }
@@ -118,6 +119,38 @@ impl Board for ArduinoLeonardo {
             (0x2341, 0x8036),
             (0x2A03, 0x0036),
             (0x2A03, 0x8036),
+        ])
+    }
+}
+
+struct ArduinoMega2560;
+
+impl Board for ArduinoMega2560 {
+    fn display_name(&self) -> &str {
+        "Arduino Mega 2560"
+    }
+
+    fn needs_reset(&self) -> bool {
+        false
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "wiring",
+            partno: "atmega2560",
+            baudrate: Some(115200),
+            do_chip_erase: false,
+        }
+    }
+
+    fn guess_port(&self) -> Option<std::path::PathBuf> {
+        find_port_from_vid_pid_list(&[
+            (0x2341, 0x0010),
+            (0x2341, 0x0042),
+            (0x2A03, 0x0010),
+            (0x2A03, 0x0042),
+            (0x2341, 0x0210),
+            (0x2341, 0x0242),
         ])
     }
 }
