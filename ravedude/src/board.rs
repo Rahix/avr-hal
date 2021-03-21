@@ -53,6 +53,7 @@ impl Board for ArduinoUno {
             programmer: "arduino",
             partno: "atmega328p",
             baudrate: None,
+            do_chip_erase: true,
         }
     }
 
@@ -82,6 +83,7 @@ impl Board for ArduinoNano {
             programmer: "arduino",
             partno: "atmega328p",
             baudrate: Some(57600),
+            do_chip_erase: true,
         }
     }
 
@@ -106,6 +108,7 @@ impl Board for ArduinoLeonardo {
             programmer: "avr109",
             partno: "atmega32u4",
             baudrate: None,
+            do_chip_erase: true,
         }
     }
 

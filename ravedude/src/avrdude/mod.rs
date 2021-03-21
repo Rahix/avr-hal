@@ -7,6 +7,7 @@ pub struct AvrdudeOptions<'a> {
     pub programmer: &'a str,
     pub partno: &'a str,
     pub baudrate: Option<u32>,
+    pub do_chip_erase: bool,
 }
 
 #[derive(Debug)]
@@ -56,7 +57,11 @@ impl Avrdude {
         flash_instruction.push(bin);
         flash_instruction.push(":e");
 
-        command = command.arg("-e").arg("-D").arg("-U").arg(flash_instruction);
+        if options.do_chip_erase {
+            command = command.arg("-e");
+        }
+
+        command = command.arg("-D").arg("-U").arg(flash_instruction);
 
         let process = command.spawn().context("failed starting avrdude")?;
 
