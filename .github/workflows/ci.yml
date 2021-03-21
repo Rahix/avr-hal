@@ -78,7 +78,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Install libudev
-        run: sudo apt-get install -y libudev-dev
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev
       - name: Check ravedude
         uses: actions-rs/cargo@v1
         with:
