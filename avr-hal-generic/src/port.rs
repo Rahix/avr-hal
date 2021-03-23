@@ -107,8 +107,21 @@ impl<PIN: PinOps> Pin<mode::Input<mode::Floating>, PIN> {
 /// does it have the mode-relevant methods availailable (e.g. `set_high()` is only available for
 /// `Output` pins).
 impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
-    /// Convert this pin into an output pin.  See [Digital Output](#digital-output).
+    /// Convert this pin into an output pin, setting the state to low.
+    /// See [Digital Output](#digital-output).
     pub fn into_output(mut self) -> Pin<mode::Output, PIN> {
+        unsafe { self.pin.out_clear() };
+        unsafe { self.pin.make_output() };
+        Pin {
+            pin: self.pin,
+            _mode: PhantomData,
+        }
+    }
+
+    /// Convert this pin into an output pin, setting the state to high.
+    /// See [Digital Output](#digital-output).
+    pub fn into_output_high(mut self) -> Pin<mode::Output, PIN> {
+        unsafe { self.pin.out_set() };
         unsafe { self.pin.make_output() };
         Pin {
             pin: self.pin,
