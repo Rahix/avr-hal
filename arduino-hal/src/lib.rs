@@ -6,9 +6,10 @@ compile_error!(
 
     Please select one of the following
 
-    * arduino-uno
     * arduino-leonardo
     * arduino-mega2560
+    * arduino-nano
+    * arduino-uno
     "
 );
 
@@ -74,7 +75,7 @@ pub use usart::Usart;
 #[cfg(feature = "board-selected")]
 pub mod prelude {
     cfg_if::cfg_if! {
-        if #[cfg(feature = "arduino-uno")] {
+        if #[cfg(any(feature = "arduino-mega2560", feature = "arduino-uno"))] {
             pub use crate::hal::usart::BaudrateArduinoExt as _;
         } else {
             pub use crate::hal::usart::BaudrateExt as _;
@@ -94,18 +95,6 @@ macro_rules! pins {
     };
 }
 
-#[cfg(any(feature = "arduino-uno"))]
-#[macro_export]
-macro_rules! default_serial {
-    ($p:expr, $pins:expr, $baud:expr) => {
-        $crate::Usart::new(
-            $p.USART0,
-            $pins.d0,
-            $pins.d1.into_output(),
-            $crate::hal::usart::BaudrateArduinoExt::into_baudrate($baud),
-        )
-    };
-}
 #[cfg(any(feature = "arduino-leonardo"))]
 #[macro_export]
 macro_rules! default_serial {
@@ -118,7 +107,21 @@ macro_rules! default_serial {
         )
     };
 }
-#[cfg(any(feature = "arduino-mega2560"))]
+// See comment in avr-hal-generic/src/usart.rs for why these boards use
+// the BaudrateArduinoExt trait instead of BaudrateExt
+#[cfg(any(feature = "arduino-mega2560", feature = "arduino-uno"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART0,
+            $pins.d0,
+            $pins.d1.into_output(),
+            $crate::hal::usart::BaudrateArduinoExt::into_baudrate($baud),
+        )
+    };
+}
+#[cfg(feature = "arduino-nano")]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {

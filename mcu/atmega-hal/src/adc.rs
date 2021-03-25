@@ -22,18 +22,24 @@ pub type Channel = avr_hal_generic::adc::Channel<crate::Atmega, crate::pac::ADC>
 /// let value = adc.read_blocking(&channel::Vbg);
 /// ```
 pub mod channel {
-    #[cfg(any(
-        feature = "atmega168",
-        feature = "atmega328p",
-        feature = "atmega328pb",
-        feature = "atmega48p"
+    #[cfg(all(
+        any(
+            feature = "atmega168",
+            feature = "atmega328p",
+            feature = "atmega328pb",
+            feature = "atmega48p",
+        ),
+        feature = "enable-extra-adc",
     ))]
     pub struct ADC6;
-    #[cfg(any(
-        feature = "atmega168",
-        feature = "atmega328p",
-        feature = "atmega328pb",
-        feature = "atmega48p"
+    #[cfg(all(
+        any(
+            feature = "atmega168",
+            feature = "atmega328p",
+            feature = "atmega328pb",
+            feature = "atmega48p"
+        ),
+        feature = "enable-extra-adc",
     ))]
     pub struct ADC7;
     #[cfg(any(
@@ -87,7 +93,9 @@ avr_hal_generic::impl_adc! {
         port::PC5: (crate::pac::adc::admux::MUX_A::ADC5, didr0::adc5d),
     },
     channels: {
+        #[cfg(feature = "enable-extra-adc")]
         channel::ADC6: crate::pac::adc::admux::MUX_A::ADC6,
+        #[cfg(feature = "enable-extra-adc")]
         channel::ADC7: crate::pac::adc::admux::MUX_A::ADC7,
         channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
         channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,

@@ -44,6 +44,14 @@ fn main() -> ! {
             ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).void_unwrap();
         }
 
+        // Arduino Nano has two more ADC pins A6 and A7.  Accessing them works a bit different from
+        // the other pins as they are not normal IO pins.  The code below shows how it works.
+        let (a6, a7) = (
+            adc.read_blocking(&adc::channel::ADC6),
+            adc.read_blocking(&adc::channel::ADC7),
+        );
+        ufmt::uwrite!(&mut serial, "A6: {} A7: {}", a6, a7).void_unwrap();
+
         ufmt::uwriteln!(&mut serial, "").void_unwrap();
         arduino_hal::delay_ms(1000);
     }

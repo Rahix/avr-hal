@@ -24,8 +24,9 @@ members = [
 
     # Examples
     "examples/arduino-leonardo",
-    "examples/arduino-uno",
     "examples/arduino-mega2560",
+    "examples/arduino-nano",
+    "examples/arduino-uno",
 ]
 exclude = [
     # The RAVEDUDE! Yeah!
