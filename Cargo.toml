@@ -25,6 +25,7 @@ members = [
     # Examples
     "examples/arduino-leonardo",
     "examples/arduino-mega2560",
+    "examples/arduino-micro",
     "examples/arduino-nano",
     "examples/arduino-uno",
 ]
