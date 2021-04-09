@@ -21,6 +21,8 @@ jobs:
             name: arduino-leonardo
           - type: board
             name: arduino-mega2560
+          - type: board
+            name: arduino-micro
           - type: mcu
             name: atmega1280
             spec: atmega1280
