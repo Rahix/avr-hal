@@ -11,6 +11,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
     Some(match board {
         "uno" => Box::new(ArduinoUno),
         "nano" => Box::new(ArduinoNano),
+        "micro" => Box::new(ArduinoMicro),
         "leonardo" => Box::new(ArduinoLeonardo),
         "mega2560" => Box::new(ArduinoMega2560),
         _ => return None,
@@ -83,6 +84,31 @@ impl Board for ArduinoNano {
         avrdude::AvrdudeOptions {
             programmer: "arduino",
             partno: "atmega328p",
+            baudrate: Some(57600),
+            do_chip_erase: true,
+        }
+    }
+
+    fn guess_port(&self) -> Option<std::path::PathBuf> {
+        None
+    }
+}
+
+struct ArduinoMicro;
+
+impl Board for ArduinoMicro {
+    fn display_name(&self) -> &str {
+        "Arduino Micro"
+    }
+
+    fn needs_reset(&self) -> bool {
+        false
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "avr109",
+            partno: "atmega32u4",
             baudrate: Some(57600),
             do_chip_erase: true,
         }
