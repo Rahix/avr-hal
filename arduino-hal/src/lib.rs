@@ -133,3 +133,16 @@ macro_rules! default_serial {
         )
     };
 }
+
+#[cfg(any(feature = "arduino-micro"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART1,
+            $pins.d0,
+            $pins.d1.into_output(),
+            $crate::hal::usart::BaudrateExt::into_baudrate($baud),
+        )
+    };
+}

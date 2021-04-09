@@ -4,6 +4,7 @@ pub(crate) mod default {
     #[cfg(any(
         feature = "arduino-leonardo",
         feature = "arduino-mega2560",
+        feature = "arduino-micro",
         feature = "arduino-nano",
         feature = "arduino-uno",
     ))]

@@ -10,3 +10,8 @@ pub use mega2560::*;
 mod uno;
 #[cfg(any(feature = "arduino-nano", feature = "arduino-uno"))]
 pub use uno::*;
+
+#[cfg(feature = "arduino-micro")]
+mod micro;
+#[cfg(feature = "arduino-micro")]
+pub use micro::*;
