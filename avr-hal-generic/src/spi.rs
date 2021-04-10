@@ -74,7 +74,8 @@ impl Default for Settings {
 pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
     fn raw_setup(&mut self, settings: &Settings);
     fn raw_release(&mut self);
-    fn raw_flush(&mut self) -> nb::Result<(), void::Void>;
+
+    fn raw_check_iflag(&self) -> bool;
     fn raw_read(&self) -> u8;
     fn raw_write(&mut self, byte: u8);
 }
@@ -85,35 +86,34 @@ pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
 /// changed from Output. This is necessary because the SPI state machine would otherwise
 /// reset itself to SPI slave mode immediately. This wrapper can be used just like an
 /// output pin, because it implements all the same traits from embedded-hal.
-pub struct ChipSelectPin<CSPIN: hal::digital::v2::OutputPin>(CSPIN);
+pub struct ChipSelectPin<CSPIN>(port::Pin<port::mode::Output, CSPIN>);
 
-impl<CSPIN: hal::digital::v2::OutputPin> hal::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
-    type Error = <CSPIN as hal::digital::v2::OutputPin>::Error;
+impl<CSPIN: port::PinOps> hal::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
+    type Error = crate::void::Void;
     fn set_low(&mut self) -> Result<(), Self::Error> {
-        self.0.set_low()
+        self.0.set_low();
+        Ok(())
     }
     fn set_high(&mut self) -> Result<(), Self::Error> {
-        self.0.set_high()
+        self.0.set_high();
+        Ok(())
     }
 }
 
-impl<CSPIN: hal::digital::v2::StatefulOutputPin> hal::digital::v2::StatefulOutputPin
-    for ChipSelectPin<CSPIN>
-{
+impl<CSPIN: port::PinOps> hal::digital::v2::StatefulOutputPin for ChipSelectPin<CSPIN> {
     fn is_set_low(&self) -> Result<bool, Self::Error> {
-        self.0.is_set_low()
+        Ok(self.0.is_set_low())
     }
     fn is_set_high(&self) -> Result<bool, Self::Error> {
-        self.0.is_set_high()
+        Ok(self.0.is_set_high())
     }
 }
 
-impl<CSPIN: hal::digital::v2::OutputPin + hal::digital::v2::ToggleableOutputPin>
-    hal::digital::v2::ToggleableOutputPin for ChipSelectPin<CSPIN>
-{
-    type Error = <CSPIN as hal::digital::v2::ToggleableOutputPin>::Error;
+impl<CSPIN: port::PinOps> hal::digital::v2::ToggleableOutputPin for ChipSelectPin<CSPIN> {
+    type Error = crate::void::Void;
     fn toggle(&mut self) -> Result<(), Self::Error> {
-        self.0.toggle()
+        self.0.toggle();
+        Ok(())
     }
 }
 
@@ -127,6 +127,7 @@ pub struct Spi<H, SPI, SCLK, MOSI, MISO, CS> {
     sclk: SCLK,
     mosi: MOSI,
     miso: MISO,
+    write_in_progress: bool,
     _cs: PhantomData<CS>,
     _h: PhantomData<H>,
 }
@@ -165,7 +166,7 @@ where
         sclk: port::Pin<port::mode::Output, SCLKPIN>,
         mosi: port::Pin<port::mode::Output, MOSIPIN>,
         miso: port::Pin<port::mode::Input<port::mode::PullUp>, MISOPIN>,
-        cs: CSPIN,
+        cs: port::Pin<port::mode::Output, CSPIN>,
         settings: Settings,
     ) -> (Self, ChipSelectPin<CSPIN>) {
         let mut spi = Self {
@@ -173,6 +174,7 @@ where
             sclk,
             mosi,
             miso: miso.forget_imode(),
+            write_in_progress: false,
             _cs: PhantomData,
             _h: PhantomData,
         };
@@ -198,6 +200,7 @@ where
             sclk,
             mosi,
             miso: miso.forget_imode(),
+            write_in_progress: false,
             _cs: PhantomData,
             _h: PhantomData,
         };
@@ -208,7 +211,7 @@ where
     /// Reconfigure the SPI peripheral after initializing
     pub fn reconfigure(&mut self, settings: Settings) -> nb::Result<(), crate::void::Void> {
         // wait for any in-flight writes to complete
-        self.p.raw_flush()?;
+        self.flush()?;
         self.p.raw_setup(&settings);
         Ok(())
     }
@@ -224,49 +227,117 @@ where
         port::Pin<port::mode::Output, SCLKPIN>,
         port::Pin<port::mode::Output, MOSIPIN>,
         port::Pin<port::mode::Input, MISOPIN>,
-        CSPIN,
+        port::Pin<port::mode::Output, CSPIN>,
     ) {
         self.p.raw_release();
         (self.p, self.sclk, self.mosi, self.miso, cs.0)
+    }
+
+    fn flush(&mut self) -> nb::Result<(), void::Void> {
+        if self.write_in_progress {
+            if self.p.raw_check_iflag() {
+                self.write_in_progress = false;
+            } else {
+                return Err(nb::Error::WouldBlock);
+            }
+        }
+        Ok(())
+    }
+
+    fn write(&mut self, byte: u8) {
+        self.write_in_progress = true;
+        self.p.raw_write(byte);
     }
 }
 
 /// FullDuplex trait implementation, allowing this struct to be provided to
 /// drivers that require it for operation.  Only 8-bit word size is supported
 /// for now.
-impl<H, SPI, SCLK, MOSI, MISO, CS> spi::FullDuplex<u8> for Spi<H, SPI, SCLK, MOSI, MISO, CS>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> spi::FullDuplex<u8>
+    for Spi<
+        H,
+        SPI,
+        port::Pin<port::mode::Output, SCLKPIN>,
+        port::Pin<port::mode::Output, MOSIPIN>,
+        port::Pin<port::mode::Input, MISOPIN>,
+        port::Pin<port::mode::Output, CSPIN>,
+    >
 where
-    SPI: SpiOps<H, SCLK, MOSI, MISO, CS>,
+    SPI: SpiOps<
+        H,
+        port::Pin<port::mode::Output, SCLKPIN>,
+        port::Pin<port::mode::Output, MOSIPIN>,
+        port::Pin<port::mode::Input, MISOPIN>,
+        port::Pin<port::mode::Output, CSPIN>,
+    >,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+    CSPIN: hal::digital::v2::OutputPin,
 {
     type Error = void::Void;
 
     /// Sets up the device for transmission and sends the data
     fn send(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
-        self.p.raw_flush()?;
-        self.p.raw_write(byte);
+        self.flush()?;
+        self.write(byte);
         Ok(())
     }
 
     /// Reads and returns the response in the data register
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
-        self.p.raw_flush()?;
+        self.flush()?;
         Ok(self.p.raw_read())
     }
 }
 
 /// Default Transfer trait implementation. Only 8-bit word size is supported for now.
-impl<H, SPI, SCLK, MOSI, MISO, CS> hal::blocking::spi::transfer::Default<u8>
-    for Spi<H, SPI, SCLK, MOSI, MISO, CS>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> hal::blocking::spi::transfer::Default<u8>
+    for Spi<
+        H,
+        SPI,
+        port::Pin<port::mode::Output, SCLKPIN>,
+        port::Pin<port::mode::Output, MOSIPIN>,
+        port::Pin<port::mode::Input, MISOPIN>,
+        port::Pin<port::mode::Output, CSPIN>,
+    >
 where
-    SPI: SpiOps<H, SCLK, MOSI, MISO, CS>,
+    SPI: SpiOps<
+        H,
+        port::Pin<port::mode::Output, SCLKPIN>,
+        port::Pin<port::mode::Output, MOSIPIN>,
+        port::Pin<port::mode::Input, MISOPIN>,
+        port::Pin<port::mode::Output, CSPIN>,
+    >,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+    CSPIN: hal::digital::v2::OutputPin,
 {
 }
 
 /// Default Write trait implementation. Only 8-bit word size is supported for now.
-impl<H, SPI, SCLK, MOSI, MISO, CS> hal::blocking::spi::write::Default<u8>
-    for Spi<H, SPI, SCLK, MOSI, MISO, CS>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> hal::blocking::spi::write::Default<u8>
+    for Spi<
+        H,
+        SPI,
+        port::Pin<port::mode::Output, SCLKPIN>,
+        port::Pin<port::mode::Output, MOSIPIN>,
+        port::Pin<port::mode::Input, MISOPIN>,
+        port::Pin<port::mode::Output, CSPIN>,
+    >
 where
-    SPI: SpiOps<H, SCLK, MOSI, MISO, CS>,
+    SPI: SpiOps<
+        H,
+        port::Pin<port::mode::Output, SCLKPIN>,
+        port::Pin<port::mode::Output, MOSIPIN>,
+        port::Pin<port::mode::Input, MISOPIN>,
+        port::Pin<port::mode::Output, CSPIN>,
+    >,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+    CSPIN: hal::digital::v2::OutputPin,
 {
 }
 
@@ -281,7 +352,6 @@ macro_rules! impl_spi {
         miso: $misopin:ty,
         cs: $cspin:ty,
     ) => {
-        static mut IS_WRITE_IN_PROGRESS: bool = false;
         impl
             $crate::spi::SpiOps<
                 $HAL,
@@ -344,6 +414,11 @@ macro_rules! impl_spi {
                 self.spcr.write(|w| w.spe().clear_bit());
             }
 
+            /// Check the interrupt flag to see if the write has completed
+            fn raw_check_iflag(&self) -> bool {
+                self.spsr.read().spif().bit_is_set()
+            }
+
             /// Read a byte from the data register
             fn raw_read(&self) -> u8 {
                 self.spdr.read().bits()
@@ -352,24 +427,7 @@ macro_rules! impl_spi {
             /// Write a byte to the data register, which begins transmission
             /// automatically.
             fn raw_write(&mut self, byte: u8) {
-                unsafe {
-                    IS_WRITE_IN_PROGRESS = true;
-                }
                 self.spdr.write(|w| unsafe { w.bits(byte) });
-            }
-
-            /// Check if write flag is set, and return a WouldBlock error if it is not.
-            fn raw_flush(&mut self) -> $crate::nb::Result<(), $crate::void::Void> {
-                if unsafe { IS_WRITE_IN_PROGRESS } {
-                    if self.spsr.read().spif().bit_is_set() {
-                        unsafe {
-                            IS_WRITE_IN_PROGRESS = false;
-                        }
-                    } else {
-                        return Err($crate::nb::Error::WouldBlock);
-                    }
-                }
-                Ok(())
             }
         }
     };
