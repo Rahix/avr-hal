@@ -52,6 +52,21 @@ pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
 
 #[cfg(feature = "device-selected")]
+pub mod adc;
+#[cfg(feature = "device-selected")]
+pub use adc::Adc;
+
+#[cfg(feature = "device-selected")]
+pub mod i2c;
+#[cfg(feature = "device-selected")]
+pub use i2c::I2c;
+
+#[cfg(feature = "device-selected")]
+pub mod spi;
+#[cfg(feature = "device-selected")]
+pub use spi::Spi;
+
+#[cfg(feature = "device-selected")]
 pub mod port;
 #[cfg(feature = "device-selected")]
 pub use port::Pins;
@@ -60,16 +75,6 @@ pub use port::Pins;
 pub mod usart;
 #[cfg(feature = "device-selected")]
 pub use usart::Usart;
-
-#[cfg(feature = "device-selected")]
-pub mod i2c;
-#[cfg(feature = "device-selected")]
-pub use i2c::I2c;
-
-#[cfg(feature = "device-selected")]
-pub mod adc;
-#[cfg(feature = "device-selected")]
-pub use adc::Adc;
 
 pub struct Atmega;
 

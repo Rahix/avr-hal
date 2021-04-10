@@ -39,15 +39,6 @@ pub mod port;
 pub use port::Pins;
 
 #[cfg(feature = "board-selected")]
-pub mod i2c {
-    pub use crate::hal::i2c::*;
-
-    pub type I2c = crate::hal::i2c::I2c<crate::DefaultClock>;
-}
-#[cfg(feature = "board-selected")]
-pub use i2c::I2c;
-
-#[cfg(feature = "board-selected")]
 pub mod adc {
     pub use crate::hal::adc::{
         channel, AdcChannel, AdcOps, AdcSettings, Channel, ClockDivider, ReferenceVoltage,
@@ -58,6 +49,24 @@ pub mod adc {
 }
 #[cfg(feature = "board-selected")]
 pub use adc::Adc;
+
+#[cfg(feature = "board-selected")]
+pub mod i2c {
+    pub use crate::hal::i2c::*;
+
+    pub type I2c = crate::hal::i2c::I2c<crate::DefaultClock>;
+}
+#[cfg(feature = "board-selected")]
+pub use i2c::I2c;
+
+#[cfg(feature = "board-selected")]
+pub mod spi {
+    pub use crate::hal::spi::*;
+
+    pub type Spi = crate::hal::spi::Spi;
+}
+#[cfg(feature = "board-selected")]
+pub use spi::Spi;
 
 #[cfg(feature = "board-selected")]
 pub mod usart {
