@@ -122,37 +122,23 @@ impl<CSPIN: port::PinOps> hal::digital::v2::ToggleableOutputPin for ChipSelectPi
 /// Stores the SPI peripheral for register access.  In addition, it takes
 /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
 /// Instantiate with the `new` method.
-pub struct Spi<H, SPI, SCLK, MOSI, MISO, CS> {
+pub struct Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> {
     p: SPI,
-    sclk: SCLK,
-    mosi: MOSI,
-    miso: MISO,
+    sclk: port::Pin<port::mode::Output, SCLKPIN>,
+    mosi: port::Pin<port::mode::Output, MOSIPIN>,
+    miso: port::Pin<port::mode::Input, MISOPIN>,
     write_in_progress: bool,
-    _cs: PhantomData<CS>,
+    _cs: PhantomData<CSPIN>,
     _h: PhantomData<H>,
 }
 
-impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
-    Spi<
-        H,
-        SPI,
-        port::Pin<port::mode::Output, SCLKPIN>,
-        port::Pin<port::mode::Output, MOSIPIN>,
-        port::Pin<port::mode::Input, MISOPIN>,
-        port::Pin<port::mode::Output, CSPIN>,
-    >
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
-    SPI: SpiOps<
-        H,
-        port::Pin<port::mode::Output, SCLKPIN>,
-        port::Pin<port::mode::Output, MOSIPIN>,
-        port::Pin<port::mode::Input, MISOPIN>,
-        port::Pin<port::mode::Output, CSPIN>,
-    >,
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
     SCLKPIN: port::PinOps,
     MOSIPIN: port::PinOps,
     MISOPIN: port::PinOps,
-    CSPIN: hal::digital::v2::OutputPin,
+    CSPIN: port::PinOps,
 {
     /// Instantiate an SPI with the registers, SCLK/MOSI/MISO/CS pins, and settings,
     /// with the internal pull-up enabled on the MISO pin.
@@ -254,26 +240,13 @@ where
 /// drivers that require it for operation.  Only 8-bit word size is supported
 /// for now.
 impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> spi::FullDuplex<u8>
-    for Spi<
-        H,
-        SPI,
-        port::Pin<port::mode::Output, SCLKPIN>,
-        port::Pin<port::mode::Output, MOSIPIN>,
-        port::Pin<port::mode::Input, MISOPIN>,
-        port::Pin<port::mode::Output, CSPIN>,
-    >
+    for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
-    SPI: SpiOps<
-        H,
-        port::Pin<port::mode::Output, SCLKPIN>,
-        port::Pin<port::mode::Output, MOSIPIN>,
-        port::Pin<port::mode::Input, MISOPIN>,
-        port::Pin<port::mode::Output, CSPIN>,
-    >,
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
     SCLKPIN: port::PinOps,
     MOSIPIN: port::PinOps,
     MISOPIN: port::PinOps,
-    CSPIN: hal::digital::v2::OutputPin,
+    CSPIN: port::PinOps,
 {
     type Error = void::Void;
 
@@ -293,51 +266,25 @@ where
 
 /// Default Transfer trait implementation. Only 8-bit word size is supported for now.
 impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> hal::blocking::spi::transfer::Default<u8>
-    for Spi<
-        H,
-        SPI,
-        port::Pin<port::mode::Output, SCLKPIN>,
-        port::Pin<port::mode::Output, MOSIPIN>,
-        port::Pin<port::mode::Input, MISOPIN>,
-        port::Pin<port::mode::Output, CSPIN>,
-    >
+    for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
-    SPI: SpiOps<
-        H,
-        port::Pin<port::mode::Output, SCLKPIN>,
-        port::Pin<port::mode::Output, MOSIPIN>,
-        port::Pin<port::mode::Input, MISOPIN>,
-        port::Pin<port::mode::Output, CSPIN>,
-    >,
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
     SCLKPIN: port::PinOps,
     MOSIPIN: port::PinOps,
     MISOPIN: port::PinOps,
-    CSPIN: hal::digital::v2::OutputPin,
+    CSPIN: port::PinOps,
 {
 }
 
 /// Default Write trait implementation. Only 8-bit word size is supported for now.
 impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> hal::blocking::spi::write::Default<u8>
-    for Spi<
-        H,
-        SPI,
-        port::Pin<port::mode::Output, SCLKPIN>,
-        port::Pin<port::mode::Output, MOSIPIN>,
-        port::Pin<port::mode::Input, MISOPIN>,
-        port::Pin<port::mode::Output, CSPIN>,
-    >
+    for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
-    SPI: SpiOps<
-        H,
-        port::Pin<port::mode::Output, SCLKPIN>,
-        port::Pin<port::mode::Output, MOSIPIN>,
-        port::Pin<port::mode::Input, MISOPIN>,
-        port::Pin<port::mode::Output, CSPIN>,
-    >,
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
     SCLKPIN: port::PinOps,
     MOSIPIN: port::PinOps,
     MISOPIN: port::PinOps,
-    CSPIN: hal::digital::v2::OutputPin,
+    CSPIN: port::PinOps,
 {
 }
 
@@ -352,15 +299,7 @@ macro_rules! impl_spi {
         miso: $misopin:ty,
         cs: $cspin:ty,
     ) => {
-        impl
-            $crate::spi::SpiOps<
-                $HAL,
-                $crate::port::Pin<$crate::port::mode::Output, $sclkpin>,
-                $crate::port::Pin<$crate::port::mode::Output, $mosipin>,
-                $crate::port::Pin<$crate::port::mode::Input, $misopin>,
-                $crate::port::Pin<$crate::port::mode::Output, $cspin>,
-            > for $SPI
-        {
+        impl $crate::spi::SpiOps<$HAL, $sclkpin, $mosipin, $misopin, $cspin> for $SPI {
             /// Sets up the control/status registers with the right settings for this secondary device
             fn raw_setup(&mut self, settings: &Settings) {
                 use $crate::hal::spi;
