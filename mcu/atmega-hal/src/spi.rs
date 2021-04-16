@@ -2,7 +2,31 @@
 use crate::port;
 pub use avr_hal_generic::spi::*;
 
-#[cfg(feature = "atmega328p")]
+#[cfg(any(feature = "atmega2560", feature = "atmega32u4"))]
+pub type Spi = avr_hal_generic::spi::Spi<
+    crate::Atmega,
+    crate::pac::SPI,
+    port::PB1,
+    port::PB2,
+    port::PB3,
+    port::PB0,
+>;
+#[cfg(any(feature = "atmega2560", feature = "atmega32u4"))]
+avr_hal_generic::impl_spi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::SPI,
+    sclk: port::PB1,
+    mosi: port::PB2,
+    miso: port::PB3,
+    cs: port::PB0,
+}
+
+#[cfg(any(
+    feature = "atmega168",
+    feature = "atmega328p",
+    feature = "atmega328pb",
+    feature = "atmega48p",
+))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
     crate::pac::SPI,
@@ -11,7 +35,12 @@ pub type Spi = avr_hal_generic::spi::Spi<
     port::PB4,
     port::PB2,
 >;
-#[cfg(feature = "atmega328p")]
+#[cfg(any(
+    feature = "atmega168",
+    feature = "atmega328p",
+    feature = "atmega328pb",
+    feature = "atmega48p",
+))]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
     peripheral: crate::pac::SPI,
@@ -19,4 +48,23 @@ avr_hal_generic::impl_spi! {
     mosi: port::PB3,
     miso: port::PB4,
     cs: port::PB2,
+}
+
+#[cfg(feature = "atmega328pb")]
+pub type Spi = avr_hal_generic::spi::Spi<
+    crate::Atmega,
+    crate::pac::SPI,
+    port::PC1,
+    port::PE3,
+    port::PC0,
+    port::PE2,
+>;
+#[cfg(feature = "atmega328pb")]
+avr_hal_generic::impl_spi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::SPI,
+    sclk: port::PC1,
+    mosi: port::PE3,
+    miso: port::PC0,
+    cs: port::PE2,
 }

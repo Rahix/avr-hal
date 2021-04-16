@@ -179,8 +179,9 @@ where
         sclk: port::Pin<port::mode::Output, SCLKPIN>,
         mosi: port::Pin<port::mode::Output, MOSIPIN>,
         miso: port::Pin<port::mode::Input<port::mode::Floating>, MISOPIN>,
+        cs: port::Pin<port::mode::Output, CSPIN>,
         settings: Settings,
-    ) -> Self {
+    ) -> (Self, ChipSelectPin<CSPIN>) {
         let mut spi = Self {
             p,
             sclk,
@@ -191,7 +192,7 @@ where
             _h: PhantomData,
         };
         spi.p.raw_setup(&settings);
-        spi
+        (spi, ChipSelectPin(cs))
     }
 
     /// Reconfigure the SPI peripheral after initializing
