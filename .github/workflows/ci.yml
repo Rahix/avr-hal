@@ -18,6 +18,8 @@ jobs:
           - type: board
             name: arduino-uno
           - type: board
+            name: arduino-diecimila
+          - type: board
             name: arduino-leonardo
           - type: board
             name: arduino-mega2560
