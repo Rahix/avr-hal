@@ -86,9 +86,9 @@ pub use usart::Usart;
 pub mod prelude {
     cfg_if::cfg_if! {
         if #[cfg(any(
+            feature = "arduino-diecimila",
             feature = "arduino-mega2560",
-            feature = "arduino-uno",
-            feature = "diecimila"
+            feature = "arduino-uno"
         ))] {
             pub use crate::hal::usart::BaudrateArduinoExt as _;
         } else {
@@ -124,9 +124,9 @@ macro_rules! default_serial {
 // See comment in avr-hal-generic/src/usart.rs for why these boards use
 // the BaudrateArduinoExt trait instead of BaudrateExt
 #[cfg(any(
+    feature = "arduino-diecimila",
     feature = "arduino-mega2560",
-    feature = "arduino-uno",
-    feature = "diecimila"
+    feature = "arduino-uno"
 ))]
 #[macro_export]
 macro_rules! default_serial {

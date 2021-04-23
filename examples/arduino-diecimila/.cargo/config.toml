@@ -1,8 +1,8 @@
 [build]
-target = "../../avr-specs/avr-atmega32u4.json"
+target = "../../avr-specs/avr-atmega168.json"
 
 [target.'cfg(target_arch = "avr")']
-runner = "ravedude leonardo"
+runner = "ravedude decimila"
 
 [unstable]
 build-std = ["core"]
