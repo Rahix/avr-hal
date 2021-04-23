@@ -10,6 +10,7 @@ rt = ["atmega-hal/rt"]
 
 board-selected = []
 mcu-atmega=[]
+arduino-diecimila = ["mcu-atmega", "atmega-hal/atmega168", "board-selected"]
 arduino-leonardo = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
 arduino-mega2560 = ["mcu-atmega", "atmega-hal/atmega2560", "board-selected"]
 arduino-nano = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]

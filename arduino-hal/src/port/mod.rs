@@ -1,3 +1,7 @@
+#[cfg(feature = "arduino-diecimila")]
+mod diecimila;
+#[cfg(feature = "arduino-diecimila")]
+pub use diecimila::*;
 #[cfg(feature = "arduino-leonardo")]
 mod leonardo;
 #[cfg(feature = "arduino-leonardo")]

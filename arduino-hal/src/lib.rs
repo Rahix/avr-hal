@@ -6,6 +6,7 @@ compile_error!(
 
     Please select one of the following
 
+    * arduino-diecimila
     * arduino-leonardo
     * arduino-mega2560
     * arduino-nano
@@ -84,7 +85,11 @@ pub use usart::Usart;
 #[cfg(feature = "board-selected")]
 pub mod prelude {
     cfg_if::cfg_if! {
-        if #[cfg(any(feature = "arduino-mega2560", feature = "arduino-uno"))] {
+        if #[cfg(any(
+            feature = "arduino-mega2560",
+            feature = "arduino-uno",
+            feature = "diecimila"
+        ))] {
             pub use crate::hal::usart::BaudrateArduinoExt as _;
         } else {
             pub use crate::hal::usart::BaudrateExt as _;
@@ -118,7 +123,11 @@ macro_rules! default_serial {
 }
 // See comment in avr-hal-generic/src/usart.rs for why these boards use
 // the BaudrateArduinoExt trait instead of BaudrateExt
-#[cfg(any(feature = "arduino-mega2560", feature = "arduino-uno"))]
+#[cfg(any(
+    feature = "arduino-mega2560",
+    feature = "arduino-uno",
+    feature = "diecimila"
+))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
