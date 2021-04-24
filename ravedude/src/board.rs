@@ -13,6 +13,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "nano" => Box::new(ArduinoNano),
         "leonardo" => Box::new(ArduinoLeonardo),
         "mega2560" => Box::new(ArduinoMega2560),
+        "diecimila" => Box::new(ArduinoDiecimila),
         _ => return None,
     })
 }
@@ -154,3 +155,29 @@ impl Board for ArduinoMega2560 {
         ])
     }
 }
+
+truct ArduinoDiecimila;
+
+impl Board for ArduinoDiecimila {
+    fn display_name(&self) -> &str {
+        "Arduino Diecimila"
+    }
+
+    fn needs_reset(&self) -> bool {
+        false
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "arduino",
+            partno: "atmega168",
+            baudrate: Some(19200),
+            do_chip_erase: false,
+        }
+    }
+
+    fn guess_port(&self) -> Option<std::path::PathBuf> {
+        None
+    }
+}
+
