@@ -23,6 +23,7 @@ members = [
     "arduino-hal",
 
     # Examples
+    "examples/arduino-diecimila",
     "examples/arduino-leonardo",
     "examples/arduino-mega2560",
     "examples/arduino-nano",
