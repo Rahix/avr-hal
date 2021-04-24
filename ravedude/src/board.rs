@@ -156,7 +156,7 @@ impl Board for ArduinoMega2560 {
     }
 }
 
-truct ArduinoDiecimila;
+struct ArduinoDiecimila;
 
 impl Board for ArduinoDiecimila {
     fn display_name(&self) -> &str {
@@ -180,4 +180,3 @@ impl Board for ArduinoDiecimila {
         None
     }
 }
-
