@@ -21,6 +21,7 @@ members = [
 
     # Higher level crates
     "arduino-hal",
+    "sparkfun-hal",
 
     # Examples
     "examples/arduino-diecimila",
