@@ -14,6 +14,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "leonardo" => Box::new(ArduinoLeonardo),
         "mega2560" => Box::new(ArduinoMega2560),
         "diecimila" => Box::new(ArduinoDiecimila),
+        "promicro" => Box::new(SparkFunProMicro)
         _ => return None,
     })
 }
@@ -178,5 +179,35 @@ impl Board for ArduinoDiecimila {
 
     fn guess_port(&self) -> Option<std::path::PathBuf> {
         None
+    }
+}
+
+struct SparkFunProMicro;
+
+impl Board for SparkFunProMicro {
+    fn display_name(&self) -> &str {
+        "SparkFun Pro Micro"
+    }
+
+    fn needs_reset(&self) -> bool {
+        true
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "avr109",
+            partno: "atmega32u4",
+            baudrate: None,
+            do_chip_erase: true,
+        }
+    }
+
+    fn guess_port(&self) -> Option<std::path::PathBuf> {
+        find_port_from_vid_pid_list(&[
+            (0x1B4F, 0x9205), //5V Pro Micro 
+            (0x1B4F, 0x9206), //5V Pro Micro
+            (0x1B4F, 0x9203), //3.3V Pro Micro
+            (0x1B4F, 0x9204), //3.3V Pro Micro
+        ])
     }
 }
