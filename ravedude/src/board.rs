@@ -204,10 +204,10 @@ impl Board for SparkFunProMicro {
 
     fn guess_port(&self) -> Option<std::path::PathBuf> {
         find_port_from_vid_pid_list(&[
-            (0x1B4F, 0x9205), //5V Pro Micro 
-            (0x1B4F, 0x9206), //5V Pro Micro
-            (0x1B4F, 0x9203), //3.3V Pro Micro
-            (0x1B4F, 0x9204), //3.3V Pro Micro
+            (0x1B4F, 0x9205), //5V 
+            (0x1B4F, 0x9206), //5V
+            (0x1B4F, 0x9203), //3.3V
+            (0x1B4F, 0x9204), //3.3V
         ])
     }
 }
