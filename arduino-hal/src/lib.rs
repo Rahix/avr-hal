@@ -109,7 +109,7 @@ macro_rules! pins {
     };
 }
 
-#[cfg(any(feature = "arduino-leonardo", feautre = "sparkfun-promicro"))]
+#[cfg(any(feature = "arduino-leonardo", feature = "sparkfun-promicro"))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
