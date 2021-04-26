@@ -11,6 +11,7 @@ compile_error!(
     * arduino-mega2560
     * arduino-nano
     * arduino-uno
+    * sparkfun-promicro
     "
 );
 
