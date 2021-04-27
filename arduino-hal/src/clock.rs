@@ -10,4 +10,6 @@ pub(crate) mod default {
         feature = "sparkfun-promicro",
     ))]
     pub type DefaultClock = avr_hal_generic::clock::MHz16;
+    #[cfg(feature = "adafruit-trinket")]
+    pub type DefaultClock = avr_hal_generic::clock::MHz8;
 }

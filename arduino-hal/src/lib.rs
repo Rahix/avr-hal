@@ -12,6 +12,7 @@ compile_error!(
     * arduino-nano
     * arduino-uno
     * sparkfun-promicro
+    * adafruit-trinket
     "
 );
 
@@ -21,6 +22,13 @@ pub use atmega_hal as hal;
 pub use atmega_hal::entry;
 #[cfg(feature = "mcu-atmega")]
 pub use atmega_hal::pac;
+
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal as hal;
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal::entry;
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal::pac;
 
 #[cfg(feature = "board-selected")]
 pub use hal::Peripherals;

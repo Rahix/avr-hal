@@ -18,3 +18,7 @@ pub use uno::*;
 mod promicro;
 #[cfg(feature = "sparkfun-promicro")]
 pub use promicro::*;
+#[cfg(feature = "adafruit-trinket")]
+mod trinket;
+#[cfg(feature = "adafruit-trinket")]
+pub use trinket::*;
