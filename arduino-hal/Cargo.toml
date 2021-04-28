@@ -5,12 +5,12 @@ authors = ["Rahix <rahix@rahix.de>"]
 edition = "2018"
 
 [features]
-default = ["rt"]
-rt = ["atmega-hal/rt", "attiny-hal/rt"]
+atmega-rt = ["atmega-hal/rt"]
+attiny-rt = ["attiny-hal/rt"]
 
 board-selected = []
-mcu-atmega=[]
-mcu-attiny=[]
+mcu-atmega=["atmega-hal", "atmega-rt"]
+mcu-attiny=["attiny-hal", "attiny-rt"]
 arduino-diecimila = ["mcu-atmega", "atmega-hal/atmega168", "board-selected"]
 arduino-leonardo = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
 arduino-mega2560 = ["mcu-atmega", "atmega-hal/atmega2560", "board-selected"]
