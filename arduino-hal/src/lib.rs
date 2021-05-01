@@ -110,7 +110,7 @@ macro_rules! pins {
     };
 }
 
-#[cfg(any(feature = "arduino-leonardo", feature = "sparkfun-promicro"))]
+#[cfg(any(feature = "arduino-leonardo"))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
@@ -118,6 +118,18 @@ macro_rules! default_serial {
             $p.USART1,
             $pins.d0,
             $pins.d1.into_output(),
+            $crate::hal::usart::BaudrateExt::into_baudrate($baud),
+        )
+    };
+}
+#[cfg(any(feature = "sparkfun-promicro"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART1,
+            $pins.rx,
+            $pins.tx.into_output(),
             $crate::hal::usart::BaudrateExt::into_baudrate($baud),
         )
     };

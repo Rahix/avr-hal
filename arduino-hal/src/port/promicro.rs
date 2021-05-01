@@ -5,94 +5,71 @@ avr_hal_generic::renamed_pins! {
     type Pin = Pin;
 
     pub struct Pins from atmega_hal::Pins {
-        /// `D0` / `RX`
+        /// `RX`
         ///
-        /// * `RX` (UART)
-        /// * `INT2`: External Interrupt
-        pub d0: atmega_hal::port::PD2 = pd2,
-        /// `D1` / `TX`
+        /// `RX` (UART)
+        pub rx: atmega_hal::port::PD2 = pd2,
+        /// `TX`
         ///
-        /// * `TX` (UART)
-        /// * `INT3`: External Interrupt
-        pub d1: atmega_hal::port::PD3 = pd3,
+        /// `TX` (UART)
+        pub tx: atmega_hal::port::PD3 = pd3,
         /// `D2` / `SDA`
         ///
-        /// * `SDA`: i2c/twi data
-        /// * `INT1`: External Interrupt
+        /// `SDA`: i2c/twi data
         pub d2: atmega_hal::port::PD1 = pd1,
         /// `D3` / `SCL`
         ///
-        /// * **PWM**: [atmega32u4_hal::timer::Timer0Pwm]
-        /// * `SCL`: i2c/twi clock
-        /// * `INT0`: External Interrupt
-        /// * `OC0B`: Output Compare Channel `B` for Timer/Counter0
+        /// `SCL`: i2c/twi clock
         pub d3: atmega_hal::port::PD0 = pd0,
         /// `D4`
         pub d4: atmega_hal::port::PD4 = pd4,
         /// `D5`
-        ///
-        /// * **PWM**: [atmega32u4_hal::timer::Timer3Pwm]
-        /// * `OC3A`: Output Compare Channel `A` for Timer/Counter3
-        /// * `#OC4A`: Inverted Output Compare Channel `A` for Timer/Counter4 (Not implemented)
         pub d5: atmega_hal::port::PC6 = pc6,
         /// `D6`
-        ///
-        /// * **PWM**: [atmega32u4_hal::timer::Timer4Pwm]
-        /// * `OC4D`: Output Compare Channel `D` for Timer/Counter4
         pub d6: atmega_hal::port::PD7 = pd7,
         /// `D7`
-        ///
-        /// * `INT6`: External Interrupt
         pub d7: atmega_hal::port::PE6 = pe6,
         /// `D8`
         pub d8: atmega_hal::port::PB4 = pb4,
         /// `D9`
-        ///
-        /// * **PWM**: [atmega32u4_hal::timer::Timer1Pwm]
-        /// * `OC1A`: Output Compare Channel `A` for Timer/Counter1
-        /// * `#OC4B`: Inverted Output Compare Channel `B` for Timer/Counter4 (Not implemented)
         pub d9: atmega_hal::port::PB5 = pb5,
         /// `D10`
-        ///
-        /// * **PWM**: [atmega32u4_hal::timer::Timer1Pwm]
-        /// * `OC1B`: Output Compare Channel `B` for Timer/Counter1
-        /// * `OC4B`: Output Compare Channel `B` for Timer/Counter4 (Not implemented)
         pub d10: atmega_hal::port::PB6 = pb6,
-        /// `RX`
+        /// `LED_RX`
         ///
-        /// Led for indicating inbound data.  Also the CS pin.
+        /// Led for indicating inbound data (yellow).  Also the CS pin for SPI.
         pub led_rx: atmega_hal::port::PB0 = pb0,
-        /// `TX`
+        /// `LED_TX`
         ///
-        /// Led for indicating outbound data
+        /// Led for indicating outbound data (green).
         pub led_tx: atmega_hal::port::PD5 = pd5,
-        /// `SCLK`
+        /// `D15`, `SCK`
         ///
         /// ICSP SCLK pin
-        pub sck: atmega_hal::port::PB1 = pb1,
-        /// `MOSI`
-        ///
-        /// ICSP MOSI pin
-        pub mosi: atmega_hal::port::PB2 = pb2,
-        /// `MISO`
+        pub d15: atmega_hal::port::PB1 = pb1,
+        /// `D14`, `MISO`
         ///
         /// ICSP MISO pin
-        pub miso: atmega_hal::port::PB3 = pb3,
+        pub d16: atmega_hal::port::PB3 = pb3,
+        /// `D16`, `MOSI`
+        ///
+        /// ICSP MOSI pin
+        pub d14: atmega_hal::port::PB2 = pb2,
         /// `A0`
         ///
-        /// * `ADC7` channel
+        /// `ADC7` channel
         pub a0: atmega_hal::port::PF7 = pf7,
         /// `A1`
         ///
-        /// * `ADC6` channel
+        /// `ADC6` channel
         pub a1: atmega_hal::port::PF6 = pf6,
         /// `A2`
         ///
-        /// * `ADC5` channel
+        /// `ADC5` channel
         pub a2: atmega_hal::port::PF5 = pf5,
         /// `A3`
         ///
-        /// * `ADC4` channel
+        /// `ADC4` channel
         pub a3: atmega_hal::port::PF4 = pf4,
     }
 }

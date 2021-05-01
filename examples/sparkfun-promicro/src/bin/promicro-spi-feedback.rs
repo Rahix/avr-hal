@@ -1,6 +1,6 @@
 //! This example demonstrates how to set up a SPI interface and communicate
 //! over it.  The physical hardware configuation consists of connecting a
-//! jumper directly from pin `~11` to pin `~12`.
+//! jumper directly from pin `~14` to pin `~16`.
 //!
 //! Once this program is written to the board, the serial output can be
 //! accessed with
@@ -31,9 +31,9 @@ fn main() -> ! {
     // Create SPI interface.
     let (mut spi, _) = arduino_hal::Spi::new(
         dp.SPI,
-        pins.sck.into_output(),
-        pins.mosi.into_output(),
-        pins.miso.into_pull_up_input(),
+        pins.d15.into_output(),
+        pins.d14.into_output(),
+        pins.d16.into_pull_up_input(),
         pins.led_rx.into_output(),
         spi::Settings::default(),
     );
