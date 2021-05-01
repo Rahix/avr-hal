@@ -14,3 +14,7 @@ pub use mega2560::*;
 mod uno;
 #[cfg(any(feature = "arduino-nano", feature = "arduino-uno"))]
 pub use uno::*;
+#[cfg(feature = "sparkfun-promicro")]
+mod promicro;
+#[cfg(feature = "sparkfun-promicro")]
+pub use promicro::*;

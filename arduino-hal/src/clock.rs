@@ -7,6 +7,7 @@ pub(crate) mod default {
         feature = "arduino-mega2560",
         feature = "arduino-nano",
         feature = "arduino-uno",
+        feature = "sparkfun-promicro",
     ))]
     pub type DefaultClock = avr_hal_generic::clock::MHz16;
 }

@@ -11,6 +11,7 @@ compile_error!(
     * arduino-mega2560
     * arduino-nano
     * arduino-uno
+    * sparkfun-promicro
     "
 );
 
@@ -109,7 +110,7 @@ macro_rules! pins {
     };
 }
 
-#[cfg(any(feature = "arduino-leonardo"))]
+#[cfg(any(feature = "arduino-leonardo", feature = "sparkfun-promicro"))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
