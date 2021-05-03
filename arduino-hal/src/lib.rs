@@ -12,6 +12,7 @@ compile_error!(
     * arduino-nano
     * arduino-uno
     * sparkfun-promicro
+    * adafruit-trinket
     "
 );
 
@@ -21,6 +22,13 @@ pub use atmega_hal as hal;
 pub use atmega_hal::entry;
 #[cfg(feature = "mcu-atmega")]
 pub use atmega_hal::pac;
+
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal as hal;
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal::entry;
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal::pac;
 
 #[cfg(feature = "board-selected")]
 pub use hal::Peripherals;
@@ -40,7 +48,7 @@ pub mod port;
 #[cfg(feature = "board-selected")]
 pub use port::Pins;
 
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod adc {
     pub use crate::hal::adc::{
         channel, AdcChannel, AdcOps, AdcSettings, Channel, ClockDivider, ReferenceVoltage,
@@ -49,28 +57,28 @@ pub mod adc {
     /// Check the [`avr_hal_generic::adc::Adc`] documentation.
     pub type Adc = crate::hal::Adc<crate::DefaultClock>;
 }
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub use adc::Adc;
 
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod i2c {
     pub use crate::hal::i2c::*;
 
     pub type I2c = crate::hal::i2c::I2c<crate::DefaultClock>;
 }
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub use i2c::I2c;
 
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod spi {
     pub use crate::hal::spi::*;
 
     pub type Spi = crate::hal::spi::Spi;
 }
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub use spi::Spi;
 
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod usart {
     pub use crate::hal::usart::{Baudrate, UsartOps};
 
@@ -80,10 +88,10 @@ pub mod usart {
     pub type UsartReader<USART, RX, TX> =
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub use usart::Usart;
 
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod prelude {
     cfg_if::cfg_if! {
         if #[cfg(any(
@@ -110,7 +118,7 @@ macro_rules! pins {
     };
 }
 
-#[cfg(any(feature = "arduino-leonardo"))]
+#[cfg(any(feature = "arduino-leonardo", feature = "sparkfun-promicro"))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
