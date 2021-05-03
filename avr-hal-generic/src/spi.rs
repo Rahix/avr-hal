@@ -231,6 +231,10 @@ where
         Ok(())
     }
 
+    fn receive(&mut self) -> u8 {
+        self.p.raw_read()
+    }
+
     fn write(&mut self, byte: u8) {
         self.write_in_progress = true;
         self.p.raw_write(byte);
@@ -261,7 +265,7 @@ where
     /// Reads and returns the response in the data register
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
         self.flush()?;
-        Ok(self.p.raw_read())
+        Ok(self.receive())
     }
 }
 

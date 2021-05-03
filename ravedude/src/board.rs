@@ -2,7 +2,7 @@ use crate::avrdude;
 
 pub trait Board {
     fn display_name(&self) -> &str;
-    fn needs_reset(&self) -> bool;
+    fn needs_reset(&self) -> Option<&str>;
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions;
     fn guess_port(&self) -> Option<std::path::PathBuf>;
 }
@@ -47,8 +47,8 @@ impl Board for ArduinoUno {
         "Arduino Uno"
     }
 
-    fn needs_reset(&self) -> bool {
-        false
+    fn needs_reset(&self) -> Option<&str> {
+        None
     }
 
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
@@ -77,8 +77,8 @@ impl Board for ArduinoNano {
         "Arduino Nano"
     }
 
-    fn needs_reset(&self) -> bool {
-        false
+    fn needs_reset(&self) -> Option<&str> {
+        None
     }
 
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
@@ -102,8 +102,8 @@ impl Board for ArduinoLeonardo {
         "Arduino Leonardo"
     }
 
-    fn needs_reset(&self) -> bool {
-        true
+    fn needs_reset(&self) -> Option<&str> {
+        Some("Reset the board by pressing the reset button once.")
     }
 
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
@@ -132,8 +132,8 @@ impl Board for ArduinoMega2560 {
         "Arduino Mega 2560"
     }
 
-    fn needs_reset(&self) -> bool {
-        false
+    fn needs_reset(&self) -> Option<&str> {
+        None
     }
 
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
@@ -164,8 +164,8 @@ impl Board for ArduinoDiecimila {
         "Arduino Diecimila"
     }
 
-    fn needs_reset(&self) -> bool {
-        false
+    fn needs_reset(&self) -> Option<&str> {
+        None
     }
 
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
@@ -189,8 +189,8 @@ impl Board for SparkFunProMicro {
         "SparkFun Pro Micro"
     }
 
-    fn needs_reset(&self) -> bool {
-        true
+    fn needs_reset(&self) -> Option<&str> {
+        Some("Reset the board by quickly pressing the reset button **twice**.")
     }
 
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
@@ -204,7 +204,7 @@ impl Board for SparkFunProMicro {
 
     fn guess_port(&self) -> Option<std::path::PathBuf> {
         find_port_from_vid_pid_list(&[
-            (0x1B4F, 0x9205), //5V 
+            (0x1B4F, 0x9205), //5V
             (0x1B4F, 0x9206), //5V
             (0x1B4F, 0x9203), //3.3V
             (0x1B4F, 0x9204), //3.3V

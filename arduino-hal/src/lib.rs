@@ -130,6 +130,18 @@ macro_rules! default_serial {
         )
     };
 }
+#[cfg(any(feature = "sparkfun-promicro"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART1,
+            $pins.rx,
+            $pins.tx.into_output(),
+            $crate::hal::usart::BaudrateExt::into_baudrate($baud),
+        )
+    };
+}
 // See comment in avr-hal-generic/src/usart.rs for why these boards use
 // the BaudrateArduinoExt trait instead of BaudrateExt
 #[cfg(any(

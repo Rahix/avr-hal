@@ -71,9 +71,12 @@ fn ravedude() -> anyhow::Result<()> {
 
     task_message!("Board", "{}", board.display_name());
 
-    if board.needs_reset() {
+    if let Some(msg) = board.needs_reset() {
         warning!("this board cannot reset itself.");
-        eprint!("Press the reset-button and then ENTER here: ");
+        eprintln!("");
+        eprintln!("    {}", msg);
+        eprintln!("");
+        eprint!("Once reset, press ENTER here: ");
         std::io::stdin().read_line(&mut String::new())?;
     }
 
