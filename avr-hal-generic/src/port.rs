@@ -591,7 +591,7 @@ macro_rules! impl_port {
                 impl digital::StatefulOutputPin for $PXi<mode::Output> {
                     fn is_set_high(&self) -> Result<bool, Self::Error> {
                         Ok(unsafe {
-                            (*<$PORTX>::ptr()).$reg_port.read().bits()
+                            (*<$PORTX>::ptr()).$reg_pin.read().bits()
                         } & (1 << $i) != 0)
                     }
 
