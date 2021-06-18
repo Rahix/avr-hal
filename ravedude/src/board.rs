@@ -12,6 +12,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "uno" => Box::new(ArduinoUno),
         "nano" => Box::new(ArduinoNano),
         "leonardo" => Box::new(ArduinoLeonardo),
+        "micro" => Box::new(ArduinoMicro),
         "mega2560" => Box::new(ArduinoMega2560),
         "diecimila" => Box::new(ArduinoDiecimila),
         "promicro" => Box::new(SparkFunProMicro),
@@ -67,6 +68,31 @@ impl Board for ArduinoUno {
             (0x2A03, 0x0043),
             (0x2341, 0x0243),
         ])
+    }
+}
+
+struct ArduinoMicro;
+
+impl Board for ArduinoMicro {
+    fn display_name(&self) -> &str {
+        "Arduino Micro"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        None
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "avr109",
+            partno: "atmega32u4",
+            baudrate: Some(115200),
+            do_chip_erase: true,
+        }
+    }
+
+    fn guess_port(&self) -> Option<std::path::PathBuf> {
+        None
     }
 }
 
