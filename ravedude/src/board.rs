@@ -79,7 +79,7 @@ impl Board for ArduinoMicro {
     }
 
     fn needs_reset(&self) -> Option<&str> {
-        None
+        Some("Reset the board by pressing the reset button once.")
     }
 
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
@@ -92,7 +92,14 @@ impl Board for ArduinoMicro {
     }
 
     fn guess_port(&self) -> Option<std::path::PathBuf> {
-        None
+        find_port_from_vid_pid_list(&[
+            (0x2341, 0x0037),
+            (0x2341, 0x8037),
+            (0x2A03, 0x0037),
+            (0x2A03, 0x8037),
+            (0x2341, 0x0237),
+            (0x2341, 0x8237),
+        ])
     }
 }
 
