@@ -41,6 +41,7 @@ struct Args {
     /// Must be one of the known board identifiers:
     ///
     /// * uno
+    /// * micro
     /// * nano
     /// * leonardo
     /// * mega2560
