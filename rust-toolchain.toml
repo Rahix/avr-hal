@@ -1,0 +1,4 @@
+[toolchain]
+channel = "nightly-2021-01-07"
+components = [ "rust-src" ]
+profile = "minimal"
