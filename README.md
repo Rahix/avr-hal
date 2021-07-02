@@ -14,11 +14,7 @@ Also note that the following documentation is **not** up to date for the state i
   - [Supported Boards](#supported-boards)
 
 ## Quickstart
-You need a nightly Rust compiler for compiling Rust code for AVR.  **Note**: Due to a regression, versions after `nightly-2021-01-07` are currently broken (see [#124](https://github.com/Rahix/avr-hal/issues/124)).  Please use that version of the compiler for now.  You can install it using
-
-```bash
-rustup toolchain install nightly-2021-01-07
-```
+You need a nightly Rust compiler for compiling Rust code for AVR.  **Note**: Due to a regression, versions after `nightly-2021-01-07` are currently broken (see [#124](https://github.com/Rahix/avr-hal/issues/124)).  Please use that version of the compiler for now. The correct version will be installed automatically.
 
 Next, install ["ravedude"](./ravedude):
 
@@ -32,7 +28,7 @@ Go into `./examples/arduino-uno` (or the directory for whatever board you want),
 cd examples/arduino-uno
 
 # Build an run it on a connected board
-cargo +nightly-2021-01-07 run --bin uno-blink
+cargo run --bin uno-blink
 ```
 
 ## Starting your own project
