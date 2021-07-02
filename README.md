@@ -9,11 +9,7 @@ avr-hal ![Continuous Integration](https://github.com/Rahix/avr-hal/workflows/Con
   - [Supported Boards](#supported-boards)
 
 ## Quickstart
-You need a nightly Rust compiler for compiling Rust code for AVR.  **Note**: Due to a regression, versions after `nightly-2021-01-07` are currently broken (see [#124](https://github.com/Rahix/avr-hal/issues/124)).  Please use that version of the compiler for now.  You can install it using
-
-```bash
-rustup toolchain install nightly-2021-01-07
-```
+You need a nightly Rust compiler for compiling Rust code for AVR.  **Note**: Due to a regression, versions after `nightly-2021-01-07` are currently broken (see [#124](https://github.com/Rahix/avr-hal/issues/124)).  
 
 Go into `./boards/arduino-uno` (or the directory for whatever board you want), and run the following commands:
 
@@ -21,11 +17,11 @@ Go into `./boards/arduino-uno` (or the directory for whatever board you want), a
 cd boards/arduino-uno
 
 # Now you are ready to build your first avr blink example!
-cargo +nightly-2021-01-07 build --example uno-blink
+cargo build --example uno-blink
 
 # For some boards, you can even run it directly (this will attempt to flash it
 # onto a connected board):
-cargo +nightly-2021-01-07 run --example uno-blink
+cargo run --example uno-blink
 
 # For others, you can find the binary file in
 ls ../../target/avr-atmega328p/debug/examples/uno-blink.elf
