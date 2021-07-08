@@ -1,0 +1,17 @@
+[package]
+name = "trinket-pro"
+version = "0.1.0"
+authors = ["Gaute Hope <eg@gaute.vetsj.com>"]
+edition = "2018"
+
+[features]
+default = ["rt"]
+rt = ["atmega328p-hal/rt"]
+arduino-nano = ["atmega328p-hal/adc-pins"]
+
+[dependencies]
+avr-hal-generic = { path = "../../avr-hal-generic/" }
+atmega328p-hal = { path = "../../chips/atmega328p-hal/", features = ["atmega328p"] }
+
+[dev-dependencies]
+panic-halt = "0.2.0"

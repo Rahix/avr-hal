@@ -33,6 +33,7 @@ members = [
     "boards/bigavr6",
     "boards/sparkfun-pro-micro",
     "boards/trinket",
+    "boards/trinket-pro",
 ]
 
 [patch.crates-io]

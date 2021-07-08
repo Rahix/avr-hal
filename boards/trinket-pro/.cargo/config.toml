@@ -1,0 +1,9 @@
+[build]
+target = "../../avr-specs/avr-atmega328p.json"
+
+[unstable]
+build-std = ["core"]
+
+[target.'cfg(target_arch = "avr")']
+runner = "./trinket-pro-runner.sh"
+
