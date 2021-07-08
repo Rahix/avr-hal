@@ -15,10 +15,11 @@ compile_error!(
     "
 );
 
+#[cfg(feature = "rt")]
+pub use avr_device::entry;
+
 #[cfg(feature = "mcu-atmega")]
 pub use atmega_hal as hal;
-#[cfg(feature = "mcu-atmega")]
-pub use atmega_hal::entry;
 #[cfg(feature = "mcu-atmega")]
 pub use atmega_hal::pac;
 

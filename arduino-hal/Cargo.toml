@@ -6,7 +6,7 @@ edition = "2018"
 
 [features]
 default = ["rt"]
-rt = ["atmega-hal/rt"]
+rt = ["avr-device/rt"]
 
 board-selected = []
 mcu-atmega=[]
