@@ -81,25 +81,34 @@ fn ravedude() -> anyhow::Result<()> {
         std::io::stdin().read_line(&mut String::new())?;
     }
 
-    let port = args.port.map_or_else(
-        || {
-            board.guess_port().context(
-                "no matching serial port found, use -P or set RAVEDUDE_PORT in your environment",
-            )
-        },
-        Ok,
-    )?;
+    let port = match args.port {
+        Some(port) => Ok(Some(port)),
+        None => match board.guess_port() {
+            Some(Ok(port)) => Ok(Some(port)),
+            p @ Some(Err(_)) => p.transpose().context("no matching serial port found, use -P or set RAVEDUDE_PORT in your environment"),
+            None => Ok(None),
+        }
+    }?;
+
 
     if let Some(bin) = args.bin.as_ref() {
-        task_message!(
-            "Programming",
-            "{} {} {}",
-            bin.display(),
-            "=>".blue().bold(),
-            port.display()
-        );
+        if let Some(port) = port.as_ref() {
+            task_message!(
+                "Programming",
+                "{} {} {}",
+                bin.display(),
+                "=>".blue().bold(),
+                port.display()
+            );
+        } else {
+            task_message!(
+                "Programming",
+                "{}",
+                bin.display(),
+            );
+        }
 
-        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), &port, bin)?;
+        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), port.as_ref(), bin)?;
         avrdude.wait()?;
 
         task_message!("Programmed", "{}", bin.display());
@@ -116,9 +125,11 @@ fn ravedude() -> anyhow::Result<()> {
             .baudrate
             .context("-b/--baudrate is needed for the serial console")?;
 
+        let port = port.context("console can only be opened for devices with USB-to-Serial")?;
+
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
         console::open(&port, baudrate)?;
-    } else if args.bin.is_none() {
+    } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
     }
 
