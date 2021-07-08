@@ -19,7 +19,7 @@ pub struct Avrdude {
 impl Avrdude {
     pub fn run(
         options: &AvrdudeOptions,
-        port: &path::Path,
+        port: Option<impl AsRef<path::Path>>,
         bin: &path::Path,
     ) -> anyhow::Result<Self> {
         let config = tempfile::Builder::new()
@@ -44,9 +44,13 @@ impl Avrdude {
             .arg("-c")
             .arg(options.programmer)
             .arg("-p")
-            .arg(options.partno)
-            .arg("-P")
-            .arg(port);
+            .arg(options.partno);
+
+        if let Some(port) = port {
+            command = command
+                .arg("-P")
+                .arg(port.as_ref());
+        }
 
         if let Some(baudrate) = options.baudrate {
             command = command.arg("-b").arg(baudrate.to_string());
