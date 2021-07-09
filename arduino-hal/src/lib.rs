@@ -19,9 +19,28 @@
 //! cargo doc --open
 //! ```
 //!
-//! in your project (where `arduino-hal` is included with the feature-flag for your board).  For
-//! quickstarting a project, take a look at the
-//! [`avr-hal-template`](https://github.com/Rahix/avr-hal-template).
+//! in your project (where `arduino-hal` is included with the feature-flag for your board).
+//!
+//! ## Usage
+//! For setting up a new project, the [`avr-hal-template`](https://github.com/Rahix/avr-hal-template)
+//! is the recommended baseline.  Applications should be built ontop of the following skeleton:
+//!
+//! ```no_run
+//! #![no_std]
+//! #![no_main]
+//!
+//! use panic_halt as _;
+//!
+//! #[arduino_hal::entry]
+//! fn main() -> ! {
+//!     let dp = arduino_hal::Peripherals::take().unwrap();
+//!     let pins = arduino_hal::pins!(dp);
+//!
+//!     loop { }
+//! }
+//! ```
+//!
+//! For examples, please check the `avr-hal` examples: <https://github.com/Rahix/avr-hal/tree/next/examples>
 
 #[cfg(not(feature = "board-selected"))]
 compile_error!(
