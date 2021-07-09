@@ -5,11 +5,13 @@
 use core::marker::PhantomData;
 
 pub trait PinMode: crate::Sealed {}
+/// GPIO pin modes
 pub mod mode {
     use core::marker::PhantomData;
 
     pub trait Io: crate::Sealed + super::PinMode {}
 
+    /// Pin is configured as a digital output.
     pub struct Output;
     impl super::PinMode for Output {}
     impl Io for Output {}
@@ -17,6 +19,7 @@ pub mod mode {
 
     pub trait InputMode: crate::Sealed {}
 
+    /// Pin is configured as digital input (floating or pulled-up).
     pub struct Input<IMODE = AnyInput> {
         pub(crate) _imode: PhantomData<IMODE>,
     }
@@ -24,18 +27,22 @@ pub mod mode {
     impl<IMODE: InputMode> Io for Input<IMODE> {}
     impl<IMODE: InputMode> crate::Sealed for Input<IMODE> {}
 
+    /// Floating input, used like `Input<Floating>`.
     pub struct Floating;
     impl InputMode for Floating {}
     impl crate::Sealed for Floating {}
 
+    /// Pulled-up input, used like `Input<PullUp>`.
     pub struct PullUp;
     impl InputMode for PullUp {}
     impl crate::Sealed for PullUp {}
 
+    /// Any input (floating or pulled-up), used like `Input<AnyInput>`.
     pub struct AnyInput;
     impl InputMode for AnyInput {}
     impl crate::Sealed for AnyInput {}
 
+    /// Pin is configured as an analog input (for the ADC).
     pub struct Analog;
 }
 
@@ -347,6 +354,13 @@ macro_rules! impl_port_traditional {
         }
     ) => {
         pub use $crate::port::mode;
+
+        /// Type-alias for a pin type which can represent any concrete pin.
+        ///
+        /// Sometimes it is easier to handle pins if they are all of the same type.  By default,
+        /// each pin gets its own distinct type in `avr-hal`, but by
+        /// [downgrading][avr_hal_generic::port::Pin#downgrading], you can cast them into this
+        /// "dynamic" type.  Do note, however, that using this dynamic type has a runtime cost.
         pub type Pin<MODE, PIN = Dynamic> = $crate::port::Pin<MODE, PIN>;
 
         $(#[$pins_attr])*
