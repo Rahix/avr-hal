@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(doc_cfg)]
 
 #[cfg(not(feature = "board-selected"))]
 compile_error!(
@@ -15,7 +16,23 @@ compile_error!(
     "
 );
 
-#[cfg(feature = "rt")]
+/// Attribute to declare the entry point of the program
+///
+/// Exactly one entry point must be declared in the entire dependency tree.
+///
+/// ```
+/// #[arduino_hal::entry]
+/// fn main() -> ! {
+///     // ...
+/// }
+/// ```
+///
+/// The entry function must have a signature of `[unsafe] fn() -> !`.
+///
+/// This macro is a reexport of [`avr_device::entry`].  It is only available when the `rt`
+/// (runtime) feature is selected (it is by default).
+#[cfg(any(feature = "rt", doc))]
+#[doc(cfg(feature = "rt"))]
 pub use avr_device::entry;
 
 #[cfg(feature = "mcu-atmega")]
