@@ -18,7 +18,7 @@ Go into `./examples/arduino-uno` (or the directory for whatever board you want),
 ```bash
 cd examples/arduino-uno
 
-# Build an run it on a connected board
+# Build and run it on a connected board
 cargo run --bin uno-blink
 ```
 
