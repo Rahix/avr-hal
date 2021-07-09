@@ -1,6 +1,28 @@
 #![no_std]
 #![feature(doc_cfg)]
 
+//! `arduino-hal`
+//! =============
+//! Common HAL (hardware abstraction layer) for Arduino boards.
+//!
+//! **Note**: This version of the documentation was built for
+#![cfg_attr(feature = "arduino-diecimila", doc = "**Arduino Diecimila**.")]
+#![cfg_attr(feature = "arduino-leonardo", doc = "**Arduino Leonardo**.")]
+#![cfg_attr(feature = "arduino-mega2560", doc = "**Arduino Mega 2560**.")]
+#![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
+#![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
+#![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
+//! This means that only items which are available for this board are visible.  If you are using a
+//! different board, try building the documentation locally with
+//!
+//! ```text
+//! cargo doc --open
+//! ```
+//!
+//! in your project (where `arduino-hal` is included with the feature-flag for your board).  For
+//! quickstarting a project, take a look at the
+//! [`avr-hal-template`](https://github.com/Rahix/avr-hal-template).
+
 #[cfg(not(feature = "board-selected"))]
 compile_error!(
     "This crate requires you to specify your target Arduino board as a feature.
@@ -35,11 +57,14 @@ compile_error!(
 #[doc(cfg(feature = "rt"))]
 pub use avr_device::entry;
 
+#[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use atmega_hal as hal;
+#[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use atmega_hal::pac;
 
+#[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use hal::Peripherals;
 
@@ -55,9 +80,11 @@ pub use delay::{delay_ms, delay_us, Delay};
 
 #[cfg(feature = "board-selected")]
 pub mod port;
+#[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use port::Pins;
 
+/// Analog to Digital converter.
 #[cfg(feature = "board-selected")]
 pub mod adc {
     pub use crate::hal::adc::{
@@ -67,24 +94,29 @@ pub mod adc {
     /// Check the [`avr_hal_generic::adc::Adc`] documentation.
     pub type Adc = crate::hal::Adc<crate::DefaultClock>;
 }
+#[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use adc::Adc;
 
+/// I2C bus controller.
 #[cfg(feature = "board-selected")]
 pub mod i2c {
     pub use crate::hal::i2c::*;
 
     pub type I2c = crate::hal::i2c::I2c<crate::DefaultClock>;
 }
+#[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use i2c::I2c;
 
+/// SPI controller.
 #[cfg(feature = "board-selected")]
 pub mod spi {
     pub use crate::hal::spi::*;
 
     pub type Spi = crate::hal::spi::Spi;
 }
+#[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use spi::Spi;
 
@@ -98,6 +130,7 @@ pub mod usart {
     pub type UsartReader<USART, RX, TX> =
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
+#[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use usart::Usart;
 
@@ -120,6 +153,13 @@ pub mod prelude {
     pub use void::ResultVoidExt as _;
 }
 
+/// Convenience macro to instanciate the [`Pins`] struct for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// ```
 #[cfg(feature = "board-selected")]
 #[macro_export]
 macro_rules! pins {

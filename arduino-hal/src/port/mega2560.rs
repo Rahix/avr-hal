@@ -4,6 +4,9 @@ pub use atmega_hal::port::Pin;
 avr_hal_generic::renamed_pins! {
     type Pin = Pin;
 
+    /// Pins of the **Arduino Mega 2560**.
+    ///
+    /// This struct is best initialized via the [`arduino_hal::pins!()`][pins] macro.
     pub struct Pins from atmega_hal::Pins {
         /// `D0` / `RX0`
         ///

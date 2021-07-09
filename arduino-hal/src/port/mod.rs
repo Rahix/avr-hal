@@ -1,3 +1,20 @@
+//! GPIO & Pin control.
+//!
+//! This module contains a [`Pins`] struct which represents all pins of the board.  The [`Pins`]
+//! struct is most easily constructed using the [`arduino_hal::pins!()`][pins] macro:
+//!
+//! ```no_run
+//! let dp = arduino_hal::Peripherals::take().unwrap();
+//! let pins = arduino_hal::pins!(dp);
+//! ```
+//!
+//! Additionally, the [`mode`] submodule contains all valid types for the `MODE` generic parameter
+//! of a pin.  The [`Pin`] type-alias represents a pin which can represent _any_ of the pins
+//! dynamically (while usually each pin has its own type).
+//!
+//! Check the documentation for [`avr_hal_generic::port::Pin`] for a detailed explanation of GPIO
+//! pins in `avr-hal`.
+
 #[cfg(feature = "arduino-diecimila")]
 mod diecimila;
 #[cfg(feature = "arduino-diecimila")]
