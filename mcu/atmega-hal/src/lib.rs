@@ -1,5 +1,24 @@
 #![no_std]
 
+//! `atmega-hal`
+//! =============
+//! Common HAL (hardware abstraction layer) for ATmega* microcontrollers.
+//!
+//! **Note**: This version of the documentation was built for
+#![cfg_attr(feature = "atmega48p", doc = "**ATmega48P**.")]
+#![cfg_attr(feature = "atmega168", doc = "**ATmega168**.")]
+#![cfg_attr(feature = "atmega328p", doc = "**ATmega328P**.")]
+#![cfg_attr(feature = "atmega328pb", doc = "**ATmega328PB**.")]
+#![cfg_attr(feature = "atmega32u4", doc = "**ATmega32U4**.")]
+#![cfg_attr(feature = "atmega2560", doc = "**ATmega2560**.")]
+#![cfg_attr(feature = "atmega1280", doc = "**ATmega1280**.")]
+//! This means that only items which are available for this MCU are visible.  If you are using
+//! a different chip, try building the documentation locally with:
+//!
+//! ```text
+//! cargo doc --features <your-mcu> --open
+//! ```
+
 #[cfg(all(
     not(feature = "device-selected"),
     not(feature = "disable-device-selection-error")

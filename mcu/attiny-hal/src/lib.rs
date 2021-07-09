@@ -1,5 +1,19 @@
 #![no_std]
 
+//! `attiny-hal`
+//! =============
+//! Common HAL (hardware abstraction layer) for ATtiny* microcontrollers.
+//!
+//! **Note**: This version of the documentation was built for
+#![cfg_attr(feature = "attiny85", doc = "**ATtiny85**.")]
+#![cfg_attr(feature = "attiny88", doc = "**ATtiny88**.")]
+//! This means that only items which are available for this MCU are visible.  If you are using
+//! a different chip, try building the documentation locally with:
+//!
+//! ```text
+//! cargo doc --features <your-mcu> --open
+//! ```
+
 #[cfg(all(
     not(feature = "device-selected"),
     not(feature = "disable-device-selection-error")
