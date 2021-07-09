@@ -35,3 +35,7 @@ pub use uno::*;
 mod promicro;
 #[cfg(feature = "sparkfun-promicro")]
 pub use promicro::*;
+#[cfg(feature = "trinket-pro")]
+mod trinket_pro;
+#[cfg(feature = "trinket-pro")]
+pub use trinket_pro::*;

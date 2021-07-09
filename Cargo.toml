@@ -29,6 +29,7 @@ members = [
     "examples/arduino-nano",
     "examples/arduino-uno",
     "examples/sparkfun-promicro",
+    "examples/trinket-pro",
 ]
 exclude = [
     # The RAVEDUDE! Yeah!
