@@ -12,6 +12,7 @@
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
+#![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
 //! This means that only items which are available for this board are visible.  If you are using a
 //! different board, try building the documentation locally with
 //!
@@ -54,6 +55,7 @@ compile_error!(
     * arduino-nano
     * arduino-uno
     * sparkfun-promicro
+    * trinket-pro
     "
 );
 
