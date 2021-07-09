@@ -19,8 +19,12 @@ jobs:
           toolchain: nightly-2021-01-07
           override: true
           components: rust-src
-      - name: Build documentation
-        run: cargo doc --all
+      - name: Build documentation (arduino-hal)
+        run: cd arduino-hal/ && cargo doc --features arduino-uno
+      - name: Build documentation (atmega-hal)
+        run: cd mcu/atmega-hal/ && cargo doc --features atmega328p
+      - name: Build documentation (attiny-hal)
+        run: cd mcu/attiny-hal/ && cargo doc --features attiny85
       - name: Deploy to GH-Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
