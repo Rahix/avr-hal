@@ -47,10 +47,10 @@ This is a generic crate containing most of the HAL implementaions in the form of
 ### `avr-specs/`
 The `avr-specs/` directory contains rustc target definitions for all supported microcontrollers.  You will need these for compiling rust code for AVR.  The [`avr-hal-template`](https://github.com/Rahix/avr-hal-template) already includes them for convenience.
 
-[avr-hal-generic docs]: #
-[arduino-hal docs]: #
-[atmega-hal docs]: #
-[attiny-hal docs]: #
+[avr-hal-generic docs]: https://rahix.github.io/avr-hal/avr_hal_generic/index.html
+[arduino-hal docs]: https://rahix.github.io/avr-hal/arduino_hal/index.html
+[atmega-hal docs]: https://rahix.github.io/avr-hal/atmega_hal/index.html
+[attiny-hal docs]: https://rahix.github.io/avr-hal/attiny_hal/index.html
 
 ## Disclaimer
 This project is not affiliated with either Microchip (former Atmel) nor any of the Vendors that created the boards supported in this repository.
