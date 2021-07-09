@@ -25,6 +25,8 @@ jobs:
             name: arduino-mega2560
           - type: board
             name: sparkfun-promicro
+          - type: board
+            name: trinket-pro
           - type: mcu
             name: atmega1280
             spec: atmega1280
