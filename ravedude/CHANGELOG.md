@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Support for *Arduino Mega 2560*.
+- Support for *Arduino Diecimila* (untested).
+- Support for the *SparkFun ProMicro*.
+- Support for *Arduino Micro*.
+- Support for the *Trinket Pro*.
 
 
 ## [0.1.2] - 2021-03-21
