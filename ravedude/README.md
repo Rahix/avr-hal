@@ -1,4 +1,4 @@
-ravedude
+ravedude [![crates.io page](https://img.shields.io/crates/v/ravedude.svg)](https://crates.io/crates/ravedude)
 ========
 `ravedude` is a CLI utility to make Rust development for AVR microcontrollers
 super smooth.  It's a wrapper around `avrdude` and provides easy access to the
