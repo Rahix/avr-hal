@@ -41,7 +41,7 @@
 //! }
 //! ```
 //!
-//! For examples, please check the `avr-hal` examples: <https://github.com/Rahix/avr-hal/tree/next/examples>
+//! For examples, please check the `avr-hal` examples: <https://github.com/Rahix/avr-hal/tree/main/examples>
 
 #[cfg(not(feature = "board-selected"))]
 compile_error!(
