@@ -2,7 +2,7 @@
 use crate::port;
 pub use avr_hal_generic::spi::*;
 
-#[cfg(any(feature = "atmega2560", feature = "atmega32u4"))]
+#[cfg(any(feature = "atmega8u2", feature = "atmega2560", feature = "atmega32u4"))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
     crate::pac::SPI,
@@ -11,7 +11,7 @@ pub type Spi = avr_hal_generic::spi::Spi<
     port::PB3,
     port::PB0,
 >;
-#[cfg(any(feature = "atmega2560", feature = "atmega32u4"))]
+#[cfg(any(feature = "atmega8u2", feature = "atmega2560", feature = "atmega32u4"))]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
     peripheral: crate::pac::SPI,
