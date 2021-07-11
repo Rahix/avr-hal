@@ -128,6 +128,8 @@ fn ravedude() -> anyhow::Result<()> {
         let port = port.context("console can only be opened for devices with USB-to-Serial")?;
 
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
+        // Empty line for visual consistency
+        eprintln!();
         console::open(&port, baudrate)?;
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
