@@ -254,7 +254,7 @@ impl Board for TrinketPro {
     }
 
     fn needs_reset(&self) -> Option<&str> {
-        None
+        Some("Reset the board by pressing the reset button once.")
     }
 
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
