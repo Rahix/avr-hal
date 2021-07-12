@@ -1,0 +1,1 @@
+initSidebarItems({"derive":[["uDebug","Automatically derive the `uDebug` trait for a `struct` or `enum`"]]});

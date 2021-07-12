@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["pins",""]],"mod":[["clock","Generic trait for clock speeds"],["delay","Delay implementations"],["pac","Reexport of `attiny85` from `avr-device`"],["port",""]],"struct":[["Attiny",""],["Peripherals","All the peripherals"]]});

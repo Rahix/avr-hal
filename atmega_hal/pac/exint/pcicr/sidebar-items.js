@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["PCICR_SPEC","Pin Change Interrupt Control Register"],["PCIE_R","Field `PCIE` reader - Pin Change Interrupt Enables"],["PCIE_W","Field `PCIE` writer - Pin Change Interrupt Enables"],["R","Register `PCICR` reader"],["W","Register `PCICR` writer"]]});

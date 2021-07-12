@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["avr_hal_generic"] = [{"text":"impl uDebug for MHz24","synthetic":false,"types":[]},{"text":"impl uDebug for MHz20","synthetic":false,"types":[]},{"text":"impl uDebug for MHz16","synthetic":false,"types":[]},{"text":"impl uDebug for MHz12","synthetic":false,"types":[]},{"text":"impl uDebug for MHz8","synthetic":false,"types":[]},{"text":"impl uDebug for MHz1","synthetic":false,"types":[]},{"text":"impl uDebug for Error","synthetic":false,"types":[]},{"text":"impl uDebug for Direction","synthetic":false,"types":[]}];
+implementors["ufmt"] = [];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DTPS_A","Value on reset: 0"]],"struct":[["DTPS_R","Field `DTPS` reader - "],["DTPS_SPEC","Dead time prescaler register"],["DTPS_W","Field `DTPS` writer - "],["R","Register `DTPS` reader"],["W","Register `DTPS` writer"]]});

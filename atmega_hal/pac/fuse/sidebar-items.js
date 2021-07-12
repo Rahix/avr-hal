@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["extended",""],["high",""],["low",""]],"struct":[["RegisterBlock","Register block"]],"type":[["EXTENDED","EXTENDED register accessor: an alias for `Reg<EXTENDED_SPEC>`"],["HIGH","HIGH register accessor: an alias for `Reg<HIGH_SPEC>`"],["LOW","LOW register accessor: an alias for `Reg<LOW_SPEC>`"]]});

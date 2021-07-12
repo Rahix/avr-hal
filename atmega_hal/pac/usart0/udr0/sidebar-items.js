@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["R","Register `UDR0` reader"],["UDR0_SPEC","USART I/O Data Register"],["W","Register `UDR0` writer"]]});

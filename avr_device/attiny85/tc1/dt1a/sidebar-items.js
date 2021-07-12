@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DT1A_SPEC","Dead Time Value Register A"],["DTVH_R","Field `DTVH` reader - "],["DTVH_W","Field `DTVH` writer - "],["DTVL_R","Field `DTVL` reader - "],["DTVL_W","Field `DTVL` writer - "],["R","Register `DT1A` reader"],["W","Register `DT1A` writer"]]});

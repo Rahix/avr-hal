@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DWDR_SPEC","debugWire data register"],["R","Register `DWDR` reader"],["W","Register `DWDR` writer"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["EXTENDED_SPEC","This register you can `read`, `write_with_zero`, `reset`, `write`, `modify`. See API."],["R","Register `EXTENDED` reader"],["SELFPRGEN_R","Field `SELFPRGEN` reader - Self Programming enable"],["SELFPRGEN_W","Field `SELFPRGEN` writer - Self Programming enable"],["W","Register `EXTENDED` writer"]]});

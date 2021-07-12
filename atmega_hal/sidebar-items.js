@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["pins",""]],"mod":[["adc","Analog-to-Digital Converter"],["clock","Generic trait for clock speeds"],["delay","Delay implementations"],["i2c",""],["pac","Reexport of `atmega328p` from `avr-device`"],["port",""],["spi",""],["usart",""],["wdt",""]],"struct":[["Atmega",""],["Peripherals","All the peripherals"]]});

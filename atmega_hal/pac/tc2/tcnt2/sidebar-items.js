@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["R","Register `TCNT2` reader"],["TCNT2_SPEC","Timer/Counter2"],["W","Register `TCNT2` writer"]]});

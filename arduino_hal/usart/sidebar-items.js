@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Baudrate","Representation of a USART baudrate"]],"trait":[["UsartOps","Internal trait for low-level USART peripherals."]],"type":[["Usart",""],["UsartReader",""],["UsartWriter",""]]});

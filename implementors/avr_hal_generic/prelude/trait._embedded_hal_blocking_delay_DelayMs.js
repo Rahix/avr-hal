@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["avr_hal_generic"] = [{"text":"impl&lt;SPEED&gt; DelayMs&lt;u16&gt; for Delay&lt;SPEED&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Delay&lt;SPEED&gt;: DelayUs&lt;u32&gt;,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;SPEED&gt; DelayMs&lt;u8&gt; for Delay&lt;SPEED&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Delay&lt;SPEED&gt;: DelayMs&lt;u16&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["R","Register `TWDR` reader"],["TWDR_SPEC","TWI Data register"],["W","Register `TWDR` writer"]]});

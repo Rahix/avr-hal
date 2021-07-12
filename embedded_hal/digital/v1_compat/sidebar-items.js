@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["OldInputPin","Wrapper to allow fallible `v2::InputPin` traits to be converted to `v1::InputPin` traits where errors will panic."],["OldOutputPin","Wrapper to allow fallible `v2::OutputPin` traits to be converted to `v1::OutputPin` traits"]]});

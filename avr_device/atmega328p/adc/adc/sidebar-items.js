@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ADC_SPEC","ADC Data Register Bytes"],["R","Register `ADC` reader"],["W","Register `ADC` writer"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["R","Register `SPSR` reader"],["SPI2X_R","Field `SPI2X` reader - Double SPI Speed Bit"],["SPI2X_W","Field `SPI2X` writer - Double SPI Speed Bit"],["SPIF_R","Field `SPIF` reader - SPI Interrupt Flag"],["SPSR_SPEC","SPI Status Register"],["W","Register `SPSR` writer"],["WCOL_R","Field `WCOL` reader - Write Collision Flag"]]});

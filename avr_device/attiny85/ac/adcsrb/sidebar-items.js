@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ACME_R","Field `ACME` reader - Analog Comparator Multiplexer Enable"],["ACME_W","Field `ACME` writer - Analog Comparator Multiplexer Enable"],["ADCSRB_SPEC","ADC Control and Status Register B"],["R","Register `ADCSRB` reader"],["W","Register `ADCSRB` writer"]]});

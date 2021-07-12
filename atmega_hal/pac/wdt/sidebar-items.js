@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["wdtcsr","Watchdog Timer Control Register"]],"struct":[["RegisterBlock","Register block"]],"type":[["WDTCSR","WDTCSR register accessor: an alias for `Reg<WDTCSR_SPEC>`"]]});

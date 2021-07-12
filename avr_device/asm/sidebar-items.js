@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["nop","No Operation"],["sleep","Sleep / Wait For Interrupt"],["wdr","Watchdog Reset"]]});

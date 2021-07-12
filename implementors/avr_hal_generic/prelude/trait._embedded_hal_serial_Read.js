@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["avr_hal_generic"] = [{"text":"impl&lt;H, USART:&nbsp;UsartOps&lt;H, RX, TX&gt;, RX, TX, CLOCK&gt; Read&lt;u8&gt; for Usart&lt;H, USART, RX, TX, CLOCK&gt;","synthetic":false,"types":[]},{"text":"impl&lt;H, USART:&nbsp;UsartOps&lt;H, RX, TX&gt;, RX, TX, CLOCK&gt; Read&lt;u8&gt; for UsartReader&lt;H, USART, RX, TX, CLOCK&gt;","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

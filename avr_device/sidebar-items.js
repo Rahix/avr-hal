@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["asm","Assembly instructions"],["attiny85","ATtiny85"],["generic","Common register and bit access and modify traits"],["interrupt","Chip-Generic Interrupt Utilities"]]});

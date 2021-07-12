@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["embedded_hal"] = [{"text":"impl&lt;Word, Error&gt; Write for dyn Write&lt;Word, Error = Error&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Word: From&lt;u8&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

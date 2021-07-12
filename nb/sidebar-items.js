@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error","A non-blocking error"]],"macro":[["await","Await operation (won't work until the language gains support for generators)"],["block","Turns the non-blocking expression `$e` into a blocking operation."],["try_nb","Future adapter"]],"type":[["Result","A non-blocking result"]]});

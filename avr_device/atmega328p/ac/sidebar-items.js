@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["acsr","Analog Comparator Control And Status Register"],["didr1","Digital Input Disable Register 1"]],"struct":[["RegisterBlock","Register block"]],"type":[["ACSR","ACSR register accessor: an alias for `Reg<ACSR_SPEC>`"],["DIDR1","DIDR1 register accessor: an alias for `Reg<DIDR1_SPEC>`"]]});

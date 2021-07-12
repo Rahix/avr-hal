@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["MHz1","1 MHz Clock"],["MHz12","12 MHz Clock"],["MHz16","16 MHz Clock"],["MHz20","20 MHz Clock"],["MHz24","24 MHz Clock"],["MHz8","8 MHz Clock"]],"trait":[["Clock","A clock speed"]]});
