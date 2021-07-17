@@ -44,10 +44,6 @@ jobs:
             spec: atmega1280
             crate: atmega-hal
           - type: mcu
-            name: atmega168
-            spec: atmega168
-            crate: atmega-hal
-          - type: mcu
             name: atmega328pb
             spec: atmega328p
             crate: atmega-hal
