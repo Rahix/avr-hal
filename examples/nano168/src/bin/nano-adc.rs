@@ -17,6 +17,7 @@ fn main() -> ! {
     let (vbg, gnd) = (
         adc.read_blocking(&adc::channel::Vbg),
         adc.read_blocking(&adc::channel::Gnd),
+        // The ATmega168 chip does not support the temperature functionality.
     );
     ufmt::uwriteln!(&mut serial, "Vbandgap: {}", vbg).void_unwrap();
     ufmt::uwriteln!(&mut serial, "Ground: {}", gnd).void_unwrap();
@@ -42,7 +43,7 @@ fn main() -> ! {
             ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).void_unwrap();
         }
 
-        // Arduino Nano has two more ADC pins A6 and A7.  Accessing them works a bit different from
+        // Nano clone (with ATmega168) has two more ADC pins A6 and A7.  Accessing them works a bit different from
         // the other pins as they are not normal IO pins.  The code below shows how it works.
         let (a6, a7) = (
             adc.read_blocking(&adc::channel::ADC6),
