@@ -35,10 +35,10 @@ jobs:
             examples: true
           - type: board
             name: arduino-nano
-            examples: false
+            examples: true
           - type: board
             name: nano168
-            examples: false
+            examples: true
           - type: mcu
             name: atmega1280
             spec: atmega1280
