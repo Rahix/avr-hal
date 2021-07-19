@@ -18,6 +18,9 @@ Go into `./examples/arduino-uno` (or the directory for whatever board you want),
 ```bash
 cd examples/arduino-uno
 
+# Set the serial port connected to the Arduino
+export RAVEDUDE_PORT=/dev/ttyUSB1
+
 # Build and run it on a connected board
 cargo run --bin uno-blink
 ```
