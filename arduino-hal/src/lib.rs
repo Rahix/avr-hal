@@ -233,7 +233,7 @@ macro_rules! default_serial {
         )
     };
 }
-#[cfg(feature = "arduino-nano")]
+#[cfg(any(feature = "arduino-nano", feature = "nano168"))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
