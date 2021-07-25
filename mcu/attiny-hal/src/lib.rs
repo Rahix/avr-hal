@@ -7,6 +7,7 @@
 //! **Note**: This version of the documentation was built for
 #![cfg_attr(feature = "attiny85", doc = "**ATtiny85**.")]
 #![cfg_attr(feature = "attiny88", doc = "**ATtiny88**.")]
+#![cfg_attr(feature = "attiny167", doc = "**ATtiny167**.")]
 //! This means that only items which are available for this MCU are visible.  If you are using
 //! a different chip, try building the documentation locally with:
 //!
@@ -25,6 +26,7 @@ compile_error!(
 
     * attiny85
     * attiny88
+    * attiny167
     "
 );
 
@@ -35,6 +37,10 @@ pub use avr_device::attiny85 as pac;
 /// Reexport of `attiny88` from `avr-device`
 #[cfg(feature = "attiny88")]
 pub use avr_device::attiny88 as pac;
+
+/// Reexport of `attiny167` from `avr-device`
+#[cfg(feature = "attiny167")]
+pub use avr_device::attiny167 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -65,5 +71,12 @@ macro_rules! pins {
 macro_rules! pins {
     ($p:expr) => {
         $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
+    };
+}
+#[cfg(feature = "attiny167")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB)
     };
 }
