@@ -39,3 +39,7 @@ pub use promicro::*;
 mod trinket_pro;
 #[cfg(feature = "trinket-pro")]
 pub use trinket_pro::*;
+#[cfg(feature = "digispark-pro")]
+mod digispark_pro;
+#[cfg(feature = "digispark-pro")]
+pub use digispark_pro::*;

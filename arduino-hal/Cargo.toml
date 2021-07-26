@@ -10,11 +10,13 @@ rt = ["avr-device/rt"]
 
 board-selected = []
 mcu-atmega=[]
+mcu-attiny=[]
 arduino-diecimila = ["mcu-atmega", "atmega-hal/atmega168", "board-selected"]
 arduino-leonardo = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
 arduino-mega2560 = ["mcu-atmega", "atmega-hal/atmega2560", "board-selected"]
 arduino-nano = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
 arduino-uno = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
+digispark-pro = ["mcu-attiny", "attiny-hal/attiny167", "board-selected"]
 trinket-pro = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
 sparkfun-promicro = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
 nano168 = ["mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc", "board-selected"]
@@ -33,6 +35,10 @@ path = "../avr-hal-generic/"
 
 [dependencies.atmega-hal]
 path = "../mcu/atmega-hal/"
+optional = true
+
+[dependencies.attiny-hal]
+path = "../mcu/attiny-hal/"
 optional = true
 
 # Because this crate has its own check that at least one device is selected, we
