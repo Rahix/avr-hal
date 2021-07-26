@@ -24,45 +24,18 @@ impl Default for ClockDivider {
     }
 }
 
-/// Select the voltage reference for the ADC peripheral
-///
-/// The internal voltage reference options may not be used if an external reference voltage is
-/// being applied to the AREF pin.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u8)]
-pub enum ReferenceVoltage {
-    /// Voltage applied to AREF pin.
-    Aref,
-    /// Default reference voltage (default).
-    AVcc,
-    /// Internal reference voltage.
-    Internal,
-}
+pub trait AdcSettings<H> {
+    type Settings: PartialEq + Copy;
 
-impl Default for ReferenceVoltage {
-    fn default() -> Self {
-        Self::AVcc
-    }
-}
-
-/// Configuration for the ADC peripheral.
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AdcSettings {
-    pub clock_divider: ClockDivider,
-    pub ref_voltage: ReferenceVoltage,
+    fn raw_init(&mut self, settings: Self::Settings);
 }
 
 /// Internal trait for the low-level ADC peripheral.
 ///
 /// **Prefer using the [`Adc`] API instead of this trait.**
-pub trait AdcOps<H> {
+pub trait AdcOps<H> where Self: AdcSettings<H> {
     /// Channel ID type for this ADC.
     type Channel: PartialEq + Copy;
-
-    /// Initialize the ADC peripheral with the specified settings.
-    ///
-    /// **Warning**: This is a low-level method and should not be called directly from user code.
-    fn raw_init(&mut self, settings: AdcSettings);
 
     /// Read out the ADC data register.
     ///
@@ -168,10 +141,10 @@ pub struct Adc<H, ADC: AdcOps<H>, CLOCK> {
 
 impl<H, ADC, CLOCK> Adc<H, ADC, CLOCK>
 where
-    ADC: AdcOps<H>,
+    ADC: AdcOps<H> + AdcSettings<H>,
     CLOCK: crate::clock::Clock,
 {
-    pub fn new(p: ADC, settings: AdcSettings) -> Self {
+    pub fn new(p: ADC, settings: ADC::Settings) -> Self {
         let mut adc = Self {
             p,
             reading_channel: None,
@@ -182,7 +155,7 @@ where
         adc
     }
 
-    pub fn initialize(&mut self, settings: AdcSettings) {
+    pub fn initialize(&mut self, settings: ADC::Settings) {
         self.p.raw_init(settings);
     }
 
@@ -250,26 +223,10 @@ macro_rules! impl_adc {
         impl $crate::adc::AdcOps<$HAL> for $ADC {
             type Channel = $Channel;
 
-            #[inline]
-            fn raw_init(&mut self, settings: $crate::adc::AdcSettings) {
-                self.adcsra.write(|w| {
-                    w.aden().set_bit();
-                    match settings.clock_divider {
-                        ClockDivider::Factor2 => w.adps().prescaler_2(),
-                        ClockDivider::Factor4 => w.adps().prescaler_4(),
-                        ClockDivider::Factor8 => w.adps().prescaler_8(),
-                        ClockDivider::Factor16 => w.adps().prescaler_16(),
-                        ClockDivider::Factor32 => w.adps().prescaler_32(),
-                        ClockDivider::Factor64 => w.adps().prescaler_64(),
-                        ClockDivider::Factor128 => w.adps().prescaler_128(),
-                    }
-                });
-                self.admux.write(|w| match settings.ref_voltage {
-                    ReferenceVoltage::Aref => w.refs().aref(),
-                    ReferenceVoltage::AVcc => w.refs().avcc(),
-                    ReferenceVoltage::Internal => w.refs().internal(),
-                });
-            }
+            // #[inline]
+            // fn raw_init(&mut self, settings: Self::Settings) {
+            //     <$ADC as $crate::adc::AdcSettings>::raw_init(settings)
+            // }
 
             #[inline]
             fn raw_read_adc(&self) -> u16 {
