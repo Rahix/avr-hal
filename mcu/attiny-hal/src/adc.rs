@@ -11,12 +11,20 @@ pub use avr_hal_generic::adc::{AdcChannel, AdcOps, ClockDivider};
 #[repr(u8)]
 pub enum ReferenceVoltage {
     /// Voltage applied to AREF pin.
+    #[cfg(any(
+        feature = "attiny85",
+        feature = "attiny167",
+    ))]
     Aref,
     /// Default reference voltage (default).
     AVcc,
     /// Internal 1.1V reference.
     Internal1_1,
     /// Internal 2.56V reference.
+    #[cfg(any(
+        feature = "attiny85",
+        feature = "attiny167",
+    ))]
     Internal2_56,
 }
 
@@ -54,20 +62,8 @@ pub type Channel = avr_hal_generic::adc::Channel<crate::Attiny, crate::pac::ADC>
 pub mod channel {
     #[cfg(feature = "attiny167")]
     pub struct AVcc_4;
-    #[cfg(any(
-        feature = "attiny85",
-        feature = "attiny167",
-    ))]
     pub struct Vbg;
-    #[cfg(any(
-        feature = "attiny85",
-        feature = "attiny167",
-    ))]
     pub struct Gnd;
-    #[cfg(any(
-        feature = "attiny85",
-        feature = "attiny167",
-    ))]
     pub struct Temperature;
 }
 
@@ -94,6 +90,11 @@ impl avr_hal_generic::adc::AdcSettings<crate::Attiny> for crate::pac::ADC {
             ReferenceVoltage::AVcc => w.refs().vcc(),
             ReferenceVoltage::Internal1_1 => w.refs().internal().refs2().clear_bit(),
             ReferenceVoltage::Internal2_56 => w.refs().internal().refs2().set_bit(),
+        });
+        #[cfg(feature = "attiny88")]
+        self.admux.write(|w| match settings.ref_voltage {
+            ReferenceVoltage::AVcc => w.refs0().avcc(),
+            ReferenceVoltage::Internal1_1 => w.refs0().internal(),
         });
         #[cfg(feature = "attiny167")]
         self.amiscr.write(|w| match settings.ref_voltage {
@@ -124,6 +125,32 @@ avr_hal_generic::impl_adc! {
         port::PB2: (crate::pac::adc::admux::MUX_A::ADC1, didr0::adc1d),
         port::PB4: (crate::pac::adc::admux::MUX_A::ADC2, didr0::adc2d),
         port::PB3: (crate::pac::adc::admux::MUX_A::ADC3, didr0::adc3d),
+    },
+    channels: {
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
+        channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
+    },
+}
+
+
+#[cfg(feature = "attiny88")]
+avr_hal_generic::impl_adc! {
+    hal: crate::Attiny,
+    peripheral: crate::pac::ADC,
+    channel_id: crate::pac::adc::admux::MUX_A,
+    set_channel: |peripheral, id| {
+        peripheral.admux.modify(|_, w| w.mux().variant(id));
+    },
+    pins: {
+        port::PC0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
+        port::PC1: (crate::pac::adc::admux::MUX_A::ADC1, didr0::adc1d),
+        port::PC2: (crate::pac::adc::admux::MUX_A::ADC2, didr0::adc2d),
+        port::PC3: (crate::pac::adc::admux::MUX_A::ADC3, didr0::adc3d),
+        port::PC4: (crate::pac::adc::admux::MUX_A::ADC4, didr0::adc4d),
+        port::PC5: (crate::pac::adc::admux::MUX_A::ADC5, didr0::adc5d),
+        port::PA0: (crate::pac::adc::admux::MUX_A::ADC6, didr0::adc6d),
+        port::PA1: (crate::pac::adc::admux::MUX_A::ADC7, didr0::adc7d),
     },
     channels: {
         channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
