@@ -55,14 +55,17 @@ pub mod channel {
     #[cfg(feature = "attiny167")]
     pub struct AVcc_4;
     #[cfg(any(
+        feature = "attiny85",
         feature = "attiny167",
     ))]
     pub struct Vbg;
     #[cfg(any(
+        feature = "attiny85",
         feature = "attiny167",
     ))]
     pub struct Gnd;
     #[cfg(any(
+        feature = "attiny85",
         feature = "attiny167",
     ))]
     pub struct Temperature;
@@ -85,10 +88,19 @@ impl avr_hal_generic::adc::AdcSettings<crate::Attiny> for crate::pac::ADC {
                 ClockDivider::Factor128 => w.adps().prescaler_128(),
             }
         });
+        #[cfg(feature = "attiny85")]
+        self.admux.write(|w| match settings.ref_voltage {
+            ReferenceVoltage::Aref => w.refs().aref(),
+            ReferenceVoltage::AVcc => w.refs().vcc(),
+            ReferenceVoltage::Internal1_1 => w.refs().internal().refs2().clear_bit(),
+            ReferenceVoltage::Internal2_56 => w.refs().internal().refs2().set_bit(),
+        });
+        #[cfg(feature = "attiny167")]
         self.amiscr.write(|w| match settings.ref_voltage {
             ReferenceVoltage::Aref => w.arefen().set_bit(),
             _ => w.arefen().clear_bit(),
         });
+        #[cfg(feature = "attiny167")]
         self.admux.write(|w| match settings.ref_voltage {
             ReferenceVoltage::Aref => w.refs().avcc(),
             ReferenceVoltage::AVcc => w.refs().avcc(),
@@ -96,6 +108,28 @@ impl avr_hal_generic::adc::AdcSettings<crate::Attiny> for crate::pac::ADC {
             ReferenceVoltage::Internal2_56 => w.refs().internal_256(),
         });
     }
+}
+
+
+#[cfg(feature = "attiny85")]
+avr_hal_generic::impl_adc! {
+    hal: crate::Attiny,
+    peripheral: crate::pac::ADC,
+    channel_id: crate::pac::adc::admux::MUX_A,
+    set_channel: |peripheral, id| {
+        peripheral.admux.modify(|_, w| w.mux().variant(id));
+    },
+    pins: {
+        port::PB5: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
+        port::PB2: (crate::pac::adc::admux::MUX_A::ADC1, didr0::adc1d),
+        port::PB4: (crate::pac::adc::admux::MUX_A::ADC2, didr0::adc2d),
+        port::PB3: (crate::pac::adc::admux::MUX_A::ADC3, didr0::adc3d),
+    },
+    channels: {
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
+        channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
+    },
 }
 
 
