@@ -6,7 +6,7 @@ pub use attiny_hal::port::Pin;
 avr_hal_generic::renamed_pins! {
     type Pin = Pin;
 
-    /// Pins of the **Arduino Uno**.
+    /// Pins of the **Digispark Pro**.
     ///
     /// This struct is best initialized via the [`arduino_hal::pins!()`][pins] macro.
     pub struct Pins from attiny_hal::Pins {
