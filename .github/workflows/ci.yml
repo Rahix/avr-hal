@@ -17,23 +17,31 @@ jobs:
         m:
           - type: board
             name: arduino-uno
+            examples: true
           - type: board
             name: arduino-diecimila
+            examples: true
           - type: board
             name: arduino-leonardo
+            examples: true
           - type: board
             name: arduino-mega2560
+            examples: true
           - type: board
             name: sparkfun-promicro
+            examples: true
           - type: board
             name: trinket-pro
+            examples: true
+          - type: board
+            name: arduino-nano
+            examples: true
+          - type: board
+            name: nano168
+            examples: true
           - type: mcu
             name: atmega1280
             spec: atmega1280
-            crate: atmega-hal
-          - type: mcu
-            name: atmega168
-            spec: atmega168
             crate: atmega-hal
           - type: mcu
             name: atmega328pb
@@ -65,8 +73,11 @@ jobs:
       - name: Install avr-gcc, binutils, and libc
         run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
       - name: Compile board crate and examples
-        if: "${{ matrix.m.type == 'board' }}"
+        if: "${{ matrix.m.type == 'board' && matrix.m.examples }}"
         run: cd "examples/${{ matrix.m.name }}" && cargo build --bins
+      - name: Compile board crate (without examples)
+        if: "${{ matrix.m.type == 'board' && !matrix.m.examples }}"
+        run: cd "arduino-hal/" && cargo build --features "${{ matrix.m.name }}"
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
         run: cd "mcu/${{ matrix.m.crate }}" && cargo build --features "${{ matrix.m.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"

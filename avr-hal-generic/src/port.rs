@@ -3,6 +3,7 @@
 //! Please take a look at the documentation for [`Pin`] for a detailed explanation.
 
 use core::marker::PhantomData;
+use embedded_hal::digital::v2::OutputPin;
 
 pub trait PinMode: crate::Sealed {}
 /// GPIO pin modes
@@ -281,6 +282,21 @@ impl<PIN: PinOps> Pin<mode::Output, PIN> {
     #[inline]
     pub fn is_set_low(&self) -> bool {
         !unsafe { self.pin.out_get() }
+    }
+}
+
+// Implements OutputPin from embedded-hal to make sure external libraries work
+impl<PIN: PinOps> OutputPin for Pin<mode::Output, PIN> {
+    type Error = core::convert::Infallible;
+
+    fn set_high(&mut self) -> Result<(), Self::Error> {
+        self.set_high();
+        Ok(())
+    }
+
+    fn set_low(&mut self) -> Result<(), Self::Error> {
+        self.set_low();
+        Ok(())
     }
 }
 

@@ -55,12 +55,27 @@ fn main() -> ! {
         // Wait for the echo to get low again
         while echo.is_high() {}
 
-        // 1 count == 4 us, so the value is multiplied by 4.
-        // 1/58 ≈ (34000 ms/2)* 1µs
-        let value = (timer1.tcnt1.read().bits() * 4) / 58;
+        // 1 count == 4 µs, so the value is multiplied by 4.
+        // 1/58 ≈ (34000 cm/s) * 1µs / 2
+        // when no object is detected, instead of keeping the echo pin completely low,
+        // some HC-SR04 labeled sensor holds the echo pin in high state for very long time,
+        // thus overflowing the u16 value when multiplying the timer1 value with 4.
+        // overflow during runtime causes panic! so it must be handled
+        let temp_timer = timer1.tcnt1.read().bits().saturating_mul(4);
+        let value  = match temp_timer {
+            u16::MAX => {
+                ufmt::uwriteln!(
+                &mut serial,
+                "Nothing was detected and jump to outer loop.\r"
+                )
+                .void_unwrap();
+                continue 'outer;
+            },
+            _ => temp_timer / 58
+        };
 
         // Await 100 ms before sending the next trig
-        // 0.1s/4µs = 50000
+        // 0.1s/4µs = 25000
         while timer1.tcnt1.read().bits() < 25000 {}
 
         ufmt::uwriteln!(

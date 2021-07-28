@@ -47,6 +47,9 @@ This is a generic crate containing most of the HAL implementaions in the form of
 ### `avr-specs/`
 The `avr-specs/` directory contains rustc target definitions for all supported microcontrollers.  You will need these for compiling rust code for AVR.  The [`avr-hal-template`](https://github.com/Rahix/avr-hal-template) already includes them for convenience.
 
+### [`ravedude`](./ravedude) [![crates.io page](https://img.shields.io/crates/v/ravedude.svg)](https://crates.io/crates/ravedude)
+`ravedude` is a utility for seamlessly integrating avrdude and a serial console into the cargo workflow.  With a bit of configuration (check its [README](./ravedude/README.md)!) you can then upload your code to your board and view its output over the serial console by just using `cargo run` as you would normally.
+
 [avr-hal-generic docs]: https://rahix.github.io/avr-hal/avr_hal_generic/index.html
 [arduino-hal docs]: https://rahix.github.io/avr-hal/arduino_hal/index.html
 [atmega-hal docs]: https://rahix.github.io/avr-hal/atmega_hal/index.html

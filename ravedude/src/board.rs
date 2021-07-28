@@ -17,6 +17,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "diecimila" => Box::new(ArduinoDiecimila),
         "promicro" => Box::new(SparkFunProMicro),
         "trinket-pro" => Box::new(TrinketPro),
+        "nano168" => Box::new(Nano168),
         _ => return None,
     })
 }
@@ -268,5 +269,30 @@ impl Board for TrinketPro {
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         None // The TrinketPro does not have USB-to-Serial.
+    }
+}
+
+struct Nano168;
+
+impl Board for Nano168 {
+    fn display_name(&self) -> &str {
+        "Nano Clone (ATmega168)"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        None
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "arduino",
+            partno: "atmega168",
+            baudrate: Some(19200),
+            do_chip_erase: false,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        Some(Err(anyhow::anyhow!("Not able to guess port")))
     }
 }
