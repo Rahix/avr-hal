@@ -25,6 +25,6 @@ pub(crate) mod default {
         feature = "nano168",
     ))]
     pub type DefaultClock = avr_hal_generic::clock::MHz16;
-    #[cfg(feature = "adafruit-trinket")]
+    #[cfg(feature = "trinket")]
     pub type DefaultClock = avr_hal_generic::clock::MHz8;
 }
