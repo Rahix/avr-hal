@@ -41,5 +41,5 @@ mod trinket_pro;
 pub use trinket_pro::*;
 #[cfg(feature = "trinket")]
 mod trinket;
-#[cfg(feature = "adafruit-trinket")]
+#[cfg(feature = "trinket")]
 pub use trinket::*;
