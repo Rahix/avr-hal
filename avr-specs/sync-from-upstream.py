@@ -28,6 +28,9 @@ SPECS = {
     "attiny88": {
         "cpu": "attiny88",
     },
+    "attiny167": {
+        "cpu": "attiny167",
+    },
 }
 
 COMMON = {
