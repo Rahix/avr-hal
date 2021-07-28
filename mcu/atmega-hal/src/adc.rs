@@ -31,28 +31,24 @@ pub struct AdcSettings {
     pub ref_voltage: ReferenceVoltage,
 }
 
-impl avr_hal_generic::adc::AdcSettings<crate::Atmega> for crate::pac::ADC {
-    type Settings = AdcSettings;
-
-    fn raw_init(&mut self, settings: Self::Settings) {
-        self.adcsra.write(|w| {
-            w.aden().set_bit();
-            match settings.clock_divider {
-                ClockDivider::Factor2 => w.adps().prescaler_2(),
-                ClockDivider::Factor4 => w.adps().prescaler_4(),
-                ClockDivider::Factor8 => w.adps().prescaler_8(),
-                ClockDivider::Factor16 => w.adps().prescaler_16(),
-                ClockDivider::Factor32 => w.adps().prescaler_32(),
-                ClockDivider::Factor64 => w.adps().prescaler_64(),
-                ClockDivider::Factor128 => w.adps().prescaler_128(),
-            }
-        });
-        self.admux.write(|w| match settings.ref_voltage {
-            ReferenceVoltage::Aref => w.refs().aref(),
-            ReferenceVoltage::AVcc => w.refs().avcc(),
-            ReferenceVoltage::Internal => w.refs().internal(),
-        });
-    }
+fn apply_settings(peripheral: &crate::pac::ADC, settings: AdcSettings) {
+    peripheral.adcsra.write(|w| {
+        w.aden().set_bit();
+        match settings.clock_divider {
+            ClockDivider::Factor2 => w.adps().prescaler_2(),
+            ClockDivider::Factor4 => w.adps().prescaler_4(),
+            ClockDivider::Factor8 => w.adps().prescaler_8(),
+            ClockDivider::Factor16 => w.adps().prescaler_16(),
+            ClockDivider::Factor32 => w.adps().prescaler_32(),
+            ClockDivider::Factor64 => w.adps().prescaler_64(),
+            ClockDivider::Factor128 => w.adps().prescaler_128(),
+        }
+    });
+    peripheral.admux.write(|w| match settings.ref_voltage {
+        ReferenceVoltage::Aref => w.refs().aref(),
+        ReferenceVoltage::AVcc => w.refs().avcc(),
+        ReferenceVoltage::Internal => w.refs().internal(),
+    });
 }
 
 /// Check the [`avr_hal_generic::adc::Adc`] documentation.
@@ -132,6 +128,8 @@ pub mod channel {
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
     peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux.modify(|_, w| w.mux().variant(id));
@@ -160,8 +158,9 @@ avr_hal_generic::impl_adc! {
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
     peripheral: crate::pac::ADC,
-    channel_id: u8,
     settings: AdcSettings,
+    apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
+    channel_id: u8,
     set_channel: |peripheral, id| {
         peripheral.admux.modify(|_, w| w.mux().bits(id & 0x1f));
         peripheral.adcsrb.modify(|_, w| w.mux5().bit(id & 0x20 != 0));
@@ -191,8 +190,9 @@ avr_hal_generic::impl_adc! {
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
     peripheral: crate::pac::ADC,
-    channel_id: u8,
     settings: AdcSettings,
+    apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
+    channel_id: u8,
     set_channel: |peripheral, id| {
         peripheral.admux.modify(|_, w| w.mux().bits(id & 0x1f));
         peripheral.adcsrb.modify(|_, w| w.mux5().bit(id & 0x20 != 0));

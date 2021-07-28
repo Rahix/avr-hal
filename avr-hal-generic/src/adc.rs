@@ -24,18 +24,20 @@ impl Default for ClockDivider {
     }
 }
 
-pub trait AdcSettings<H> {
-    type Settings: PartialEq + Copy;
-
-    fn raw_init(&mut self, settings: Self::Settings);
-}
-
 /// Internal trait for the low-level ADC peripheral.
 ///
 /// **Prefer using the [`Adc`] API instead of this trait.**
-pub trait AdcOps<H> where Self: AdcSettings<H> {
+pub trait AdcOps<H> {
     /// Channel ID type for this ADC.
     type Channel: PartialEq + Copy;
+
+    /// Settings type for this ADC.
+    type Settings: PartialEq + Copy;
+
+    /// Initialize the ADC peripheral with the specified settings.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_init(&mut self, settings: Self::Settings);
 
     /// Read out the ADC data register.
     ///
@@ -141,7 +143,7 @@ pub struct Adc<H, ADC: AdcOps<H>, CLOCK> {
 
 impl<H, ADC, CLOCK> Adc<H, ADC, CLOCK>
 where
-    ADC: AdcOps<H> + AdcSettings<H>,
+    ADC: AdcOps<H>,
     CLOCK: crate::clock::Clock,
 {
     pub fn new(p: ADC, settings: ADC::Settings) -> Self {
@@ -205,6 +207,8 @@ macro_rules! impl_adc {
     (
         hal: $HAL:ty,
         peripheral: $ADC:ty,
+        settings: $Settings:ty,
+        apply_settings: |$settings_periph_var:ident, $settings_var:ident| $apply_settings:block,
         channel_id: $Channel:ty,
         set_channel: |$periph_var:ident, $chan_var:ident| $set_channel:block,
         pins: {
@@ -222,11 +226,15 @@ macro_rules! impl_adc {
     ) => {
         impl $crate::adc::AdcOps<$HAL> for $ADC {
             type Channel = $Channel;
+            type Settings = $Settings;
 
-            // #[inline]
-            // fn raw_init(&mut self, settings: Self::Settings) {
-            //     <$ADC as $crate::adc::AdcSettings>::raw_init(settings)
-            // }
+            #[inline]
+            fn raw_init(&mut self, settings: Self::Settings) {
+                let $settings_periph_var = self;
+                let $settings_var = settings;
+
+                $apply_settings
+            }
 
             #[inline]
             fn raw_read_adc(&self) -> u16 {
