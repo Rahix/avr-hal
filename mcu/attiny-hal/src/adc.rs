@@ -67,48 +67,19 @@ pub mod channel {
     pub struct Temperature;
 }
 
-impl avr_hal_generic::adc::AdcSettings<crate::Attiny> for crate::pac::ADC {
-    type Settings = AdcSettings;
-
-    #[inline]
-    fn raw_init(&mut self, settings: Self::Settings) {
-        self.adcsra.write(|w| {
-            w.aden().set_bit();
-            match settings.clock_divider {
-                ClockDivider::Factor2 => w.adps().prescaler_2(),
-                ClockDivider::Factor4 => w.adps().prescaler_4(),
-                ClockDivider::Factor8 => w.adps().prescaler_8(),
-                ClockDivider::Factor16 => w.adps().prescaler_16(),
-                ClockDivider::Factor32 => w.adps().prescaler_32(),
-                ClockDivider::Factor64 => w.adps().prescaler_64(),
-                ClockDivider::Factor128 => w.adps().prescaler_128(),
-            }
-        });
-        #[cfg(feature = "attiny85")]
-        self.admux.write(|w| match settings.ref_voltage {
-            ReferenceVoltage::Aref => w.refs().aref(),
-            ReferenceVoltage::AVcc => w.refs().vcc(),
-            ReferenceVoltage::Internal1_1 => w.refs().internal().refs2().clear_bit(),
-            ReferenceVoltage::Internal2_56 => w.refs().internal().refs2().set_bit(),
-        });
-        #[cfg(feature = "attiny88")]
-        self.admux.write(|w| match settings.ref_voltage {
-            ReferenceVoltage::AVcc => w.refs0().avcc(),
-            ReferenceVoltage::Internal1_1 => w.refs0().internal(),
-        });
-        #[cfg(feature = "attiny167")]
-        self.amiscr.write(|w| match settings.ref_voltage {
-            ReferenceVoltage::Aref => w.arefen().set_bit(),
-            _ => w.arefen().clear_bit(),
-        });
-        #[cfg(feature = "attiny167")]
-        self.admux.write(|w| match settings.ref_voltage {
-            ReferenceVoltage::Aref => w.refs().avcc(),
-            ReferenceVoltage::AVcc => w.refs().avcc(),
-            ReferenceVoltage::Internal1_1 => w.refs().internal_11(),
-            ReferenceVoltage::Internal2_56 => w.refs().internal_256(),
-        });
-    }
+fn apply_clock(peripheral: &crate::pac::ADC, settings: AdcSettings) {
+    peripheral.adcsra.write(|w| {
+        w.aden().set_bit();
+        match settings.clock_divider {
+            ClockDivider::Factor2 => w.adps().prescaler_2(),
+            ClockDivider::Factor4 => w.adps().prescaler_4(),
+            ClockDivider::Factor8 => w.adps().prescaler_8(),
+            ClockDivider::Factor16 => w.adps().prescaler_16(),
+            ClockDivider::Factor32 => w.adps().prescaler_32(),
+            ClockDivider::Factor64 => w.adps().prescaler_64(),
+            ClockDivider::Factor128 => w.adps().prescaler_128(),
+        }
+    });
 }
 
 
@@ -116,6 +87,16 @@ impl avr_hal_generic::adc::AdcSettings<crate::Attiny> for crate::pac::ADC {
 avr_hal_generic::impl_adc! {
     hal: crate::Attiny,
     peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| {
+        apply_clock(peripheral, settings);
+        peripheral.admux.write(|w| match settings.ref_voltage {
+            ReferenceVoltage::Aref => w.refs().aref(),
+            ReferenceVoltage::AVcc => w.refs().vcc(),
+            ReferenceVoltage::Internal1_1 => w.refs().internal().refs2().clear_bit(),
+            ReferenceVoltage::Internal2_56 => w.refs().internal().refs2().set_bit(),
+        });
+    },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux.modify(|_, w| w.mux().variant(id));
@@ -138,6 +119,14 @@ avr_hal_generic::impl_adc! {
 avr_hal_generic::impl_adc! {
     hal: crate::Attiny,
     peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| {
+        apply_clock(peripheral, settings);
+        peripheral.admux.write(|w| match settings.ref_voltage {
+            ReferenceVoltage::AVcc => w.refs0().avcc(),
+            ReferenceVoltage::Internal1_1 => w.refs0().internal(),
+        });
+    },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux.modify(|_, w| w.mux().variant(id));
@@ -164,6 +153,20 @@ avr_hal_generic::impl_adc! {
 avr_hal_generic::impl_adc! {
     hal: crate::Attiny,
     peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| {
+        apply_clock(peripheral, settings);
+        peripheral.amiscr.write(|w| match settings.ref_voltage {
+            ReferenceVoltage::Aref => w.arefen().set_bit(),
+            _ => w.arefen().clear_bit(),
+        });
+        peripheral.admux.write(|w| match settings.ref_voltage {
+            ReferenceVoltage::Aref => w.refs().avcc(),
+            ReferenceVoltage::AVcc => w.refs().avcc(),
+            ReferenceVoltage::Internal1_1 => w.refs().internal_11(),
+            ReferenceVoltage::Internal2_56 => w.refs().internal_256(),
+        });
+    },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux.modify(|_, w| w.mux().variant(id));
