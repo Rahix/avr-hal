@@ -41,10 +41,15 @@ struct Args {
     /// Must be one of the known board identifiers:
     ///
     /// * uno
-    /// * micro
     /// * nano
     /// * leonardo
+    /// * micro
     /// * mega2560
+    /// * diecimila
+    /// * promicro
+    /// * trinket-pro
+    /// * trinket
+    /// * nano168
     #[structopt(name = "BOARD", verbatim_doc_comment)]
     board: String,
 
