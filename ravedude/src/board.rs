@@ -138,7 +138,19 @@ impl Board for ArduinoLeonardo {
     }
 
     fn needs_reset(&self) -> Option<&str> {
-        Some("Reset the board by pressing the reset button once.")
+        let a = self.guess_port();
+        match a {
+            Some(Ok(name)) => {
+                match serialport::new(name.to_str().unwrap(), 1200).open() {
+                    Ok(_) => {
+                        std::thread::sleep(core::time::Duration::from_secs(1));
+                        None
+                    },
+                    Err(_) => Some("Reset the board by pressing the reset button once.")
+                }
+            },
+            _ => Some("Reset the board by pressing the reset button once.")
+        }
     }
 
     fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
