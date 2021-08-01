@@ -58,10 +58,7 @@ impl Default for Settings {
         Settings {
             data_order: DataOrder::MostSignificantFirst,
             clock: SerialClockRate::OscfOver4,
-            mode: spi::Mode {
-                polarity: spi::Polarity::IdleLow,
-                phase: spi::Phase::CaptureOnSecondTransition,
-            },
+            mode: spi::MODE_1,
         }
     }
 }
