@@ -15,5 +15,5 @@ cd examples/arduino-uno
 cargo run --bin uno-blink
 ```
 
-You need to install [`ravedude`](https://crates.io/crates/ravedude) to make
+You need to install [`ravedude`](https://crates.io/crates/ravedude) with `cargo install ravedude` to make
 this work.
