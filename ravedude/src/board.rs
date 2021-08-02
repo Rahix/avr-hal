@@ -301,7 +301,7 @@ impl Board for Trinket {
             programmer: "usbtiny",
             partno: "attiny85",
             baudrate: None,
-            do_chip_erase: false,
+            do_chip_erase: true,
         }
     }
 
