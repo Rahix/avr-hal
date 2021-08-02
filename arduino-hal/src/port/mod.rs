@@ -39,3 +39,7 @@ pub use promicro::*;
 mod trinket_pro;
 #[cfg(feature = "trinket-pro")]
 pub use trinket_pro::*;
+#[cfg(feature = "trinket")]
+mod trinket;
+#[cfg(feature = "trinket")]
+pub use trinket::*;

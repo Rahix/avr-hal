@@ -17,6 +17,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "diecimila" => Box::new(ArduinoDiecimila),
         "promicro" => Box::new(SparkFunProMicro),
         "trinket-pro" => Box::new(TrinketPro),
+        "trinket" => Box::new(Trinket),
         "nano168" => Box::new(Nano168),
         _ => return None,
     })
@@ -281,6 +282,31 @@ impl Board for TrinketPro {
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         None // The TrinketPro does not have USB-to-Serial.
+    }
+}
+
+struct Trinket;
+
+impl Board for Trinket {
+    fn display_name(&self) -> &str {
+        "Trinket"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        Some("Reset the board by pressing the reset button once.")
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "usbtiny",
+            partno: "attiny85",
+            baudrate: None,
+            do_chip_erase: false,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        None // The Trinket does not have USB-to-Serial.
     }
 }
 

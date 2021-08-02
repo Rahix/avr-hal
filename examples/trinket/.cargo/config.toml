@@ -1,0 +1,8 @@
+[build]
+target = "../../avr-specs/avr-attiny85.json"
+
+[target.'cfg(target_arch = "avr")']
+runner = "ravedude trinket"
+
+[unstable]
+build-std = ["core"]

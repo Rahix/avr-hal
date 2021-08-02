@@ -13,6 +13,7 @@
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
 #![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
+#![cfg_attr(feature = "trinket", doc = "**Trinket**.")]
 #![cfg_attr(feature = "nano168", doc = "**Nano clone (ATmega168)**.")]
 //! This means that only items which are available for this board are visible.  If you are using a
 //! different board, try building the documentation locally with
@@ -57,6 +58,7 @@ compile_error!(
     * arduino-uno
     * sparkfun-promicro
     * trinket-pro
+    * trinket
     * nano168
     "
 );
@@ -88,6 +90,13 @@ pub use atmega_hal as hal;
 pub use atmega_hal::pac;
 
 #[doc(no_inline)]
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal as hal;
+#[doc(no_inline)]
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal::pac;
+
+#[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use hal::Peripherals;
 
@@ -108,7 +117,7 @@ pub mod port;
 pub use port::Pins;
 
 /// Analog to Digital converter.
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod adc {
     pub use crate::hal::adc::{
         channel, AdcChannel, AdcOps, AdcSettings, Channel, ClockDivider, ReferenceVoltage,
@@ -118,32 +127,32 @@ pub mod adc {
     pub type Adc = crate::hal::Adc<crate::DefaultClock>;
 }
 #[doc(no_inline)]
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub use adc::Adc;
 
 /// I2C bus controller.
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod i2c {
     pub use crate::hal::i2c::*;
 
     pub type I2c = crate::hal::i2c::I2c<crate::DefaultClock>;
 }
 #[doc(no_inline)]
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub use i2c::I2c;
 
 /// SPI controller.
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod spi {
     pub use crate::hal::spi::*;
 
     pub type Spi = crate::hal::spi::Spi;
 }
 #[doc(no_inline)]
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub use spi::Spi;
 
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod usart {
     pub use crate::hal::usart::{Baudrate, UsartOps};
 
@@ -154,10 +163,10 @@ pub mod usart {
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
 #[doc(no_inline)]
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub use usart::Usart;
 
-#[cfg(feature = "board-selected")]
+#[cfg(feature = "mcu-atmega")]
 pub mod prelude {
     cfg_if::cfg_if! {
         if #[cfg(any(
