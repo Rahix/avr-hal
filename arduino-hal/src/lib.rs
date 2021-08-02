@@ -11,6 +11,7 @@
 #![cfg_attr(feature = "arduino-mega2560", doc = "**Arduino Mega 2560**.")]
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
+#![cfg_attr(feature = "digispark-pro", doc = "**Digispark Pro**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
 #![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
 #![cfg_attr(feature = "nano168", doc = "**Nano clone (ATmega168)**.")]
@@ -55,6 +56,7 @@ compile_error!(
     * arduino-mega2560
     * arduino-nano
     * arduino-uno
+    * digispark-pro
     * sparkfun-promicro
     * trinket-pro
     * nano168
@@ -86,6 +88,13 @@ pub use atmega_hal as hal;
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use atmega_hal::pac;
+
+#[doc(no_inline)]
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal as hal;
+#[doc(no_inline)]
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal::pac;
 
 #[doc(no_inline)]
 #[cfg(feature = "board-selected")]

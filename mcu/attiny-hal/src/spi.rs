@@ -20,3 +20,22 @@ avr_hal_generic::impl_spi! {
     miso: port::PB4,
     cs: port::PB2,
 }
+
+#[cfg(feature = "attiny167")]
+pub type Spi = avr_hal_generic::spi::Spi<
+        crate::Atmega,
+    crate::pac::SPI,
+    port::PA5,
+    port::PA4,
+    port::PA2,
+    port::PA6,
+    >;
+#[cfg(feature = "attiny167")]
+avr_hal_generic::impl_spi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::SPI,
+    sclk: port::PA5,
+    mosi: port::PA4,
+    miso: port::PA2,
+    cs: port::PA6,
+}
