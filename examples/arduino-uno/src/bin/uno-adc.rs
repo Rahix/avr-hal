@@ -1,3 +1,14 @@
+/*!
+ * Show readouts of all ADC channels.
+ *
+ * This example displays values for all ADC channels over the serial console.  During startup, it
+ * also displays the values for Vbandgap, GND, and a readout of the MCU's temperature sensor.  For
+ * the meanings of these values, please reference the ATmega328P datasheet.
+ *
+ * Connections
+ * -----------
+ *  - `A0` - `A5`: Connect analog voltages as you like to see them read out.
+ */
 #![no_std]
 #![no_main]
 

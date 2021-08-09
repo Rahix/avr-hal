@@ -1,10 +1,15 @@
-//! Example for using the HC-SR04 ultrasonic distance sensor
-//!
-//! Sensor Datasheet: https://www.electroschematics.com/hc-sr04-datasheet/
-//!
-//! Connections:
-//!   - TRIG <- D2
-//!   - ECHO -> D3
+/*!
+ * Example for using the HC-SR04 ultrasonic distance sensor.
+ *
+ * This example prints out the distance reported by the sensor over the serial console.
+ *
+ * Sensor Datasheet: https://www.electroschematics.com/hc-sr04-datasheet/
+ *
+ * Connections
+ * -----------
+ *   - `D2`: HC-SR04 `TRIG`
+ *   - `D3`: HC-SR04 `ECHO`
+ */
 #![no_std]
 #![no_main]
 
@@ -18,7 +23,7 @@ fn main() -> ! {
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
     let mut trig = pins.d2.into_output();
-    let echo = pins.d3;  // pin is input by default
+    let echo = pins.d3; // pin is input by default
 
     // Starting and initializing the timer with prescaling 64.
     // it gives one clock count every 4 µs.
@@ -62,16 +67,16 @@ fn main() -> ! {
         // thus overflowing the u16 value when multiplying the timer1 value with 4.
         // overflow during runtime causes panic! so it must be handled
         let temp_timer = timer1.tcnt1.read().bits().saturating_mul(4);
-        let value  = match temp_timer {
+        let value = match temp_timer {
             u16::MAX => {
                 ufmt::uwriteln!(
-                &mut serial,
-                "Nothing was detected and jump to outer loop.\r"
+                    &mut serial,
+                    "Nothing was detected and jump to outer loop.\r"
                 )
                 .void_unwrap();
                 continue 'outer;
-            },
-            _ => temp_timer / 58
+            }
+            _ => temp_timer / 58,
         };
 
         // Await 100 ms before sending the next trig

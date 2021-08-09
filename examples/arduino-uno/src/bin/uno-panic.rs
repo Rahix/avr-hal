@@ -1,7 +1,9 @@
-//! Example of a custom panic handler.
-//!
-//! The panic handler will print out where the panic occurred and then blink the oboard LED rapidly
-//! to make the user aware of the problem.
+/*!
+ * Example of a custom panic handler.
+ *
+ * The panic handler will print out where the panic occurred and then blink the oboard LED rapidly
+ * to make the user aware of the problem.
+ */
 #![no_std]
 #![no_main]
 

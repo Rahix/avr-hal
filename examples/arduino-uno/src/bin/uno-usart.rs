@@ -1,3 +1,6 @@
+/*!
+ * Demonstration of writing to and reading from the serial console.
+ */
 #![no_std]
 #![no_main]
 

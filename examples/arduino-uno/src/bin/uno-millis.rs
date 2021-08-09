@@ -1,11 +1,13 @@
-//! A basic implementation of the `millis()` function from Arduino:
-//!
-//!     https://www.arduino.cc/reference/en/language/functions/time/millis/
-//!
-//! Uses timer 0 and one of its interrupts to update a global millisecond
-//! counter.  A walkthough of this code is available here:
-//!
-//!     https://blog.rahix.de/005-avr-hal-millis/
+/*!
+ * A basic implementation of the `millis()` function from Arduino:
+ *
+ *     https://www.arduino.cc/reference/en/language/functions/time/millis/
+ *
+ * Uses timer TC0 and one of its interrupts to update a global millisecond
+ * counter.  A walkthough of this code is available here:
+ *
+ *     https://blog.rahix.de/005-avr-hal-millis/
+ */
 #![no_std]
 #![no_main]
 #![feature(abi_avr_interrupt)]
@@ -89,4 +91,3 @@ fn main() -> ! {
         ufmt::uwriteln!(&mut serial, "Got {} after {} ms!\r", b, time).void_unwrap();
     }
 }
-

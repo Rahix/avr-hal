@@ -1,17 +1,16 @@
-//! This example demonstrates how to set up a SPI interface and communicate
-//! over it.  The physical hardware configuation consists of connecting a
-//! jumper directly from pin `~11` to pin `~12`.
-//!
-//! Once this program is written to the board, the serial output can be
-//! accessed with
-//!
-//! ```
-//! sudo screen /dev/ttyACM0 57600
-//! ```
-//!
-//! You should see it output the line `data: 15` repeatedly (aka 0b00001111).
-//! If the output you see is `data: 255`, you may need to check your jumper.
-
+/*!
+ * Example of the SPI bus, by looping back output to input.
+ *
+ * This example demonstrates how to set up a SPI interface and communicate
+ * over it.  The physical hardware configuation consists of connecting a
+ * jumper directly from pin `D11` to pin `D12`.
+ *
+ * If done correctly, you should see it output the line `data: 15` repeatedly (aka 0b00001111).  If
+ * the output you see is `data: 255`, you may need to check your jumper.
+ *
+ * Connections:
+ *  - `D11` connected directly to `D12` (loop MOSI to MISO)
+ */
 #![no_std]
 #![no_main]
 

@@ -1,9 +1,16 @@
+/*!
+ * Demonstration of setting up the watchdog timer.
+ *
+ * A watchdog timer is used to ensure the firmware did not lock itself up.  This works by requiring
+ * the firmware to periodically "feed" the watchdog.  If it fails to do so for a certain
+ * (configurable) timeout, the watchdog will reset the device.
+ */
 #![no_std]
 #![no_main]
 
+use arduino_hal::hal::wdt;
 use arduino_hal::prelude::*;
 use panic_halt as _;
-use arduino_hal::hal::wdt;
 
 #[arduino_hal::entry]
 fn main() -> ! {
