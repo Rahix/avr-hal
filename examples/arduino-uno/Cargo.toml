@@ -10,6 +10,7 @@ panic-halt = "0.2.0"
 ufmt = "0.1.0"
 nb = "0.1.2"
 embedded-hal = "0.2.3"
+pwm-pca9685 = "0.3.1"
 
 [dependencies.arduino-hal]
 path = "../../arduino-hal/"
