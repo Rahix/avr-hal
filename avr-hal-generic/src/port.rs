@@ -144,7 +144,7 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
     }
 
     /// Convert this pin into an output pin with open drain, setting the state to low
-    /// See [Digital Output Open Drain(#digital-opendrain)]
+    /// See [Digital Output Open Drain](#digital-output-open-drain)
     pub fn into_opendrain(mut self) -> Pin<mode::OpenDrain, PIN> {
         unsafe { self.pin.out_clear() };
         unsafe { self.pin.make_output() };
@@ -155,7 +155,7 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
     }
 
     /// Convert this pin into an output pin with open drain, setting the state to tristate
-    /// See [Digital Output Open Drain(#digital-opendrain)]
+    /// See [Digital Output Open Drain](#digital-output-open-drain)
     pub fn into_opendrain_tristate(mut self) -> Pin<mode::OpenDrain, PIN> {
         unsafe { self.pin.out_clear() };
         unsafe { self.pin.make_input(false) };
