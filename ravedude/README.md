@@ -1,7 +1,7 @@
 ravedude [![crates.io page](https://img.shields.io/crates/v/ravedude.svg)](https://crates.io/crates/ravedude)
 ========
 `ravedude` is a CLI utility to make Rust development for AVR microcontrollers
-super smooth.  It's a wrapper around `avrdude` and provides easy access to the
+super smooth.  It's a wrapper around `avrdude` (tested with avrdude version 6.3) and provides easy access to the
 target's serial console, similar to the Arduino IDE.
 
 `ravedude` is meant to be used as a cargo "runner".  This allows you to just use
