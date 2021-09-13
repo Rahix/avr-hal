@@ -7,6 +7,9 @@ mod board;
 mod console;
 mod ui;
 
+/// This represents the minimum (Major, Minor) version raverdude requires avrdude to meet.
+const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
+
 /// ravedude is a rust wrapper around avrdude for providing the smoothest possible development
 /// experience with rust on AVR microcontrollers.
 ///
@@ -22,7 +25,7 @@ mod ui;
         fallback = "unknown"
     ))]
 struct Args {
-    /// After sucessfully flashing the program, open a serial console to see output sent by the
+    /// After successfully flashing the program, open a serial console to see output sent by the
     /// board and possibly interact with it.
     #[structopt(short = "c", long = "open-console")]
     open_console: bool,
@@ -71,6 +74,7 @@ fn main() {
 }
 
 fn ravedude() -> anyhow::Result<()> {
+    avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
     let args: Args = structopt::StructOpt::from_args();
 
     let board = board::get_board(&args.board).expect("board not found");
@@ -90,11 +94,12 @@ fn ravedude() -> anyhow::Result<()> {
         Some(port) => Ok(Some(port)),
         None => match board.guess_port() {
             Some(Ok(port)) => Ok(Some(port)),
-            p @ Some(Err(_)) => p.transpose().context("no matching serial port found, use -P or set RAVEDUDE_PORT in your environment"),
+            p @ Some(Err(_)) => p.transpose().context(
+                "no matching serial port found, use -P or set RAVEDUDE_PORT in your environment",
+            ),
             None => Ok(None),
-        }
+        },
     }?;
-
 
     if let Some(bin) = args.bin.as_ref() {
         if let Some(port) = port.as_ref() {
@@ -106,11 +111,7 @@ fn ravedude() -> anyhow::Result<()> {
                 port.display()
             );
         } else {
-            task_message!(
-                "Programming",
-                "{}",
-                bin.display(),
-            );
+            task_message!("Programming", "{}", bin.display(),);
         }
 
         let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), port.as_ref(), bin)?;

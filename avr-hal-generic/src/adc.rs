@@ -1,4 +1,4 @@
-/// Analog-to-Digial converter
+/// Analog-to-Digital converter
 use core::marker::PhantomData;
 
 /// The division factor between the system clock frequency and the input clock to the AD converter.

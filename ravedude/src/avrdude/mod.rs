@@ -1,4 +1,4 @@
-use anyhow::Context as _;
+use anyhow::{bail, Context as _};
 use std::path;
 use std::process;
 
@@ -17,6 +17,50 @@ pub struct Avrdude {
 }
 
 impl Avrdude {
+    pub fn require_min_ver(ver: (u8, u8)) -> anyhow::Result<()> {
+        let output = process::Command::new("avrdude")
+            .arg("-?")
+            .output()
+            .context("Failed to start and gather avrdude output.")?;
+        let stdout: &str =
+            std::str::from_utf8(&output.stdout).context("Avrdude's stdout contains non-utf8.")?;
+        let version: &str = stdout
+            .split("version")
+            .last()
+            .context("Unable to obtain avrdude's version string")?
+            .trim();
+        let (version, _) = version
+            .split_once('-')
+            .context("Unable to obtain avrdude's version string")?
+            .to_owned();
+        let (major, minor) = version.split_once('.').unwrap();
+        let major = major
+            .parse::<u8>()
+            .context("Unable to parse major version number.")?;
+        let minor = minor
+            .parse::<u8>()
+            .context("Unable to parse minor version number.")?;
+        if major < ver.0 {
+            bail!(
+                "Avrdude does not meet minimum version requirements ({}.{}), but {}.{} was found.",
+                ver.0,
+                ver.1,
+                major,
+                minor
+            );
+        }
+        if major == ver.0 && minor < ver.1 {
+            bail!(
+                "Avrdude does not meet minimum version requirements ({}.{}), but {}.{} was found.",
+                ver.0,
+                ver.1,
+                major,
+                minor
+            );
+        }
+        Ok(())
+    }
+
     pub fn run(
         options: &AvrdudeOptions,
         port: Option<impl AsRef<path::Path>>,
@@ -33,7 +77,7 @@ impl Avrdude {
 
             let mut f = std::fs::File::create(&config).context("could not create avrdude.conf")?;
             f.write_all(include_bytes!("avrdude.conf"))
-                .context("coult not write avrdude.conf")?;
+                .context("could not write avrdude.conf")?;
             f.flush().unwrap();
         }
 
@@ -47,9 +91,7 @@ impl Avrdude {
             .arg(options.partno);
 
         if let Some(port) = port {
-            command = command
-                .arg("-P")
-                .arg(port.as_ref());
+            command = command.arg("-P").arg(port.as_ref());
         }
 
         if let Some(baudrate) = options.baudrate {
