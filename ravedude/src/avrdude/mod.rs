@@ -17,14 +17,14 @@ pub struct Avrdude {
 }
 
 impl Avrdude {
-    pub fn require_min_ver(ver: (u8, u8)) -> anyhow::Result<()> {
+    pub fn require_min_ver((req_major, req_minor): (u8, u8)) -> anyhow::Result<()> {
         let output = process::Command::new("avrdude")
             .arg("-?")
             .output()
             .context("Failed to start and gather avrdude output.")?;
-        let stdout: &str =
-            std::str::from_utf8(&output.stdout).context("Avrdude's stdout contains non-utf8.")?;
-        let version: &str = stdout
+        let stderr: &str =
+            std::str::from_utf8(&output.stderr).context("Avrdude's stderr contains non-utf8.")?;
+        let version: &str = stderr
             .split("version")
             .last()
             .context("Unable to obtain avrdude's version string")?
@@ -40,22 +40,22 @@ impl Avrdude {
         let minor = minor
             .parse::<u8>()
             .context("Unable to parse minor version number.")?;
-        if major < ver.0 {
+        if major < req_major {
             bail!(
-                "Avrdude does not meet minimum version requirements ({}.{}), but {}.{} was found.",
-                ver.0,
-                ver.1,
+                "Avrdude does not meet minimum version requirements. v{}.{} was found while v{}.{} or greater is required.",
                 major,
-                minor
+                minor,
+                req_major,
+                req_minor,
             );
         }
-        if major == ver.0 && minor < ver.1 {
+        if major == req_major && minor < req_minor {
             bail!(
-                "Avrdude does not meet minimum version requirements ({}.{}), but {}.{} was found.",
-                ver.0,
-                ver.1,
+                "Avrdude does not meet minimum version requirements. v{}.{} was found while v{}.{} or greater is required.",
                 major,
-                minor
+                minor,
+                req_major,
+                req_minor,
             );
         }
         Ok(())
