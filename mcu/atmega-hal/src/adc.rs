@@ -1,4 +1,4 @@
-//! Analog-to-Digital Converter
+//! Analog-to-Digial Converter
 
 use crate::port;
 pub use avr_hal_generic::adc::{AdcChannel, AdcOps, ClockDivider};

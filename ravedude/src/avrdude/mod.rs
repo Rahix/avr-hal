@@ -1,4 +1,4 @@
-use anyhow::{bail, Context as _};
+use anyhow::Context as _;
 use std::path;
 use std::process;
 
@@ -17,45 +17,27 @@ pub struct Avrdude {
 }
 
 impl Avrdude {
+    fn get_avrdude_version() -> anyhow::Result<(u8, u8)> {
+        let output = process::Command::new("avrdude").arg("-?").output()?;
+        let stderr: &str = std::str::from_utf8(&output.stderr)?;
+        let err = || anyhow::anyhow!("failed to derive version number from avrdude");
+        let version: &str = stderr.split("version").last().ok_or_else(err)?.trim();
+        let (version, _) = version.split_once('-').ok_or_else(err)?.to_owned();
+        let (major, minor) = version.split_once('.').ok_or_else(err)?;
+        let major = major.parse::<u8>()?;
+        let minor = minor.parse::<u8>()?;
+        Ok((major, minor))
+    }
+
     pub fn require_min_ver((req_major, req_minor): (u8, u8)) -> anyhow::Result<()> {
-        let output = process::Command::new("avrdude")
-            .arg("-?")
-            .output()
-            .context("Failed to start and gather avrdude output.")?;
-        let stderr: &str =
-            std::str::from_utf8(&output.stderr).context("Avrdude's stderr contains non-utf8.")?;
-        let version: &str = stderr
-            .split("version")
-            .last()
-            .context("Unable to obtain avrdude's version string")?
-            .trim();
-        let (version, _) = version
-            .split_once('-')
-            .context("Unable to obtain avrdude's version string")?
-            .to_owned();
-        let (major, minor) = version.split_once('.').unwrap();
-        let major = major
-            .parse::<u8>()
-            .context("Unable to parse major version number.")?;
-        let minor = minor
-            .parse::<u8>()
-            .context("Unable to parse minor version number.")?;
-        if major < req_major {
-            bail!(
-                "Avrdude does not meet minimum version requirements. v{}.{} was found while v{}.{} or greater is required.",
-                major,
-                minor,
-                req_major,
-                req_minor,
-            );
-        }
-        if major == req_major && minor < req_minor {
-            bail!(
-                "Avrdude does not meet minimum version requirements. v{}.{} was found while v{}.{} or greater is required.",
-                major,
-                minor,
-                req_major,
-                req_minor,
+        let (major, minor) =
+            Self::get_avrdude_version().context("Failed reading avrdude version information.")?;
+        if (major, minor) < (req_major, req_minor) {
+            anyhow::bail!(
+                "Avrdude does not meet minimum version requirements. v{}.{} was found while v{}.{} or greater is required.\n\
+                You may find a more suitable version here: http://download.savannah.gnu.org/releases/avrdude/",
+                major, minor,
+                req_major, req_minor,
             );
         }
         Ok(())

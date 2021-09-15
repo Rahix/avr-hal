@@ -74,8 +74,8 @@ fn main() {
 }
 
 fn ravedude() -> anyhow::Result<()> {
-    avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
     let args: Args = structopt::StructOpt::from_args();
+    avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
 
     let board = board::get_board(&args.board).expect("board not found");
 
