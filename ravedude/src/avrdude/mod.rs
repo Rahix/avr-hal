@@ -22,7 +22,10 @@ impl Avrdude {
         let stderr: &str = std::str::from_utf8(&output.stderr)?;
         let err = || anyhow::anyhow!("failed to derive version number from avrdude");
         let version: &str = stderr.split("version").last().ok_or_else(err)?.trim();
-        let (version, _) = version.split_once('-').ok_or_else(err)?.to_owned();
+        let version: String = version
+            .chars()
+            .take_while(|c| c.is_ascii_digit() || *c == '.')
+            .collect();
         let (major, minor) = version.split_once('.').ok_or_else(err)?;
         let major = major.parse::<u8>()?;
         let minor = minor.parse::<u8>()?;
