@@ -38,7 +38,7 @@ impl Avrdude {
         if (major, minor) < (req_major, req_minor) {
             anyhow::bail!(
                 "Avrdude does not meet minimum version requirements. v{}.{} was found while v{}.{} or greater is required.\n\
-                You may find a more suitable version here: http://download.savannah.gnu.org/releases/avrdude/",
+                You may find a more suitable version here: https://download.savannah.gnu.org/releases/avrdude/",
                 major, minor,
                 req_major, req_minor,
             );
