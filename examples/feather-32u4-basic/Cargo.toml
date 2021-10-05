@@ -1,0 +1,14 @@
+[package]
+name = "feather-32u4-examples"
+version = "0.0.0"
+authors = ["Gaute Hope <eg@gaute.vetsj.com>"]
+edition = "2018"
+publish = false
+
+[dependencies]
+panic-halt = "0.2.0"
+embedded-hal = "0.2.3"
+
+[dependencies.arduino-hal]
+path = "../../arduino-hal/"
+features = ["feather-32u4"]
