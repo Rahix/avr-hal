@@ -125,7 +125,7 @@ avr_hal_generic::renamed_pins! {
         /// * CLK0
         /// * OC4A
         /// * ICP3
-        /// * L LED on Trinket Pro
+        /// * L LED
         pub d13: atmega_hal::port::PC7 = pc7,
     }
 }
