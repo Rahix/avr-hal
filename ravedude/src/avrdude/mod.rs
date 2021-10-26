@@ -17,6 +17,35 @@ pub struct Avrdude {
 }
 
 impl Avrdude {
+    fn get_avrdude_version() -> anyhow::Result<(u8, u8)> {
+        let output = process::Command::new("avrdude").arg("-?").output()?;
+        let stderr: &str = std::str::from_utf8(&output.stderr)?;
+        let err = || anyhow::anyhow!("failed to derive version number from avrdude");
+        let version: &str = stderr.split("version").last().ok_or_else(err)?.trim();
+        let version: String = version
+            .chars()
+            .take_while(|c| c.is_ascii_digit() || *c == '.')
+            .collect();
+        let (major, minor) = version.split_once('.').ok_or_else(err)?;
+        let major = major.parse::<u8>()?;
+        let minor = minor.parse::<u8>()?;
+        Ok((major, minor))
+    }
+
+    pub fn require_min_ver((req_major, req_minor): (u8, u8)) -> anyhow::Result<()> {
+        let (major, minor) =
+            Self::get_avrdude_version().context("Failed reading avrdude version information.")?;
+        if (major, minor) < (req_major, req_minor) {
+            anyhow::bail!(
+                "Avrdude does not meet minimum version requirements. v{}.{} was found while v{}.{} or greater is required.\n\
+                You may find a more suitable version here: https://download.savannah.gnu.org/releases/avrdude/",
+                major, minor,
+                req_major, req_minor,
+            );
+        }
+        Ok(())
+    }
+
     pub fn run(
         options: &AvrdudeOptions,
         port: Option<impl AsRef<path::Path>>,
@@ -33,7 +62,7 @@ impl Avrdude {
 
             let mut f = std::fs::File::create(&config).context("could not create avrdude.conf")?;
             f.write_all(include_bytes!("avrdude.conf"))
-                .context("coult not write avrdude.conf")?;
+                .context("could not write avrdude.conf")?;
             f.flush().unwrap();
         }
 
@@ -47,9 +76,7 @@ impl Avrdude {
             .arg(options.partno);
 
         if let Some(port) = port {
-            command = command
-                .arg("-P")
-                .arg(port.as_ref());
+            command = command.arg("-P").arg(port.as_ref());
         }
 
         if let Some(baudrate) = options.baudrate {
