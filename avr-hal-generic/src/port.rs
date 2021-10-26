@@ -347,7 +347,7 @@ impl<PIN: PinOps> Pin<mode::OpenDrain, PIN> {
     /// *Note*: The electrical state of the pin might differ due to external circuitry.
     #[inline]
     pub fn is_set_high(&self) -> bool {
-        unsafe { self.pin.out_get() }
+        unsafe { self.pin.in_get() }
     }
 
     /// Check whether the pin is set low.
@@ -355,7 +355,7 @@ impl<PIN: PinOps> Pin<mode::OpenDrain, PIN> {
     /// *Note*: The electrical state of the pin might differ due to external circuitry.
     #[inline]
     pub fn is_set_low(&self) -> bool {
-        !unsafe { self.pin.out_get() }
+        !unsafe { self.pin.in_get() }
     }
 }
 
