@@ -1,6 +1,6 @@
 [package]
 name = "nano168-examples"
-Description = "Examples for the arduino clones with Atmega168 chip"
+description = "Examples for the arduino clones with Atmega168 chip"
 version = "0.0.0"
 authors = ["David R. Morrison <drmorr@evokewonder.com>", "Franz Dietrich <dietrich@teilgedanken.de>"]
 edition = "2018"
