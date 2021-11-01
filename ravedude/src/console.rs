@@ -12,6 +12,13 @@ pub fn open(port: &std::path::Path, baudrate: u32) -> anyhow::Result<()> {
     let mut stdin = std::io::stdin();
     let mut stdout = std::io::stdout();
 
+    // Set a CTRL+C handler to terminate cleanly instead of with an error.
+    ctrlc::set_handler(move || {
+        eprintln!("");
+        eprintln!("Exiting.");
+        std::process::exit(0);
+    }).context("failed setting a CTRL+C handler")?;
+
     // Spawn a thread for the receiving end because stdio is not portably non-blocking...
     std::thread::spawn(move || loop {
         let mut buf = [0u8; 4098];
