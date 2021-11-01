@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Support for the *Nano 168* (that's Arduino Nano clones with an ATmega168).
 
+### Fixed
+- Fixed `ravedude` terminating with an error on CTRL+C ([#225]).
+
+[#225]: https://github.com/Rahix/avr-hal/pull/225
+
 
 ## [0.1.3] - 2021-07-11
 ### Added
