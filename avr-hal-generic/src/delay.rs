@@ -34,13 +34,12 @@ impl<SPEED> Delay<SPEED> {
 cfg_if::cfg_if! {
     if #[cfg(target_arch = "avr")] {
         #[allow(unused_assignments)]
-        fn busy_loop(mut c: u16) {
+        fn busy_loop(c: u16) {
             unsafe {
-                llvm_asm!("1: sbiw $0,1\n\tbrne 1b"
-                     : "=w"(c)
-                     : "0"(c)
-                     :
-                     : "volatile"
+                 asm!(
+                    "1: sbiw {}, 1",
+                    "brne 1b",
+                    in(reg_iw) c,
                  );
             }
         }
@@ -82,7 +81,12 @@ impl delay::DelayUs<u16> for Delay<crate::clock::MHz20> {
         // for a one-microsecond delay, simply return.  the overhead
         // of the function call takes 18 (20) cycles, which is 1us
         unsafe {
-            llvm_asm!("nop\nnop\nnop\nnop" :::: "volatile");
+            asm!(
+                "nop",
+                "nop",
+                "nop",
+                "nop",
+            );
         } //just waiting 4 cycles
 
         if us <= 1 {
