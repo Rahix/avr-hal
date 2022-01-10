@@ -49,7 +49,7 @@ Reading | ################################################## | 100% 0.00s
 
 avrdude: Device signature = 0x1e950f (probably m328p)
 avrdude: erasing chip
-avrdude: reading input file &quot;avr-hal/target/avr-atmega328p/debug/uno-i2cdetect.elf&quot; 
+avrdude: reading input file &quot;avr-hal/target/avr-atmega328p/debug/uno-i2cdetect.elf&quot;
 avrdude: writing flash (1654 bytes):
 
 Writing | ################################################## | 100% 0.27s
