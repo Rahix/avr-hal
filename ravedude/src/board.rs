@@ -127,7 +127,9 @@ impl Board for ArduinoNano {
     }
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(Err(anyhow::anyhow!("Not able to guess port")))
+        Some(find_port_from_vid_pid_list(&[
+            (0x1A86, 0x7523),
+        ]))
     }
 }
 

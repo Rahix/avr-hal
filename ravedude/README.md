@@ -7,6 +7,9 @@ target's serial console, similar to the Arduino IDE.
 `ravedude` is meant to be used as a cargo "runner".  This allows you to just use
 `cargo run` for building, deploying, and running your AVR code!
 
+if you get an `Error: no matching serial port found, use -P or set RAVEDUDE_PORT in your environment` , 
+run `cargo run` with set environment variable or adjust `runner = "ravedude {X} -cb {X} -P /dev/ttyUSB{X}"` inside `.cargo/config.toml` (replace {X} with your respective values)
+
 ## Installation
 On Linux systems, you'll need pkg-config and libudev development files
 installed:
@@ -46,7 +49,7 @@ Reading | ################################################## | 100% 0.00s
 
 avrdude: Device signature = 0x1e950f (probably m328p)
 avrdude: erasing chip
-avrdude: reading input file &quot;avr-hal/target/avr-atmega328p/debug/uno-i2cdetect.elf&quot;
+avrdude: reading input file &quot;avr-hal/target/avr-atmega328p/debug/uno-i2cdetect.elf&quot; 
 avrdude: writing flash (1654 bytes):
 
 Writing | ################################################## | 100% 0.27s
