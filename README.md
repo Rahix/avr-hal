@@ -32,6 +32,7 @@ cargo run --bin uno-blink
 The best way to start your own project is via the [`avr-hal-template`](https://github.com/Rahix/avr-hal-template) which you can easily use with [`cargo-generate`](https://github.com/cargo-generate/cargo-generate):
 
 ```bash
+cargo install cargo-generate
 cargo generate --git https://github.com/Rahix/avr-hal-template.git
 ```
 
