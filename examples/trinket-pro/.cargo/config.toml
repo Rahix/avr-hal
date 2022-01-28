@@ -6,3 +6,4 @@ runner = "ravedude trinket-pro"
 
 [unstable]
 build-std = ["core"]
+build-std-features = ["compiler-builtins-mangled-names"]

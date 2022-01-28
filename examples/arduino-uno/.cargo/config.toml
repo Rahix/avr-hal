@@ -6,3 +6,4 @@ runner = "ravedude uno -cb 57600"
 
 [unstable]
 build-std = ["core"]
+build-std-features = ["compiler-builtins-mangled-names"]
