@@ -86,7 +86,7 @@ pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
 pub struct ChipSelectPin<CSPIN>(port::Pin<port::mode::Output, CSPIN>);
 
 impl<CSPIN: port::PinOps> hal::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
-    type Error = crate::void::Void;
+    type Error = core::convert::Infallible;
     fn set_low(&mut self) -> Result<(), Self::Error> {
         self.0.set_low();
         Ok(())
@@ -107,7 +107,7 @@ impl<CSPIN: port::PinOps> hal::digital::v2::StatefulOutputPin for ChipSelectPin<
 }
 
 impl<CSPIN: port::PinOps> hal::digital::v2::ToggleableOutputPin for ChipSelectPin<CSPIN> {
-    type Error = crate::void::Void;
+    type Error = core::convert::Infallible;
     fn toggle(&mut self) -> Result<(), Self::Error> {
         self.0.toggle();
         Ok(())
