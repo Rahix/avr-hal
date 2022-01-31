@@ -20,9 +20,7 @@ static PIN_CHANGED: AtomicBool = AtomicBool::new(false);
 #[avr_device::interrupt(atmega328p)]
 #[allow(non_snake_case)]
 fn PCINT2() {
-	avr_device::interrupt::free(|_cs| {
-        PIN_CHANGED.store(true, Ordering::SeqCst);
-    });
+    PIN_CHANGED.store(true, Ordering::SeqCst);
 }
 
 #[arduino_hal::entry]
@@ -40,8 +38,10 @@ fn main() -> ! {
         pins.d3.into_floating_input().downgrade() //DT
     ];
 
-    //Needed to enable pin change interrupts
+    // Enable the PCINT2 pin change interrupt
     dp.EXINT.pcicr.write(|w| unsafe { w.bits(0b100) });
+
+    // Enable pin change interrupts on PCINT18 which is pin PD2 (= d2)
     dp.EXINT.pcmsk2.write(|w| unsafe { w.bits(0b100) });
 
     //From this point on an interrupt can happen
