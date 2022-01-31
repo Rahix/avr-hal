@@ -18,7 +18,7 @@ use either::*;
 static REVERSED: AtomicBool = AtomicBool::new(false);
 
 fn is_reversed() -> bool {
-    return avr_device::interrupt::free(|_| { REVERSED.load(Ordering::SeqCst) });
+    return REVERSED.load(Ordering::SeqCst);
 }
 
 #[avr_device::interrupt(atmega328p)]
