@@ -23,6 +23,17 @@ fn PCINT2() {
     PIN_CHANGED.store(true, Ordering::SeqCst);
 }
 
+fn rotate(flag: &AtomicBool) -> bool {
+    avr_device::interrupt::free(|_cs| {
+        if flag.load(Ordering::SeqCst) {
+            flag.store(false, Ordering::SeqCst);
+            true
+        } else {
+            false
+        }
+    })
+}
+
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
@@ -48,25 +59,21 @@ fn main() -> ! {
     unsafe { avr_device::interrupt::enable() };
 
     loop {
-        avr_device::interrupt::free(|_cs| {
-            if PIN_CHANGED.load(Ordering::SeqCst) {
-                PIN_CHANGED.store(false, Ordering::SeqCst);
-
-                //Check which direction the rotary encoder was turned
-                if rotary_pins[0].is_high() != rotary_pins[1].is_high() {
-                    dir_pin.set_high();
-                } else {
-                    dir_pin.set_low();
-                }
-
-                //Move the stepper motor
-                for _ in 0..=50 {
-                    step_pin.set_high();
-                    arduino_hal::delay_us(2000);
-                    step_pin.set_low();
-                    arduino_hal::delay_us(2000);
-                }
+        if rotate(&PIN_CHANGED) {
+            //Check which direction the rotary encoder was turned
+            if rotary_pins[0].is_high() != rotary_pins[1].is_high() {
+                dir_pin.set_high();
+            } else {
+                dir_pin.set_low();
             }
-        });
+
+            //Move the stepper motor
+            for _ in 0..=50 {
+                step_pin.set_high();
+                arduino_hal::delay_us(2000);
+                step_pin.set_low();
+                arduino_hal::delay_us(2000);
+            }
+        }
     }
 }
