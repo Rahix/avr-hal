@@ -18,3 +18,7 @@ features = ["arduino-uno"]
 
 [dependencies.avr-device]
 version = "0.3"
+
+[dependencies.either]
+version = "1.6.1"
+default-features = false
