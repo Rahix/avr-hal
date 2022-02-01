@@ -31,6 +31,10 @@ pub use mega2560::*;
 mod uno;
 #[cfg(any(feature = "arduino-nano", feature = "arduino-uno", feature = "nano168"))]
 pub use uno::*;
+#[cfg(feature = "kontrolir")]
+mod kontrolir;
+#[cfg(feature = "kontrolir")]
+pub use kontrolir::*;
 #[cfg(feature = "sparkfun-promicro")]
 mod promicro;
 #[cfg(feature = "sparkfun-promicro")]

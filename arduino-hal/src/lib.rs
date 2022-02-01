@@ -11,6 +11,7 @@
 #![cfg_attr(feature = "arduino-mega2560", doc = "**Arduino Mega 2560**.")]
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
+#![cfg_attr(feature = "kontrolir", doc = "**AnalysIR KontroLIR**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
 #![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
 #![cfg_attr(feature = "trinket", doc = "**Trinket**.")]
@@ -56,6 +57,7 @@ compile_error!(
     * arduino-mega2560
     * arduino-nano
     * arduino-uno
+    * kontrolir
     * sparkfun-promicro
     * trinket-pro
     * trinket
@@ -131,25 +133,34 @@ pub mod adc {
 pub use adc::Adc;
 
 /// I2C bus controller.
-#[cfg(feature = "mcu-atmega")]
+#[cfg(all(feature = "mcu-atmega", not(feature = "kontrolir")))]
 pub mod i2c {
     pub use crate::hal::i2c::*;
 
     pub type I2c = crate::hal::i2c::I2c<crate::DefaultClock>;
 }
+/// I2C bus controller.
+#[cfg(all(feature = "mcu-atmega", feature = "kontrolir"))]
+pub mod i2c {
+    pub use crate::hal::i2c::*;
+
+    pub type I2c = crate::hal::i2c::I2c0<crate::DefaultClock>;
+}
+
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use i2c::I2c;
 
 /// SPI controller.
-#[cfg(feature = "mcu-atmega")]
+#[cfg(all(feature = "mcu-atmega", not(feature = "kontrolir")))]
 pub mod spi {
     pub use crate::hal::spi::*;
 
     pub type Spi = crate::hal::spi::Spi;
 }
+
 #[doc(no_inline)]
-#[cfg(feature = "mcu-atmega")]
+#[cfg(all(feature = "mcu-atmega", not(feature = "kontrolir")))]
 pub use spi::Spi;
 
 #[cfg(feature = "mcu-atmega")]
@@ -172,7 +183,8 @@ pub mod prelude {
         if #[cfg(any(
             feature = "arduino-diecimila",
             feature = "arduino-mega2560",
-            feature = "arduino-uno"
+            feature = "arduino-uno",
+            feature = "kontrolir",
         ))] {
             pub use crate::hal::usart::BaudrateArduinoExt as _;
         } else {
@@ -229,7 +241,7 @@ macro_rules! default_serial {
 #[cfg(any(
     feature = "arduino-diecimila",
     feature = "arduino-mega2560",
-    feature = "arduino-uno"
+    feature = "arduino-uno",
 ))]
 #[macro_export]
 macro_rules! default_serial {
@@ -251,6 +263,18 @@ macro_rules! default_serial {
             $pins.d0,
             $pins.d1.into_output(),
             $crate::hal::usart::BaudrateExt::into_baudrate($baud),
+        )
+    };
+}
+#[cfg(feature = "kontrolir")]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART0,
+            $pins.rxd,
+            $pins.txd.into_output(),
+            $crate::hal::usart::BaudrateArduinoExt::into_baudrate($baud),
         )
     };
 }

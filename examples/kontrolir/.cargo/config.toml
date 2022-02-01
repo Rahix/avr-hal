@@ -1,0 +1,9 @@
+[build]
+target = "../../avr-specs/avr-atmega328p.json"
+
+[target.'cfg(target_arch = "avr")']
+runner = "ravedude kontrolir -cb 57600"
+
+[unstable]
+build-std = ["core"]
+build-std-features = ["compiler-builtins-mangled-names"]
