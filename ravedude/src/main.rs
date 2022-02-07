@@ -45,6 +45,7 @@ struct Args {
     ///
     /// * uno
     /// * nano
+    /// * nano-new
     /// * leonardo
     /// * micro
     /// * mega2560

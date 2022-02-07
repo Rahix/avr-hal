@@ -11,6 +11,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
     Some(match board {
         "uno" => Box::new(ArduinoUno),
         "nano" => Box::new(ArduinoNano),
+        "nano-new" => Box::new(ArduinoNanoNew),
         "leonardo" => Box::new(ArduinoLeonardo),
         "micro" => Box::new(ArduinoMicro),
         "mega2560" => Box::new(ArduinoMega2560),
@@ -122,6 +123,31 @@ impl Board for ArduinoNano {
             programmer: "arduino",
             partno: "atmega328p",
             baudrate: Some(57600),
+            do_chip_erase: true,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        Some(Err(anyhow::anyhow!("Not able to guess port")))
+    }
+}
+
+struct ArduinoNanoNew;
+
+impl Board for ArduinoNanoNew {
+    fn display_name(&self) -> &str {
+        "Arduino Nano (New Bootloader)"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        None
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "arduino",
+            partno: "atmega328p",
+            baudrate: Some(115200),
             do_chip_erase: true,
         }
     }
