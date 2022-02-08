@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
+## [0.1.4] - 2022-02-08
 ### Added
 - Support for the *Nano 168* (that's Arduino Nano clones with an ATmega168).
 - Support for the *Adafruit Trinket* ([#179]).
@@ -49,7 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial, miminal version.
 
 
-[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.3...HEAD
+[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.4...HEAD
+[0.1.4]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.3...ravedude-0.1.4
 [0.1.3]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.2...ravedude-0.1.3
 [0.1.2]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.1...ravedude-0.1.2
 [0.1.1]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.0...ravedude-0.1.1
