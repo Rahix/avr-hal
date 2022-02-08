@@ -7,10 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Support for the *Nano 168* (that's Arduino Nano clones with an ATmega168).
+- Support for the *Adafruit Trinket* ([#179]).
+- Added support for the Arduino Leonardo auto-reset method even though
+  `avr-hal` does not yet support it ([#207]).
+- Added a check whether the `avrdude` version is recent enough to support all
+  features we need ([#221]).
 
 ### Fixed
 - Fixed `ravedude` terminating with an error on CTRL+C ([#225]).
 
+[#179]: https://github.com/Rahix/avr-hal/pull/179
+[#207]: https://github.com/Rahix/avr-hal/pull/207
+[#221]: https://github.com/Rahix/avr-hal/pull/221
 [#225]: https://github.com/Rahix/avr-hal/pull/225
 
 
