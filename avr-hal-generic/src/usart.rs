@@ -150,6 +150,12 @@ pub enum Event {
     /// your MCU for details.
     RxComplete,
 
+    /// A complete byte was sent.
+    ///
+    /// Corresponds to the `USART_TX` or `USART#_TX` interrupt.  Please refer to the datasheet for
+    /// your MCU for details.
+    TxComplete,
+
     /// All data from the USART data register was transmitted.
     ///
     /// Corresponds to the `USART_UDRE` or `USART#_UDRE` interrupt.  Please refer to the datasheet
@@ -531,8 +537,10 @@ macro_rules! impl_usart_traditional {
                     match event {
                         $crate::usart::Event::RxComplete =>
                             self.[<ucsr $n b>].modify(|_, w| w.[<rxcie $n>]().bit(state)),
-                        $crate::usart::Event::DataRegisterEmpty =>
+                        $crate::usart::Event::TxComplete =>
                             self.[<ucsr $n b>].modify(|_, w| w.[<txcie $n>]().bit(state)),
+                        $crate::usart::Event::DataRegisterEmpty =>
+                            self.[<ucsr $n b>].modify(|_, w| w.[<udrie $n>]().bit(state)),
                     }
                 }
             }
