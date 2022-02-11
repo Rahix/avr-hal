@@ -479,7 +479,7 @@ macro_rules! impl_usart_traditional {
             > for $USART {
                 fn raw_init<CLOCK>(&mut self, baudrate: $crate::usart::Baudrate<CLOCK>) {
                     self.[<ubrr $n>].write(|w| unsafe { w.bits(baudrate.ubrr) });
-                    self.[<ucsr $n a>].write(|w| w.[<u2x $n>]().bit(baudrate.u2x));
+                    self.[<ucsr $n a>].write(|w| w.[<u2x $n>]().bit(baudrate.u2x).[<udre $n>]().clear_bit());
 
                     // Enable receiver and transmitter but leave interrupts disabled.
                     self.[<ucsr $n b>].write(|w| w
