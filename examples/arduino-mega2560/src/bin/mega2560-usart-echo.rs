@@ -1,6 +1,3 @@
-/*!
- * Demonstration of writing to and reading from the serial console.
- */
 #![no_std]
 #![no_main]
 
@@ -21,7 +18,7 @@ fn main() -> ! {
         // Read a byte from the serial connection
         let b = nb::block!(serial.read()).void_unwrap();
 
-        // Answer
-        ufmt::uwriteln!(&mut serial, "Got {}!\r", b).void_unwrap();
+        // Echo the byte back to the serial connection
+        nb::block!(serial.write(b)).void_unwrap();
     }
 }

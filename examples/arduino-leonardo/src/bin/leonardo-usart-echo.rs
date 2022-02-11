@@ -15,10 +15,10 @@ fn main() -> ! {
     ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").void_unwrap();
 
     loop {
-        // Read a byte from the serial connection default
+        // Read a byte from the serial connection
         let b = nb::block!(serial.read()).void_unwrap();
 
-        // Answer
-        ufmt::uwriteln!(&mut serial, "Got {}!\r", b).void_unwrap();
+        // Echo the byte back to the serial connection
+        nb::block!(serial.write(b)).void_unwrap();
     }
 }
