@@ -4,7 +4,7 @@
 use arduino_hal::prelude::*;
 use panic_halt as _;
 
-use embedded_hal::serial::Read;
+use embedded_hal::serial::{Read, Write};
 
 #[arduino_hal::entry]
 fn main() -> ! {
