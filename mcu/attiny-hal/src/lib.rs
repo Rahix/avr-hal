@@ -47,6 +47,11 @@ pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
 
 #[cfg(feature = "device-selected")]
+pub mod adc;
+#[cfg(feature = "device-selected")]
+pub use adc::Adc;
+
+#[cfg(feature = "device-selected")]
 pub mod port;
 #[cfg(feature = "device-selected")]
 pub use port::Pins;
