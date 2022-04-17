@@ -1,5 +1,11 @@
 #![no_std]
 #![feature(llvm_asm)]
+//
+// Stable since 1.53.0
+#![feature(int_bits_const)]
+//
+// Stable since 1.57.0
+#![feature(const_panic)]
 
 pub extern crate embedded_hal as hal;
 
