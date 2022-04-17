@@ -23,6 +23,7 @@ pub mod spi;
 pub mod adc;
 pub mod pwm;
 pub mod wdt;
+pub mod time;
 
 /// Prelude containing all HAL traits
 pub mod prelude {
