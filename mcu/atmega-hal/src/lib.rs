@@ -100,6 +100,9 @@ pub mod wdt;
 #[cfg(feature = "device-selected")]
 pub use wdt::Wdt;
 
+#[cfg(feature = "device-selected")]
+pub mod time;
+
 pub struct Atmega;
 
 #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
