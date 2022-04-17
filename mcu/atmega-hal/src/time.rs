@@ -5,12 +5,11 @@
 //!
 //! Also see [avr_hal_generic::time]
 
-pub use avr_hal_generic::time::Prescaler;
-pub use avr_hal_generic::time::Resolution;
-pub use avr_hal_generic::time::TimingCircuitOps;
+use avr_hal_generic::time::Prescaler;
+use avr_hal_generic::time::TimingCircuitOps;
 
+use crate::HAL;
 use crate::pac;
-use crate::Atmega as HAL;
 
 /// Define the interrupt handler for the interrupt vector for the given
 /// Timer peripheral
@@ -22,6 +21,13 @@ macro_rules! attach_timing_circuit_interrupt {
         #[$crate::avr_device::interrupt(atmega328p)]
         fn TIMER0_COMPA() $body
     };
+    ($name:ident; $body:block) => {
+        compile_error!(concat!(
+            "Your selected platform does not have a compatible timer named: ",
+            stringify!($name),
+            "\nSee arduino_hal::time::timers for a list of supported timers"
+        ));
+    }
 }
 
 #[cfg(any(feature = "atmega328p"))]
