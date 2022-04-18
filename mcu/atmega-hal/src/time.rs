@@ -9,75 +9,11 @@ use avr_hal_generic::time::Prescaler;
 use avr_hal_generic::time::TimingCircuitOps;
 
 use crate::HAL;
-use crate::pac;
 
-/// Define the interrupt handler for the interrupt vector for the given
-/// Timer peripheral
 #[cfg(feature = "atmega328p")]
-#[macro_export]
-macro_rules! attach_timing_circuit_interrupt {
-    (Timer0; $body:block) => {
-        // The timer interrupt service routine
-        #[$crate::avr_device::interrupt(atmega328p)]
-        fn TIMER0_COMPA() $body
-    };
-    ($name:ident; $body:block) => {
-        compile_error!(concat!(
-            "Your selected platform does not have a compatible timer named: ",
-            stringify!($name),
-            "\nSee arduino_hal::time::timers for a list of supported timers"
-        ));
-    }
-}
-
-#[cfg(any(feature = "atmega328p"))]
-pub use pac::TC0 as Timer0;
-
-// TODO: implement via macro
-#[cfg(any(feature = "atmega328p"))]
-impl TimingCircuitOps<HAL> for Timer0 {
-    type Counter = <pac::tc0::tcnt0::TCNT0_SPEC as avr_device::generic::RegisterSpec>::Ux;
-
-    fn read_counter(&self) -> (Self::Counter, bool) {
-        (self.tcnt0.read().bits(), self.tifr0.read().ocf0a().bit())
-    }
-
-    fn initialize(&self, p: Prescaler, top: Self::Counter) {
-        // Set top value
-        self.ocr0a.write(|w| unsafe {
-            // TODO: Why is this unsafe???
-            // TODO: Safety, is this sound?
-            w.bits(top)
-        });
-        // Set prescaler
-        self.tccr0b.write(|w| match p {
-            Prescaler::P1 => w.cs0().direct(),
-            Prescaler::P8 => w.cs0().prescale_8(),
-            Prescaler::P64 => w.cs0().prescale_64(),
-            Prescaler::P256 => w.cs0().prescale_256(),
-            Prescaler::P1024 => w.cs0().prescale_1024(),
-        });
-        // Set CTC mode, enable timer
-        // TODO: might be better to be put into `enable_timer`
-        self.tccr0a.write(|w| w.wgm0().ctc());
-    }
-
-    unsafe fn enable_interrupt(&self) {
-        self.timsk0.write(|w| w.ocie0a().set_bit());
-    }
-
-    /// Disable this clock and disable any interrupts from it
-    fn disable(&self) {
-        // Stop clock
-        self.tccr0b.write(|w| w.cs0().no_clock());
-        // Disable all interrupts
-        self.timsk0.write(|w| {
-            w.ocie0a()
-                .clear_bit() //
-                .ocie0b()
-                .clear_bit() //
-                .toie0()
-                .clear_bit() //
-        });
-    }
+avr_hal_generic::impl_timer_circuit_via_TCn_OCRnA!{
+    hal: HAL,
+    chip: atmega328p,
+    // TODO: `TC1` does not work, because `WGM1_W` has no `ctc` function.
+    timers: [ 0, /* 1, */ 2 ],
 }

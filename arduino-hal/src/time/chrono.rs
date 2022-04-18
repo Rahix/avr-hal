@@ -109,14 +109,15 @@ impl<H, Tp: Timepiece<H>> Chronometer<H, Tp> {
             Tp::access_millis(cs).set(0.into());
         });
 
+        // Init timer stuff
+        tc.configure(prescaler, timer_cnt);
+
+        // Enable timer & interrupt
         unsafe {
             // SAFETY: we have a `Tp: Timepiece`, which guarantees us that a
             // corresponding interrupt handler has been installed.
-            tc.enable_interrupt();
+            tc.enable();
         }
-
-        // Init timer stuff
-        tc.initialize(prescaler, timer_cnt);
 
         // We are done here
         Self {

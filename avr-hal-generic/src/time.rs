@@ -31,19 +31,16 @@ pub trait TimingCircuitOps<H> {
 
     /// Configure the timer with the given prescaler and top value.
     ///
-    /// This also starts the timer.
-    fn initialize(&self, p: Prescaler, top: Self::Counter);
+    /// Should be call be called before [`enable`]
+    fn configure(&self, p: Prescaler, top: Self::Counter);
 
-    /// Enable the timer interrupt
+    /// Start the timing circuit, including its interrupt.
     ///
     /// # Safety
     /// A timer interrupt handler for this timer must have been set up.
     //
     // TODO: Would it make sens if this were safe? What if no handler is set?
-    //
-    // TODO: maybe we call it just `enable` and also kick-off
-    //       the timer here (instead of doing it in `initialize`)
-    unsafe fn enable_interrupt(&self);
+    unsafe fn enable(&self);
 
     /// Disable this timer and disable any interrupts from it
     fn disable(&self);
@@ -177,4 +174,128 @@ impl Resolution {
 
         Some((prescaler, cnt))
     }
+}
+
+
+/// Implements [TimingCircuitOps] for acc `avr_device::$chip::[<TC $n>]` timers
+/// using `[<OCR $n a>]` comparator and interrupt
+#[macro_export]
+macro_rules! impl_timer_circuit_via_TCn_OCRnA {
+    // NOTICE: because of the inner macro, we must not define `$body`!
+    (
+        hal: $HAL:ident,
+        // `chip` should be `ident`, but Rust 1.51 does not accept it in
+        // `#[$crate::avr_device::interrupt($chip)]`
+        chip: $chip:tt,
+        // List of timer number as in `TCn`
+        timers: [ $( $n:expr ),* $(,)? ] $(,)?
+
+    ) => {
+        $crate::paste::paste! {
+            /// Define the interrupt handler for the interrupt vector for the given
+            /// Timer peripheral
+            #[macro_export]
+            macro_rules! attach_timing_circuit_interrupt {
+                $( /* for each $n */
+                    // Rule matching timer $n
+                    ([<Timer $n>]; $body:block) => {
+                        // The timer interrupt service routine
+                        #[$crate::avr_device::interrupt($chip)]
+                        fn [<TIMER $n _COMPA>]() $body
+                    };
+                )*
+
+                // Final rule reporting invalid timers
+                ($name:ident; $body:block) => {
+                    compile_error!(concat!(
+                        "Your selected platform (",
+                        stringify!($chip),
+                        ") does not have a compatible timer named: ",
+                        stringify!($name),
+                        "\nSee arduino_hal::time::timers for a list of supported timers"
+                    ));
+                }
+            }
+
+            $( /* for each $n */
+
+                /// Ensures that the mentioned interrupt exists for the given chip
+                #[doc(hidden)]
+                const _: $crate::avr_device::$chip::Interrupt = $crate::avr_device::$chip::Interrupt::[<TIMER $n _COMPA>];
+
+                // public reexport,
+                // will be re-reexported in `arduino_hal::time::timers`
+                pub use $crate::avr_device::$chip::[<TC $n>] as [<Timer $n>];
+
+                #[doc = "Make [`Timer" $n "`] eligible for time-keeping."]
+                #[doc = ""]
+                #[doc = "This implementation uses the `OCR" $n "A` comparator in CTC mode"]
+                #[doc = "and thus attaches to `TIMER" $n "_COMPA` interrupt."]
+                impl TimingCircuitOps<$HAL> for [<Timer $n>] {
+
+                    type Counter =
+                        <
+                            $crate::avr_device::$chip::[<tc $n>]::[<tcnt $n>]::[<TCNT $n _SPEC>]
+                            as $crate::avr_device::generic::RegisterSpec
+                        >::Ux;
+
+                    fn read_counter(&self) -> (Self::Counter, bool) {
+                        (
+                            self
+                                .[<tcnt $n >]
+                                .read()
+                                .bits(),
+                            self
+                                .[<tifr $n>]
+                                .read()
+                                .[<ocf $n a>]()
+                                .bit(),
+                        )
+                    }
+
+                    fn configure(&self, p: $crate::time::Prescaler, top: Self::Counter) {
+                        // Set top value
+                        self.[<ocr $n a>]
+                            .write(|w| unsafe {
+                                // TODO: Why is this unsafe???
+                                // TODO: Safety, is this sound?
+                                w.bits(top)
+                            });
+                        // Set prescaler
+                        self.[<tccr $n b>]
+                            .write(|w| match p {
+                                Prescaler::P1 => w.[<cs $n>]().direct(),
+                                Prescaler::P8 => w.[<cs $n>]().prescale_8(),
+                                Prescaler::P64 => w.[<cs $n>]().prescale_64(),
+                                Prescaler::P256 => w.[<cs $n>]().prescale_256(),
+                                Prescaler::P1024 => w.[<cs $n>]().prescale_1024(),
+                            });
+                    }
+
+                    unsafe fn enable(&self) {
+                        // Enable the timer
+                        self.[<timsk $n>].write(|w| w.[<ocie $n a>]().set_bit());
+                        // Set CTC mode, enable timer
+                        // TODO: might be better to be put into `enable_timer`
+                        self.[<tccr $n a>].write(|w| w.[<wgm $n>]().ctc());
+                    }
+
+                    /// Disable this clock and disable any interrupts from it
+                    fn disable(&self) {
+                        // Stop clock
+                        self.[<tccr $n b>].write(|w| w.[<cs $n>]().no_clock());
+                        // Disable all interrupts
+                        self.[<timsk $n >].write(|w| {
+                            w.[<ocie $n a>]()
+                                .clear_bit() //
+                                .[<ocie $n b>]()
+                                .clear_bit() //
+                                .[<toie $n>]()
+                                .clear_bit() //
+                        });
+                    }
+                }
+            )* /* repeats $n */
+        }
+    };
 }
