@@ -34,7 +34,7 @@ impl<H, Tp: Timepiece<H>> StaticChronometer<H, Tp> {
     ///
     /// Notice, if the clock is stopped or not yet initialized, it will just
     /// return the last value, and the clock will appear frozen.
-    pub fn millis() -> Tp::Millis {
+    pub fn millis(&self) -> Tp::Millis {
         // Get the current number of milliseconds
         avr_device::interrupt::free(|cs| Tp::access_millis(cs).get())
     }
@@ -64,7 +64,7 @@ where
 
     pub fn now_with_cs(&self, cs: &avr_device::interrupt::CriticalSection) -> Instant<Self> {
         // TODO make use of `cs`
-        Instant::new(Self::millis())
+        Instant::new(Self::new().millis())
     }
 }
 

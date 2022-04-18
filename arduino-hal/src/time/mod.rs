@@ -18,6 +18,8 @@ pub use avr_hal_generic::time::Prescaler;
 pub use avr_hal_generic::time::Resolution;
 pub use avr_hal_generic::time::TimingCircuitOps;
 
+pub use embedded_time;
+
 /// Supported timer devices
 pub mod timers {
     pub use crate::hal::time::*;

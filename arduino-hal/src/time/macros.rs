@@ -15,13 +15,12 @@ pub use core::cell::RefCell;
 /// ```
 /// use arduino_hal::impl_timepiece;
 /// impl_timepiece! {
-///     pub timepiece MyFooTimer {
-///         hal: arduino_hal::hal::Atmega,
+///     pub timepiece Foo {
 ///         peripheral: Timer0,
 ///         cpu_clock: arduino_hal::DefaultClock,
 ///         millis: u32,
 ///         micros: u32,
-///         resolution: crate::time::Resolution::_1_MS,
+///         resolution: arduino_hal::time::Resolution::MS_1,
 ///     }
 /// }
 /// ```
@@ -47,8 +46,24 @@ macro_rules! impl_timepiece {
         }}
 
         $(#[$meta])*
-        $vis struct $Name {
-            pub peripheral: $crate::hal::time::$TC,
+        $vis struct $Name(pub $crate::hal::time::$TC);
+
+        impl $Name {
+            /// A statically accessible clock, based on this timepiece
+            ///
+            /// Notice that you first need to initialize the corresponding
+            /// Chronometer before this clock will start running.
+            const CLOCK: $crate::time::StaticChronometer<$crate::hal::HAL, $Name> = $crate::time::StaticChronometer::new();
+
+            /// Wraps the given peripheral, to be used to create a Chronometer
+            $vis fn new(peripheral: $crate::hal::time::$TC) -> Self {
+                Self(peripheral)
+            }
+        }
+        impl ::core::convert::From<$crate::hal::time::$TC> for $Name {
+            fn from(peripheral: $crate::hal::time::$TC) -> Self {
+                Self(peripheral)
+            }
         }
 
         unsafe impl $crate::time::Timepiece<$crate::hal::HAL> for $Name {
@@ -70,10 +85,16 @@ macro_rules! impl_timepiece {
             const TIMER_PARAMS: ($crate::time::Prescaler, <Self::Circuit as $crate::time::TimingCircuitOps<$crate::hal::HAL>>::Counter) = {
                 // Ensure that `$resolution` is a Resolution
                 let res: $crate::time::Resolution = $resolution;
-                let (prescaler, cnt_top) = res.params_for_frq(
+                let param_opt = res.params_for_frq(
                     <Self::CpuClock as $crate::time::macros::CpuClock>::FREQ,
                     <Self::Circuit as $crate::time::TimingCircuitOps<$crate::hal::HAL>>::Counter::MAX as u32 /* TODO: use `Into` */
-                ).unwrap();
+                );
+                // Manual `unwrap` because `const_panic` is already stable,
+                // unlike `const_option`
+                let (prescaler, cnt_top) = match param_opt {
+                    Some(param) => param,
+                    None => panic!("Invalid timer configuration. The selected resolution can not be achieved with the selected timer peripheral at the current CPU-frequency"),
+                };
 
                 (prescaler, cnt_top as _)
             };
@@ -86,7 +107,7 @@ macro_rules! impl_timepiece {
             }
 
             fn access_peripheral(&self) -> &Self::Circuit {
-                &self.peripheral
+                &self.0
             }
         }
     };
