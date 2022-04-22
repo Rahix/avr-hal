@@ -16,7 +16,7 @@ fn main() -> ! {
 
     ufmt::uwriteln!(&mut serial, "Setup started...").void_unwrap();
 
-    for i in 0..20 {
+    for _i in 0..20 {
         ufmt::uwrite!(&mut serial, ".").void_unwrap();
         led.toggle();
         arduino_hal::delay_ms(100);
