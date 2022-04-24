@@ -3,6 +3,9 @@
 use core::marker;
 use hal::blocking::delay;
 
+#[cfg(all(target_arch = "avr", avr_hal_asm_macro))]
+use core::arch::asm;
+
 /// A busy-loop delay implementation
 ///
 /// # Example
@@ -32,7 +35,18 @@ impl<SPEED> Delay<SPEED> {
 // based on https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/wiring.c
 
 cfg_if::cfg_if! {
-    if #[cfg(target_arch = "avr")] {
+    if #[cfg(all(target_arch = "avr", avr_hal_asm_macro))] {
+        fn busy_loop(c: u16) {
+            unsafe {
+                asm!(
+                    "1:",
+                    "sbiw {c}, 1",
+                    "brne 1b",
+                    c = in(reg_iw) c,
+                );
+            }
+        }
+    } else if #[cfg(target_arch = "avr")] {
         #[allow(unused_assignments)]
         fn busy_loop(mut c: u16) {
             unsafe {
@@ -81,9 +95,15 @@ impl delay::DelayUs<u16> for Delay<crate::clock::MHz20> {
 
         // for a one-microsecond delay, simply return.  the overhead
         // of the function call takes 18 (20) cycles, which is 1us
+        #[cfg(all(target_arch = "avr", avr_hal_asm_macro))]
+        unsafe {
+            asm!("nop", "nop", "nop", "nop");
+        }
+
+        #[cfg(all(target_arch = "avr", not(avr_hal_asm_macro)))]
         unsafe {
             llvm_asm!("nop\nnop\nnop\nnop" :::: "volatile");
-        } //just waiting 4 cycles
+        }
 
         if us <= 1 {
             return;
@@ -238,7 +258,7 @@ where
     }
 }
 
-impl <SPEED> delay::DelayMs<u8> for Delay<SPEED>
+impl<SPEED> delay::DelayMs<u8> for Delay<SPEED>
 where
     Delay<SPEED>: delay::DelayMs<u16>,
 {
