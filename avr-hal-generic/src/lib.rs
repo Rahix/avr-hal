@@ -1,5 +1,6 @@
 #![no_std]
-#![feature(llvm_asm)]
+#![cfg_attr(avr_hal_asm_macro, feature(asm_experimental_arch))]
+#![cfg_attr(not(avr_hal_asm_macro), feature(llvm_asm))]
 
 pub extern crate embedded_hal as hal;
 
