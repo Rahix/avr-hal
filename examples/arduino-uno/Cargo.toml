@@ -23,5 +23,5 @@ version = "0.3"
 version = "1.6.1"
 default-features = false
 
-[dependencies.arduino-portable]
-path = "../arduino-portable"
+[dependencies.avr-portable]
+path = "../avr-portable"

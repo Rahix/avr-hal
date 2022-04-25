@@ -15,6 +15,6 @@ fn main() -> ! {
     ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").void_unwrap();
 
     loop {
-        arduino_portable::report(&mut serial);
+        avr_portable::report(&mut serial);
     }
 }

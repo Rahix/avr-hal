@@ -15,5 +15,5 @@ embedded-hal = "0.2.3"
 path = "../../arduino-hal/"
 features = ["arduino-leonardo"]
 
-[dependencies.arduino-portable]
-path = "../arduino-portable"
+[dependencies.avr-portable]
+path = "../avr-portable"

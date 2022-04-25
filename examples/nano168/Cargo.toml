@@ -19,5 +19,5 @@ features = ["nano168"]
 [dependencies.avr-device]
 version = "0.3"
 
-[dependencies.arduino-portable]
-path = "../arduino-portable"
+[dependencies.avr-portable]
+path = "../avr-portable"
