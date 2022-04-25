@@ -42,12 +42,7 @@ fn main() -> ! {
     ];
 
     loop {
-        for (i, ch) in channels.iter().enumerate() {
-            let v = adc.read_blocking(ch);
-            ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).void_unwrap();
-        }
-
-        ufmt::uwriteln!(&mut serial, "").void_unwrap();
+        avr_portable::report_adc(&mut serial, &mut adc, &channels);
         arduino_hal::delay_ms(1000);
     }
 }

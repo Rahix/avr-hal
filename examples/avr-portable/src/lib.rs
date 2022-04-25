@@ -19,6 +19,26 @@ pub fn report<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK>(
     ufmt::uwriteln!(serial, "Got {}!\r", b).void_unwrap();
 }
 
+pub fn report_adc<
+    H,
+    USART: UsartOps<H, RX, TX>,
+    RX,
+    TX,
+    ADCOPS: avr_hal_generic::adc::AdcOps<H>,
+    CLOCK: avr_hal_generic::clock::Clock,
+>(
+    serial: &mut Usart<H, USART, RX, TX, CLOCK>,
+    adc: &mut avr_hal_generic::adc::Adc<H, ADCOPS, CLOCK>,
+    channels: &[avr_hal_generic::adc::Channel<H, ADCOPS>],
+) {
+    for (i, ch) in channels.iter().enumerate() {
+        let v = adc.read_blocking(ch);
+        ufmt::uwrite!(serial, "A{}: {} ", i, v).void_unwrap();
+    }
+
+    ufmt::uwriteln!(serial, "").void_unwrap();
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
