@@ -3,10 +3,12 @@
 //! If you want library routines to be portable between different AVR implementations,
 //! it is best to use types from [avr_hal_generic] instead of [arduino_hal]
 
-use avr_hal_generic::usart::{Usart, UsartOps};
-// use avr_hal_generic::serial::Read;
 use avr_hal_generic::adc::AdcChannel;
+use avr_hal_generic::port::PinOps;
+use avr_hal_generic::spi::{Spi, SpiOps};
+use avr_hal_generic::usart::{Usart, UsartOps};
 use embedded_hal::serial::Read;
+use embedded_hal::spi::FullDuplex;
 pub use void::ResultVoidErrExt as _;
 pub use void::ResultVoidExt as _;
 
@@ -56,6 +58,23 @@ pub fn report_adc_multi<
     }
 
     ufmt::uwriteln!(serial, "").void_unwrap();
+}
+
+pub fn spi_loopback<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>(
+    spi: &mut Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
+    val: u8,
+) -> u8
+where
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
+    SCLKPIN: PinOps,
+    MOSIPIN: PinOps,
+    MISOPIN: PinOps,
+    CSPIN: PinOps,
+{
+    // Send a byte
+    nb::block!(spi.send(val)).void_unwrap();
+    // Because MISO is connected to MOSI, the read data should be the same
+    nb::block!(spi.read()).void_unwrap()
 }
 
 #[cfg(test)]
