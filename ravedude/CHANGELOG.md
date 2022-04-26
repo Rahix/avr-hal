@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed bug in avrdude version number parsing code which didn't allow version
+  numbers with more than two components ([#260]).
+
+[#260]: https://github.com/Rahix/avr-hal/pull/260
 
 
 ## [0.1.4] - 2022-02-08
