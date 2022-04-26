@@ -1,19 +1,19 @@
 /*!
  * Blinks a 4 leds in sequence on pins D3 - D6. When an external interrupt on D2/INT0 comes in
  * the sequence is reversed.
- * 
- * Note: The use of the either crate requires the deactivation of std to use it in core. See the Cargo.toml 
+ *
+ * Note: The use of the either crate requires the deactivation of std to use it in core. See the Cargo.toml
  * in this directory for details.
  */
 #![no_std]
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
-use panic_halt as _;
+use arduino_hal::port::{mode, Pin};
 use core::ops::Range;
 use core::sync::atomic::{AtomicBool, Ordering};
-use arduino_hal::port::{mode, Pin};
 use either::*;
+use panic_halt as _;
 
 static REVERSED: AtomicBool = AtomicBool::new(false);
 
@@ -27,7 +27,7 @@ fn INT0() {
     REVERSED.store(!current, Ordering::SeqCst);
 }
 
-fn blink_for_range(range : Range<u16>, leds : &mut[Pin<mode::Output>]) {
+fn blink_for_range(range: Range<u16>, leds: &mut [Pin<mode::Output>]) {
     range.map(|i| i * 100).for_each(|ms| {
         let iter = if is_reversed() {
             Left(leds.iter_mut().rev())

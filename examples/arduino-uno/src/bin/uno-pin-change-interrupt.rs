@@ -12,7 +12,7 @@
 use arduino_hal;
 use panic_halt as _;
 
-use core:: sync::atomic::{AtomicBool, Ordering};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 static PIN_CHANGED: AtomicBool = AtomicBool::new(false);
 
@@ -42,11 +42,11 @@ fn main() -> ! {
     //Pins used to drive the stepper motor
     let mut dir_pin = pins.d4.into_output();
     let mut step_pin = pins.d5.into_output();
-    
+
     //Rotary encoder attached on these pins
     let rotary_pins = [
         pins.d2.into_floating_input().downgrade(), //CLK
-        pins.d3.into_floating_input().downgrade() //DT
+        pins.d3.into_floating_input().downgrade(), //DT
     ];
 
     // Enable the PCINT2 pin change interrupt
