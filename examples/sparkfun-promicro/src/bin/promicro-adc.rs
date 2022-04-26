@@ -23,16 +23,17 @@ fn main() -> ! {
     ufmt::uwriteln!(&mut serial, "Ground: {}", gnd).void_unwrap();
     ufmt::uwriteln!(&mut serial, "Temperature: {}", tmp).void_unwrap();
 
+    let a0 = pins.a0.into_analog_input(&mut adc);
     // To store multiple channels in an array, we use the `into_channel()` method.
-    let channels: [adc::Channel; 4] = [
-        pins.a0.into_analog_input(&mut adc).into_channel(),
+    let channels: [adc::Channel; 3] = [
         pins.a1.into_analog_input(&mut adc).into_channel(),
         pins.a2.into_analog_input(&mut adc).into_channel(),
         pins.a3.into_analog_input(&mut adc).into_channel(),
     ];
 
     loop {
-        avr_portable::report_adc(&mut serial, &mut adc, &channels);
+        avr_portable::report_adc_single(&mut serial, &mut adc, 0, &a0);
+        avr_portable::report_adc_multi(&mut serial, &mut adc, &channels);
 
         arduino_hal::delay_ms(1000);
     }
