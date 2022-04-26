@@ -9,6 +9,7 @@ use avr_hal_generic::spi::{Spi, SpiOps};
 use avr_hal_generic::usart::{Usart, UsartOps};
 use embedded_hal::serial::Read;
 use embedded_hal::spi::FullDuplex;
+use ufmt::uWrite;
 pub use void::ResultVoidErrExt as _;
 pub use void::ResultVoidExt as _;
 
@@ -23,15 +24,13 @@ pub fn report<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK>(
 }
 
 pub fn report_adc_single<
+    W: uWrite<Error = void::Void>,
     H,
-    USART: UsartOps<H, RX, TX>,
-    RX,
-    TX,
     ADCOPS: avr_hal_generic::adc::AdcOps<H>,
     CLOCK: avr_hal_generic::clock::Clock,
     PIN: AdcChannel<H, ADCOPS>,
 >(
-    serial: &mut Usart<H, USART, RX, TX, CLOCK>,
+    serial: &mut W,
     adc: &mut avr_hal_generic::adc::Adc<H, ADCOPS, CLOCK>,
     i: usize,
     analog_pin: &PIN,
@@ -41,14 +40,12 @@ pub fn report_adc_single<
 }
 
 pub fn report_adc_multi<
+    W: uWrite<Error = void::Void>,
     H,
-    USART: UsartOps<H, RX, TX>,
-    RX,
-    TX,
     ADCOPS: avr_hal_generic::adc::AdcOps<H>,
     CLOCK: avr_hal_generic::clock::Clock,
 >(
-    serial: &mut Usart<H, USART, RX, TX, CLOCK>,
+    serial: &mut W,
     adc: &mut avr_hal_generic::adc::Adc<H, ADCOPS, CLOCK>,
     channels: &[avr_hal_generic::adc::Channel<H, ADCOPS>],
 ) {
