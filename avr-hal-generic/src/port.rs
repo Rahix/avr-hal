@@ -157,7 +157,6 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
     /// Convert this pin into an open-drain output pin, setting the state to high.
     /// See [Digital Output Open Drain](#digital-output-open-drain)
     pub fn into_opendrain_high(mut self) -> Pin<mode::OpenDrain, PIN> {
-        unsafe { self.pin.out_clear() };
         unsafe { self.pin.make_input(false) };
         Pin {
             pin: self.pin,
