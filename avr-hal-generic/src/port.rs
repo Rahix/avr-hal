@@ -143,7 +143,7 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
         }
     }
 
-    /// Convert this pin into an output pin with open drain, setting the state to low
+    /// Convert this pin into an open-drain output pin, setting the state to low.
     /// See [Digital Output Open Drain](#digital-output-open-drain)
     pub fn into_opendrain(mut self) -> Pin<mode::OpenDrain, PIN> {
         unsafe { self.pin.out_clear() };
@@ -154,9 +154,9 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
         }
     }
 
-    /// Convert this pin into an output pin with open drain, setting the state to tristate
+    /// Convert this pin into an open-drain output pin, setting the state to high.
     /// See [Digital Output Open Drain](#digital-output-open-drain)
-    pub fn into_opendrain_tristate(mut self) -> Pin<mode::OpenDrain, PIN> {
+    pub fn into_opendrain_high(mut self) -> Pin<mode::OpenDrain, PIN> {
         unsafe { self.pin.out_clear() };
         unsafe { self.pin.make_input(false) };
         Pin {
@@ -330,9 +330,9 @@ impl<PIN: PinOps> OutputPin for Pin<mode::Output, PIN> {
 
 /// # Digital Output Open Drain
 impl<PIN: PinOps> Pin<mode::OpenDrain, PIN> {
-    /// Set the pin to tristate mode (Input without PullUp)
+    /// Set the pin high (Input without PullUp so it is floating)
     #[inline]
-    pub fn set_tristate(&mut self) {
+    pub fn set_high(&mut self) {
         unsafe { self.pin.make_input(false) }
     }
 
@@ -346,7 +346,7 @@ impl<PIN: PinOps> Pin<mode::OpenDrain, PIN> {
     ///
     /// *Note*: The electrical state of the pin might differ due to external circuitry.
     #[inline]
-    pub fn is_set_high(&self) -> bool {
+    pub fn is_high(&self) -> bool {
         unsafe { self.pin.in_get() }
     }
 
@@ -354,8 +354,8 @@ impl<PIN: PinOps> Pin<mode::OpenDrain, PIN> {
     ///
     /// *Note*: The electrical state of the pin might differ due to external circuitry.
     #[inline]
-    pub fn is_set_low(&self) -> bool {
-        !unsafe { self.pin.in_get() }
+    pub fn is_low(&self) -> bool {
+        !self.is_high()
     }
 }
 
@@ -364,7 +364,7 @@ impl<PIN: PinOps> OutputPin for Pin<mode::OpenDrain, PIN> {
     type Error = core::convert::Infallible;
 
     fn set_high(&mut self) -> Result<(), Self::Error> {
-        self.set_tristate();
+        self.set_high();
         Ok(())
     }
 
@@ -379,11 +379,11 @@ impl<PIN: PinOps> InputPin for Pin<mode::OpenDrain, PIN> {
     type Error = core::convert::Infallible;
 
     fn is_high(&self) -> Result<bool, Self::Error> {
-        Ok(self.is_set_high())
+        Ok(self.is_high())
     }
 
     fn is_low(&self) -> Result<bool, Self::Error> {
-        Ok(self.is_set_low())
+        Ok(self.is_low())
     }
 }
 
