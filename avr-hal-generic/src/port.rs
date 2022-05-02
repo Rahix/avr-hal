@@ -18,7 +18,7 @@ pub mod mode {
     impl Io for Output {}
     impl crate::Sealed for Output {}
 
-    // Pin is configures as a digital output with open drain behaviour
+    /// Pin is configured as a digital output with open drain behaviour
     pub struct OpenDrain;
     impl super::PinMode for OpenDrain {}
     impl Io for OpenDrain {}
