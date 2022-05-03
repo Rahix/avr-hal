@@ -18,9 +18,11 @@ fn main() -> ! {
     );
 
     ufmt::uwriteln!(&mut serial, "Write direction test:\r").void_unwrap();
-    i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Write).void_unwrap();
+    i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Write)
+        .void_unwrap();
     ufmt::uwriteln!(&mut serial, "\r\nRead direction test:\r").void_unwrap();
-    i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Read).void_unwrap();
+    i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Read)
+        .void_unwrap();
 
     loop {}
 }
