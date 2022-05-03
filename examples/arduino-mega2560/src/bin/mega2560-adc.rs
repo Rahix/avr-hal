@@ -21,9 +21,9 @@ fn main() -> ! {
     ufmt::uwriteln!(&mut serial, "Vbandgap: {}", vbg).void_unwrap();
     ufmt::uwriteln!(&mut serial, "Ground: {}", gnd).void_unwrap();
 
-    let a0 = pins.a0.into_analog_input(&mut adc);
     // To store multiple channels in an array, we use the `into_channel()` method.
-    let channels: [adc::Channel; 15] = [
+    let channels: [adc::Channel; 16] = [
+        pins.a0.into_analog_input(&mut adc).into_channel(),
         pins.a1.into_analog_input(&mut adc).into_channel(),
         pins.a2.into_analog_input(&mut adc).into_channel(),
         pins.a3.into_analog_input(&mut adc).into_channel(),
@@ -42,8 +42,17 @@ fn main() -> ! {
     ];
 
     loop {
-        avr_portable::report_adc_single(&mut serial, &mut adc, 0, &a0);
-        avr_portable::report_adc_multi(&mut serial, &mut adc, &channels);
+        if true {
+            for (i, ch) in channels.iter().enumerate() {
+                let v = adc.read_blocking(ch);
+                ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).void_unwrap();
+            }
+
+            ufmt::uwriteln!(&mut serial, "").void_unwrap();
+        } else {
+            avr_portable::report_adc_single(&mut serial, &mut adc, 0, &channels[0]);
+            avr_portable::report_adc_multi(&mut serial, &mut adc, &channels[1..]);
+        }
         arduino_hal::delay_ms(1000);
     }
 }
