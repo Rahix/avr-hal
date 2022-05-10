@@ -36,6 +36,8 @@ members = [
 exclude = [
     # The RAVEDUDE! Yeah!
     "ravedude",
+    # requires the user of this crate to specify the features for embedded-hal
+    "examples/avr-portable",
 ]
 
 [patch.crates-io]

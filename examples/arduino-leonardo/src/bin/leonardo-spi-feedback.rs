@@ -17,7 +17,7 @@
 
 use arduino_hal::prelude::*;
 use arduino_hal::spi;
-use embedded_hal::spi::FullDuplex;
+// use embedded_hal::spi::FullDuplex;
 use panic_halt as _;
 
 #[arduino_hal::entry]
@@ -39,10 +39,7 @@ fn main() -> ! {
     );
 
     loop {
-        // Send a byte
-        nb::block!(spi.send(0b00001111)).void_unwrap();
-        // Because MISO is connected to MOSI, the read data should be the same
-        let data = nb::block!(spi.read()).void_unwrap();
+        let data = avr_portable::spi_loopback(&mut spi, 0b00001111);
 
         ufmt::uwriteln!(&mut serial, "data: {}\r", data).void_unwrap();
         arduino_hal::delay_ms(1000);

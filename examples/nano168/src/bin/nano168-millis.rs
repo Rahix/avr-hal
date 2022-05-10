@@ -89,4 +89,3 @@ fn main() -> ! {
         ufmt::uwriteln!(&mut serial, "Got {} after {} ms!\r", b, time).void_unwrap();
     }
 }
-
