@@ -9,7 +9,7 @@ and then modernized to account for API drift since 2020
 
 */
 
-use arduino_hal::hal::port::PB5;
+use arduino_hal::hal::port::Dynamic;
 use arduino_hal::port::mode::Output;
 use arduino_hal::port::Pin;
 use arduino_hal::prelude::*;
@@ -19,11 +19,11 @@ use core::mem;
 use panic_halt as _;
 use ufmt::{uWrite, uwriteln};
 
-struct InterruptState<LED> {
-    blinker: Pin<Output, LED>,
+struct InterruptState {
+    blinker: Pin<Output, Dynamic>,
 }
 
-static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState<PB5>> = mem::MaybeUninit::uninit();
+static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState> = mem::MaybeUninit::uninit();
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -39,7 +39,9 @@ fn main() -> ! {
         // SAFETY: Interrupts are not enabled at this point so we can safely write the global
         // variable here.  A memory barrier afterwards ensures the compiler won't reorder this
         // after any operation that enables interrupts.
-        INTERRUPT_STATE = mem::MaybeUninit::new(InterruptState { blinker: led });
+        INTERRUPT_STATE = mem::MaybeUninit::new(InterruptState {
+            blinker: led.downgrade(),
+        });
         core::sync::atomic::compiler_fence(core::sync::atomic::Ordering::SeqCst);
     }
 
@@ -56,22 +58,15 @@ fn main() -> ! {
         avr_device::interrupt::enable();
     }
 
-    if true {
-        ufmt::uwriteln!(
-            &mut serial,
-            "configured timer output compare register = {}",
-            tmr1.ocr1a.read().bits()
-        )
-        .void_unwrap();
-    }
-    loop {
-        if true {
-            avr_device::asm::sleep()
-        } else {
-            arduino_hal::delay_ms(100);
+    ufmt::uwriteln!(
+        &mut serial,
+        "configured timer output compare register = {}",
+        tmr1.ocr1a.read().bits()
+    )
+    .void_unwrap();
 
-            ufmt::uwriteln!(&mut serial, "counter = {}", tmr1.tcnt1.read().bits()).void_unwrap();
-        }
+    loop {
+        avr_device::asm::sleep()
     }
 }
 
