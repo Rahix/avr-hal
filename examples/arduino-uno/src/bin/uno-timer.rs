@@ -9,7 +9,6 @@ and then modernized to account for API drift since 2020
 
 */
 
-use arduino_hal::hal::port::Dynamic;
 use arduino_hal::port::mode::Output;
 use arduino_hal::port::Pin;
 use arduino_hal::prelude::*;
@@ -20,7 +19,7 @@ use panic_halt as _;
 use ufmt::{uWrite, uwriteln};
 
 struct InterruptState {
-    blinker: Pin<Output, Dynamic>,
+    blinker: Pin<Output>,
 }
 
 static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState> = mem::MaybeUninit::uninit();
