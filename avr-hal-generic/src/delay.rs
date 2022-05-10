@@ -36,13 +36,14 @@ impl<SPEED> Delay<SPEED> {
 
 cfg_if::cfg_if! {
     if #[cfg(all(target_arch = "avr", avr_hal_asm_macro))] {
-        fn busy_loop(c: u16) {
+        #[allow(unused_assignments)]
+        fn busy_loop(mut c: u16) {
             unsafe {
                 asm!(
                     "1:",
                     "sbiw {c}, 1",
                     "brne 1b",
-                    c = in(reg_iw) c,
+                    c = inout(reg_iw) c,
                 );
             }
         }
