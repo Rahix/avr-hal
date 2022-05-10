@@ -82,8 +82,9 @@ pub fn rig_timer<W: uWrite<Error = void::Void>>(tmr1: &TC1, serial: &mut W) {
      https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
      section 15.11
     */
+    use arduino_hal::clock::Clock;
 
-    const ARDUINO_UNO_CLOCK_FREQUENCY_HZ: u32 = 16_000_000;
+    const ARDUINO_UNO_CLOCK_FREQUENCY_HZ: u32 = arduino_hal::DefaultClock::FREQ;
     const CLOCK_SOURCE: CS1_A = CS1_A::PRESCALE_256;
     let clock_divisor: u32 = match CLOCK_SOURCE {
         CS1_A::DIRECT => 1,
