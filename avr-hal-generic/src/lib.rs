@@ -22,7 +22,7 @@ pub mod usart;
 pub mod i2c;
 pub mod spi;
 pub mod adc;
-pub mod pwm;
+pub mod simple_pwm;
 pub mod wdt;
 
 /// Prelude containing all HAL traits

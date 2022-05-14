@@ -91,6 +91,9 @@ pub mod port;
 pub use port::Pins;
 
 #[cfg(feature = "device-selected")]
+pub mod simple_pwm;
+
+#[cfg(feature = "device-selected")]
 pub mod usart;
 #[cfg(feature = "device-selected")]
 pub use usart::Usart;
