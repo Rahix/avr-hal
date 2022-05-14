@@ -112,6 +112,10 @@ pub use delay::{delay_ms, delay_us, Delay};
 
 #[cfg(feature = "board-selected")]
 pub mod port;
+
+#[cfg(feature = "board-selected")]
+pub mod simple_pwm;
+
 #[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use port::Pins;

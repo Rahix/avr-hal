@@ -24,6 +24,12 @@ pub mod mode {
     impl Io for OpenDrain {}
     impl crate::Sealed for OpenDrain {}
 
+    pub struct PwmOutput<TC> {
+        pub(crate) _timer: PhantomData<TC>
+    }
+    impl<TC> super::PinMode for PwmOutput<TC> {}
+    impl<TC> crate::Sealed for PwmOutput<TC> {}
+
     pub trait InputMode: crate::Sealed {}
 
     /// Pin is configured as digital input (floating or pulled-up).
