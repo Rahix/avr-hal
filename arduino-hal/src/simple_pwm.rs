@@ -7,4 +7,9 @@
 
 pub use avr_hal_generic::simple_pwm::IntoPwmPin;
 pub use avr_hal_generic::simple_pwm::Prescaler;
+
+#[cfg(feature = "mcu-atmega")]
 pub use atmega_hal::simple_pwm::*;
+
+#[cfg(feature = "mcu-attiny")]
+pub use attiny_hal::simple_pwm::*;
