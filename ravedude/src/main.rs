@@ -92,7 +92,7 @@ fn ravedude() -> anyhow::Result<()> {
 
     if let Some(wait_time) = args.reset_delay{
         if wait_time > 0 {
-            task_message!("Waiting {} seconds before proceeding", "{}", wait_time);
+            println!("Waiting {} ms before proceeding", wait_time);
             let wait_time = Duration::from_millis(wait_time);
             thread::sleep(wait_time);
         }else{
