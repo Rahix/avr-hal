@@ -10,8 +10,8 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
     /// let mut timer0 = Timer0Pwm::new(dp.TC0, Prescaler::Prescale64);
     ///
-    /// let mut d5 = portd.d5.into_output().into_pwm(&mut timer0);
-    /// let mut d6 = portd.d6.into_output().into_pwm(&mut timer0);
+    /// let mut d5 = pins.d5.into_output().into_pwm(&mut timer0);
+    /// let mut d6 = pins.d6.into_output().into_pwm(&mut timer0);
     ///
     /// d5.set_duty(128);
     /// d5.enable();
@@ -58,8 +58,8 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
     /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
     ///
-    /// let mut d9 = portb.d9.into_output().into_pwm(&mut timer1);
-    /// let mut d10 = portb.d10.into_output().into_pwm(&mut timer1);
+    /// let mut d9 = pins.d9.into_output().into_pwm(&mut timer1);
+    /// let mut d10 = pins.d10.into_output().into_pwm(&mut timer1);
     ///
     /// d9.set_duty(128);
     /// d9.enable();
@@ -110,8 +110,8 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
     /// let mut timer2 = Timer2Pwm::new(dp.TC2, Prescaler::Prescale64);
     ///
-    /// let mut d11 = portb.d11.into_output().into_pwm(&mut timer2);
-    /// let mut d3 = portd.d3.into_output().into_pwm(&mut timer2);
+    /// let mut d11 = pins.d11.into_output().into_pwm(&mut timer2);
+    /// let mut d3 = pins.d3.into_output().into_pwm(&mut timer2);
     ///
     /// d11.set_duty(128);
     /// d11.enable();
@@ -241,8 +241,8 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
     /// let mut timer0 = Timer0Pwm::new(dp.TC0, Prescaler::Prescale64);
     ///
-    /// let mut d13 = portb.d13.into_output().into_pwm(&mut timer0);
-    /// let mut d4 = portg.d4.into_output().into_pwm(&mut timer0);
+    /// let mut d13 = pins.d13.into_output().into_pwm(&mut timer0);
+    /// let mut d4 = pins.d4.into_output().into_pwm(&mut timer0);
     ///
     /// d13.set_duty(128);
     /// d13.enable();
@@ -289,9 +289,9 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
     /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
     ///
-    /// let mut d11 = portb.d11.into_output().into_pwm(&mut timer1);
-    /// let mut d12 = portb.d12.into_output().into_pwm(&mut timer1);
-    /// let mut d13 = portb.d13.into_output().into_pwm(&mut timer1);
+    /// let mut d11 = pins.d11.into_output().into_pwm(&mut timer1);
+    /// let mut d12 = pins.d12.into_output().into_pwm(&mut timer1);
+    /// let mut d13 = pins.d13.into_output().into_pwm(&mut timer1);
     ///
     /// d11.set_duty(128);
     /// d11.enable();
@@ -347,8 +347,8 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
     /// let mut timer2 = Timer2Pwm::new(dp.TC2, Prescaler::Prescale64);
     ///
-    /// let mut d10 = portb.into_output().into_pwm(&mut timer2);
-    /// let mut d9 = porth.into_output().into_pwm(&mut timer2);
+    /// let mut d10 = pins.d10.into_output().into_pwm(&mut timer2);
+    /// let mut d9 = pins.d9.into_output().into_pwm(&mut timer2);
     ///
     /// d10.set_duty(128);
     /// d10.enable();
@@ -400,9 +400,9 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
     /// let mut timer3 = Timer3Pwm::new(dp.TC3, Prescaler::Prescale64);
     ///
-    /// let mut d5 = porte.d5.into_output().into_pwm(&mut timer3);
-    /// let mut d2 = porte.d2.into_output().into_pwm(&mut timer3);
-    /// let mut d3 = porte.d3.into_output().into_pwm(&mut timer3);
+    /// let mut d5 = pins.d5.into_output().into_pwm(&mut timer3);
+    /// let mut d2 = pins.d2.into_output().into_pwm(&mut timer3);
+    /// let mut d3 = pins.d3.into_output().into_pwm(&mut timer3);
     ///
     /// d5.set_duty(128);
     /// d5.enable();
@@ -463,9 +463,9 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
     /// let mut timer4 = Timer4Pwm::new(dp.TC4, Prescaler::Prescale64);
     ///
-    /// let mut d6 = porth.d6.into_output().into_pwm(&mut timer4);
-    /// let mut d7 = porth.d7.into_output().into_pwm(&mut timer4);
-    /// let mut d8 = porth.d8.into_output().into_pwm(&mut timer4);
+    /// let mut d6 = pins.d6.into_output().into_pwm(&mut timer4);
+    /// let mut d7 = pins.d7.into_output().into_pwm(&mut timer4);
+    /// let mut d8 = pins.d8.into_output().into_pwm(&mut timer4);
     ///
     /// d6.set_duty(128);
     /// d6.enable();
@@ -526,9 +526,9 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
     /// let mut timer5 = Timer5Pwm::new(dp.TC5, Prescaler::Prescale64);
     ///
-    /// let mut d46 = portl.d46.into_output().into_pwm(&mut timer5);
-    /// let mut d45 = portl.d45.into_output().into_pwm(&mut timer5);
-    /// let mut d44 = portl.d44.into_output().into_pwm(&mut timer5);
+    /// let mut d46 = pins.d46.into_output().into_pwm(&mut timer5);
+    /// let mut d45 = pins.d45.into_output().into_pwm(&mut timer5);
+    /// let mut d44 = pins.d44.into_output().into_pwm(&mut timer5);
     ///
     /// d46.set_duty(128);
     /// d46.enable();
