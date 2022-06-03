@@ -26,9 +26,9 @@ impl Avrdude {
             .chars()
             .take_while(|c| c.is_ascii_digit() || *c == '.')
             .collect();
-        let (major, minor) = version.split_once('.').ok_or_else(err)?;
-        let major = major.parse::<u8>()?;
-        let minor = minor.parse::<u8>()?;
+        let mut version_splits = version.split('.');
+        let major = version_splits.next().ok_or_else(err)?.parse::<u8>()?;
+        let minor = version_splits.next().ok_or_else(err)?.parse::<u8>()?;
         Ok((major, minor))
     }
 
