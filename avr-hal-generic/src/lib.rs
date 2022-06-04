@@ -1,11 +1,6 @@
 #![no_std]
-#![feature(llvm_asm)]
-//
-// Stable since 1.53.0
-#![feature(int_bits_const)]
-//
-// Stable since 1.57.0
-#![feature(const_panic)]
+#![cfg_attr(avr_hal_asm_macro, feature(asm_experimental_arch))]
+#![cfg_attr(not(avr_hal_asm_macro), feature(llvm_asm))]
 
 pub extern crate embedded_hal as hal;
 
