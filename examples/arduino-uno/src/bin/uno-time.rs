@@ -6,9 +6,6 @@
 //
 // Needed for the timer interrupt that is attached via `impl_timepiece`
 #![feature(abi_avr_interrupt)]
-//
-// Needed if compiling with Rust prior to 1.57.0
-#![feature(const_panic)]
 
 use arduino_hal::impl_timepiece;
 use arduino_hal::prelude::*;
@@ -70,13 +67,9 @@ fn main() -> ! {
         // accessible), which has just milliseconds precision with whatever
         // resolution you configured your timepiece (i.e. `Foo`)
         let time = Foo::CLOCK.now().duration_since_epoch();
-        /* Currently using `Seconds::from` has some
-         * "undefined reference to `__lshrsi3'" errors,
-         * however, it works with drmorr0's compiler
         let seconds = Seconds::<u32>::try_from(time).unwrap();
-        let seconds = seconds.integer(); // extract the integer, since `Seconds` is not `uDisplay`
-         */
-        let seconds = Foo::CLOCK.millis() / 1_000; // default tool-chain alternative
+        // extract the integer, since `Seconds` is not `uDisplay`
+        let seconds = seconds.integer();
 
         ufmt::uwriteln!(
             &mut serial,
