@@ -275,13 +275,17 @@ macro_rules! impl_timer_circuit_via_TCn_OCRnA {
                     }
 
                     fn enable(&self, p: $crate::time::Prescaler, top: Self::Counter) {
-                        // Set clear timer on compare (CTC) mode using comparator A
-                        // Notice the CTC mode on a 8-bit timer is `0b010`
-                        // whereas the highest bit is in `[<wgm $n8 2>]` and the
-                        // lower two bits are in `[<wgm $n8>]`.
+                        // Set 'clear timer on compare' (CTC) mode using comparator A
+                        // Notice the CTC mode on a 8-bit timer is `0b010`.
+                        // Those three bits are split between
+                        // `TCCRxB::WGMx2` (top bit) and `TCCRxA::WGMx` (lower two bits)
                         // Also see: https://github.com/Rahix/avr-device/issues/96
-                        self.[<tccr $n8 a>].modify(|_,w| w.[<wgm $n8>]().ctc());
+
+                        // Clearing the top bit
                         self.[<tccr $n8 b>].modify(|_,w| w.[<wgm $n8 2>]().clear_bit());
+
+                        // Setting the lower two bits
+                        self.[<tccr $n8 a>].modify(|_,w| w.[<wgm $n8>]().ctc());
 
                         // Set top value for comparator A
                         self.[<ocr $n8 a>]
@@ -362,14 +366,17 @@ macro_rules! impl_timer_circuit_via_TCn_OCRnA {
                     }
 
                     fn enable(&self, p: $crate::time::Prescaler, top: Self::Counter) {
-                        // Set clear timer on compare (CTC) mode using comparator A
-                        // Notice the CTC mode on a 8-bit timer is `0b0100`
-                        // whereas the highest two bits are in
-						// `[<tccr $n16 b>]::[<wgm $n16>]` and the
-                        // lower two bits are in `[<tccr $n16 a>]::[<wgm $n16>]`.
+                        // Set 'clear timer on compare' (CTC) mode using comparator A
+                        // Notice the CTC mode on a 16-bit timer is `0b0100`.
+                        // Those four bits are split between
+                        // `TCCRxB::WGMx` (top two bits) and `TCCRxA::WGMx` (lower two bits)
                         // Also see: https://github.com/Rahix/avr-device/issues/96
-                        self.[<tccr $n16 a>].modify(|_,w| w.[<wgm $n16>]().bits(0b00));
+
+                        // Setting the top two bits
                         self.[<tccr $n16 b>].modify(|_,w| w.[<wgm $n16>]().bits(0b01));
+
+                        // Setting the lower two bits
+                        self.[<tccr $n16 a>].modify(|_,w| w.[<wgm $n16>]().bits(0b00));
 
                         // Set top value for comparator A
                         self.[<ocr $n16 a>]
