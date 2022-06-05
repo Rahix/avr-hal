@@ -29,18 +29,23 @@ pub trait TimingCircuitOps<H> {
     /// without the interrupt been executed yet.
     fn read_counter(&self) -> (Self::Counter, bool);
 
-    /// Configure the timer with the given prescaler and top value.
+    /// Configure the timer and enables it
+    ///
+    /// This will set the given prescaler and top value on this timer,
+    /// and then start it.
     ///
     /// Should be call be called before [`enable`]
-    fn configure(&self, p: Prescaler, top: Self::Counter);
+    fn enable(&self, p: Prescaler, top: Self::Counter);
 
-    /// Start the timing circuit, including its interrupt.
+    /// Unmasks the timer interrupt.
+    ///
+    /// Should be called between `disable` and `enable`.
     ///
     /// # Safety
     /// A timer interrupt handler for this timer must have been set up.
     //
     // TODO: Would it make sens if this were safe? What if no handler is set?
-    unsafe fn enable(&self);
+    unsafe fn set_interrupt_enable(&self);
 
     /// Disable this timer and disable any interrupts from it
     fn disable(&self);
@@ -176,7 +181,6 @@ impl Resolution {
     }
 }
 
-
 /// Implements [TimingCircuitOps] for acc `avr_device::$chip::[<TC $n>]` timers
 /// using `[<OCR $n a>]` comparator and interrupt
 #[macro_export]
@@ -187,7 +191,7 @@ macro_rules! impl_timer_circuit_via_TCn_OCRnA {
         // `chip` should be `ident`, but Rust 1.51 does not accept it in
         // `#[$crate::avr_device::interrupt($chip)]`
         chip: $chip:tt,
-        // List of timer number as in `TCn`
+        // List of 8-bit timer number as in `TCn`
         timers: [ $( $n:expr ),* $(,)? ] $(,)?
 
     ) => {
@@ -253,17 +257,32 @@ macro_rules! impl_timer_circuit_via_TCn_OCRnA {
                         )
                     }
 
-                    fn configure(&self, p: $crate::time::Prescaler, top: Self::Counter) {
-                        // Set top value
+                    unsafe fn set_interrupt_enable(&self) {
+                        // Enable the interrupt by setting
+                        // the Output Compare match A Interrupt Enable bit.
+                        self.[<timsk $n>].modify(|_,w| w.[<ocie $n a>]().set_bit());
+                    }
+
+                    fn enable(&self, p: $crate::time::Prescaler, top: Self::Counter) {
+                        // Set clear timer on compare (CTC) mode using comparator A
+                        // Notice the CTC mode on a 8-bit timer is `0b010`
+                        // whereas the highest bit is in `[<wgm $n 2>]` and the
+                        // lower two bits are in `[<wgm $n>]`.
+                        // Also see: https://github.com/Rahix/avr-device/issues/96
+                        self.[<tccr $n a>].modify(|_,w| w.[<wgm $n>]().ctc());
+                        self.[<tccr $n b>].modify(|_,w| w.[<wgm $n 2>]().clear_bit());
+
+                        // Set top value for comparator A
                         self.[<ocr $n a>]
-                            .write(|w| unsafe {
+                            .modify(|_,w| unsafe {
                                 // TODO: Why is this unsafe???
                                 // TODO: Safety, is this sound?
                                 w.bits(top)
                             });
-                        // Set prescaler
+
+                        // Set prescaler and thereby start the timer
                         self.[<tccr $n b>]
-                            .write(|w| match p {
+                            .modify(|_,w| match p {
                                 Prescaler::P1 => w.[<cs $n>]().direct(),
                                 Prescaler::P8 => w.[<cs $n>]().prescale_8(),
                                 Prescaler::P64 => w.[<cs $n>]().prescale_64(),
@@ -272,20 +291,12 @@ macro_rules! impl_timer_circuit_via_TCn_OCRnA {
                             });
                     }
 
-                    unsafe fn enable(&self) {
-                        // Enable the timer
-                        self.[<timsk $n>].write(|w| w.[<ocie $n a>]().set_bit());
-                        // Set CTC mode, enable timer
-                        // TODO: might be better to be put into `enable_timer`
-                        self.[<tccr $n a>].write(|w| w.[<wgm $n>]().ctc());
-                    }
-
                     /// Disable this clock and disable any interrupts from it
                     fn disable(&self) {
                         // Stop clock
-                        self.[<tccr $n b>].write(|w| w.[<cs $n>]().no_clock());
+                        self.[<tccr $n b>].modify(|_,w| w.[<cs $n>]().no_clock());
                         // Disable all interrupts
-                        self.[<timsk $n >].write(|w| {
+                        self.[<timsk $n >].modify(|_,w| {
                             w.[<ocie $n a>]()
                                 .clear_bit() //
                                 .[<ocie $n b>]()

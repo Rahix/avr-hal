@@ -96,12 +96,10 @@ impl<H, Tp: Timepiece<H>> Chronometer<H, Tp> {
     pub fn new(timepiece: Tp) -> Self {
         let (prescaler, timer_cnt) = Tp::TIMER_PARAMS;
 
-        // TODO: obviously most of these fields are numbered by the Timer nr
-        // that is used.
-
-        // Configure the timer for the above interval (in CTC mode)
-        // and enable its interrupt.
+        // Configure the timer for the above interval
         let tc = timepiece.access_peripheral();
+
+        // First, disable the timer, in case it was in use
         tc.disable();
 
         // Reset the global millisecond counter
@@ -109,15 +107,15 @@ impl<H, Tp: Timepiece<H>> Chronometer<H, Tp> {
             Tp::access_millis(cs).set(0.into());
         });
 
-        // Init timer stuff
-        tc.configure(prescaler, timer_cnt);
-
-        // Enable timer & interrupt
+        // Enable timer interrupt
         unsafe {
             // SAFETY: we have a `Tp: Timepiece`, which guarantees us that a
             // corresponding interrupt handler has been installed.
-            tc.enable();
+            tc.set_interrupt_enable();
         }
+
+        // Configure timer & start it
+        tc.enable(prescaler, timer_cnt);
 
         // We are done here
         Self {
