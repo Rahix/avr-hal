@@ -14,6 +14,6 @@ use crate::HAL;
 avr_hal_generic::impl_timer_circuit_via_TCn_OCRnA!{
     hal: HAL,
     chip: atmega328p,
-    // TODO: `TC1` does not work, because `WGM1_W` has no `ctc` function.
-    timers: [ 0, /* 1, */ 2 ],
+    timers_8_bit: [ 0, 2 ],
+    timers_16_bit: [ 1, ],
 }
