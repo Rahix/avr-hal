@@ -4,6 +4,9 @@ import json
 import subprocess
 
 SPECS = {
+    "atmega8u2": {
+        "cpu": "atmega8u2",
+    },
     "atmega32u4": {
         "cpu": "atmega32u4",
     },

@@ -8,6 +8,7 @@ edition = "2018"
 rt = ["avr-device/rt"]
 device-selected = []
 enable-extra-adc = []
+atmega8u2 = ["avr-device/atmega8u2", "device-selected"]
 atmega48p = ["avr-device/atmega48p", "device-selected"]
 atmega168 = ["avr-device/atmega168", "device-selected"]
 atmega328p = ["avr-device/atmega328p", "device-selected"]
