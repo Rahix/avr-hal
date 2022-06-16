@@ -5,7 +5,7 @@ Hardware Abstraction Layer for AVR microcontrollers and common boards (for examp
 **This is a new version of `avr-hal`!  Older versions can be found in the `old` branch but will no longer get support.**
 
 ## Quickstart
-You need a nightly Rust compiler for compiling Rust code for AVR.  **Note**: Due to a regression, versions after `nightly-2021-01-07` are currently broken (see [#124](https://github.com/Rahix/avr-hal/issues/124)).  Please use that version of the compiler for now. The correct version will be installed automatically.
+You need a nightly Rust compiler for compiling Rust code for AVR.  The correct version will be installed automatically due to the `rust-toolchain.toml` file.
 
 On Ubuntu, you'll need to install dependencies:
 

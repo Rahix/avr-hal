@@ -3,7 +3,7 @@
 //! Please take a look at the documentation for [`Pin`] for a detailed explanation.
 
 use core::marker::PhantomData;
-use embedded_hal::digital::v2::{OutputPin, InputPin};
+use embedded_hal::digital::v2::{InputPin, OutputPin};
 
 pub trait PinMode: crate::Sealed {}
 /// GPIO pin modes
@@ -17,6 +17,12 @@ pub mod mode {
     impl super::PinMode for Output {}
     impl Io for Output {}
     impl crate::Sealed for Output {}
+
+    /// Pin is configured as a digital output with open drain behaviour
+    pub struct OpenDrain;
+    impl super::PinMode for OpenDrain {}
+    impl Io for OpenDrain {}
+    impl crate::Sealed for OpenDrain {}
 
     pub trait InputMode: crate::Sealed {}
 
@@ -131,6 +137,27 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
     pub fn into_output_high(mut self) -> Pin<mode::Output, PIN> {
         unsafe { self.pin.out_set() };
         unsafe { self.pin.make_output() };
+        Pin {
+            pin: self.pin,
+            _mode: PhantomData,
+        }
+    }
+
+    /// Convert this pin into an open-drain output pin, setting the state to low.
+    /// See [Digital Output Open Drain](#digital-output-open-drain)
+    pub fn into_opendrain(mut self) -> Pin<mode::OpenDrain, PIN> {
+        unsafe { self.pin.out_clear() };
+        unsafe { self.pin.make_output() };
+        Pin {
+            pin: self.pin,
+            _mode: PhantomData,
+        }
+    }
+
+    /// Convert this pin into an open-drain output pin, setting the state to high.
+    /// See [Digital Output Open Drain](#digital-output-open-drain)
+    pub fn into_opendrain_high(mut self) -> Pin<mode::OpenDrain, PIN> {
+        unsafe { self.pin.make_input(false) };
         Pin {
             pin: self.pin,
             _mode: PhantomData,
@@ -297,6 +324,65 @@ impl<PIN: PinOps> OutputPin for Pin<mode::Output, PIN> {
     fn set_low(&mut self) -> Result<(), Self::Error> {
         self.set_low();
         Ok(())
+    }
+}
+
+/// # Digital Output Open Drain
+impl<PIN: PinOps> Pin<mode::OpenDrain, PIN> {
+    /// Set the pin high (Input without PullUp so it is floating)
+    #[inline]
+    pub fn set_high(&mut self) {
+        unsafe { self.pin.make_input(false) }
+    }
+
+    /// Set pin low (pull it to GND, Output to low).
+    #[inline]
+    pub fn set_low(&mut self) {
+        unsafe { self.pin.make_output() }
+    }
+
+    /// Check whether the pin is set high.
+    ///
+    /// *Note*: The electrical state of the pin might differ due to external circuitry.
+    #[inline]
+    pub fn is_high(&self) -> bool {
+        unsafe { self.pin.in_get() }
+    }
+
+    /// Check whether the pin is set low.
+    ///
+    /// *Note*: The electrical state of the pin might differ due to external circuitry.
+    #[inline]
+    pub fn is_low(&self) -> bool {
+        !self.is_high()
+    }
+}
+
+// Implements OutputPin from embedded-hal to make sure external libraries work
+impl<PIN: PinOps> OutputPin for Pin<mode::OpenDrain, PIN> {
+    type Error = core::convert::Infallible;
+
+    fn set_high(&mut self) -> Result<(), Self::Error> {
+        self.set_high();
+        Ok(())
+    }
+
+    fn set_low(&mut self) -> Result<(), Self::Error> {
+        self.set_low();
+        Ok(())
+    }
+}
+
+// Implements InputPin from embedded-hal to make sure external libraries work
+impl<PIN: PinOps> InputPin for Pin<mode::OpenDrain, PIN> {
+    type Error = core::convert::Infallible;
+
+    fn is_high(&self) -> Result<bool, Self::Error> {
+        Ok(self.is_high())
+    }
+
+    fn is_low(&self) -> Result<bool, Self::Error> {
+        Ok(self.is_low())
     }
 }
 

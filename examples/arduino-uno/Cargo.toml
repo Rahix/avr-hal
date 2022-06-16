@@ -11,7 +11,7 @@ ufmt = "0.1.0"
 nb = "0.1.2"
 embedded-hal = "0.2.3"
 pwm-pca9685 = "0.3.1"
-hash32 = "0.2.1"
+infrared = "0.14.1"
 
 [dependencies.arduino-hal]
 path = "../../arduino-hal/"
@@ -22,4 +22,8 @@ version = "0.3"
 
 [dependencies.either]
 version = "1.6.1"
+default-features = false
+
+[dependencies.void]
+version = "*"
 default-features = false
