@@ -39,5 +39,5 @@ exclude = [
 ]
 
 [patch.crates-io]
-# XXX: Temporary fix for avr-rust/rust#148
-ufmt = { git = "https://github.com/Rahix/ufmt.git", rev = "12225dc1678e42fecb0e8635bf80f501e24817d9" }
+# XXX: fix i32 / u32 uDebug impl for 16-bit pointer width by mrk-its
+ufmt = { git = "https://github.com/mrk-its/ufmt.git", rev = "e6e574625e89bce9a5cb907eae43bfd45672f768" }

@@ -51,7 +51,16 @@ pub mod port;
 #[cfg(feature = "device-selected")]
 pub use port::Pins;
 
+#[cfg(feature = "device-selected")]
+pub mod time;
+
+/// HAL token
 pub struct Attiny;
+
+#[doc(hidden)] // to be used in macros
+pub use crate::Attiny as HAL;
+#[doc(hidden)] // to be used in macros
+pub use avr_device;
 
 #[cfg(feature = "attiny85")]
 #[macro_export]

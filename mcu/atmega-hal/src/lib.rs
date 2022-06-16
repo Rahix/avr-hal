@@ -100,7 +100,16 @@ pub mod wdt;
 #[cfg(feature = "device-selected")]
 pub use wdt::Wdt;
 
+#[cfg(feature = "device-selected")]
+pub mod time;
+
+/// HAL token
 pub struct Atmega;
+
+#[doc(hidden)] // to be used in macros
+pub use crate::Atmega as HAL;
+#[doc(hidden)] // to be used in macros
+pub use avr_device;
 
 #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
 #[macro_export]
