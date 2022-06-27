@@ -28,6 +28,9 @@ compile_error!(
     "
 );
 
+#[cfg(feature = "attiny84")]
+pub use avr_device::attiny84 as pac;
+
 /// Reexport of `attiny85` from `avr-device`
 #[cfg(feature = "attiny85")]
 pub use avr_device::attiny85 as pac;
@@ -53,6 +56,13 @@ pub use port::Pins;
 
 pub struct Attiny;
 
+#[cfg(feature = "attiny84")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB)
+    };
+}
 #[cfg(feature = "attiny85")]
 #[macro_export]
 macro_rules! pins {

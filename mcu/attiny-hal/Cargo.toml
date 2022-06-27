@@ -7,6 +7,7 @@ edition = "2018"
 [features]
 rt = ["avr-device/rt"]
 device-selected = []
+attiny84 = ["avr-device/attiny84", "device-selected"]
 attiny85 = ["avr-device/attiny85", "device-selected"]
 attiny88 = ["avr-device/attiny88", "device-selected"]
 
