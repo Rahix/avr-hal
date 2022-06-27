@@ -548,8 +548,8 @@ macro_rules! impl_port_traditional {
             #[inline]
             unsafe fn out_toggle(&mut self) {
                 match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_pin_reg.modify(|r, w| {
-                        w.bits(r.bits() | self.mask)
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_pin_reg.write(|w| {
+                        w.bits(self.mask)
                     }),)+
                 }
             }
@@ -623,9 +623,7 @@ macro_rules! impl_port_traditional {
 
                 #[inline]
                 unsafe fn out_toggle(&mut self) {
-                    (*<$PinPort>::ptr()).$pin_pin_reg.modify(|r, w| {
-                        w.bits(r.bits() | (1 << $pin_num))
-                    })
+                    (*<$PinPort>::ptr()).$pin_pin_reg.write(|w| w.bits(1 << $pin_num))
                 }
 
                 #[inline]
