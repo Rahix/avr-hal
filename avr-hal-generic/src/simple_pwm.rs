@@ -2,8 +2,8 @@
 
 use core::marker::PhantomData;
 
-use crate::port::Pin;
 use crate::port::mode;
+use crate::port::Pin;
 
 /// Clock prescaler for PWM
 ///
@@ -55,7 +55,7 @@ impl<TC, PIN: PwmPinOps<TC>> IntoPwmPin<TC, PIN> for Pin<mode::Output, PIN> {
     fn into_pwm(self, _timer: &TC) -> Pin<mode::PwmOutput<TC>, PIN> {
         Pin {
             pin: self.pin,
-            _mode: PhantomData
+            _mode: PhantomData,
         }
     }
 }

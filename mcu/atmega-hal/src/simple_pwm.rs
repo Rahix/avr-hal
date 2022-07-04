@@ -2,7 +2,12 @@ use avr_hal_generic::simple_pwm::Prescaler;
 
 use crate::port::*;
 
-#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p", feature = "atmega328pb"))]
+#[cfg(any(
+    feature = "atmega48p",
+    feature = "atmega168",
+    feature = "atmega328p",
+    feature = "atmega328pb"
+))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC0` for PWM (pins `PD5`, `PD6`)
     ///
@@ -50,7 +55,12 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p", feature = "atmega328pb"))]
+#[cfg(any(
+    feature = "atmega48p",
+    feature = "atmega168",
+    feature = "atmega328p",
+    feature = "atmega328pb"
+))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC1` for PWM (pins `PB1`, `PB2`)
     ///
@@ -102,7 +112,12 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p", feature = "atmega328pb"))]
+#[cfg(any(
+    feature = "atmega48p",
+    feature = "atmega168",
+    feature = "atmega328p",
+    feature = "atmega328pb"
+))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC2` for PWM (pins `PB3`, `PD3`)
     ///
@@ -232,8 +247,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-
-#[cfg(any(feature = "atmega1280", feature="atmega2560"))]
+#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC0` for PWM (pins `PB7`, `PG5`)
     ///
@@ -281,7 +295,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega1280", feature="atmega2560"))]
+#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC1` for PWM (pins `PB5`, `PB6`, `PB7`)
     ///
@@ -339,7 +353,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega1280", feature="atmega2560"))]
+#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC2` for PWM (pins `PB4`, `PH6`)
     ///
@@ -392,7 +406,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega1280", feature="atmega2560"))]
+#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC3` for PWM (pins `PE3`, `PE4`, `PE5`)
     ///
@@ -455,7 +469,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega1280", feature="atmega2560"))]
+#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC4` for PWM (pins `PH3`, `PH4`, `PH5`)
     ///
@@ -518,7 +532,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega1280", feature="atmega2560"))]
+#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC5` for PWM (pins `PL3`, `PL4`, `PL5`)
     ///
