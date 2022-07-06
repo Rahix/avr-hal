@@ -7,12 +7,19 @@ Hardware Abstraction Layer for AVR microcontrollers and common boards (for examp
 ## Quickstart
 You need a nightly Rust compiler for compiling Rust code for AVR.  The correct version will be installed automatically due to the `rust-toolchain.toml` file.
 
-On Ubuntu, you'll need to install dependencies:
+Install dependencies:
 
-```bash
-sudo apt install avr-libc gcc-avr pkg-config avrdude
-```
-
+- Ubuntu
+  ```bash
+  sudo apt install avr-libc gcc-avr pkg-config avrdude
+  ```
+- Macos  
+  ```bash
+  xcode-select --install # if you haven't already done so
+  brew tap osx-cross/avr
+  brew install avr-gcc avrdude
+  ```
+  
 Next, install ["ravedude"](./ravedude), a tool which seamlessly integrates flashing your board into the usual cargo workflow:
 
 ```bash
