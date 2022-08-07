@@ -8,6 +8,7 @@
 #![cfg_attr(feature = "attiny85", doc = "**ATtiny85**.")]
 #![cfg_attr(feature = "attiny88", doc = "**ATtiny88**.")]
 #![cfg_attr(feature = "attiny167", doc = "**ATtiny167**.")]
+#![cfg_attr(feature = "attiny2313", doc = "**ATtiny2313**.")]
 //! This means that only items which are available for this MCU are visible.  If you are using
 //! a different chip, try building the documentation locally with:
 //!
@@ -27,6 +28,7 @@ compile_error!(
     * attiny85
     * attiny88
     * attiny167
+    * attiny2313
     "
 );
 
@@ -45,6 +47,10 @@ pub use avr_device::attiny88 as pac;
 #[cfg(feature = "attiny167")]
 pub use avr_device::attiny167 as pac;
 
+/// Reexport of `attiny2313` from `avr-device`
+#[cfg(feature = "attiny2313")]
+pub use avr_device::attiny2313 as pac;
+
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
 pub use avr_device::entry;
@@ -55,9 +61,10 @@ pub use pac::Peripherals;
 pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
 
-#[cfg(feature = "device-selected")]
+// ATtiny2313 does not have ADC and will not compile with this module
+#[cfg(all(feature = "device-selected", not(feature = "attiny2313")))]
 pub mod adc;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", not(feature = "attiny2313")))]
 pub use adc::Adc;
 
 #[cfg(feature = "device-selected")]
@@ -96,5 +103,12 @@ macro_rules! pins {
 macro_rules! pins {
     ($p:expr) => {
         $crate::Pins::new($p.PORTA, $p.PORTB)
+    };
+}
+#[cfg(feature = "attiny2313")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTD)
     };
 }

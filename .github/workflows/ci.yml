@@ -66,6 +66,10 @@ jobs:
             name: attiny167
             spec: attiny167
             crate: attiny-hal
+          - type: mcu
+            name: attiny2313
+            spec: attiny2313
+            crate: attiny-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
