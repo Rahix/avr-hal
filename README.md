@@ -11,7 +11,7 @@ Install dependencies:
 
 - Ubuntu
   ```bash
-  sudo apt install avr-libc gcc-avr pkg-config avrdude
+  sudo apt install avr-libc gcc-avr pkg-config avrdude libudev-dev cmake build-essential
   ```
 - Macos  
   ```bash
