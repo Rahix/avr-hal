@@ -12,14 +12,12 @@
     ]
   },
   "linker": "avr-gcc",
-  "linker-is-gnu": true,
   "llvm-target": "avr-unknown-unknown",
   "max-atomic-width": 8,
   "no-default-libraries": false,
   "pre-link-args": {
     "gcc": [
-      "-mmcu=atmega48p",
-      "-Wl,--as-needed"
+      "-mmcu=atmega48p"
     ]
   },
   "target-c-int-width": "16",
