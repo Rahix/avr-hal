@@ -32,6 +32,7 @@ members = [
     "examples/sparkfun-promicro",
     "examples/trinket-pro",
     "examples/trinket",
+    "examples/feather-32u4-rfm"
 ]
 exclude = [
     # The RAVEDUDE! Yeah!

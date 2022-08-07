@@ -1,0 +1,15 @@
+[package]
+name = "feather-32u4-rfm-examples"
+description = "Examples for the Adafruit Feather 32u4 RFM boards"
+version = "0.0.0"
+authors = ["Calvin Laurenson <calvin@laurenson.dev>"]
+edition = "2018"
+publish = false
+
+[dependencies]
+panic-halt = "0.2.0"
+embedded-hal = "0.2.3"
+
+[dependencies.arduino-hal]
+path = "../../arduino-hal/"
+features = ["feather-32u4-rfm"]
