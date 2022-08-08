@@ -31,6 +31,9 @@ SPECS = {
     "attiny167": {
         "cpu": "attiny167",
     },
+    "attiny2313": {
+        "cpu": "at90s2313",
+    },
 }
 
 COMMON = {
@@ -74,7 +77,7 @@ def main():
         spec = copy.deepcopy(upstream_spec)
         spec.update(COMMON)
         spec.update(settings)
-        spec["pre-link-args"]["gcc"][0] = f"-mmcu={mcu}"
+        spec["pre-link-args"]["gcc"][0] = f"-mmcu={settings['cpu']}"
 
         with open(f"avr-specs/avr-{mcu}.json", "w") as f:
             json.dump(spec, f, sort_keys=True, indent=2)
