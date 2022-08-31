@@ -952,6 +952,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
+#[cfg(any(feature = "atmega1284p"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC3` for PWM (pins `PB6`, `PB7`)
     pub struct Timer3Pwm {
