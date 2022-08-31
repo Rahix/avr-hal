@@ -852,7 +852,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(feature = "atmega1284p")]
+#[cfg(any(feature = "atmega1284p"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC1` for PWM (pins `PD5`, `PD4`)
     ///

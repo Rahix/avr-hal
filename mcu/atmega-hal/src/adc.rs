@@ -225,9 +225,7 @@ avr_hal_generic::impl_adc! {
     },
 }
 
-#[cfg(any(
-feature = "atmega1284p",
-))]
+#[cfg(any(feature = "atmega1284p"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
     peripheral: crate::pac::ADC,
