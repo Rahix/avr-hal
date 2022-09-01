@@ -22,6 +22,9 @@ SPECS = {
     "atmega2560": {
         "cpu": "atmega2560",
     },
+    "atmega1284p": {
+        "cpu": "atmega1284p",
+    },
     "attiny85": {
         "cpu": "attiny85",
     },
