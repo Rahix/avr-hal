@@ -5,11 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added a `--reset-delay` option as an alternative to interactively waiting
+  for the user to confirm board reset ([#275]).
+- Added support for newer Arduino Nano boards which have a different baudrate setting.
+  The board is called `nano-new` ([#247]).
+
 ### Fixed
 - Fixed bug in avrdude version number parsing code which didn't allow version
   numbers with more than two components ([#260]).
+- Fixed ATtiny85 avrdude config ([#274]).
 
+[#247]: https://github.com/Rahix/avr-hal/pull/247
 [#260]: https://github.com/Rahix/avr-hal/pull/260
+[#274]: https://github.com/Rahix/avr-hal/pull/274
+[#275]: https://github.com/Rahix/avr-hal/pull/275
 
 
 ## [0.1.4] - 2022-02-08
