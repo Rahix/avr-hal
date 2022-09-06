@@ -2,8 +2,6 @@ avr-hal ![Continuous Integration](https://github.com/Rahix/avr-hal/workflows/Con
 =======
 Hardware Abstraction Layer for AVR microcontrollers and common boards (for example Arduino).  Based on the [`avr-device`](https://github.com/Rahix/avr-device) crate.
 
-**This is a new version of `avr-hal`!  Older versions can be found in the `old` branch but will no longer get support.**
-
 ## Quickstart
 You need a nightly Rust compiler for compiling Rust code for AVR.  The correct version will be installed automatically due to the `rust-toolchain.toml` file.
 
