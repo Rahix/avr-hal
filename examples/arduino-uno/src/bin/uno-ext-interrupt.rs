@@ -10,7 +10,6 @@
 #![feature(abi_avr_interrupt)]
 
 use panic_halt as _;
-use core::ops::Range;
 use core::sync::atomic::{AtomicBool, Ordering};
 use arduino_hal::port::{mode, Pin};
 use either::*;
@@ -18,7 +17,7 @@ use either::*;
 static REVERSED: AtomicBool = AtomicBool::new(false);
 
 fn is_reversed() -> bool {
-    return REVERSED.load(Ordering::SeqCst);
+    REVERSED.load(Ordering::SeqCst)
 }
 
 #[avr_device::interrupt(atmega328p)]
@@ -27,7 +26,7 @@ fn INT0() {
     REVERSED.store(!current, Ordering::SeqCst);
 }
 
-fn blink_for_range(range : Range<u16>, leds : &mut[Pin<mode::Output>]) {
+fn blink_for_range(range: impl Iterator<Item = u16>, leds: &mut [Pin<mode::Output>]) {
     range.map(|i| i * 100).for_each(|ms| {
         let iter = if is_reversed() {
             Left(leds.iter_mut().rev())
@@ -63,6 +62,6 @@ fn main() -> ! {
 
     loop {
         blink_for_range(0..10, &mut leds);
-        blink_for_range(10..0, &mut leds);
+        blink_for_range((0..10).rev(), &mut leds);
     }
 }

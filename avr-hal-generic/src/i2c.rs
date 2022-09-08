@@ -404,7 +404,7 @@ macro_rules! impl_i2c_twi {
             > for $I2C
         {
             #[inline]
-            fn raw_setup<CLOCK: crate::clock::Clock>(&mut self, speed: u32) {
+            fn raw_setup<CLOCK: $crate::clock::Clock>(&mut self, speed: u32) {
                 // Calculate TWBR register value
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
                 self.twbr.write(|w| unsafe { w.bits(twbr as u8) });

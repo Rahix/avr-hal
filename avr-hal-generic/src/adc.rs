@@ -184,7 +184,7 @@ where
             // Measurement on current pin completed
             (Some(channel), false) if *channel == pin.channel() => {
                 self.reading_channel = None;
-                Ok(self.p.raw_read_adc().into())
+                Ok(self.p.raw_read_adc())
             }
             // Measurement on other pin is ongoing
             (Some(_), _) => {
@@ -298,7 +298,7 @@ macro_rules! impl_adc {
         $(#[$channel_attr])*
         impl $channel_ty {
             pub fn into_channel(self) -> $crate::adc::Channel<$HAL, $ADC> {
-                crate::adc::Channel::new(self)
+                $crate::adc::Channel::new(self)
             }
         }
         )*)?

@@ -1,4 +1,3 @@
-
 /*!
  * Example for receiving IR signals from a remote control using an [Irdroino] shield
  * and the [Infrared] crate.
