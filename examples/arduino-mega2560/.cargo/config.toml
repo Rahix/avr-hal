@@ -6,4 +6,3 @@ runner = "ravedude -cb 57600 mega2560"
 
 [unstable]
 build-std = ["core"]
-build-std-features = ["compiler-builtins-mangled-names"]

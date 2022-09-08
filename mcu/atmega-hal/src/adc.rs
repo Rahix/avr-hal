@@ -76,6 +76,7 @@ pub mod channel {
             feature = "atmega328p",
             feature = "atmega328pb",
             feature = "atmega48p",
+            feature = "atmega1284p",
         ),
         feature = "enable-extra-adc",
     ))]
@@ -85,7 +86,8 @@ pub mod channel {
             feature = "atmega168",
             feature = "atmega328p",
             feature = "atmega328pb",
-            feature = "atmega48p"
+            feature = "atmega48p",
+            feature = "atmega1284p",
         ),
         feature = "enable-extra-adc",
     ))]
@@ -98,6 +100,7 @@ pub mod channel {
         feature = "atmega328pb",
         feature = "atmega32u4",
         feature = "atmega48p",
+        feature = "atmega1284p",
     ))]
     pub struct Vbg;
     #[cfg(any(
@@ -108,6 +111,7 @@ pub mod channel {
         feature = "atmega328pb",
         feature = "atmega32u4",
         feature = "atmega48p",
+        feature = "atmega1284p",
     ))]
     pub struct Gnd;
     #[cfg(any(
@@ -218,5 +222,33 @@ avr_hal_generic::impl_adc! {
     channels: {
         channel::Vbg: 0b011110,
         channel::Gnd: 0b011111,
+    },
+}
+
+#[cfg(any(feature = "atmega1284p"))]
+avr_hal_generic::impl_adc! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
+    channel_id: crate::pac::adc::admux::MUX_A,
+    set_channel: |peripheral, id| {
+        peripheral.admux.modify(|_, w| w.mux().variant(id));
+    },
+    pins: {
+        port::PA0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
+        port::PA1: (crate::pac::adc::admux::MUX_A::ADC1, didr0::adc1d),
+        port::PA2: (crate::pac::adc::admux::MUX_A::ADC2, didr0::adc2d),
+        port::PA3: (crate::pac::adc::admux::MUX_A::ADC3, didr0::adc3d),
+        port::PA4: (crate::pac::adc::admux::MUX_A::ADC4, didr0::adc4d),
+        port::PA5: (crate::pac::adc::admux::MUX_A::ADC5, didr0::adc5d),
+    },
+    channels: {
+        #[cfg(feature = "enable-extra-adc")]
+        channel::ADC6: crate::pac::adc::admux::MUX_A::ADC6,
+        #[cfg(feature = "enable-extra-adc")]
+        channel::ADC7: crate::pac::adc::admux::MUX_A::ADC7,
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }

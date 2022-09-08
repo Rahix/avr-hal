@@ -24,6 +24,12 @@ pub mod mode {
     impl Io for OpenDrain {}
     impl crate::Sealed for OpenDrain {}
 
+    pub struct PwmOutput<TC> {
+        pub(crate) _timer: PhantomData<TC>,
+    }
+    impl<TC> super::PinMode for PwmOutput<TC> {}
+    impl<TC> crate::Sealed for PwmOutput<TC> {}
+
     pub trait InputMode: crate::Sealed {}
 
     /// Pin is configured as digital input (floating or pulled-up).
@@ -548,8 +554,8 @@ macro_rules! impl_port_traditional {
             #[inline]
             unsafe fn out_toggle(&mut self) {
                 match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_pin_reg.modify(|r, w| {
-                        w.bits(r.bits() | self.mask)
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_pin_reg.write(|w| {
+                        w.bits(self.mask)
                     }),)+
                 }
             }
@@ -623,9 +629,7 @@ macro_rules! impl_port_traditional {
 
                 #[inline]
                 unsafe fn out_toggle(&mut self) {
-                    (*<$PinPort>::ptr()).$pin_pin_reg.modify(|r, w| {
-                        w.bits(r.bits() | (1 << $pin_num))
-                    })
+                    (*<$PinPort>::ptr()).$pin_pin_reg.write(|w| w.bits(1 << $pin_num))
                 }
 
                 #[inline]

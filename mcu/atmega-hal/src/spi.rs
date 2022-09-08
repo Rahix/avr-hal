@@ -76,3 +76,22 @@ avr_hal_generic::impl_spi! {
     miso: port::PC0,
     cs: port::PE2,
 }
+
+#[cfg(any(feature = "atmega1284p"))]
+pub type Spi = avr_hal_generic::spi::Spi<
+    crate::Atmega,
+    crate::pac::SPI,
+    port::PB7,
+    port::PB5,
+    port::PB6,
+    port::PB4,
+>;
+#[cfg(any(feature = "atmega1284p"))]
+avr_hal_generic::impl_spi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::SPI,
+    sclk: port::PB7,
+    mosi: port::PB5,
+    miso: port::PB6,
+    cs: port::PB4,
+}
