@@ -12,6 +12,7 @@ pub struct AvrdudeOptions<'a> {
 
 #[derive(Debug)]
 pub struct Avrdude {
+    #[allow(dead_code)]
     config: tempfile::NamedTempFile,
     process: process::Child,
 }
