@@ -35,7 +35,7 @@ SPECS = {
         "cpu": "attiny167",
     },
     "attiny2313": {
-        "cpu": "at90s2313",
+        "cpu": "attiny2313",
     },
 }
 

@@ -1,7 +1,7 @@
 {
   "arch": "avr",
   "atomic-cas": false,
-  "cpu": "at90s2313",
+  "cpu": "attiny2313",
   "data-layout": "e-P1-p:16:8-i8:8-i16:8-i32:8-i64:8-f32:8-f64:8-n8-a:8",
   "eh-frame-header": false,
   "exe-suffix": ".elf",
@@ -17,7 +17,7 @@
   "no-default-libraries": false,
   "pre-link-args": {
     "gcc": [
-      "-mmcu=at90s2313"
+      "-mmcu=attiny2313"
     ]
   },
   "target-c-int-width": "16",
