@@ -7,6 +7,9 @@ You need a nightly Rust compiler for compiling Rust code for AVR.  The correct v
 
 Install dependencies:
 
+- Windows
+[See here](https://github.com/Rahix/avr-hal/wiki/Setting-up-environment) on how to setup and install avr-gcc for windows.
+
 - Ubuntu
   ```bash
   sudo apt install avr-libc gcc-avr pkg-config avrdude libudev-dev build-essential
