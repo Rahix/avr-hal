@@ -19,7 +19,7 @@ Install dependencies:
   ```
 - Windows
 
-  Install Scoop
+  Install Scoop using Powershell
   ```PowerShell
   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Needed to run a remote script the first time
   irm get.scoop.sh | iex
@@ -29,7 +29,7 @@ Install dependencies:
   scoop install avr-gcc
   scoop install avrdude
   ```
-  [See here](https://github.com/Rahix/avr-hal/wiki/Setting-up-environment) for more information.
+  See [Setting up environment](https://github.com/Rahix/avr-hal/wiki/Setting-up-environment) for more information.
   
 Next, install ["ravedude"](./ravedude), a tool which seamlessly integrates flashing your board into the usual cargo workflow:
 
