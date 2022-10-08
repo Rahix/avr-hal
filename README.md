@@ -18,6 +18,7 @@ Install dependencies:
   brew install avr-gcc avrdude
   ```
 - Windows
+
   Install Scoop
   ```PowerShell
   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Needed to run a remote script the first time
