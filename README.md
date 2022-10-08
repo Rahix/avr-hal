@@ -7,24 +7,6 @@ You need a nightly Rust compiler for compiling Rust code for AVR.  The correct v
 
 Install dependencies:
 
-- Windows
-
-  Install Scoop
-  ```powershell
-  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Needed to run a remote script the first time
-  irm get.scoop.sh | iex
-
-  ```
-  Install scoop install avr-gcc and avrdude
-
-
-  ```
-   scoop install avr-gcc
-   scoop install avrdude
-  ```
-
-   [See here](https://github.com/Rahix/avr-hal/wiki/Setting-up-environment) for more information.
-
 - Ubuntu
   ```bash
   sudo apt install avr-libc gcc-avr pkg-config avrdude libudev-dev build-essential
@@ -35,6 +17,18 @@ Install dependencies:
   brew tap osx-cross/avr
   brew install avr-gcc avrdude
   ```
+- Windows
+  Install Scoop
+  ```PowerShell
+  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Needed to run a remote script the first time
+  irm get.scoop.sh | iex
+  ```
+  Install avr-gcc and avrdude
+  ```
+  scoop install avr-gcc
+  scoop install avrdude
+  ```
+  [See here](https://github.com/Rahix/avr-hal/wiki/Setting-up-environment) for more information.
   
 Next, install ["ravedude"](./ravedude), a tool which seamlessly integrates flashing your board into the usual cargo workflow:
 
