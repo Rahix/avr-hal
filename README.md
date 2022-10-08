@@ -19,7 +19,7 @@ Install dependencies:
   ```
 - Windows
 
-  Install {Scoop](https://scoop.sh/) using Powershell
+  Install [Scoop](https://scoop.sh/) using Powershell
   ```PowerShell
   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Needed to run a remote script the first time
   irm get.scoop.sh | iex
