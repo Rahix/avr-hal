@@ -11,20 +11,19 @@ Install dependencies:
 
   Install Scoop
   ```powershell
-  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Optional: Needed to run a remote script the first time
+  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Needed to run a remote script the first time
   irm get.scoop.sh | iex
 
   ```
-Install scoop install avr-gcc and avrdude
+  Install scoop install avr-gcc and avrdude
 
 
   ```
-scoop install avr-gcc
-scoop install avrdude
-
+   scoop install avr-gcc
+   scoop install avrdude
   ```
 
-[See here](https://github.com/Rahix/avr-hal/wiki/Setting-up-environment) for more information.
+   [See here](https://github.com/Rahix/avr-hal/wiki/Setting-up-environment) for more information.
 
 - Ubuntu
   ```bash
