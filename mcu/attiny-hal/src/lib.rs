@@ -60,6 +60,7 @@ pub use pac::Peripherals;
 
 pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
+pub use avr_hal_generic::prelude;
 
 // ATtiny2313 does not have ADC and will not compile with this module
 #[cfg(all(feature = "device-selected", not(feature = "attiny2313")))]

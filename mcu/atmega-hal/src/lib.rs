@@ -74,6 +74,7 @@ pub use pac::Peripherals;
 
 pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
+pub use avr_hal_generic::prelude;
 
 #[cfg(feature = "device-selected")]
 pub mod adc;
