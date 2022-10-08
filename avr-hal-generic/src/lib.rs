@@ -27,10 +27,6 @@ pub mod wdt;
 
 /// Prelude containing all HAL traits
 pub mod prelude {
-    pub use hal::digital::v2::InputPin as _;
-    pub use hal::digital::v2::OutputPin as _;
-    pub use hal::digital::v2::StatefulOutputPin as _;
-    pub use hal::digital::v2::ToggleableOutputPin as _;
     pub use hal::prelude::*;
     pub use ufmt::uWrite as _;
     pub use void::ResultVoidErrExt as _;
