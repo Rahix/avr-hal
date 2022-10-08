@@ -16,7 +16,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: nightly-2021-01-07
+          toolchain: nightly-2022-06-13
           override: true
           components: rust-src
       - name: Build documentation (arduino-hal)
