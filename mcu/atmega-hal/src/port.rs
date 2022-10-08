@@ -1,3 +1,5 @@
+pub use avr_hal_generic::port::{mode, PinOps, PinMode};
+
 #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {

@@ -474,8 +474,6 @@ macro_rules! impl_port_traditional {
                                         $pin_ddr_reg:ident),)+
         }
     ) => {
-        pub use $crate::port::mode;
-
         /// Type-alias for a pin type which can represent any concrete pin.
         ///
         /// Sometimes it is easier to handle pins if they are all of the same type.  By default,
