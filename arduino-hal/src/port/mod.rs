@@ -1,7 +1,7 @@
 //! GPIO & Pin control.
 //!
 //! This module contains a [`Pins`] struct which represents all pins of the board.  The [`Pins`]
-//! struct is most easily constructed using the [`arduino_hal::pins!()`][pins] macro:
+//! struct is most easily constructed using the [`arduino_hal::pins!()`][crate::pins] macro:
 //!
 //! ```no_run
 //! let dp = arduino_hal::Peripherals::take().unwrap();

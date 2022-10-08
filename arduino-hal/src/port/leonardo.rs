@@ -5,7 +5,7 @@ avr_hal_generic::renamed_pins! {
 
     /// Pins of the **Arduino Leonardo**.
     ///
-    /// This struct is best initialized via the [`arduino_hal::pins!()`][pins] macro.
+    /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
     pub struct Pins from atmega_hal::Pins {
         /// `D0` / `RX`
         ///
