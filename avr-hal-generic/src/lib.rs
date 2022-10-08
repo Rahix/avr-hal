@@ -28,9 +28,9 @@ pub mod wdt;
 /// Prelude containing all HAL traits
 pub mod prelude {
     pub use hal::prelude::*;
-    pub use ufmt::uWrite as _;
-    pub use void::ResultVoidErrExt as _;
-    pub use void::ResultVoidExt as _;
+    pub use ufmt::uWrite as _ufmt_uWrite;
+    pub use void::ResultVoidErrExt as _void_ResultVoidErrExt;
+    pub use void::ResultVoidExt as _void_ResultVoidExt;
 }
 
 // For making certain traits unimplementable from outside this crate.
