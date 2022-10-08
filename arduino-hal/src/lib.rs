@@ -172,6 +172,8 @@ pub use usart::Usart;
 
 #[cfg(feature = "mcu-atmega")]
 pub mod prelude {
+    pub use crate::hal::prelude::*;
+
     cfg_if::cfg_if! {
         if #[cfg(any(
             feature = "arduino-diecimila",
@@ -183,10 +185,6 @@ pub mod prelude {
             pub use crate::hal::usart::BaudrateExt as _;
         }
     }
-
-    pub use ufmt::uWrite as _;
-    pub use void::ResultVoidErrExt as _;
-    pub use void::ResultVoidExt as _;
 }
 
 /// Convenience macro to instanciate the [`Pins`] struct for this board.
