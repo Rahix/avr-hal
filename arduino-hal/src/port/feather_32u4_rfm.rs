@@ -6,7 +6,7 @@ avr_hal_generic::renamed_pins! {
 
     /// Pins of the **Adafruit Feather 32u4 RFM69 and RFM9* **.
     ///
-    /// This struct is best initialized via the [`arduino_hal::pins!()`][pins] macro.
+    /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
     /// [Reference](https://github.com/adafruit/Adafruit-Feather-32u4-Basic-Proto-PCB/blob/master/Adafruit%20Feather%2032u4%20Basic%20Proto%20Pinout.pdf)
     pub struct Pins from atmega_hal::Pins {
         /// `A0`
