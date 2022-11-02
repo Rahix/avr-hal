@@ -24,7 +24,7 @@ disable-device-selection-error = []
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-version = "0.3"
+version = "0.4"
 
 # Because this crate has its own check that at least one device is selected, we
 # can safely "circumvent" the check in `avr-device`.

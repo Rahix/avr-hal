@@ -18,7 +18,7 @@ path = "../../arduino-hal/"
 features = ["arduino-uno"]
 
 [dependencies.avr-device]
-version = "0.3"
+version = "0.4"
 
 [dependencies.either]
 version = "1.6.1"
