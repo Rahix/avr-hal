@@ -388,6 +388,67 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::WriteRead
     }
 }
 
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::Transactional
+    for I2c<H, I2C, SDA, SCL, CLOCK>
+{
+    type Error = Error;
+
+    fn exec<'a>(
+        &mut self,
+        address: u8,
+        operations: &mut [hal::blocking::i2c::Operation<'a>],
+    ) -> Result<(), Self::Error> {
+        let mut op_iter = operations.iter_mut();
+
+        // Figure out what kind of operation we are starting with
+        let first_op = match op_iter.next() {
+            // No operations, return right away
+            None => return Ok(()),
+            Some(op) => op,
+        };
+
+        // Process the first operation and find the data direction
+        let mut cur_dir = match first_op {
+            hal::blocking::i2c::Operation::Write(bytes) => {
+                self.p.raw_start(address, Direction::Write)?;
+                self.p.raw_write(bytes)?;
+                Direction::Write
+            }
+            hal::blocking::i2c::Operation::Read(buffer) => {
+                self.p.raw_start(address, Direction::Read)?;
+                self.p.raw_read(buffer)?;
+                Direction::Read
+            }
+        };
+
+        for op in op_iter {
+            match op {
+                hal::blocking::i2c::Operation::Write(bytes) => {
+                    if cur_dir != Direction::Write {
+                        // Was reading, now writing
+                        self.p.raw_start(address, Direction::Write)?;
+                        cur_dir = Direction::Write;
+                    }
+                    self.p.raw_write(bytes)?;
+                }
+                hal::blocking::i2c::Operation::Read(buffer) => {
+                    if cur_dir != Direction::Read {
+                        // Was writing, now reading
+                        self.p.raw_start(address, Direction::Read)?;
+                        cur_dir = Direction::Read;
+                    }
+                    self.p.raw_read(buffer)?;
+                }
+            }
+        }
+
+        // Always send a stop if any operations occured
+        self.p.raw_stop()?;
+
+        Ok(())
+    }
+}
+
 #[macro_export]
 macro_rules! impl_i2c_twi {
     (
