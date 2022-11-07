@@ -20,6 +20,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "trinket-pro" => Box::new(TrinketPro),
         "trinket" => Box::new(Trinket),
         "nano168" => Box::new(Nano168),
+        "kontrolir" => Box::new(AnalysirKontrolir),
         _ => return None,
     })
 }
@@ -253,6 +254,33 @@ impl Board for ArduinoDiecimila {
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         Some(Err(anyhow::anyhow!("Not able to guess port")))
+    }
+}
+
+struct AnalysirKontrolir;
+
+impl Board for AnalysirKontrolir {
+    fn display_name(&self) -> &str {
+        "AnalysIR KontroLIR"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        None
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "arduino",
+            partno: "atmega328pb",
+            baudrate: None,
+            do_chip_erase: true,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        Some(find_port_from_vid_pid_list(&[
+            (0x1a86, 0x7523),
+        ]))
     }
 }
 

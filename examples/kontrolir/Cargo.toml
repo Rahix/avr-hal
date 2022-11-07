@@ -1,0 +1,18 @@
+[package]
+name = "kontrolir"
+version = "0.1.0"
+authors = ["Johan Kristell <johan@jott.se>"]
+edition = "2018"
+
+[dependencies]
+panic-halt = "0.2.0"
+ufmt = "0.1.0"
+nb = "0.1.2"
+embedded-hal = "0.2.3"
+
+[dependencies.arduino-hal]
+path = "../../arduino-hal/"
+features = ["kontrolir"]
+
+[dependencies.avr-device]
+version = "0.3"
