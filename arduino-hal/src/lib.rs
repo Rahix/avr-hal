@@ -9,6 +9,7 @@
 #![cfg_attr(feature = "arduino-diecimila", doc = "**Arduino Diecimila**.")]
 #![cfg_attr(feature = "arduino-leonardo", doc = "**Arduino Leonardo**.")]
 #![cfg_attr(feature = "arduino-mega2560", doc = "**Arduino Mega 2560**.")]
+#![cfg_attr(feature = "arduino-mega1280", doc = "**Arduino Mega 1280**.")]
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
@@ -54,6 +55,7 @@ compile_error!(
     * arduino-diecimila
     * arduino-leonardo
     * arduino-mega2560
+    * arduino-mega1280
     * arduino-nano
     * arduino-uno
     * sparkfun-promicro
@@ -178,6 +180,7 @@ pub mod prelude {
         if #[cfg(any(
             feature = "arduino-diecimila",
             feature = "arduino-mega2560",
+            feature = "arduino-mega1280",
             feature = "arduino-uno"
         ))] {
             pub use crate::hal::usart::BaudrateArduinoExt as _;
@@ -231,6 +234,7 @@ macro_rules! default_serial {
 #[cfg(any(
     feature = "arduino-diecimila",
     feature = "arduino-mega2560",
+    feature = "arduino-mega1280",
     feature = "arduino-uno"
 ))]
 #[macro_export]

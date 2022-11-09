@@ -23,10 +23,10 @@ pub use diecimila::*;
 mod leonardo;
 #[cfg(feature = "arduino-leonardo")]
 pub use leonardo::*;
-#[cfg(feature = "arduino-mega2560")]
-mod mega2560;
-#[cfg(feature = "arduino-mega2560")]
-pub use mega2560::*;
+#[cfg(any(feature = "arduino-mega2560", feature = "arduino-mega1280"))]
+mod mega;
+#[cfg(any(feature = "arduino-mega2560", feature = "arduino-mega1280"))]
+pub use mega::*;
 #[cfg(any(feature = "arduino-nano", feature = "arduino-uno", feature = "nano168"))]
 mod uno;
 #[cfg(any(feature = "arduino-nano", feature = "arduino-uno", feature = "nano168"))]
