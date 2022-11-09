@@ -3,8 +3,13 @@ pub use atmega_hal::port::{mode, Pin, PinOps, PinMode};
 avr_hal_generic::renamed_pins! {
     type Pin = Pin;
 
-    /// Pins of the **Arduino Mega 2560**.
-    ///
+    /// Pins of the **Arduino Mega 2560** and **Arduino Mega 1280**.
+    /// 
+    /// mega1280:
+    ///     https://www.arduino.cc/en/uploads/Main/arduino-mega-schematic.pdf
+    /// mega2560:
+    ///     https://www.arduino.cc/en/uploads/Main/arduino-mega2560-schematic.pdf
+    /// 
     /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
     pub struct Pins from atmega_hal::Pins {
         /// `D0` / `RX0`
