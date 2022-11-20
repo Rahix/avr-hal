@@ -6,6 +6,7 @@
 //!
 //! **Note**: This version of the documentation was built for
 #![cfg_attr(feature = "atmega48p", doc = "**ATmega48P**.")]
+#![cfg_attr(feature = "atmega8", doc = "**ATmega8**.")]
 #![cfg_attr(feature = "atmega168", doc = "**ATmega168**.")]
 #![cfg_attr(feature = "atmega328p", doc = "**ATmega328P**.")]
 #![cfg_attr(feature = "atmega328pb", doc = "**ATmega328PB**.")]
@@ -30,6 +31,7 @@ compile_error!(
     Please select one of the following
 
     * atmega48p
+    * atmega8
     * atmega168
     * atmega328p
     * atmega328pb
@@ -61,6 +63,9 @@ pub use avr_device::atmega32u4 as pac;
 /// Reexport of `atmega48p` from `avr-device`
 #[cfg(feature = "atmega48p")]
 pub use avr_device::atmega48p as pac;
+/// Reexport of `atmega8` from `avr-device`
+#[cfg(feature = "atmega8")]
+pub use avr_device::atmega8 as pac;
 /// Reexport of `atmega1284p` from `avr-device`
 #[cfg(feature = "atmega1284p")]
 pub use avr_device::atmega1284p as pac;
@@ -111,7 +116,7 @@ pub use wdt::Wdt;
 
 pub struct Atmega;
 
-#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
+#[cfg(any(feature = "atmega48p", feature = "atmega8", feature = "atmega168", feature = "atmega328p"))]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {

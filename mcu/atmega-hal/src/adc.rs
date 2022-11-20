@@ -128,6 +128,7 @@ pub mod channel {
     feature = "atmega328p",
     feature = "atmega328pb",
     feature = "atmega48p",
+    feature = "atmega8",
 ))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,

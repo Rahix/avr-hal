@@ -59,6 +59,10 @@ jobs:
             spec: atmega1284p
             crate: atmega-hal
           - type: mcu
+            name: atmega8
+            spec: atmega8
+            crate: atmega-hal
+          - type: mcu
             name: attiny85
             spec: attiny85
             crate: attiny-hal

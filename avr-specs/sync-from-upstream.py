@@ -10,6 +10,9 @@ SPECS = {
     "atmega48p": {
         "cpu": "atmega48p",
     },
+    "atmega8": {
+        "cpu": "atmega8",
+    },
     "atmega168": {
         "cpu": "atmega168",
     },
