@@ -4,6 +4,9 @@
 
 pub extern crate embedded_hal as hal;
 
+pub extern crate embedded_storage;
+
+
 #[doc(hidden)]
 pub extern crate avr_device;
 #[doc(hidden)]
@@ -24,6 +27,7 @@ pub mod simple_pwm;
 pub mod spi;
 pub mod usart;
 pub mod wdt;
+pub mod ep;
 
 /// Prelude containing all HAL traits
 pub mod prelude {

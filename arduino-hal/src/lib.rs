@@ -166,6 +166,16 @@ pub mod usart {
     pub type UsartReader<USART, RX, TX> =
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
+
+/// EEPROM controller
+pub mod ep {
+    pub use crate::hal::ep::*;
+    pub type Eeprom = crate::hal::ep::Eeprom;
+}
+#[doc(no_inline)]
+#[cfg(feature = "mcu-atmega")]
+pub use ep::Eeprom;
+
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use usart::Usart;
