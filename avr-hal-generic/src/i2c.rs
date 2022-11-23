@@ -538,7 +538,7 @@ macro_rules! impl_i2c_twi {
             #[inline]
             fn raw_stop(&mut self) -> Result<(), Error> {
                 self.twcr
-                    .write(|w| w.twen().set_bit().twint().set_bit().twsto().set_bit());
+                    .write(|w| w.twen().set_bit().twsto().set_bit());
                 Ok(())
             }
         }
