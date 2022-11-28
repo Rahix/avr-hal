@@ -7,9 +7,7 @@
 use arduino_hal::prelude::*;
 use panic_halt as _;
 
-// use embedded_hal::serial::Read;
-
-use embedded_storage::nor_flash::ReadNorFlash;
+// use embedded_storage::nor_flash::ReadNorFlash;
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -17,7 +15,7 @@ fn main() -> ! {
     let pins = arduino_hal::pins!(dp);
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    let mut ep = arduino_hal::Eeprom {};
+    let mut ep = arduino_hal::Eeprom::new(dp.EEPROM);
     let ep_capacity = ep.capacity();
     ufmt::uwriteln!(&mut serial, "eeprom capacity is:{}\r", ep_capacity).void_unwrap();
 

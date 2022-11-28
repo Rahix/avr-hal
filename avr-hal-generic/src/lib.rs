@@ -21,13 +21,13 @@ pub extern crate void;
 pub mod adc;
 pub mod clock;
 pub mod delay;
+pub mod eeprom;
 pub mod i2c;
 pub mod port;
 pub mod simple_pwm;
 pub mod spi;
 pub mod usart;
 pub mod wdt;
-pub mod ep;
 
 /// Prelude containing all HAL traits
 pub mod prelude {

@@ -110,9 +110,9 @@ pub mod wdt;
 pub use wdt::Wdt;
 
 #[cfg(feature = "device-selected")]
-pub mod ep;
+pub mod eeprom;
 #[cfg(feature = "device-selected")]
-pub use ep::Eeprom;
+pub use eeprom::Eeprom;
 
 
 pub struct Atmega;

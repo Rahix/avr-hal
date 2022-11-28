@@ -1,18 +1,25 @@
+pub use avr_hal_generic::eeprom::{EepromOps, OutOfBoundsError};
+
+pub type Eeprom = avr_hal_generic::eeprom::Eeprom<crate::Atmega, crate::pac::EEPROM>;
+
+///////////////////////////////////////////////////////////
 #[cfg(feature = "atmega48p")]
-avr_hal_generic::impl_atmega_eeprom! {
-    name: Eeprom,
+avr_hal_generic::impl_eeprom_atmega! {
+    hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
     capacity: 256,
+    addr_width: u8,
     set_address: |peripheral, address| {
-        peripheral.eearl.write(|w| w.bits(address as u8));
+        peripheral.eearl.write(|w| w.bits(address));
     },
 }
 
 #[cfg(feature = "atmega168")]
-avr_hal_generic::impl_atmega_eeprom! {
-    name: Eeprom,
+avr_hal_generic::impl_eeprom_atmega! {
+    hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
     capacity: 512,
+    addr_width: u16,
     set_address: |peripheral, address| {
         peripheral.eear.write(|w| w.bits(address));
     },
@@ -23,10 +30,11 @@ avr_hal_generic::impl_atmega_eeprom! {
     feature = "atmega328p",
     feature = "atmega32u4"
 ))]
-avr_hal_generic::impl_atmega_eeprom! {
-    name: Eeprom,
+avr_hal_generic::impl_eeprom_atmega! {
+    hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
     capacity: 1024,
+    addr_width: u16,
     set_address: |peripheral, address| {
         peripheral.eear.write(|w| w.bits(address));
     },
@@ -37,10 +45,11 @@ avr_hal_generic::impl_atmega_eeprom! {
     feature = "atmega1280",
     feature = "atmega1284p"
 ))]
-avr_hal_generic::impl_atmega_eeprom! {
-    name: Eeprom,
+avr_hal_generic::impl_eeprom_atmega! {
+    hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
     capacity: 4096,
+    addr_width: u16,
     set_address: |peripheral, address| {
         peripheral.eear.write(|w| w.bits(address));
     },
