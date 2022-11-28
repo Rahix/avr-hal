@@ -137,31 +137,33 @@ macro_rules! impl_eeprom_atmega {
         set_address: |$periph_var:ident, $address:ident| $set_address:block,
     ) => {
         mod helper {
+            #[inline]
             pub unsafe fn wait_read(regs: &$EEPROM) {
                 //Wait for completion of previous write.
                 while regs.eecr.read().eepe().bit_is_set() {}
             }
-
+            #[inline]
             pub unsafe fn set_address(regs: &$EEPROM, address: $addrwidth) {
                 wait_read(regs);
                 let $periph_var = regs;
                 let $address = address;
                 $set_address
             }
-
+            #[inline]
             pub unsafe fn set_erasewrite_mode(regs: &$EEPROM) {
                 regs.eecr.write(|w| {
                     // Set Master Write Enable bit, and and Erase+Write mode mode..
                     w.eempe().set_bit().eepm().val_0x00()
                 })
             }
-
+            #[inline]
             pub unsafe fn set_erase_mode(regs: &$EEPROM) {
                 regs.eecr.write(|w| {
                     // Set Master Write Enable bit, and Erase-only mode..
                     w.eempe().set_bit().eepm().val_0x01()
                 });
             }
+            #[inline]
             pub unsafe fn set_write_mode(regs: &$EEPROM) {
                 regs.eecr.write(|w| {
                     // Set Master Write Enable bit, and Write-only mode..
@@ -172,7 +174,6 @@ macro_rules! impl_eeprom_atmega {
         impl $crate::eeprom::EepromOps<$HAL> for $EEPROM {
             const CAPACITY: u16 = $capacity;
 
-            #[inline]
             fn raw_read_byte(&self, address: u16) -> u8 {
                 unsafe {
                     helper::set_address(self, address as $addrwidth);
@@ -181,7 +182,6 @@ macro_rules! impl_eeprom_atmega {
                 }
             }
 
-            #[inline]
             fn raw_write_byte(&mut self, address: u16, data: u8) {
                 unsafe {
                     helper::set_address(self, address as $addrwidth);
@@ -220,7 +220,6 @@ macro_rules! impl_eeprom_atmega {
                 }
             }
 
-            #[inline]
             fn raw_erase_byte(&mut self, address: u16) {
                 unsafe {
                     helper::set_address(self, address as $addrwidth);
@@ -244,30 +243,32 @@ macro_rules! impl_eeprom_attiny {
         set_address: |$periph_var:ident, $address:ident| $set_address:block,
     ) => {
         mod helper {
+            #[inline]
             pub unsafe fn wait_read(regs: &$EEPROM) {
                 while regs.eecr.read().eepe().bit_is_set() {}
             }
-
+            #[inline]
             pub unsafe fn set_address(regs: &$EEPROM, address: $addrwidth) {
                 wait_read(regs);
                 let $periph_var = regs;
                 let $address = address;
                 $set_address
             }
-
+            #[inline]
             pub unsafe fn set_erasewrite_mode(regs: &$EEPROM) {
                 regs.eecr.write(|w| {
                     // Set Master Write Enable bit...and and Erase+Write mode mode..
                     w.eempe().set_bit().eepm().atomic()
                 });
             }
-
+            #[inline]
             pub unsafe fn set_erase_mode(regs: &$EEPROM) {
                 regs.eecr.write(|w| {
                     // Set Master Write Enable bit, and Erase-only mode..
                     w.eempe().set_bit().eepm().erase()
                 });
             }
+            #[inline]
             pub unsafe fn set_write_mode(regs: &$EEPROM) {
                 regs.eecr.write(|w| {
                     // Set Master Write Enable bit, and Write-only mode..
@@ -278,7 +279,6 @@ macro_rules! impl_eeprom_attiny {
         impl $crate::eeprom::EepromOps<$HAL> for $EEPROM {
             const CAPACITY: u16 = $capacity;
 
-            #[inline]
             fn raw_read_byte(&self, offset: u16) -> u8 {
                 unsafe {
                     helper::set_address(self, offset as $addrwidth);
@@ -287,7 +287,6 @@ macro_rules! impl_eeprom_attiny {
                 }
             }
 
-            #[inline]
             fn raw_write_byte(&mut self, address: u16, data: u8) {
                 unsafe {
                     helper::set_address(self, address as $addrwidth);
@@ -326,7 +325,6 @@ macro_rules! impl_eeprom_attiny {
                 }
             }
 
-            #[inline]
             fn raw_erase_byte(&mut self, address: u16) {
                 unsafe {
                     helper::set_address(self, address as $addrwidth);
