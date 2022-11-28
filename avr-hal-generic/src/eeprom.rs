@@ -41,19 +41,19 @@ where
 
     #[inline]
     pub fn read_byte(&self, offset: u16) -> u8 {
-        assert!(offset < EEPROM::CAPACITY);
+        debug_assert!(offset < EEPROM::CAPACITY);
         self.p.raw_read_byte(offset)
     }
 
     #[inline]
     pub fn write_byte(&mut self, offset: u16, data: u8) {
-        assert!(offset < EEPROM::CAPACITY);
+        debug_assert!(offset < EEPROM::CAPACITY);
         avr_device::interrupt::free(|_cs| self.p.raw_write_byte(offset, data));
     }
 
     #[inline]
     pub fn erase_byte(&mut self, offset: u16) {
-        assert!(offset < EEPROM::CAPACITY);
+        debug_assert!(offset < EEPROM::CAPACITY);
         avr_device::interrupt::free(|_cs| self.p.raw_erase_byte(offset));
     }
 
