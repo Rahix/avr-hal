@@ -108,11 +108,11 @@ where
     const READ_SIZE: usize = 1;
 
     fn read(&mut self, offset: u32, bytes: &mut [u8]) -> Result<(), Self::Error> {
-        self.read(offset, bytes)
+        Eeprom::<H, EEPROM>::read(self, offset as u16, bytes)
     }
 
     fn capacity(&self) -> usize {
-        self.capacity() as usize
+        Eeprom::<H, EEPROM>::capacity(self) as usize
     }
 }
 
@@ -123,11 +123,11 @@ where
     const WRITE_SIZE: usize = 1;
     const ERASE_SIZE: usize = 1;
     fn erase(&mut self, from: u32, to: u32) -> Result<(), Self::Error> {
-        self.erase(from as u16, to as u16)
+        Eeprom::<H, EEPROM>::erase(self, from as u16, to as u16)
     }
 
     fn write(&mut self, offset: u32, bytes: &[u8]) -> Result<(), Self::Error> {
-        self.write(offset as u16, bytes)
+        Eeprom::<H, EEPROM>::write(self, offset as u16, bytes)
     }
 }
 // AVR supports multiple writes
@@ -137,14 +137,14 @@ impl<H, EEPROM> embedded_storage::nor_flash::MultiwriteNorFlash for Eeprom<H, EE
 }
 
 #[macro_export]
-macro_rules! impl_eeprom_normal {
+macro_rules! impl_eeprom_common {
     (
         hal: $HAL:ty,
         peripheral: $EEPROM:ty,
         capacity: $capacity:literal,
         addr_width: $addrwidth:ty,
         set_address: |$periph_var:ident, $address:ident| $set_address:block,
-        set_erasewrie_mode: |$periph_ewmode_var:ident| $set_erasewrie_mode:block,
+        set_erasewrite_mode: |$periph_ewmode_var:ident| $set_erasewrite_mode:block,
         set_erase_mode: |$periph_emode_var:ident| $set_erase_mode:block,
         set_write_mode: |$periph_wmode_var:ident| $set_write_mode:block,
     ) => {
@@ -188,7 +188,7 @@ macro_rules! impl_eeprom_normal {
 
                             {
                                 let $periph_ewmode_var = &self;
-                                $set_erasewrie_mode
+                                $set_erasewrite_mode
                             }
                             self.eecr.write(|w| w.eepe().set_bit()); // Start Erase+Write operation.
                         } else {
@@ -281,13 +281,13 @@ macro_rules! impl_eeprom_atmega {
             }
         }
 
-        $crate::impl_eeprom_normal! {
+        $crate::impl_eeprom_common! {
             hal: $HAL,
             peripheral: $EEPROM,
             capacity: $capacity,
             addr_width: $addrwidth,
             set_address: |peripheral, address| {atmega_helper::set_address(peripheral, address)},
-            set_erasewrie_mode: |peripheral| {atmega_helper::set_erasewrite_mode(peripheral)},
+            set_erasewrite_mode: |peripheral| {atmega_helper::set_erasewrite_mode(peripheral)},
             set_erase_mode: |peripheral| {atmega_helper::set_erase_mode(peripheral)},
             set_write_mode: |peripheral| {atmega_helper::set_write_mode(peripheral)},
         }
@@ -338,13 +338,13 @@ macro_rules! impl_eeprom_attiny {
             }
         }
 
-        $crate::impl_eeprom_normal! {
+        $crate::impl_eeprom_common! {
             hal: $HAL,
             peripheral: $EEPROM,
             capacity: $capacity,
             addr_width: $addrwidth,
             set_address: |peripheral, address| {attiny_helper::set_address(peripheral, address)},
-            set_erasewrie_mode: |peripheral| {attiny_helper::set_erasewrite_mode(peripheral)},
+            set_erasewrite_mode: |peripheral| {attiny_helper::set_erasewrite_mode(peripheral)},
             set_erase_mode: |peripheral| {attiny_helper::set_erase_mode(peripheral)},
             set_write_mode: |peripheral| {attiny_helper::set_write_mode(peripheral)},
         }
