@@ -11,10 +11,16 @@ pub struct OutOfBoundsError;
 pub trait EepromOps<H> {
     const CAPACITY: u16;
 
+    /// Read a single byte from offset `address`.  Does not do a bounds check.
+    ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
     fn raw_read_byte(&self, address: u16) -> u8;
+    /// Erase and write a single byte at offset `address`.  Does not do a bounds check.
+    ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
     fn raw_write_byte(&mut self, address: u16, data: u8);
+    /// Erase a single byte at offset `address`.  Does not do a bounds check.
+    ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
     fn raw_erase_byte(&mut self, address: u16);
 }
@@ -28,6 +34,9 @@ impl<H, EEPROM> Eeprom<H, EEPROM>
 where
     EEPROM: EepromOps<H>,
 {
+    pub const CAPACITY: u16 = EEPROM::CAPACITY;
+
+    #[inline]
     pub fn new(p: EEPROM) -> Self {
         Self {
             p,
@@ -36,29 +45,29 @@ where
     }
     #[inline]
     pub fn capacity(&self) -> u16 {
-        EEPROM::CAPACITY
+        Self::CAPACITY
     }
 
     #[inline]
     pub fn read_byte(&self, offset: u16) -> u8 {
-        debug_assert!(offset < EEPROM::CAPACITY);
+        assert!(offset < Self::CAPACITY);
         self.p.raw_read_byte(offset)
     }
 
     #[inline]
     pub fn write_byte(&mut self, offset: u16, data: u8) {
-        debug_assert!(offset < EEPROM::CAPACITY);
-        avr_device::interrupt::free(|_cs| self.p.raw_write_byte(offset, data));
+        assert!(offset < Self::CAPACITY);
+        self.p.raw_write_byte(offset, data)
     }
 
     #[inline]
     pub fn erase_byte(&mut self, offset: u16) {
-        debug_assert!(offset < EEPROM::CAPACITY);
-        avr_device::interrupt::free(|_cs| self.p.raw_erase_byte(offset));
+        assert!(offset < Self::CAPACITY);
+        self.p.raw_erase_byte(offset)
     }
 
     pub fn read(&self, offset: u16, buf: &mut [u8]) -> Result<(), OutOfBoundsError> {
-        if buf.len() as u16 + offset > EEPROM::CAPACITY {
+        if buf.len() as u16 + offset > Self::CAPACITY {
             return Err(OutOfBoundsError);
         }
         for (i, byte) in buf.iter_mut().enumerate() {
@@ -68,23 +77,23 @@ where
     }
 
     pub fn write(&mut self, offset: u16, buf: &[u8]) -> Result<(), OutOfBoundsError> {
-        if buf.len() as u16 + offset > EEPROM::CAPACITY {
+        if buf.len() as u16 + offset > Self::CAPACITY {
             return Err(OutOfBoundsError);
         }
 
         for (i, byte) in buf.iter().enumerate() {
-            avr_device::interrupt::free(|_cs| self.p.raw_write_byte(offset + i as u16, *byte));
+            self.p.raw_write_byte(offset + i as u16, *byte)
         }
         Ok(())
     }
 
     pub fn erase(&mut self, from: u16, to: u16) -> Result<(), OutOfBoundsError> {
-        if to > EEPROM::CAPACITY || from > to {
+        if to > Self::CAPACITY || from > to {
             return Err(OutOfBoundsError);
         }
 
         for i in from..to {
-            avr_device::interrupt::free(|_cs| self.p.raw_erase_byte(i));
+            self.p.raw_erase_byte(i)
         }
 
         Ok(())
@@ -128,6 +137,106 @@ impl<H, EEPROM> embedded_storage::nor_flash::MultiwriteNorFlash for Eeprom<H, EE
 }
 
 #[macro_export]
+macro_rules! impl_eeprom_normal {
+    (
+        hal: $HAL:ty,
+        peripheral: $EEPROM:ty,
+        capacity: $capacity:literal,
+        addr_width: $addrwidth:ty,
+        set_address: |$periph_var:ident, $address:ident| $set_address:block,
+        set_erasewrie_mode: |$periph_ewmode_var:ident| $set_erasewrie_mode:block,
+        set_erase_mode: |$periph_emode_var:ident| $set_erase_mode:block,
+        set_write_mode: |$periph_wmode_var:ident| $set_write_mode:block,
+    ) => {
+        impl $crate::eeprom::EepromOps<$HAL> for $EEPROM {
+            const CAPACITY: u16 = $capacity;
+
+            fn raw_read_byte(&self, address: u16) -> u8 {
+                unsafe {
+                    {
+                        let $periph_var = &self;
+                        let $address = address as $addrwidth;
+                        $set_address
+                    }
+
+                    self.eecr.write(|w| w.eere().set_bit());
+                    self.eedr.read().bits()
+                }
+            }
+
+            fn raw_write_byte(&mut self, address: u16, data: u8) {
+                unsafe {
+                    {
+                        let $periph_var = &self;
+                        let $address = address as $addrwidth;
+                        $set_address
+                    }
+
+                    //Start EEPROM read operation
+                    self.eecr.write(|w| w.eere().set_bit());
+                    let old_value = self.eedr.read().bits();
+                    let diff_mask = old_value ^ data;
+
+                    // Check if any bits are changed to '1' in the new value.
+                    if (diff_mask & data) != 0 {
+                        // Now we know that _some_ bits need to be erased to '1'.
+
+                        // Check if any bits in the new value are '0'.
+                        if data != 0xff {
+                            // Now we know that some bits need to be programmed to '0' also.
+                            self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
+
+                            {
+                                let $periph_ewmode_var = &self;
+                                $set_erasewrie_mode
+                            }
+                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase+Write operation.
+                        } else {
+                            // Now we know that all bits should be erased.
+                            {
+                                let $periph_emode_var = &self;
+                                $set_erase_mode
+                            }
+                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase-only operation.
+                        }
+                    }
+                    //Now we know that _no_ bits need to be erased to '1'.
+                    else {
+                        // Check if any bits are changed from '1' in the old value.
+                        if diff_mask != 0 {
+                            // Now we know that _some_ bits need to the programmed to '0'.
+                            self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
+                            {
+                                let $periph_wmode_var = &self;
+                                $set_write_mode
+                            }
+                            self.eecr.write(|w| w.eepe().set_bit()); // Start Write-only operation.
+                        }
+                    }
+                }
+            }
+
+            fn raw_erase_byte(&mut self, address: u16) {
+                unsafe {
+                    {
+                        let $periph_var = &self;
+                        let $address = address as $addrwidth;
+                        $set_address
+                    }
+                    // Now we know that all bits should be erased.
+                    {
+                        let $periph_emode_var = &self;
+                        $set_erase_mode
+                    }
+                    // Start Erase-only operation.
+                    self.eecr.write(|w| w.eepe().set_bit());
+                }
+            }
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! impl_eeprom_atmega {
     (
         hal: $HAL:ty,
@@ -136,7 +245,7 @@ macro_rules! impl_eeprom_atmega {
         addr_width: $addrwidth:ty,
         set_address: |$periph_var:ident, $address:ident| $set_address:block,
     ) => {
-        mod helper {
+        mod atmega_helper {
             #[inline]
             pub unsafe fn wait_read(regs: &$EEPROM) {
                 //Wait for completion of previous write.
@@ -171,64 +280,16 @@ macro_rules! impl_eeprom_atmega {
                 });
             }
         }
-        impl $crate::eeprom::EepromOps<$HAL> for $EEPROM {
-            const CAPACITY: u16 = $capacity;
 
-            fn raw_read_byte(&self, address: u16) -> u8 {
-                unsafe {
-                    helper::set_address(self, address as $addrwidth);
-                    self.eecr.write(|w| w.eere().set_bit());
-                    self.eedr.read().bits()
-                }
-            }
-
-            fn raw_write_byte(&mut self, address: u16, data: u8) {
-                unsafe {
-                    helper::set_address(self, address as $addrwidth);
-
-                    //Start EEPROM read operation
-                    self.eecr.write(|w| w.eere().set_bit());
-                    let old_value = self.eedr.read().bits();
-                    let diff_mask = old_value ^ data;
-
-                    // Check if any bits are changed to '1' in the new value.
-                    if (diff_mask & data) != 0 {
-                        // Now we know that _some_ bits need to be erased to '1'.
-
-                        // Check if any bits in the new value are '0'.
-                        if data != 0xff {
-                            // Now we know that some bits need to be programmed to '0' also.
-                            self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
-                            helper::set_erasewrite_mode(self);
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase+Write operation.
-                        } else {
-                            // Now we know that all bits should be erased.
-                            helper::set_erase_mode(self);
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase-only operation.
-                        }
-                    }
-                    //Now we know that _no_ bits need to be erased to '1'.
-                    else {
-                        // Check if any bits are changed from '1' in the old value.
-                        if diff_mask != 0 {
-                            // Now we know that _some_ bits need to the programmed to '0'.
-                            self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
-                            helper::set_write_mode(self);
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Write-only operation.
-                        }
-                    }
-                }
-            }
-
-            fn raw_erase_byte(&mut self, address: u16) {
-                unsafe {
-                    helper::set_address(self, address as $addrwidth);
-                    // Now we know that all bits should be erased.
-                    helper::set_erase_mode(self);
-                    // Start Erase-only operation.
-                    self.eecr.write(|w| w.eepe().set_bit());
-                }
-            }
+        $crate::impl_eeprom_normal! {
+            hal: $HAL,
+            peripheral: $EEPROM,
+            capacity: $capacity,
+            addr_width: $addrwidth,
+            set_address: |peripheral, address| {atmega_helper::set_address(peripheral, address)},
+            set_erasewrie_mode: |peripheral| {atmega_helper::set_erasewrite_mode(peripheral)},
+            set_erase_mode: |peripheral| {atmega_helper::set_erase_mode(peripheral)},
+            set_write_mode: |peripheral| {atmega_helper::set_write_mode(peripheral)},
         }
     };
 }
@@ -242,7 +303,7 @@ macro_rules! impl_eeprom_attiny {
         addr_width: $addrwidth:ty,
         set_address: |$periph_var:ident, $address:ident| $set_address:block,
     ) => {
-        mod helper {
+        mod attiny_helper {
             #[inline]
             pub unsafe fn wait_read(regs: &$EEPROM) {
                 while regs.eecr.read().eepe().bit_is_set() {}
@@ -276,64 +337,16 @@ macro_rules! impl_eeprom_attiny {
                 });
             }
         }
-        impl $crate::eeprom::EepromOps<$HAL> for $EEPROM {
-            const CAPACITY: u16 = $capacity;
 
-            fn raw_read_byte(&self, offset: u16) -> u8 {
-                unsafe {
-                    helper::set_address(self, offset as $addrwidth);
-                    self.eecr.write(|w| w.eere().set_bit());
-                    self.eedr.read().bits()
-                }
-            }
-
-            fn raw_write_byte(&mut self, address: u16, data: u8) {
-                unsafe {
-                    helper::set_address(self, address as $addrwidth);
-
-                    //Start EEPROM read operation
-                    self.eecr.write(|w| w.eere().set_bit());
-                    let old_value = self.eedr.read().bits();
-                    let diff_mask = old_value ^ data;
-
-                    // Check if any bits are changed to '1' in the new value.
-                    if (diff_mask & data) != 0 {
-                        // Now we know that _some_ bits need to be erased to '1'.
-
-                        // Check if any bits in the new value are '0'.
-                        if data != 0xff {
-                            // Now we know that some bits need to be programmed to '0' also.
-                            self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
-                            helper::set_erasewrite_mode(self);
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase+Write operation.
-                        } else {
-                            // Now we know that all bits should be erased.
-                            helper::set_erase_mode(self);
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase-only operation.
-                        }
-                    }
-                    //Now we know that _no_ bits need to be erased to '1'.
-                    else {
-                        // Check if any bits are changed from '1' in the old value.
-                        if diff_mask != 0 {
-                            // Now we know that _some_ bits need to the programmed to '0'.
-                            self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
-                            helper::set_write_mode(self);
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Write-only operation.
-                        }
-                    }
-                }
-            }
-
-            fn raw_erase_byte(&mut self, address: u16) {
-                unsafe {
-                    helper::set_address(self, address as $addrwidth);
-                    // Now we know that all bits should be erased.
-                    helper::set_erase_mode(self);
-                    // Start Erase-only operation.
-                    self.eecr.write(|w| w.eepe().set_bit());
-                }
-            }
+        $crate::impl_eeprom_normal! {
+            hal: $HAL,
+            peripheral: $EEPROM,
+            capacity: $capacity,
+            addr_width: $addrwidth,
+            set_address: |peripheral, address| {attiny_helper::set_address(peripheral, address)},
+            set_erasewrie_mode: |peripheral| {attiny_helper::set_erasewrite_mode(peripheral)},
+            set_erase_mode: |peripheral| {attiny_helper::set_erase_mode(peripheral)},
+            set_write_mode: |peripheral| {attiny_helper::set_write_mode(peripheral)},
         }
     };
 }

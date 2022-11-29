@@ -167,9 +167,13 @@ pub mod usart {
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
 
+#[cfg(feature = "board-selected")]
+pub mod eeprom {
+    pub use crate::hal::eeprom::{Eeprom, EepromOps, OutOfBoundsError};
+}
 #[doc(no_inline)]
-#[cfg(feature = "mcu-atmega")]
-pub use crate::hal::eeprom::Eeprom;
+#[cfg(feature = "board-selected")]
+pub use eeprom::Eeprom;
 
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]

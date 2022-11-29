@@ -4,9 +4,6 @@
 
 pub extern crate embedded_hal as hal;
 
-pub extern crate embedded_storage;
-
-
 #[doc(hidden)]
 pub extern crate avr_device;
 #[doc(hidden)]

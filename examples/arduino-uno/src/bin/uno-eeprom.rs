@@ -7,8 +7,6 @@
 use arduino_hal::prelude::*;
 use panic_halt as _;
 
-// use embedded_storage::nor_flash::ReadNorFlash;
-
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
@@ -19,8 +17,7 @@ fn main() -> ! {
     let ep_capacity = ep.capacity();
     ufmt::uwriteln!(&mut serial, "eeprom capacity is:{}\r", ep_capacity).void_unwrap();
 
-    // atmega328p eeprom size is 1024
-    let mut data = [0_u8; 1024];
+    let mut data = [0_u8; arduino_hal::Eeprom::CAPACITY as usize];
     let _start_address: u16 = 0;
 
     if ep.read(0, &mut data).is_err() {
@@ -32,5 +29,8 @@ fn main() -> ! {
     for i in data {
         ufmt::uwriteln!(&mut serial, "{}", i).void_unwrap();
     }
+
+    let _=ep.erase(0, arduino_hal::Eeprom::CAPACITY);
+
     loop {}
 }
