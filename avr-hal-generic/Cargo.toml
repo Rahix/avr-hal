@@ -10,6 +10,7 @@ nb = "0.1.2"
 ufmt = "0.1.0"
 paste = "1.0.0"
 avr-device = "0.4"
+embedded-storage = "0.2"
 
 [dependencies.embedded-hal]
 version = "0.2.3"

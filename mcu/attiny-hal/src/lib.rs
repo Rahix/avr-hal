@@ -76,6 +76,12 @@ pub use port::Pins;
 #[cfg(feature = "device-selected")]
 pub mod simple_pwm;
 
+#[cfg(feature = "device-selected")]
+pub mod eeprom;
+#[cfg(feature = "device-selected")]
+pub use eeprom::Eeprom;
+
+
 pub struct Attiny;
 
 #[cfg(feature = "attiny84")]

@@ -18,6 +18,7 @@ pub extern crate void;
 pub mod adc;
 pub mod clock;
 pub mod delay;
+pub mod eeprom;
 pub mod i2c;
 pub mod port;
 pub mod simple_pwm;
