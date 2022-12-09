@@ -15,6 +15,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "leonardo" => Box::new(ArduinoLeonardo),
         "micro" => Box::new(ArduinoMicro),
         "mega2560" => Box::new(ArduinoMega2560),
+        "mega1280" => Box::new(ArduinoMega1280),
         "diecimila" => Box::new(ArduinoDiecimila),
         "promicro" => Box::new(SparkFunProMicro),
         "trinket-pro" => Box::new(TrinketPro),
@@ -198,6 +199,34 @@ impl Board for ArduinoLeonardo {
         ]))
     }
 }
+
+
+struct ArduinoMega1280;
+
+impl Board for ArduinoMega1280 {
+    fn display_name(&self) -> &str {
+        "Arduino Mega 1280"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        None
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "arduino",
+            partno: "atmega1280",
+            baudrate: Some(57600),
+            do_chip_erase: false,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+       // This board uses a generic serial interface id 0403:6001 which is too common for auto detection.
+       Some(Err(anyhow::anyhow!("Unable to guess port.")))
+    }
+}
+
 
 struct ArduinoMega2560;
 

@@ -28,6 +28,9 @@ jobs:
             name: arduino-mega2560
             examples: true
           - type: board
+            name: arduino-mega1280
+            examples: true
+          - type: board
             name: sparkfun-promicro
             examples: true
           - type: board
