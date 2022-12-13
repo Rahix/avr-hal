@@ -1,4 +1,4 @@
-/**
+/*!
  * 
  * Code sample to work with 74HC595 shift register,
  * wired as in https://lastminuteengineers.com/74hc595-shift-register-arduino-tutorial/
