@@ -66,8 +66,8 @@ fn main() -> ! {
 
         for i in 0..8 {
             data |= 1 << i;
+            
             update_shift_register(&mut data_pin, &mut latch_pin, &mut clock_pin, &data);
-
             arduino_hal::delay_ms(500);
         }
     }
