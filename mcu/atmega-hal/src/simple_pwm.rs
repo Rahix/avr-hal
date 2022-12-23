@@ -1066,7 +1066,7 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer2Pwm {
         timer: crate::pac::TC2,
         init: |tim, prescaler| {
-            tim.tccr2.modify(|_r, w| w.wgm2().pwm_fast());
+            tim.tccr2.modify(|_r, w| w.wgm20().set_bit().wgm21().set_bit());
             tim.tccr2.modify(|_r, w| match prescaler {
                     Prescaler::Direct => w.cs2().direct(),
                     Prescaler::Prescale8 => w.cs2().prescale_8(),
