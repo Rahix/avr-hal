@@ -58,7 +58,7 @@ avr_hal_generic::impl_eeprom_atmega! {
 #[cfg(any(
     feature = "atmega8"
 ))]
-avr_hal_generic::impl_eeprom_atmega8! {
+avr_hal_generic::impl_eeprom_atmega_old! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
     capacity: 512,

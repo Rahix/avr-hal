@@ -237,7 +237,7 @@ macro_rules! impl_eeprom_common {
 }
 
 #[macro_export]
-macro_rules! impl_eeprom_atmega8 {
+macro_rules! impl_eeprom_atmega_old {
     (
         hal: $HAL:ty,
         peripheral: $EEPROM:ty,
