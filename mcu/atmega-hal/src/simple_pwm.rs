@@ -992,3 +992,98 @@ avr_hal_generic::impl_simple_pwm! {
         },
     }
 }
+
+#[cfg(any(
+    feature = "atmega8",
+))]
+avr_hal_generic::impl_simple_pwm! {
+    /// Use `TC1` for PWM (pins `PB1`, `PB2`)
+    ///
+    /// # Example
+    /// ```
+    /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
+    ///
+    /// let mut b1 = pins.b1.into_output().into_pwm(&mut timer1);
+    /// let mut b2 = pins.b2.into_output().into_pwm(&mut timer1);
+    ///
+    /// d9.set_duty(128);
+    /// d9.enable();
+    /// ```
+    pub struct Timer1Pwm {
+        timer: crate::pac::TC1,
+        init: |tim, prescaler| {
+            tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
+            tim.tccr1b.modify(|_r, w| {
+                w.wgm1().bits(0b01);
+
+                match prescaler {
+                    Prescaler::Direct => w.cs1().direct(),
+                    Prescaler::Prescale8 => w.cs1().prescale_8(),
+                    Prescaler::Prescale64 => w.cs1().prescale_64(),
+                    Prescaler::Prescale256 => w.cs1().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs1().prescale_1024(),
+                }
+            });
+        },
+        pins: {
+            PB1: {
+                ocr: ocr1a,
+                into_pwm: |tim| if enable {
+                    tim.tccr1a.modify(|_r, w| w.com1a().match_clear());
+                } else {
+                    tim.tccr1a.modify(|_r, w| w.com1a().disconnected());
+                },
+            },
+
+            PB2: {
+                ocr: ocr1b,
+                into_pwm: |tim| if enable {
+                    tim.tccr1a.modify(|_r, w| w.com1b().match_clear());
+                } else {
+                    tim.tccr1a.modify(|_r, w| w.com1b().disconnected());
+                },
+            },
+        },
+    }
+}
+
+#[cfg(any(
+    feature = "atmega8",
+))]
+avr_hal_generic::impl_simple_pwm! {
+    /// Use `TC2` for PWM (pins `PB3`, `PD3`)
+    ///
+    /// # Example
+    /// ```
+    /// let mut timer2 = Timer2Pwm::new(dp.TC2, Prescaler::Prescale64);
+    ///
+    /// let mut d11 = pins.d11.into_output().into_pwm(&mut timer2);
+    /// let mut d3 = pins.d3.into_output().into_pwm(&mut timer2);
+    ///
+    /// d11.set_duty(128);
+    /// d11.enable();
+    /// ```
+    pub struct Timer2Pwm {
+        timer: crate::pac::TC2,
+        init: |tim, prescaler| {
+            tim.tccr2.modify(|_r, w| w.wgm2().pwm_fast());
+            tim.tccr2.modify(|_r, w| match prescaler {
+                    Prescaler::Direct => w.cs2().direct(),
+                    Prescaler::Prescale8 => w.cs2().prescale_8(),
+                    Prescaler::Prescale64 => w.cs2().prescale_64(),
+                    Prescaler::Prescale256 => w.cs2().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs2().prescale_1024(),
+            });
+        },
+        pins: {
+            PB3: {
+                ocr: ocr2,
+                into_pwm: |tim| if enable {
+                    tim.tccr2.modify(|_r, w| w.com2().match_clear());
+                } else {
+                    tim.tccr2.modify(|_r, w| w.com2().disconnected());
+                },
+            },
+        },
+    }
+}

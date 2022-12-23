@@ -237,6 +237,68 @@ macro_rules! impl_eeprom_common {
 }
 
 #[macro_export]
+macro_rules! impl_eeprom_atmega8 {
+    (
+        hal: $HAL:ty,
+        peripheral: $EEPROM:ty,
+        capacity: $capacity:literal,
+        addr_width: $addrwidth:ty,
+        set_address: |$periph_var:ident, $address:ident| $set_address:block,
+    ) => {
+        mod atmega_helper {
+            #[inline]
+            pub unsafe fn wait_read(regs: &$EEPROM) {
+                //Wait for completion of previous write.
+                while regs.eecr.read().eewe().bit_is_set() {}
+            }
+
+            #[inline]
+            pub unsafe fn set_address(regs: &$EEPROM, address: u16) {
+                wait_read(regs);
+                let $periph_var = regs;
+                let $address = address;
+                $set_address
+            }
+        }
+
+        impl $crate::eeprom::EepromOps<$HAL> for $EEPROM {
+            const CAPACITY: u16 = $capacity;
+
+
+            fn raw_read_byte(&self, address: u16) -> u8 {
+                unsafe {
+                    atmega_helper::set_address(&self, address);
+                }
+                self.eecr.write(|w| w.eere().set_bit());
+                self.eedr.read().bits()
+            }
+
+            fn raw_write_byte(&mut self, address: u16, data: u8) {
+                unsafe {
+                    atmega_helper::set_address(&self, address);
+                }
+
+                //Start EEPROM read operation
+                self.eedr.write(|w| unsafe {
+                    w.bits(data)
+                });
+
+                self.eecr.write(|w|
+                    w
+                        .eemwe().set_bit()
+                        .eewe().clear_bit());
+
+                self.eecr.write(|w| w.eewe().set_bit());
+            }
+
+            fn raw_erase_byte(&mut self, address: u16) {
+                self.raw_write_byte(address, 0);
+            }
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! impl_eeprom_atmega {
     (
         hal: $HAL:ty,
