@@ -8,6 +8,7 @@ avr_hal_generic::impl_wdt! {
     hal: crate::Atmega,
     peripheral: crate::pac::WDT,
     mcusr: crate::pac::cpu::MCUSR,
+    wdtcsr_name: "wdtcsr",
     timeout: |to, w| match to {
         Timeout::Ms16 => w.wdpl().cycles_2k_512k(),
         Timeout::Ms32 => w.wdpl().cycles_4k_1024k(),
@@ -27,6 +28,7 @@ avr_hal_generic::impl_wdt! {
     hal: crate::Atmega,
     peripheral: crate::pac::WDT,
     mcusr: crate::pac::cpu::MCUCSR,
+    wdtcsr_name: "wdtcr",
     timeout: |to, w| match to {
         Timeout::Ms16 => w.wdpl().cycles_16k(),
         Timeout::Ms32 => w.wdpl().cycles_32k(),
