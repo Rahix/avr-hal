@@ -80,13 +80,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: nightly-2022-06-13
-          override: true
           components: rust-src
       - name: Install avr-gcc, binutils, and libc
         run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
@@ -105,17 +103,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
-          override: true
+          components: check
       - name: Install libudev
         run: sudo apt-get update && sudo apt-get install -y libudev-dev
       - name: Check ravedude
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --manifest-path ravedude/Cargo.toml
+        run: |
+          cargo check --manifest-path ravedude/Cargo.toml
