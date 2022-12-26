@@ -33,6 +33,7 @@ members = [
     "examples/sparkfun-promicro",
     "examples/trinket-pro",
     "examples/trinket",
+    "examples/digispark",
 ]
 exclude = [
     # The RAVEDUDE! Yeah!

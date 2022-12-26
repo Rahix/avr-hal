@@ -9,7 +9,6 @@
 #![no_main]
 
 use arduino_hal::hal::wdt;
-use arduino_hal::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
@@ -20,7 +19,7 @@ fn main() -> ! {
     let mut led = pins.d13.into_output();
     led.set_high();
 
-    for i in 0..20 {
+    for _i in 0..20 {
         led.toggle();
         arduino_hal::delay_ms(100);
     }

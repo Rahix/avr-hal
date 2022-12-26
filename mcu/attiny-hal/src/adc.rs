@@ -1,3 +1,4 @@
+#![allow(non_camel_case_types)]
 //! Analog-to-Digital Converter
 
 use crate::port;

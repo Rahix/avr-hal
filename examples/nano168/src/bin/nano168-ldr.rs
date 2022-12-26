@@ -28,8 +28,6 @@
 use arduino_hal::prelude::*;
 use panic_halt as _;
 
-use arduino_hal::adc;
-
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
@@ -54,7 +52,7 @@ fn main() -> ! {
             x if x > 250 => "dimmly lit",
             x if x > 50 => "rather dark",
             x if x <= 50 => "very dark",
-            x => "invalid", // to satisfy the compiler ()
+            _ => "invalid", // to satisfy the compiler ()
         };
 
         // output to the serial
