@@ -960,7 +960,7 @@ avr_hal_generic::impl_simple_pwm! {
         init: |tim, prescaler| {
             tim.tccr3a.modify(|_r, w| w.wgm3().bits(0b01));
             tim.tccr3b.modify(|_r, w| {
-                unsafe { w.wgm3().bits(0b01) };
+                w.wgm3().bits(0b01);
 
                 match prescaler {
                     Prescaler::Direct => w.cs3().direct(),
