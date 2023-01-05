@@ -122,8 +122,8 @@ impl crate::usart::UsartOps<
     fn raw_init<CLOCK>(&mut self, baudrate: crate::usart::Baudrate<CLOCK>) {
         let ubrrh: u8 = ((baudrate.ubrr >> 8) & 0xFF) as u8;
         let ubrrl: u8 = (baudrate.ubrr & 0xFF) as u8;
-        self.ubrrh().write(|w| unsafe {w.bits(ubrrh)});
-        self.ubrrl.write(|w| unsafe {w.bits(ubrrl)});
+        self.ubrrh().write(|w| {w.bits(ubrrh)});
+        self.ubrrl.write(|w| {w.bits(ubrrl)});
         self.ucsra.write(|w| w.u2x().bit(baudrate.u2x));
 
         // Enable receiver and transmitter but leave interrupts disabled.
@@ -161,7 +161,7 @@ impl crate::usart::UsartOps<
         // Call flush to make sure the data-register is empty
         self.raw_flush()?;
 
-        self.udr.write(|w| unsafe { w.bits(byte) });
+        self.udr.write(|w| { w.bits(byte) });
         Ok(())
     }
 
