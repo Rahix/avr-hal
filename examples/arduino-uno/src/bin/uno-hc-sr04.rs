@@ -34,7 +34,7 @@ fn main() -> ! {
 
     'outer: loop {
         // the timer is reinitialized with value 0.
-        timer1.tcnt1.write(|w| unsafe { w.bits(0) });
+        timer1.tcnt1.write(|w| w.bits(0));
 
         // the trigger must be set to high under 10 µs as per the HC-SR04 datasheet
         trig.set_high();
@@ -55,7 +55,7 @@ fn main() -> ! {
             }
         }
         // Restarting the timer
-        timer1.tcnt1.write(|w| unsafe { w.bits(0) });
+        timer1.tcnt1.write(|w| w.bits(0));
 
         // Wait for the echo to get low again
         while echo.is_high() {}

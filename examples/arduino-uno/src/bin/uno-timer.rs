@@ -115,7 +115,7 @@ pub fn rig_timer<W: uWrite<Error = void::Void>>(tmr1: &TC1, serial: &mut W) {
             .wgm1()
             .bits(0b01)
     });
-    tmr1.ocr1a.write(|w| unsafe { w.bits(ticks) });
+    tmr1.ocr1a.write(|w| w.bits(ticks));
     tmr1.timsk1.write(|w| w.ocie1a().set_bit()); //enable this specific interrupt
 }
 

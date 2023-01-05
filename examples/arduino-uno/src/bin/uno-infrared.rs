@@ -66,7 +66,7 @@ fn main() -> ! {
     dp.EXINT.pcicr.write(|w| unsafe { w.bits(0b100) });
 
     // Enable pin change interrupts on PCINT18 which is pin PD2 (= d2)
-    dp.EXINT.pcmsk2.write(|w| unsafe { w.bits(0b100) });
+    dp.EXINT.pcmsk2.write(|w| w.bits(0b100));
 
     let ir = Receiver::with_pin(Clock::FREQ, pins.d2);
 
@@ -143,7 +143,7 @@ impl Clock {
     pub fn start(&self, tc0: arduino_hal::pac::TC0) {
         // Configure the timer for the above interval (in CTC mode)
         tc0.tccr0a.write(|w| w.wgm0().ctc());
-        tc0.ocr0a.write(|w| unsafe { w.bits(Self::TOP) });
+        tc0.ocr0a.write(|w| w.bits(Self::TOP));
         tc0.tccr0b.write(|w| w.cs0().variant(Self::PRESCALER));
 
         // Enable interrupt
