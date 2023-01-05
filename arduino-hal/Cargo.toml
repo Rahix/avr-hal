@@ -8,6 +8,8 @@ edition = "2018"
 default = ["rt"]
 rt = ["avr-device/rt"]
 
+critical-section-impl = ["avr-device/critical-section-impl"]
+
 board-selected = []
 mcu-atmega=[]
 mcu-attiny=[]
