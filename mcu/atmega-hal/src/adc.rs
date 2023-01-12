@@ -78,7 +78,6 @@ pub mod channel {
             feature = "atmega328pb",
             feature = "atmega48p",
             feature = "atmega1284p",
-            feature = "atmega32"
         ),
         feature = "enable-extra-adc",
     ))]
