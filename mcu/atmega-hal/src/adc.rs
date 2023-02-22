@@ -76,6 +76,7 @@ pub mod channel {
             feature = "atmega328p",
             feature = "atmega328pb",
             feature = "atmega48p",
+            feature = "atmega128a",
             feature = "atmega1284p",
         ),
         feature = "enable-extra-adc",
@@ -87,6 +88,7 @@ pub mod channel {
             feature = "atmega328p",
             feature = "atmega328pb",
             feature = "atmega48p",
+            feature = "atmega128a",
             feature = "atmega1284p",
         ),
         feature = "enable-extra-adc",
@@ -100,6 +102,7 @@ pub mod channel {
         feature = "atmega328pb",
         feature = "atmega32u4",
         feature = "atmega48p",
+        feature = "atmega128a",
         feature = "atmega1284p",
     ))]
     pub struct Vbg;
@@ -111,6 +114,7 @@ pub mod channel {
         feature = "atmega328pb",
         feature = "atmega32u4",
         feature = "atmega48p",
+        feature = "atmega128a",
         feature = "atmega1284p",
     ))]
     pub struct Gnd;
@@ -189,6 +193,35 @@ avr_hal_generic::impl_adc! {
         channel::Temperature: 0b100111,
     },
 }
+
+#[cfg(feature = "atmega128a")]
+avr_hal_generic::impl_adc! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
+    channel_id: u8,
+    set_channel: |peripheral, id| {
+        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        // peripheral.admux.modify(|_, w| w.mux().bits(id & 0x1f));
+        // peripheral.adcsrb.modify(|_, w| w.mux5().bit(id & 0x20 != 0)); // No ADCSRB register
+    },
+    pins: {
+        port::PF0: (0b000000, didr0::adc0d),
+        port::PF1: (0b000001, didr0::adc1d),
+        port::PF2: (0b000010, didr0::adc2d),
+        port::PF3: (0b000011, didr0::adc3d),
+        port::PF4: (0b000100, didr0::adc4d),
+        port::PF5: (0b000101, didr0::adc5d),
+        port::PF6: (0b000110, didr0::adc6d),
+        port::PF7: (0b000111, didr0::adc7d),
+    },
+    channels: {
+        channel::Vbg: 0b011110,
+        channel::Gnd: 0b011111,
+    },
+}
+
 
 #[cfg(any(feature = "atmega2560", feature = "atmega1280"))]
 avr_hal_generic::impl_adc! {

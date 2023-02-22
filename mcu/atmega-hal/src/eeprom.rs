@@ -42,6 +42,7 @@ avr_hal_generic::impl_eeprom_atmega! {
 
 #[cfg(any(
     feature = "atmega2560",
+    feature = "atmega128a",
     feature = "atmega1280",
     feature = "atmega1284p"
 ))]
