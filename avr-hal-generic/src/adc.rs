@@ -214,7 +214,7 @@ macro_rules! impl_adc {
         pins: {
             $(
                 $(#[$pin_attr:meta])*
-                $pin:ty: ($pin_channel:expr, $didr:ident::$didr_method:ident),
+                $pin:ty: ($pin_channel:expr$(, $didr:ident::$didr_method:ident)?),
             )+
         },
         $(channels: {
@@ -263,8 +263,9 @@ macro_rules! impl_adc {
             fn raw_enable_channel(&mut self, channel: Self::Channel) {
                 match channel {
                     $(
-                        $(#[$pin_attr])*
-                        x if x == $pin_channel => self.$didr.modify(|_, w| w.$didr_method().set_bit()),
+                        x if x == $pin_channel => {
+                            $(self.$didr.modify(|_, w| w.$didr_method().set_bit());)?
+                        }
                     )+
                     _ => unreachable!(),
                 }
@@ -305,98 +306,3 @@ macro_rules! impl_adc {
     };
 }
 
-#[macro_export]
-macro_rules! impl_adc_no_didr {
-    (
-        hal: $HAL:ty,
-        peripheral: $ADC:ty,
-        settings: $Settings:ty,
-        apply_settings: |$settings_periph_var:ident, $settings_var:ident| $apply_settings:block,
-        channel_id: $Channel:ty,
-        set_channel: |$periph_var:ident, $chan_var:ident| $set_channel:block,
-        pins: {
-            $(
-                $(#[$pin_attr:meta])*
-                $pin:ty: $pin_channel:expr,
-            )*
-        },
-        $(channels: {
-            $(
-                $(#[$channel_attr:meta])*
-                $channel_ty:ty: $channel:expr,
-            )*
-        },)?
-    ) => {
-        impl $crate::adc::AdcOps<$HAL> for $ADC {
-            type Channel = $Channel;
-            type Settings = $Settings;
-
-            #[inline]
-            fn raw_init(&mut self, settings: Self::Settings) {
-                let $settings_periph_var = self;
-                let $settings_var = settings;
-
-                $apply_settings
-            }
-
-            #[inline]
-            fn raw_read_adc(&self) -> u16 {
-                self.adc.read().bits()
-            }
-
-            #[inline]
-            fn raw_is_converting(&self) -> bool {
-                self.adcsra.read().adsc().bit_is_set()
-            }
-
-            #[inline]
-            fn raw_start_conversion(&mut self) {
-                self.adcsra.modify(|_, w| w.adsc().set_bit());
-            }
-
-            #[inline]
-            fn raw_set_channel(&mut self, channel: Self::Channel) {
-                let $periph_var = self;
-                let $chan_var = channel;
-
-                $set_channel
-            }
-
-            #[inline]
-            fn raw_enable_channel(&mut self, channel: Self::Channel) {
-            }
-        }
-
-        $(
-        $(#[$pin_attr])*
-        impl $crate::adc::AdcChannel<$HAL, $ADC> for $crate::port::Pin<$crate::port::mode::Analog, $pin> {
-            #[inline]
-            fn channel(&self) -> $Channel {
-                $pin_channel
-            }
-        }
-        )+
-
-        $($(
-        $(#[$channel_attr])*
-        impl $crate::adc::AdcChannel<$HAL, $ADC> for $channel_ty {
-            #[inline]
-            fn channel(&self) -> $Channel {
-                $channel
-            }
-        }
-
-        /// Convert this channel into a generic "[`Channel`][adc-channel]" type.
-        ///
-        /// The generic channel type can be used to store multiple channels in an array.
-        ///
-        /// [adc-channel]: crate::adc::Channel
-        $(#[$channel_attr])*
-        impl $channel_ty {
-            pub fn into_channel(self) -> $crate::adc::Channel<$HAL, $ADC> {
-                crate::adc::Channel::new(self)
-            }
-        }
-        )*)?
-    };
-}

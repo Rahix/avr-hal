@@ -8,7 +8,7 @@ avr_hal_generic::impl_wdt! {
     hal: crate::Atmega,
     peripheral: crate::pac::WDT,
     mcusr: crate::pac::cpu::MCUSR,
-    wdtcsr_name: "wdtcsr",
+    wdtcsr_name: wdtcsr,
     timeout: |to, w| match to {
         Timeout::Ms16 => w.wdpl().cycles_2k_512k(),
         Timeout::Ms32 => w.wdpl().cycles_4k_1024k(),
@@ -28,7 +28,7 @@ avr_hal_generic::impl_wdt! {
     hal: crate::Atmega,
     peripheral: crate::pac::WDT,
     mcusr: crate::pac::cpu::MCUCSR,
-    wdtcsr_name: "wdtcr",
+    wdtcsr_name: wdtcr,
     timeout: |to, w| match to {
         Timeout::Ms16 => w.wdpl().cycles_16k(),
         Timeout::Ms32 => w.wdpl().cycles_32k(),
@@ -38,7 +38,7 @@ avr_hal_generic::impl_wdt! {
         Timeout::Ms500 => w.wdpl().cycles_512k(),
         Timeout::Ms1000 => w.wdpl().cycles_1024k(),
         Timeout::Ms2000 => w.wdpl().cycles_2048k(),
-        Timeout::Ms4000 => panic!(), // Does not exist for ATmega8..
-        Timeout::Ms8000 => panic!() // Does not exist for ATmega8...
+        Timeout::Ms4000 => panic!(), // Does not exist for ATmega8 ...
+        Timeout::Ms8000 => panic!() // Does not exist for ATmega8 ...
     },
 }

@@ -120,7 +120,8 @@ impl crate::usart::UsartOps<
     crate::port::Pin<crate::port::mode::Output, port::PD1>,
 > for crate::pac::USART {
     fn raw_init<CLOCK>(&mut self, baudrate: crate::usart::Baudrate<CLOCK>) {
-        let ubrrh: u8 = ((baudrate.ubrr >> 8) & 0xFF) as u8;
+        // msb of ubrrh has to be 0 to set ubrrh register. (see atmega8 datasheet)
+        let ubrrh: u8 = ((baudrate.ubrr >> 8) & 0x0F) as u8;
         let ubrrl: u8 = (baudrate.ubrr & 0xFF) as u8;
         self.ubrrh().write(|w| {w.bits(ubrrh)});
         self.ubrrl.write(|w| {w.bits(ubrrl)});
@@ -135,7 +136,7 @@ impl crate::usart::UsartOps<
         // Set frame format to 8n1 for now.  At some point, this should be made
         // configurable, similar to what is done in other HALs.
         self.ucsrc().write(|w| w
-            .ursel().set_bit() // sets the ucsrc instead of ubrrh (ubrrh and ucsrc share same location on ATmega8)
+            .ursel().set_bit() // sets the ucsrc instead of ubrrh (ubrrh and ucsrc share same location on ATmega8, see atmega8 datasheet)
             .umsel().usart_async()
             .ucsz().chr8()
             .usbs().stop1()

@@ -85,70 +85,68 @@ macro_rules! impl_wdt {
         hal: $HAL:ty,
         peripheral: $WDT:ty,
         mcusr: $MCUSR:ty,
-        wdtcsr_name: $WDTCSR:expr,
+        wdtcsr_name: $wdtcsr:ident,
         timeout: |$to:ident, $w:ident| $to_match:expr,
     ) => {
-        $crate::paste::paste! {
-            impl $crate::wdt::WdtOps<$HAL> for $WDT {
-                type MCUSR = $MCUSR;
+        impl $crate::wdt::WdtOps<$HAL> for $WDT {
+            type MCUSR = $MCUSR;
 
-                #[inline]
-                fn raw_init(&mut self, m: &Self::MCUSR) {
-                    /// If a prior reset was provided by the watchdog, the WDRF in MCUSR would be set,
-                    /// so WDRF is also cleared to allow for re-enabling the watchdog.
-                    m.modify(|_, w| w.wdrf().clear_bit());
-                }
+            #[inline]
+            fn raw_init(&mut self, m: &Self::MCUSR) {
+                /// If a prior reset was provided by the watchdog, the WDRF in MCUSR would be set,
+                /// so WDRF is also cleared to allow for re-enabling the watchdog.
+                m.modify(|_, w| w.wdrf().clear_bit());
+            }
 
-                #[inline]
-                fn raw_start(&mut self, timeout: Timeout) -> Result<(), ()> {
-                    // The sequence for changing time-out configuration is as follows:
-                    //
-                    //     1. In the same operation, write a logic one to the Watchdog change enable bit
-                    //        (WDCE) and WDE. A logic one must be written to WDE regardless of the
-                    //        previous value of the WDE bit.
-                    //     2. Within the next four clock cycles, write the WDE and Watchdog prescaler
-                    //        bits (WDP) as desired, but with the WDCE bit cleared. This must be done in
-                    //        one operation.
-                    $crate::avr_device::interrupt::free(|_| {
-                        // Reset the watchdog timer.
-                        self.raw_feed();
-                        // Enable watchdog configuration mode.
-                        self.[<$WDTCSR>].modify(|_, w| w.wdce().set_bit().wde().set_bit());
-                        // Enable watchdog and set interval.
-                        self.[<$WDTCSR>].write(|w| {
-                            let $to = timeout;
-                            let $w = w;
-                            ($to_match).wde().set_bit().wdce().clear_bit()
-                        });
+            #[inline]
+            fn raw_start(&mut self, timeout: Timeout) -> Result<(), ()> {
+                // The sequence for changing time-out configuration is as follows:
+                //
+                //     1. In the same operation, write a logic one to the Watchdog change enable bit
+                //        (WDCE) and WDE. A logic one must be written to WDE regardless of the
+                //        previous value of the WDE bit.
+                //     2. Within the next four clock cycles, write the WDE and Watchdog prescaler
+                //        bits (WDP) as desired, but with the WDCE bit cleared. This must be done in
+                //        one operation.
+                $crate::avr_device::interrupt::free(|_| {
+                    // Reset the watchdog timer.
+                    self.raw_feed();
+                    // Enable watchdog configuration mode.
+                    self.$wdtcsr.modify(|_, w| w.wdce().set_bit().wde().set_bit());
+                    // Enable watchdog and set interval.
+                    self.$wdtcsr.write(|w| {
+                        let $to = timeout;
+                        let $w = w;
+                        ($to_match).wde().set_bit().wdce().clear_bit()
+                    });
 
-                        Ok(())
-                    })
-                }
+                    Ok(())
+                })
+            }
 
-                #[inline]
-                fn raw_feed(&mut self) {
-                    avr_device::asm::wdr();
-                }
+            #[inline]
+            fn raw_feed(&mut self) {
+                avr_device::asm::wdr();
+            }
 
-                #[inline]
-                fn raw_stop(&mut self) {
-                    // The sequence for clearing WDE is as follows:
-                    //
-                    //     1. In the same operation, write a logic one to the Watchdog change enable bit
-                    //        (WDCE) and WDE. A logic one must be written to WDE regardless of the
-                    //        previous value of the WDE bit.
-                    //     2. Within the next four clock cycles, clear the WDE and WDCE bits.
-                    //        This must be done in one operation.
-                    $crate::avr_device::interrupt::free(|_| {
-                        // Reset the watchdog timer.
-                        self.raw_feed();
-                        // Enable watchdog configuration mode.
-                        self.[<$WDTCSR>].modify(|_, w| w.wdce().set_bit().wde().set_bit());
-                        // Disable watchdog.
-                        self.[<$WDTCSR>].reset();
-                    })
-                }
+            #[inline]
+            fn raw_stop(&mut self) {
+                // The sequence for clearing WDE is as follows:
+                //
+                //     1. In the same operation, write a logic one to the Watchdog change enable bit
+                //        (WDCE) and WDE. A logic one must be written to WDE regardless of the
+                //        previous value of the WDE bit.
+                //     2. Within the next four clock cycles, clear the WDE and WDCE bits.
+                //        This must be done in one operation.
+                $crate::avr_device::interrupt::free(|_| {
+                    // Reset the watchdog timer.
+                    self.raw_feed();
+                    // Enable watchdog configuration mode.
+                    self.$wdtcsr.modify(|_, w| w.wdce().set_bit().wde().set_bit());
+                    // Disable watchdog.
+                    self.$wdtcsr.reset();
+                })
             }
         }
-    };
+    }
 }

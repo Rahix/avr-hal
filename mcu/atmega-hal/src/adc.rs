@@ -258,7 +258,7 @@ avr_hal_generic::impl_adc! {
 }
 
 #[cfg(any(feature = "atmega8"))]
-avr_hal_generic::impl_adc_no_didr! {
+avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
     peripheral: crate::pac::ADC,
     settings: AdcSettings,
@@ -268,12 +268,12 @@ avr_hal_generic::impl_adc_no_didr! {
         peripheral.admux.modify(|_, w| w.mux().variant(id));
     },
     pins: {
-        port::PC0: crate::pac::adc::admux::MUX_A::ADC0,
-        port::PC1: crate::pac::adc::admux::MUX_A::ADC1,
-        port::PC2: crate::pac::adc::admux::MUX_A::ADC2,
-        port::PC3: crate::pac::adc::admux::MUX_A::ADC3,
-        port::PC4: crate::pac::adc::admux::MUX_A::ADC4,
-        port::PC5: crate::pac::adc::admux::MUX_A::ADC5,
+        port::PC0: (crate::pac::adc::admux::MUX_A::ADC0),
+        port::PC1: (crate::pac::adc::admux::MUX_A::ADC1),
+        port::PC2: (crate::pac::adc::admux::MUX_A::ADC2),
+        port::PC3: (crate::pac::adc::admux::MUX_A::ADC3),
+        port::PC4: (crate::pac::adc::admux::MUX_A::ADC4),
+        port::PC5: (crate::pac::adc::admux::MUX_A::ADC5),
     },
     channels: {
         #[cfg(feature = "enable-extra-adc")]
