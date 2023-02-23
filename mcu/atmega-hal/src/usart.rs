@@ -113,6 +113,13 @@ pub type Usart0<CLOCK> = Usart<
     CLOCK,
 >;
 
+// TODO: atmega8 USART is different from other atmegas
+// implemented so far. It uses the same register address
+// for UBRRH and UCSRC, the way to select which register
+// to write to, msb has to be 1 (for UCSRC)
+// or 0 (for UBRRH). Because of the same address,
+// these two are exposed as functions instead of
+// fields.
 #[cfg(any(feature = "atmega8"))]
 impl crate::usart::UsartOps<
     crate::Atmega,
