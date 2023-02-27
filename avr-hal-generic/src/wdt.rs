@@ -85,6 +85,7 @@ macro_rules! impl_wdt {
         hal: $HAL:ty,
         peripheral: $WDT:ty,
         mcusr: $MCUSR:ty,
+        wdtcsr_name: $wdtcsr:ident,
         timeout: |$to:ident, $w:ident| $to_match:expr,
     ) => {
         impl $crate::wdt::WdtOps<$HAL> for $WDT {
@@ -111,10 +112,9 @@ macro_rules! impl_wdt {
                     // Reset the watchdog timer.
                     self.raw_feed();
                     // Enable watchdog configuration mode.
-                    self.wdtcsr
-                        .modify(|_, w| w.wdce().set_bit().wde().set_bit());
+                    self.$wdtcsr.modify(|_, w| w.wdce().set_bit().wde().set_bit());
                     // Enable watchdog and set interval.
-                    self.wdtcsr.write(|w| {
+                    self.$wdtcsr.write(|w| {
                         let $to = timeout;
                         let $w = w;
                         ($to_match).wde().set_bit().wdce().clear_bit()
@@ -142,12 +142,11 @@ macro_rules! impl_wdt {
                     // Reset the watchdog timer.
                     self.raw_feed();
                     // Enable watchdog configuration mode.
-                    self.wdtcsr
-                        .modify(|_, w| w.wdce().set_bit().wde().set_bit());
+                    self.$wdtcsr.modify(|_, w| w.wdce().set_bit().wde().set_bit());
                     // Disable watchdog.
-                    self.wdtcsr.reset();
+                    self.$wdtcsr.reset();
                 })
             }
         }
-    };
+    }
 }

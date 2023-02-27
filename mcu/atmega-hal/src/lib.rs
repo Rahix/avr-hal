@@ -14,6 +14,7 @@
 #![cfg_attr(feature = "atmega128a", doc = "**ATmega128A**.")]
 #![cfg_attr(feature = "atmega1280", doc = "**ATmega1280**.")]
 #![cfg_attr(feature = "atmega1284p", doc = "**ATmega1284P**.")]
+#![cfg_attr(feature = "atmega8", doc = "**ATmega8**.")]
 //! This means that only items which are available for this MCU are visible.  If you are using
 //! a different chip, try building the documentation locally with:
 //!
@@ -39,6 +40,7 @@ compile_error!(
     * atmega1280
     * atmega2560
     * atmega1284p
+    * atmega8
     "
 );
 
@@ -69,6 +71,9 @@ pub use avr_device::atmega128a as pac;
 /// Reexport of `atmega1284p` from `avr-device`
 #[cfg(feature = "atmega1284p")]
 pub use avr_device::atmega1284p as pac;
+/// Reexport of `atmega8` from `avr-device`
+#[cfg(feature = "atmega8")]
+pub use avr_device::atmega8 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -171,6 +176,16 @@ macro_rules! pins {
     ($p:expr) => {
         $crate::Pins::new(
             $p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD,
+        )
+    };
+}
+
+#[cfg(any(feature = "atmega8"))]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new(
+            $p.PORTB, $p.PORTC, $p.PORTD,
         )
     };
 }
