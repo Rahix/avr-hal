@@ -50,6 +50,10 @@ jobs:
             spec: atmega1280
             crate: atmega-hal
           - type: mcu
+            name: atmega128a
+            spec: atmega128a
+            crate: atmega-hal
+          - type: mcu
             name: atmega328pb
             spec: atmega328p
             crate: atmega-hal

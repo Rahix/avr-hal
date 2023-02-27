@@ -16,6 +16,9 @@ SPECS = {
     "atmega328p": {
         "cpu": "atmega328p",
     },
+    "atmega128a": {
+        "cpu": "atmega128a",
+    },
     "atmega1280": {
         "cpu": "atmega1280",
     },

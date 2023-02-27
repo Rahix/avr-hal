@@ -204,25 +204,23 @@ avr_hal_generic::impl_adc! {
     peripheral: crate::pac::ADC,
     settings: AdcSettings,
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
-    channel_id: u8,
+    channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux.modify(|_, w| w.mux().variant(id));
-        // peripheral.admux.modify(|_, w| w.mux().bits(id & 0x1f));
-        // peripheral.adcsrb.modify(|_, w| w.mux5().bit(id & 0x20 != 0)); // No ADCSRB register
     },
     pins: {
-        port::PF0: (0b000000, didr0::adc0d),
-        port::PF1: (0b000001, didr0::adc1d),
-        port::PF2: (0b000010, didr0::adc2d),
-        port::PF3: (0b000011, didr0::adc3d),
-        port::PF4: (0b000100, didr0::adc4d),
-        port::PF5: (0b000101, didr0::adc5d),
-        port::PF6: (0b000110, didr0::adc6d),
-        port::PF7: (0b000111, didr0::adc7d),
+        port::PF0: (crate::pac::adc::admux::MUX_A::ADC0),
+        port::PF1: (crate::pac::adc::admux::MUX_A::ADC1),
+        port::PF2: (crate::pac::adc::admux::MUX_A::ADC2),
+        port::PF3: (crate::pac::adc::admux::MUX_A::ADC3),
+        port::PF4: (crate::pac::adc::admux::MUX_A::ADC4),
+        port::PF5: (crate::pac::adc::admux::MUX_A::ADC5),
+        port::PF6: (crate::pac::adc::admux::MUX_A::ADC6),
+        port::PF7: (crate::pac::adc::admux::MUX_A::ADC7),
     },
     channels: {
-        channel::Vbg: 0b011110,
-        channel::Gnd: 0b011111,
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }
 
