@@ -41,14 +41,14 @@ avr_hal_generic::impl_usart_traditional! {
     tx: port::PB3,
 }
 
-#[cfg(any(feature = "atmega32u4", feature = "atmega1280", feature = "atmega2560", feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega32u4",feature = "atmega128a", feature = "atmega1280", feature = "atmega2560", feature = "atmega1284p"))]
 pub type Usart1<CLOCK> = Usart<
     crate::pac::USART1,
     port::Pin<port::mode::Input, port::PD2>,
     port::Pin<port::mode::Output, port::PD3>,
     CLOCK,
 >;
-#[cfg(any(feature = "atmega32u4", feature = "atmega1280", feature = "atmega2560", feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega32u4",feature = "atmega128a", feature = "atmega1280", feature = "atmega2560", feature = "atmega1284p"))]
 avr_hal_generic::impl_usart_traditional! {
     hal: crate::Atmega,
     peripheral: crate::pac::USART1,
@@ -193,3 +193,75 @@ impl crate::usart::UsartOps<
     }
 }
 
+// TODO: ATmega128A USART1 is also different from other atmegas
+// Mainly needed because ubrr1 is split in ubrr1h and ubrr1l
+#[cfg(any(feature = "atmega128a"))]
+impl crate::usart::UsartOps<
+    crate::Atmega,
+    crate::port::Pin<crate::port::mode::Input, port::PD2>,
+    crate::port::Pin<crate::port::mode::Output, port::PD3>,
+> for crate::pac::USART1 {
+    fn raw_init<CLOCK>(&mut self, baudrate: crate::usart::Baudrate<CLOCK>) {
+        let ubrr1h: u8 = (baudrate.ubrr >> 8) as u8;
+        let ubrr1l: u8 = baudrate.ubrr as u8;
+        self.ubrr1h.write(|w| {w.bits(ubrr1h)});
+        self.ubrr1l.write(|w| {w.bits(ubrr1l)});
+        self.ucsr1a.write(|w| w.u2x1().bit(baudrate.u2x));
+
+        // Enable receiver and transmitter but leave interrupts disabled.
+        self.ucsr1b.write(|w| w
+            .txen1().set_bit()
+            .rxen1().set_bit()
+        );
+
+        // Set frame format to 8n1 for now.  At some point, this should be made
+        // configurable, similar to what is done in other HALs.
+        self.ucsr1c.write(|w| w
+            .umsel1().usart_async()
+            .ucsz1().chr8()
+            .usbs1().stop1()
+            .upm1().disabled()
+        );
+    }
+
+    fn raw_deinit(&mut self) {
+        // Wait for any ongoing transfer to finish.
+        avr_hal_generic::nb::block!(self.raw_flush()).ok();
+        self.ucsr1b.reset();
+    }
+
+    fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), avr_hal_generic::void::Void> {
+        if self.ucsr1a.read().udre1().bit_is_clear() {
+            Err(avr_hal_generic::nb::Error::WouldBlock)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn raw_write(&mut self, byte: u8) -> avr_hal_generic::nb::Result<(), avr_hal_generic::void::Void> {
+        // Call flush to make sure the data-register is empty
+        self.raw_flush()?;
+
+        self.udr1.write(|w| { w.bits(byte) });
+        Ok(())
+    }
+
+    fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, avr_hal_generic::void::Void> {
+        if self.ucsr1a.read().rxc1().bit_is_clear() {
+            return Err(avr_hal_generic::nb::Error::WouldBlock);
+        }
+
+        Ok(self.udr1.read().bits())
+    }
+
+    fn raw_interrupt(&mut self, event: crate::usart::Event, state: bool) {
+        match event {
+            crate::usart::Event::RxComplete =>
+                self.ucsr1b.modify(|_, w| w.rxcie1().bit(state)),
+            crate::usart::Event::TxComplete =>
+                self.ucsr1b.modify(|_, w| w.txcie1().bit(state)),
+            crate::usart::Event::DataRegisterEmpty =>
+                self.ucsr1b.modify(|_, w| w.udrie1().bit(state)),
+        }
+    }
+}
