@@ -1,0 +1,13 @@
+[package]
+name = "digispark-examples"
+version = "0.0.0"
+authors = ["Petr Scheubrein <petr.sche@seznam.cz>"]
+edition = "2021"
+
+[dependencies]
+panic-halt = "0.2.0"
+embedded-hal = "0.2.7"
+
+[dependencies.arduino-hal]
+path = "../../arduino-hal/"
+features = ["digispark"]
