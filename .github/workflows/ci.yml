@@ -45,6 +45,9 @@ jobs:
           - type: board
             name: nano168
             examples: true
+          - type: board
+            name: digispark
+            examples: true
           - type: mcu
             name: atmega1280
             spec: atmega1280

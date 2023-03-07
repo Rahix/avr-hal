@@ -8,6 +8,21 @@ pub struct AvrdudeOptions<'a> {
     pub partno: &'a str,
     pub baudrate: Option<u32>,
     pub do_chip_erase: bool,
+    pub do_verify_check: bool,
+    pub extended_parameters: &'a [&'a str],
+}
+
+impl<'a> Default for AvrdudeOptions<'a> {
+    fn default() -> Self {
+        AvrdudeOptions {
+            programmer: "",
+            partno: "",
+            baudrate: None,
+            do_chip_erase: true,
+            do_verify_check: true,
+            extended_parameters: &[],
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -82,6 +97,14 @@ impl Avrdude {
 
         if let Some(baudrate) = options.baudrate {
             command = command.arg("-b").arg(baudrate.to_string());
+        }
+
+        if !options.do_verify_check {
+            command = command.arg("-V");
+        }
+
+        for param in options.extended_parameters {
+            command = command.arg("-x").arg(param);
         }
 
         // TODO: Check that `bin` does not contain :

@@ -21,6 +21,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "trinket-pro" => Box::new(TrinketPro),
         "trinket" => Box::new(Trinket),
         "nano168" => Box::new(Nano168),
+        "digispark" => Box::new(Digispark),
         _ => return None,
     })
 }
@@ -63,6 +64,7 @@ impl Board for ArduinoUno {
             partno: "atmega328p",
             baudrate: None,
             do_chip_erase: true,
+            ..Default::default()
         }
     }
 
@@ -93,6 +95,7 @@ impl Board for ArduinoMicro {
             partno: "atmega32u4",
             baudrate: Some(115200),
             do_chip_erase: true,
+            ..Default::default()
         }
     }
 
@@ -125,6 +128,7 @@ impl Board for ArduinoNano {
             partno: "atmega328p",
             baudrate: Some(57600),
             do_chip_erase: true,
+            ..Default::default()
         }
     }
 
@@ -150,6 +154,7 @@ impl Board for ArduinoNanoNew {
             partno: "atmega328p",
             baudrate: Some(115200),
             do_chip_erase: true,
+            ..Default::default()
         }
     }
 
@@ -187,6 +192,7 @@ impl Board for ArduinoLeonardo {
             partno: "atmega32u4",
             baudrate: None,
             do_chip_erase: true,
+            ..Default::default()
         }
     }
 
@@ -218,6 +224,7 @@ impl Board for ArduinoMega1280 {
             partno: "atmega1280",
             baudrate: Some(57600),
             do_chip_erase: false,
+            ..Default::default()
         }
     }
 
@@ -245,6 +252,7 @@ impl Board for ArduinoMega2560 {
             partno: "atmega2560",
             baudrate: Some(115200),
             do_chip_erase: false,
+            ..Default::default()
         }
     }
 
@@ -277,6 +285,7 @@ impl Board for ArduinoDiecimila {
             partno: "atmega168",
             baudrate: Some(19200),
             do_chip_erase: false,
+            ..Default::default()
         }
     }
 
@@ -302,6 +311,7 @@ impl Board for SparkFunProMicro {
             partno: "atmega32u4",
             baudrate: None,
             do_chip_erase: true,
+            ..Default::default()
         }
     }
 
@@ -332,6 +342,7 @@ impl Board for TrinketPro {
             partno: "atmega328p",
             baudrate: None,
             do_chip_erase: false,
+            ..Default::default()
         }
     }
 
@@ -357,6 +368,7 @@ impl Board for Trinket {
             partno: "attiny85",
             baudrate: None,
             do_chip_erase: true,
+            ..Default::default()
         }
     }
 
@@ -382,10 +394,39 @@ impl Board for Nano168 {
             partno: "atmega168",
             baudrate: Some(19200),
             do_chip_erase: false,
+            ..Default::default()
         }
     }
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         Some(Err(anyhow::anyhow!("Not able to guess port")))
+    }
+}
+
+struct Digispark;
+
+impl Board for Digispark {
+    fn display_name(&self) -> &str {
+        "Digispark (Model A)"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        None
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "micronucleus",
+            partno: "attiny85",
+            baudrate: None,
+            do_chip_erase: true,
+            do_verify_check: false,
+            extended_parameters: &["wait"],
+            ..Default::default()
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        None
     }
 }
