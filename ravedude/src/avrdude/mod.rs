@@ -49,6 +49,7 @@ impl Avrdude {
 
     pub fn run(
         options: &AvrdudeOptions,
+        do_eeprom: bool,
         port: Option<impl AsRef<path::Path>>,
         bin: &path::Path,
     ) -> anyhow::Result<Self> {
@@ -99,7 +100,7 @@ impl Avrdude {
         // appended to the command-line, but avrdude will return with a
         // nonzero error code if the ELF file didn't have an `.eeprom` section.
         // So we conditionally add it.
-        {
+        if do_eeprom {
             let fp = std::fs::File::open(bin).context("could not read ELF file")?;
             let mut elf = elf::ElfStream::<elf::endian::LittleEndian, _>::open_stream(fp).context("parsing ELF file failed")?;
 

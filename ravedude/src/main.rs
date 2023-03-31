@@ -33,6 +33,11 @@ struct Args {
     #[structopt(short = "c", long = "open-console")]
     open_console: bool,
 
+    /// Skip flashing .eeprom section to AVR EEPROM. Default is to auto-detect
+    /// an .eeprom section.
+    #[structopt(short = "s", long = "skip-eeprom")]
+    skip_eeprom: bool,
+
     /// Baudrate which should be used for the serial console.
     #[structopt(short = "b", long = "baudrate")]
     baudrate: Option<u32>,
@@ -135,7 +140,7 @@ fn ravedude() -> anyhow::Result<()> {
             task_message!("Programming", "{}", bin.display(),);
         }
 
-        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), port.as_ref(), bin)?;
+        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), !args.skip_eeprom, port.as_ref(), bin)?;
         avrdude.wait()?;
 
         task_message!("Programmed", "{}", bin.display());
