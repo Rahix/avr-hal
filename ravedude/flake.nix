@@ -18,13 +18,15 @@
 
         naersk' = pkgs.callPackage naersk {};
 
+        lib = pkgs.lib;
+
       in
       rec {
-        defaultPackage = naersk'.buildPackage {
+        packages.default = naersk'.buildPackage {
           pname = "ravedude";
           src = ./.;
 
-          buildInputs = with pkgs; [
+          buildInputs = with pkgs; lib.optionals pkgs.stdenv.isLinux [
             pkg-config
             udev
           ];
