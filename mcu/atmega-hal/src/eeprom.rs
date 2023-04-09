@@ -26,7 +26,6 @@ avr_hal_generic::impl_eeprom_atmega! {
 }
 
 #[cfg(any(
-    feature = "atmega324pa",
     feature = "atmega328pb",
     feature = "atmega328p",
     feature = "atmega32u4"
@@ -56,9 +55,7 @@ avr_hal_generic::impl_eeprom_atmega! {
     },
 }
 
-#[cfg(any(
-    feature = "atmega8"
-))]
+#[cfg(any(feature = "atmega8"))]
 avr_hal_generic::impl_eeprom_atmega_old! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
