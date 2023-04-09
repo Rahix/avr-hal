@@ -18,7 +18,7 @@ avr_hal_generic::impl_i2c_twi! {
     scl: port::PD0,
 }
 
-#[cfg(any(feature = "atmega328p", feature = "atmega168", feature = "atmega48p"))]
+#[cfg(any(feature = "atmega328p", feature = "atmega168", feature = "atmega48p", feature = "atmega8"))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
     crate::pac::TWI,
@@ -26,7 +26,7 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     port::Pin<port::mode::Input, port::PC5>,
     CLOCK,
 >;
-#[cfg(any(feature = "atmega328p", feature = "atmega168", feature = "atmega48p"))]
+#[cfg(any(feature = "atmega328p", feature = "atmega168", feature = "atmega48p", feature = "atmega8"))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
     peripheral: crate::pac::TWI,

@@ -95,3 +95,13 @@ avr_hal_generic::impl_spi! {
     miso: port::PB6,
     cs: port::PB4,
 }
+
+#[cfg(any(feature = "atmega8"))]
+avr_hal_generic::impl_spi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::SPI,
+    sclk: port::PB5,
+    mosi: port::PB3,
+    miso: port::PB4,
+    cs: port::PB2,
+}

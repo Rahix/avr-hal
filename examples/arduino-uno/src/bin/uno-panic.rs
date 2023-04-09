@@ -9,6 +9,14 @@
 
 use arduino_hal::prelude::*;
 
+// Documentation build does not like this and fails with the following error, even though
+// everything is fine when compiling the binary.
+//
+//      error[E0152]: found duplicate lang item `panic_impl`
+//
+// Ignore the panic handler in documentation builds.  This is not needed in downstream code, it is
+// an artifact of the avr-hal examples structure.
+#[cfg(not(doc))]
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     // disable interrupts - firmware has panicked so no ISRs should continue running
