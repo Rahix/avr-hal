@@ -42,4 +42,3 @@ exclude = [
 [patch.crates-io]
 # XXX: Temporary fix for avr-rust/rust#148
 ufmt = { git = "https://github.com/Rahix/ufmt.git", rev = "12225dc1678e42fecb0e8635bf80f501e24817d9" }
-avr-device = { git = "https://github.com/rahix/avr-device", rev = "ec1366120157f85c5c8f4ca72ddf3cddb0d4ce2f" }
