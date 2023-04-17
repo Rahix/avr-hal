@@ -105,7 +105,7 @@ avr_hal_generic::impl_usart_traditional! {
     tx: port::PJ1,
 }
 
-#[cfg(any(feature = "atmega8"))]
+#[cfg(any(feature = "atmega8", feature = "atmega32a"))]
 pub type Usart0<CLOCK> = Usart<
     crate::pac::USART,
     port::Pin<port::mode::Input, port::PD0>,
@@ -120,7 +120,7 @@ pub type Usart0<CLOCK> = Usart<
 // or 0 (for UBRRH). Because of the same address,
 // these two are exposed as functions instead of
 // fields.
-#[cfg(any(feature = "atmega8"))]
+#[cfg(any(feature = "atmega8", feature = "atmega32a"))]
 impl crate::usart::UsartOps<
     crate::Atmega,
     crate::port::Pin<crate::port::mode::Input, port::PD0>,
