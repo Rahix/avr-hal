@@ -65,7 +65,7 @@ avr_hal_generic::impl_i2c_twi! {
     scl: port::PE1,
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
     crate::pac::TWI,
@@ -73,7 +73,7 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     port::Pin<port::mode::Input, port::PC0>,
     CLOCK,
 >;
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
     peripheral: crate::pac::TWI,

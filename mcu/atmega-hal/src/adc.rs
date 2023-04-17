@@ -73,6 +73,7 @@ pub mod channel {
     #[cfg(all(
         any(
             feature = "atmega168",
+            feature = "atmega32a",
             feature = "atmega328p",
             feature = "atmega328pb",
             feature = "atmega48p",
@@ -86,6 +87,7 @@ pub mod channel {
     #[cfg(all(
         any(
             feature = "atmega168",
+            feature = "atmega32a",
             feature = "atmega328p",
             feature = "atmega328pb",
             feature = "atmega48p",
@@ -100,6 +102,7 @@ pub mod channel {
         feature = "atmega1280",
         feature = "atmega168",
         feature = "atmega2560",
+        feature = "atmega32a",
         feature = "atmega328p",
         feature = "atmega328pb",
         feature = "atmega32u4",
@@ -113,6 +116,7 @@ pub mod channel {
         feature = "atmega1280",
         feature = "atmega168",
         feature = "atmega2560",
+        feature = "atmega32a",
         feature = "atmega328p",
         feature = "atmega328pb",
         feature = "atmega32u4",
@@ -163,6 +167,32 @@ avr_hal_generic::impl_adc! {
         channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
         #[cfg(any(feature = "atmega328p", feature = "atmega328pb", feature = "atmega48p"))]
         channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
+    },
+}
+
+#[cfg(any(feature = "atmega32a"))]
+avr_hal_generic::impl_adc! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
+    channel_id: crate::pac::adc::admux::MUX_A,
+    set_channel: |peripheral, id| {
+        peripheral.admux.modify(|_, w| w.mux().variant(id));
+    },
+    pins: {
+        port::PA0: (crate::pac::adc::admux::MUX_A::ADC0),
+        port::PA1: (crate::pac::adc::admux::MUX_A::ADC1),
+        port::PA2: (crate::pac::adc::admux::MUX_A::ADC2),
+        port::PA3: (crate::pac::adc::admux::MUX_A::ADC3),
+        port::PA4: (crate::pac::adc::admux::MUX_A::ADC4),
+        port::PA5: (crate::pac::adc::admux::MUX_A::ADC5),
+        port::PA6: (crate::pac::adc::admux::MUX_A::ADC6),
+        port::PA7: (crate::pac::adc::admux::MUX_A::ADC7),
+    },
+    channels: {
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }
 

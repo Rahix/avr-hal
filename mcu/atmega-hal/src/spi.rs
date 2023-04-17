@@ -77,7 +77,7 @@ avr_hal_generic::impl_spi! {
     cs: port::PE2,
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
     crate::pac::SPI,
@@ -86,7 +86,7 @@ pub type Spi = avr_hal_generic::spi::Spi<
     port::PB6,
     port::PB4,
 >;
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
     peripheral: crate::pac::SPI,

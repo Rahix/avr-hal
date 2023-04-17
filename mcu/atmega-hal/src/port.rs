@@ -292,7 +292,7 @@ avr_hal_generic::impl_port_traditional! {
     }
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {
         PORTA: (crate::pac::PORTA, porta, pina, ddra),
