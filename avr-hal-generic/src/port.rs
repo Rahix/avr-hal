@@ -591,9 +591,9 @@ macro_rules! impl_port_traditional {
                     }),)+
                 }
                 if pull_up {
-                    self.out_clear()
-                } else {
                     self.out_set()
+                } else {
+                    self.out_clear()
                 }
             }
         }
