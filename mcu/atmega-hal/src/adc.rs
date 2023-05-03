@@ -73,6 +73,7 @@ pub mod channel {
     #[cfg(all(
         any(
             feature = "atmega168",
+            feature = "atmega324pa",
             feature = "atmega328p",
             feature = "atmega328pb",
             feature = "atmega48p",
@@ -85,6 +86,7 @@ pub mod channel {
     #[cfg(all(
         any(
             feature = "atmega168",
+            feature = "atmega324pa",
             feature = "atmega328p",
             feature = "atmega328pb",
             feature = "atmega48p",
@@ -98,6 +100,7 @@ pub mod channel {
         feature = "atmega1280",
         feature = "atmega168",
         feature = "atmega2560",
+        feature = "atmega324pa",
         feature = "atmega328p",
         feature = "atmega328pb",
         feature = "atmega32u4",
@@ -110,6 +113,7 @@ pub mod channel {
         feature = "atmega1280",
         feature = "atmega168",
         feature = "atmega2560",
+        feature = "atmega324pa",
         feature = "atmega328p",
         feature = "atmega328pb",
         feature = "atmega32u4",
@@ -229,7 +233,7 @@ avr_hal_generic::impl_adc! {
     },
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega324pa"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
     peripheral: crate::pac::ADC,

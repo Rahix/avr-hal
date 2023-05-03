@@ -804,7 +804,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega324pa"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC0` for PWM (pins `PB3`, `PB4`)
     ///
@@ -852,7 +852,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega324pa"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC1` for PWM (pins `PD5`, `PD4`)
     ///
@@ -904,7 +904,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega324pa"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC2` for PWM (pins `PD7`, `PD6`)
     ///

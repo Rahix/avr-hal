@@ -8,6 +8,7 @@
 #![cfg_attr(feature = "atmega48p", doc = "**ATmega48P**.")]
 #![cfg_attr(feature = "atmega168", doc = "**ATmega168**.")]
 #![cfg_attr(feature = "atmega328p", doc = "**ATmega328P**.")]
+#![cfg_attr(feature = "atmega324pa", doc = "**ATmega324PA**.")]
 #![cfg_attr(feature = "atmega328pb", doc = "**ATmega328PB**.")]
 #![cfg_attr(feature = "atmega32u4", doc = "**ATmega32U4**.")]
 #![cfg_attr(feature = "atmega2560", doc = "**ATmega2560**.")]
@@ -32,6 +33,7 @@ compile_error!(
 
     * atmega48p
     * atmega168
+    * atmega324pa
     * atmega328p
     * atmega328pb
     * atmega32u4
@@ -51,6 +53,9 @@ pub use avr_device::atmega168 as pac;
 /// Reexport of `atmega2560` from `avr-device`
 #[cfg(feature = "atmega2560")]
 pub use avr_device::atmega2560 as pac;
+/// Reexport of `atmega324pa` from `avr-device`
+#[cfg(feature = "atmega324pa")]
+pub use avr_device::atmega324pa as pac;
 /// Reexport of `atmega328p` from `avr-device`
 #[cfg(feature = "atmega328p")]
 pub use avr_device::atmega328p as pac;
@@ -154,7 +159,7 @@ macro_rules! pins {
     };
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega324pa"))]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {

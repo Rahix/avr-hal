@@ -77,7 +77,7 @@ avr_hal_generic::impl_spi! {
     cs: port::PE2,
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega324pa"))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
     crate::pac::SPI,
