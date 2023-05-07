@@ -3,7 +3,7 @@ pub use avr_hal_generic::wdt::{Timeout, WdtOps};
 
 pub type Wdt = avr_hal_generic::wdt::Wdt<crate::Atmega, crate::pac::WDT>;
 
-#[cfg(not(feature = "atmega8"))]
+#[cfg(not(any(feature = "atmega128a", feature = "atmega8")))]
 avr_hal_generic::impl_wdt! {
     hal: crate::Atmega,
     peripheral: crate::pac::WDT,
@@ -23,7 +23,7 @@ avr_hal_generic::impl_wdt! {
     },
 }
 
-#[cfg(feature = "atmega8")]
+#[cfg(any(feature = "atmega128a", feature = "atmega8"))]
 avr_hal_generic::impl_wdt! {
     hal: crate::Atmega,
     peripheral: crate::pac::WDT,
