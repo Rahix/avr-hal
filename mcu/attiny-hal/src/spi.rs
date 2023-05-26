@@ -45,17 +45,18 @@ avr_hal_generic::impl_spi! {
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Attiny,
     crate::pac::USI,
-    port::PB2, //SCLK
-    port::PB0, //MOSI
-    port::PB1, //MISO
-    port::PB4, //Chip select
+    port::PB2,
+    port::PB1,
+    port::PB0,
+    port::PB4,
     >;
 #[cfg(feature = "attiny85")]
-impl crate::spi::SpiOps<crate::Attiny, port::PB2, port::PB0, port::PB1, port::PB4> for crate::pac::USI {
+impl crate::spi::SpiOps<crate::Attiny, port::PB2, port::PB1, port::PB0, port::PB4> for crate::pac::USI {
     fn raw_setup(&mut self, _settings: &Settings) {
         self.usicr.write(|w| {
             w.usiwm().three_wire();
-            w.usics().no_clock()
+            w.usics().ext_pos();
+            w.usiclk().set_bit()
         });
     }
 
@@ -88,10 +89,11 @@ impl crate::spi::SpiOps<crate::Attiny, port::PB2, port::PB0, port::PB1, port::PB
         });
 
         // clock bytes out
-        for _ in 0..16 {
+        while self.usisr.read().usioif().bit_is_clear() {
             self.usicr.write(|w| {
-                //w.usiwm().three_wire();
-                //w.usics().no_clock();
+                // XXX WM and CS also need to be written to for it to work on my end
+                w.usiwm().three_wire();
+                w.usics().ext_pos();
                 w.usiclk().set_bit();
                 w.usitc().set_bit()
             });
