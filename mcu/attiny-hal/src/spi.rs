@@ -67,8 +67,6 @@ impl crate::spi::SpiOps<crate::Attiny, port::PB2, port::PB1, port::PB0, port::PB
     }
 
     fn raw_check_iflag(&self) -> bool {
-        // USIOIF is set when the counter overflows, from the datasheet
-        // ... "Can therefor be used to determine when a transfer is completed" (p 109)
         self.usisr.read().usioif().bit_is_set()
     }
 
@@ -83,12 +81,10 @@ impl crate::spi::SpiOps<crate::Attiny, port::PB2, port::PB1, port::PB0, port::PB
             w.bits(byte)
         });
 
-        // Make sure the finished bit is cleared (by setting it)
         self.usisr.write(|w| {
             w.usioif().set_bit()
         });
 
-        // clock bytes out
         while self.usisr.read().usioif().bit_is_clear() {
             self.usicr.write(|w| {
                 // XXX WM and CS also need to be written to for it to work on my end
@@ -101,6 +97,5 @@ impl crate::spi::SpiOps<crate::Attiny, port::PB2, port::PB1, port::PB0, port::PB
             avr_device::asm::nop();
             avr_device::asm::nop();
         }
-        // USIOIF should be set now
     }
 }
