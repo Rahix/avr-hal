@@ -1,3 +1,8 @@
+extern crate serial;
+
+use std::io;
+use serial::prelude::*;
+
 use anyhow::Context as _;
 use colored::Colorize as _;
 use structopt::clap::AppSettings;
@@ -42,11 +47,18 @@ struct Args {
     #[structopt(short = "P", long = "port", parse(from_os_str), env = "RAVEDUDE_PORT")]
     port: Option<std::path::PathBuf>,
 
+    #[structopt(short = "A", long = "avrdude-root", parse(from_os_str), env = "RAVEDUDE_AVRDUDE_ROOT")]
+    avrdude_root: Option<std::path::PathBuf>,
+
     /// This assumes the board is already resetting.
     /// Instead of giving the reset instructions and waiting for user confirmation, we wait the amount in milliseconds before proceeding.
     /// Set this value to 0 to skip the board reset question instantly.
     #[structopt(short = "d", long = "reset-delay")]
     reset_delay: Option<u64>,
+
+    /// Port Reset opens the port for .25 second and acts a a reset for nano every
+    #[structopt(short = "r", long = "port-reset")]
+    port_reset: bool,
 
     /// Which board to interact with.
     ///
@@ -92,7 +104,7 @@ fn ravedude() -> anyhow::Result<()> {
     let board = board::get_board(&args.board).expect("board not found");
 
     task_message!("Board", "{}", board.display_name());
-
+        
     if let Some(wait_time) = args.reset_delay{
         if wait_time > 0 {
             println!("Waiting {} ms before proceeding", wait_time);
@@ -123,6 +135,35 @@ fn ravedude() -> anyhow::Result<()> {
         },
     }?;
 
+
+    if args.port_reset {
+        if args.avrdude_root.is_none() {
+            panic!("no avrdude root path found, set RAVEDUDE_AVRDUDE_ROOT in your environment");
+        }
+    }
+
+    if args.port_reset {
+
+        if let Some(port) = port.as_ref() {
+            task_message!("Port Reset",  "{}", port.display());
+            println!("Opening Port {}", port.display());
+            let mut serial_port = serial::open(port).unwrap();
+    
+            interact(&mut serial_port).unwrap();
+    
+            // Wait for half a second
+            let half_second = Duration::from_millis(500);
+            thread::sleep(half_second);
+        }
+    } 
+    else {
+        task_message!(
+            "",
+            "{}",
+            "(Skip flashing because if resetting you must specify path of avrdude )".dimmed()
+        );
+    }
+
     if let Some(bin) = args.bin.as_ref() {
         if let Some(port) = port.as_ref() {
             task_message!(
@@ -136,7 +177,11 @@ fn ravedude() -> anyhow::Result<()> {
             task_message!("Programming", "{}", bin.display(),);
         }
 
-        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), port.as_ref(), bin)?;
+        let mut avrdude = avrdude::Avrdude::run(
+            &board.avrdude_options(), 
+            args.avrdude_root, 
+            port.as_ref(), 
+            bin)?;
         avrdude.wait()?;
 
         task_message!("Programmed", "{}", bin.display());
@@ -170,3 +215,18 @@ fn ravedude() -> anyhow::Result<()> {
 
     Ok(())
 }
+
+fn interact<T: SerialPort>(port: &mut T) -> io::Result<()> {
+    port.reconfigure(&|settings| {
+        settings.set_baud_rate(serial::Baud1200)?;
+        // settings.set_char_size(serial::Bits8);
+        // settings.set_parity(serial::ParityNone);
+        // settings.set_stop_bits(serial::Stop1);
+        // settings.set_flow_control(serial::FlowNone);
+        println!("Completed setting Port");
+        Ok(())
+    })?;
+ 
+    Ok(())
+}
+    

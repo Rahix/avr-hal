@@ -1,5 +1,6 @@
 use anyhow::Context as _;
 use std::path;
+use std::path::PathBuf;
 use std::process;
 
 #[derive(Debug)]
@@ -8,6 +9,9 @@ pub struct AvrdudeOptions<'a> {
     pub partno: &'a str,
     pub baudrate: Option<u32>,
     pub do_chip_erase: bool,
+    pub fuse2: Option<u8>,
+    pub fuse5: Option<u8>,
+    pub fuse8: Option<u8>,
 }
 
 #[derive(Debug)]
@@ -49,9 +53,11 @@ impl Avrdude {
 
     pub fn run(
         options: &AvrdudeOptions,
+        avrdude_root: Option<std::path::PathBuf>,
         port: Option<impl AsRef<path::Path>>,
         bin: &path::Path,
     ) -> anyhow::Result<Self> {
+
         let config = tempfile::Builder::new()
             .prefix(".avrdude-")
             .suffix(".conf")
@@ -67,22 +73,59 @@ impl Avrdude {
             f.flush().unwrap();
         }
 
-        let mut command = process::Command::new("avrdude");
+        // Set the binary to be the default or <avrdude_root>/bin/avrdude
+        println!("We are here 2 {:?}", options);
+
+        let mut bin_command = PathBuf::from("avrdude");
+        if let Some(avrdude_root) = &avrdude_root {
+            let mut new_path_buf = avrdude_root.clone();
+            new_path_buf.extend(&["bin", "avrdude"]);
+            bin_command = new_path_buf.to_path_buf();
+        }
+
+        let mut command = process::Command::new(bin_command.into_os_string());
         let mut command = command
-            .arg("-C")
-            .arg(&config.as_ref())
+            .arg("-v")
+            .arg("-V")
             .arg("-c")
             .arg(options.programmer)
             .arg("-p")
             .arg(options.partno);
 
-        if let Some(port) = port {
-            command = command.arg("-P").arg(port.as_ref());
+        if let Some(avrdude_root) = &avrdude_root {
+    
+            if let Some(fuse2) = options.fuse2 {
+                command = command.arg("-U").arg( format!("fuse2:w:{:#02X}:m",fuse2));
+            }
+
+            if let Some(fuse5) = options.fuse5 {
+                command = command.arg("-U").arg( format!("fuse2:w:{:#02X}:m",fuse5));
+            }
+
+            if let Some(fuse8) = options.fuse8 {
+                command = command.arg("-U").arg( format!("fuse2:w:{:#02X}:m",fuse8));
+            }
+
+            if let Some(port) = port {
+                command = command.arg("-P").arg(port.as_ref());
+            }
+
+            let mut new_path_buf = avrdude_root.clone();
+            new_path_buf.extend(&["etc", "avrdude.conf"]);
+            let conf_command = new_path_buf.to_path_buf();
+            
+            command = command.arg("-C").arg(conf_command)
+
+        }
+        else {
+            command = command.arg("-C").arg(&config.as_ref())
         }
 
         if let Some(baudrate) = options.baudrate {
             command = command.arg("-b").arg(baudrate.to_string());
         }
+
+        println!("{:?}", command);
 
         // TODO: Check that `bin` does not contain :
         let mut flash_instruction: std::ffi::OsString = "flash:w:".into();

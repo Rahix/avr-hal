@@ -12,6 +12,7 @@
 #![cfg_attr(feature = "arduino-mega1280", doc = "**Arduino Mega 1280**.")]
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
+#![cfg_attr(feature = "nano-every", doc = "**Nano Every**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
 #![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
 #![cfg_attr(feature = "trinket", doc = "**Trinket**.")]
@@ -58,6 +59,7 @@ compile_error!(
     * arduino-mega1280
     * arduino-nano
     * arduino-uno
+    * nano-every
     * sparkfun-promicro
     * trinket-pro
     * trinket
@@ -257,7 +259,7 @@ macro_rules! default_serial {
         )
     };
 }
-#[cfg(any(feature = "arduino-nano", feature = "nano168"))]
+#[cfg(any(feature = "arduino-nano", feature = "nano-every", feature = "nano168"))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
