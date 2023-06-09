@@ -14,3 +14,6 @@ embedded-hal = "0.2.3"
 [dependencies.arduino-hal]
 path = "../../arduino-hal/"
 features = ["arduino-nano"]
+
+[dependencies.avr-device]
+version = "0.5.1"
