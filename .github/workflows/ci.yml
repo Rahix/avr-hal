@@ -116,7 +116,6 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-          components: check
       - name: Install libudev
         run: sudo apt-get update && sudo apt-get install -y libudev-dev
       - name: Check ravedude
