@@ -8,12 +8,15 @@ edition = "2018"
 default = ["rt"]
 rt = ["avr-device/rt"]
 
+critical-section-impl = ["avr-device/critical-section-impl"]
+
 board-selected = []
 mcu-atmega=[]
 mcu-attiny=[]
 arduino-diecimila = ["mcu-atmega", "atmega-hal/atmega168", "board-selected"]
 arduino-leonardo = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
 arduino-mega2560 = ["mcu-atmega", "atmega-hal/atmega2560", "board-selected"]
+arduino-mega1280 = ["mcu-atmega", "atmega-hal/atmega1280", "board-selected"]
 arduino-nano = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
 arduino-uno = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
 trinket-pro = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
@@ -48,7 +51,7 @@ path = "../mcu/attiny-hal/"
 optional = true
 
 [dependencies.avr-device]
-version = "0.3"
+version = "0.5.1"
 
 # Because this crate has its own check that at least one device is selected, we
 # can safely "circumvent" the check in `avr-device`.

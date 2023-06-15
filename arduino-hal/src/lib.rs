@@ -9,6 +9,7 @@
 #![cfg_attr(feature = "arduino-diecimila", doc = "**Arduino Diecimila**.")]
 #![cfg_attr(feature = "arduino-leonardo", doc = "**Arduino Leonardo**.")]
 #![cfg_attr(feature = "arduino-mega2560", doc = "**Arduino Mega 2560**.")]
+#![cfg_attr(feature = "arduino-mega1280", doc = "**Arduino Mega 1280**.")]
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
@@ -54,6 +55,7 @@ compile_error!(
     * arduino-diecimila
     * arduino-leonardo
     * arduino-mega2560
+    * arduino-mega1280
     * arduino-nano
     * arduino-uno
     * sparkfun-promicro
@@ -166,16 +168,28 @@ pub mod usart {
     pub type UsartReader<USART, RX, TX> =
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
+
+#[cfg(feature = "board-selected")]
+pub mod eeprom {
+    pub use crate::hal::eeprom::{Eeprom, EepromOps, OutOfBoundsError};
+}
+#[doc(no_inline)]
+#[cfg(feature = "board-selected")]
+pub use eeprom::Eeprom;
+
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use usart::Usart;
 
 #[cfg(feature = "mcu-atmega")]
 pub mod prelude {
+    pub use crate::hal::prelude::*;
+
     cfg_if::cfg_if! {
         if #[cfg(any(
             feature = "arduino-diecimila",
             feature = "arduino-mega2560",
+            feature = "arduino-mega1280",
             feature = "arduino-uno"
         ))] {
             pub use crate::hal::usart::BaudrateArduinoExt as _;
@@ -183,10 +197,6 @@ pub mod prelude {
             pub use crate::hal::usart::BaudrateExt as _;
         }
     }
-
-    pub use ufmt::uWrite as _;
-    pub use void::ResultVoidErrExt as _;
-    pub use void::ResultVoidExt as _;
 }
 
 /// Convenience macro to instanciate the [`Pins`] struct for this board.
@@ -233,6 +243,7 @@ macro_rules! default_serial {
 #[cfg(any(
     feature = "arduino-diecimila",
     feature = "arduino-mega2560",
+    feature = "arduino-mega1280",
     feature = "arduino-uno"
 ))]
 #[macro_export]

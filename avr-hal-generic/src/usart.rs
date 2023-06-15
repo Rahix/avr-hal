@@ -79,10 +79,10 @@ impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
 
     fn compare_value(&self) -> u32 {
         if self.u2x {
-            return 8 * (self.ubrr as u32 + 1);
+            8 * (self.ubrr as u32 + 1)
         } else {
-            return 16 * (self.ubrr as u32 + 1);
-        };
+            16 * (self.ubrr as u32 + 1)
+        }
     }
 }
 

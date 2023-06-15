@@ -30,7 +30,7 @@ fn main() -> ! {
     // - Each count increases the duty-cycle by 4us.
     // - Use OC1A which is connected to D9 of the Arduino Uno.
     let tc1 = dp.TC1;
-    tc1.icr1.write(|w| unsafe { w.bits(4999) });
+    tc1.icr1.write(|w| w.bits(4999));
     tc1.tccr1a
         .write(|w| w.wgm1().bits(0b10).com1a().match_clear());
     tc1.tccr1b
@@ -40,7 +40,7 @@ fn main() -> ! {
         // 100 counts => 0.4ms
         // 700 counts => 2.8ms
         for duty in 100..=700 {
-            tc1.ocr1a.write(|w| unsafe { w.bits(duty) });
+            tc1.ocr1a.write(|w| w.bits(duty));
             arduino_hal::delay_ms(20);
         }
     }

@@ -1,3 +1,5 @@
+pub use avr_hal_generic::port::{mode, PinOps, PinMode};
+
 #[cfg(feature = "attiny2313")]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {

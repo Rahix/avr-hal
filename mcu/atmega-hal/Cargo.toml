@@ -14,8 +14,12 @@ atmega328p = ["avr-device/atmega328p", "device-selected"]
 atmega328pb = ["avr-device/atmega328pb", "device-selected"]
 atmega32u4 = ["avr-device/atmega32u4", "device-selected"]
 atmega2560 = ["avr-device/atmega2560", "device-selected"]
+atmega128a = ["avr-device/atmega128a", "device-selected"]
 atmega1280 = ["avr-device/atmega1280", "device-selected"]
 atmega1284p = ["avr-device/atmega1284p", "device-selected"]
+atmega8 = ["avr-device/atmega8", "device-selected"]
+
+critical-section-impl = ["avr-device/critical-section-impl"]
 
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
@@ -24,7 +28,7 @@ disable-device-selection-error = []
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-version = "0.3"
+version = "0.5.1"
 
 # Because this crate has its own check that at least one device is selected, we
 # can safely "circumvent" the check in `avr-device`.

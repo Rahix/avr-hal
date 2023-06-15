@@ -1,5 +1,4 @@
-pub use attiny_hal::port::mode;
-pub use attiny_hal::port::Pin;
+pub use attiny_hal::port::{mode, Pin, PinOps, PinMode};
 
 avr_hal_generic::renamed_pins! {
     type Pin = Pin;

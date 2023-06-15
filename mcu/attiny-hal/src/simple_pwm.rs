@@ -1,5 +1,6 @@
-use avr_hal_generic::simple_pwm::Prescaler;
+pub use avr_hal_generic::simple_pwm::{PwmPinOps, Prescaler};
 
+#[cfg(any(feature = "attiny85",feature = "attiny84",feature="attiny88"))]
 use crate::port::*;
 
 #[cfg(feature = "attiny84")]

@@ -58,11 +58,13 @@ struct Args {
     /// * leonardo
     /// * micro
     /// * mega2560
+    /// * mega1280
     /// * diecimila
     /// * promicro
     /// * trinket-pro
     /// * trinket
     /// * nano168
+    /// * duemilanove
     #[structopt(name = "BOARD", verbatim_doc_comment)]
     board: String,
 

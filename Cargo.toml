@@ -26,6 +26,7 @@ members = [
     "examples/arduino-diecimila",
     "examples/arduino-leonardo",
     "examples/arduino-mega2560",
+    "examples/arduino-mega1280",
     "examples/arduino-nano",
     "examples/arduino-uno",
     "examples/nano168",

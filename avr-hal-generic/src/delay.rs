@@ -10,7 +10,16 @@ use core::arch::asm;
 ///
 /// # Example
 /// ```rust
-/// let mut delay = delay::Delay::<clock::MHz16>::new();
+/// // Instead of arduino_hal below you may also use a different
+/// // HAL based on avr_hal_generic like attiny_hal or atmega_hal
+/// // depending on actual hardware. For example:
+/// //
+/// // use attiny_hal as hal;
+///
+/// use arduino_hal as hal;
+/// use hal::prelude::*;
+///
+/// let mut delay = hal::delay::Delay::<hal::clock::MHz16>::new();
 ///
 /// // Wait 1 second
 /// delay.delay_ms(1000);

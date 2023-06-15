@@ -184,7 +184,7 @@ where
             // Measurement on current pin completed
             (Some(channel), false) if *channel == pin.channel() => {
                 self.reading_channel = None;
-                Ok(self.p.raw_read_adc().into())
+                Ok(self.p.raw_read_adc())
             }
             // Measurement on other pin is ongoing
             (Some(_), _) => {
@@ -214,7 +214,7 @@ macro_rules! impl_adc {
         pins: {
             $(
                 $(#[$pin_attr:meta])*
-                $pin:ty: ($pin_channel:expr, $didr:ident::$didr_method:ident),
+                $pin:ty: ($pin_channel:expr$(, $didr:ident::$didr_method:ident)?),
             )+
         },
         $(channels: {
@@ -263,8 +263,9 @@ macro_rules! impl_adc {
             fn raw_enable_channel(&mut self, channel: Self::Channel) {
                 match channel {
                     $(
-                        $(#[$pin_attr])*
-                        x if x == $pin_channel => self.$didr.modify(|_, w| w.$didr_method().set_bit()),
+                        x if x == $pin_channel => {
+                            $(self.$didr.modify(|_, w| w.$didr_method().set_bit());)?
+                        }
                     )+
                     _ => unreachable!(),
                 }
@@ -298,9 +299,10 @@ macro_rules! impl_adc {
         $(#[$channel_attr])*
         impl $channel_ty {
             pub fn into_channel(self) -> $crate::adc::Channel<$HAL, $ADC> {
-                crate::adc::Channel::new(self)
+                $crate::adc::Channel::new(self)
             }
         }
         )*)?
     };
 }
+

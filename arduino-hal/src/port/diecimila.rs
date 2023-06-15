@@ -1,12 +1,11 @@
-pub use atmega_hal::port::mode;
-pub use atmega_hal::port::Pin;
+pub use atmega_hal::port::{mode, Pin, PinOps, PinMode};
 
 avr_hal_generic::renamed_pins! {
     type Pin = Pin;
 
     /// Pins of the **Arduino Diecimila**.
     ///
-    /// This struct is best initialized via the [`arduino_hal::pins!()`][pins] macro.
+    /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
     pub struct Pins from atmega_hal::Pins {
         /// `A0`
         ///

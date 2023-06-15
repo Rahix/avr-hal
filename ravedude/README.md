@@ -24,6 +24,8 @@ Next, install the latest version from crates.io with the following command:
 cargo install ravedude
 ```
 
+Alternatively, if you're using Nix (the package manager) + Flakes, you can install `ravedude` by adding `inputs.ravedude.url = "github:Rahix/avr-hal?dir=ravedude";` and use the package `ravedude.packages."${system}".default`.
+
 Now you need to add *ravedude* to your project.  For example in a project for
 Arduino Uno, place the following into your `.cargo/config.toml` (**not in
 `Cargo.toml`**):

@@ -16,6 +16,9 @@ SPECS = {
     "atmega328p": {
         "cpu": "atmega328p",
     },
+    "atmega128a": {
+        "cpu": "atmega128a",
+    },
     "atmega1280": {
         "cpu": "atmega1280",
     },
@@ -24,6 +27,9 @@ SPECS = {
     },
     "atmega1284p": {
         "cpu": "atmega1284p",
+    },
+    "atmega8": {
+        "cpu": "atmega8",
     },
     "attiny85": {
         "cpu": "attiny85",
@@ -35,7 +41,7 @@ SPECS = {
         "cpu": "attiny167",
     },
     "attiny2313": {
-        "cpu": "at90s2313",
+        "cpu": "attiny2313",
     },
 }
 
