@@ -77,6 +77,11 @@ pub use port::Pins;
 pub mod simple_pwm;
 
 #[cfg(feature = "device-selected")]
+pub mod wdt;
+#[cfg(feature = "device-selected")]
+pub use wdt::Wdt;
+
+#[cfg(feature = "device-selected")]
 pub mod eeprom;
 #[cfg(feature = "device-selected")]
 pub use eeprom::Eeprom;
