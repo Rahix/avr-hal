@@ -52,6 +52,7 @@ jobs:
           - type: mcu
             name: atmega32a
             spec: atmega32a
+            crate: atmega-hal
           - type: mcu
             name: atmega128a
             spec: atmega128a
