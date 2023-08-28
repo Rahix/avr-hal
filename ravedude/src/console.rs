@@ -21,7 +21,11 @@ pub fn open(port: &std::path::Path, baudrate: u32) -> anyhow::Result<()> {
 
     // Spawn a thread for the receiving end because stdio is not portably non-blocking...
     std::thread::spawn(move || loop {
+        #[cfg(not(target_os = "windows"))]
         let mut buf = [0u8; 4098];
+        #[cfg(target_os = "windows")]
+        let mut buf = [0u8; 1];
+        
         match rx.read(&mut buf) {
             Ok(count) => {
                 stdout.write(&buf[..count]).unwrap();
