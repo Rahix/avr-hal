@@ -23,6 +23,8 @@ pub fn open(port: &std::path::Path, baudrate: u32) -> anyhow::Result<()> {
     std::thread::spawn(move || loop {
         #[cfg(not(target_os = "windows"))]
         let mut buf = [0u8; 4098];
+
+        // Use buffer size 1 for windows because it blocks on rx.read until the buffer is full
         #[cfg(target_os = "windows")]
         let mut buf = [0u8; 1];
         
