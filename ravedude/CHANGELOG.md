@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed serial console not working on Windows ([#433]).
+
+[#433]: https://github.com/Rahix/avr-hal/pull/433
 
 
 ## [0.1.5] - 2022-09-18
