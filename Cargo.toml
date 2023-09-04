@@ -31,6 +31,7 @@ members = [
     "examples/arduino-uno",
     "examples/nano168",
     "examples/sparkfun-promicro",
+    "examples/sparkfun-promini-5v",
     "examples/trinket-pro",
     "examples/trinket",
 ]
