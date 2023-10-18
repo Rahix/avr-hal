@@ -430,7 +430,7 @@ impl<PIN: PinOps, IMODE: mode::InputMode> Pin<mode::Input<IMODE>, PIN> {
 /// let pins = atmega_hal::pins!(dp);
 /// let mut adc = atmega_hal::Adc::new(dp.ADC, Default::default());
 ///
-/// let a0 = dp.pc0.into_analog_input(&mut adc);
+/// let a0 = pins.pc0.into_analog_input(&mut adc);
 ///
 /// let voltage = a0.analog_read(&mut adc);
 /// // ^- this is equivalent to -v
