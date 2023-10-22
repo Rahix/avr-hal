@@ -21,6 +21,7 @@ pub(crate) mod default {
         feature = "arduino-mega1280",
         feature = "arduino-nano",
         feature = "arduino-uno",
+        feature = "nano-every",
         feature = "sparkfun-promicro",
         feature = "trinket-pro",
         feature = "nano168",

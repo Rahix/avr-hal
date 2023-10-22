@@ -12,6 +12,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "uno" => Box::new(ArduinoUno),
         "nano" => Box::new(ArduinoNano),
         "nano-new" => Box::new(ArduinoNanoNew),
+        "nano-every" => Box::new(ArduinoNanoEvery),
         "leonardo" => Box::new(ArduinoLeonardo),
         "micro" => Box::new(ArduinoMicro),
         "mega2560" => Box::new(ArduinoMega2560),
@@ -64,6 +65,9 @@ impl Board for ArduinoUno {
             partno: "atmega328p",
             baudrate: None,
             do_chip_erase: true,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -94,6 +98,9 @@ impl Board for ArduinoMicro {
             partno: "atmega32u4",
             baudrate: Some(115200),
             do_chip_erase: true,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -126,6 +133,9 @@ impl Board for ArduinoNano {
             partno: "atmega328p",
             baudrate: Some(57600),
             do_chip_erase: true,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -151,6 +161,37 @@ impl Board for ArduinoNanoNew {
             partno: "atmega328p",
             baudrate: Some(115200),
             do_chip_erase: true,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        Some(Err(anyhow::anyhow!("Not able to guess port")))
+    }
+}
+
+struct ArduinoNanoEvery;
+
+impl Board for ArduinoNanoEvery {
+    fn display_name(&self) -> &str {
+        "Arduino Nano Every"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        None
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "jtag2updi",
+            partno: "atmega4809",
+            baudrate: Some(115200),
+            do_chip_erase: true,
+            fuse2:Some(0x01),
+            fuse5:Some(0x69),
+            fuse8:Some(0x00),
         }
     }
 
@@ -188,6 +229,9 @@ impl Board for ArduinoLeonardo {
             partno: "atmega32u4",
             baudrate: None,
             do_chip_erase: true,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -219,6 +263,9 @@ impl Board for ArduinoMega1280 {
             partno: "atmega1280",
             baudrate: Some(57600),
             do_chip_erase: false,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -246,6 +293,9 @@ impl Board for ArduinoMega2560 {
             partno: "atmega2560",
             baudrate: Some(115200),
             do_chip_erase: false,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -278,6 +328,9 @@ impl Board for ArduinoDiecimila {
             partno: "atmega168",
             baudrate: Some(19200),
             do_chip_erase: false,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -303,6 +356,9 @@ impl Board for SparkFunProMicro {
             partno: "atmega32u4",
             baudrate: None,
             do_chip_erase: true,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -333,6 +389,9 @@ impl Board for TrinketPro {
             partno: "atmega328p",
             baudrate: None,
             do_chip_erase: false,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -358,6 +417,9 @@ impl Board for Trinket {
             partno: "attiny85",
             baudrate: None,
             do_chip_erase: true,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -383,6 +445,9 @@ impl Board for Nano168 {
             partno: "atmega168",
             baudrate: Some(19200),
             do_chip_erase: false,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
@@ -409,6 +474,9 @@ impl Board for ArduinoDuemilanove {
             partno: "atmega328p",
             baudrate: Some(57600),
             do_chip_erase: true,
+            fuse2:None,
+            fuse5:None,
+            fuse8:None,
         }
     }
 
