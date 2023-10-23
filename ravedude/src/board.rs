@@ -338,7 +338,7 @@ impl Board for SparkFunProMini5V {
     }
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(find_port_from_vid_pid_list(&[(0x0403, 0x6001)]))
+        Some(Err(anyhow::anyhow!("Not able to guess port")))
     }
 }
 
