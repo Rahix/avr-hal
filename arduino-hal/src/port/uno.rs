@@ -3,7 +3,7 @@ pub use atmega_hal::port::{mode, Pin, PinOps, PinMode};
 avr_hal_generic::renamed_pins! {
     type Pin = Pin;
 
-    /// Pins of the **Arduino Uno**.
+    /// Pins of the **Arduino Uno**, **Arduino Nano**, and **SparkFun ProMini 5V (16MHz)**.
     ///
     /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
     pub struct Pins from atmega_hal::Pins {

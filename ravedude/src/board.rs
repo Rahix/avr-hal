@@ -18,6 +18,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "mega1280" => Box::new(ArduinoMega1280),
         "diecimila" => Box::new(ArduinoDiecimila),
         "promicro" => Box::new(SparkFunProMicro),
+        "promini-5v" => Box::new(SparkFunProMini5V),
         "trinket-pro" => Box::new(TrinketPro),
         "trinket" => Box::new(Trinket),
         "nano168" => Box::new(Nano168),
@@ -313,6 +314,31 @@ impl Board for SparkFunProMicro {
             (0x1B4F, 0x9203), //3.3V
             (0x1B4F, 0x9204), //3.3V
         ]))
+    }
+}
+
+struct SparkFunProMini5V;
+
+impl Board for SparkFunProMini5V {
+    fn display_name(&self) -> &str {
+        "SparkFun Pro Mini 5V (16MHz)"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        None
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "arduino",
+            partno: "atmega328p",
+            baudrate: Some(57600),
+            do_chip_erase: true,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        Some(Err(anyhow::anyhow!("Not able to guess port")))
     }
 }
 

@@ -21,6 +21,7 @@ arduino-nano = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-
 arduino-uno = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
 trinket-pro = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
 sparkfun-promicro = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
+sparkfun-promini-5v = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
 trinket = ["mcu-attiny", "attiny-hal/attiny85", "board-selected"]
 nano168 = ["mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc", "board-selected"]
 
