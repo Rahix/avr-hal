@@ -14,19 +14,38 @@ pub(crate) mod default {
     ///
     /// However, you can of course still use other clock speeds but you'll then need to correctly
     /// name the types from the HAL crate using your own clock definition.
-    #[cfg(any(
-        feature = "arduino-diecimila",
-        feature = "arduino-leonardo",
-        feature = "arduino-mega2560",
-        feature = "arduino-mega1280",
-        feature = "arduino-nano",
-        feature = "arduino-uno",
-        feature = "sparkfun-promicro",
-        feature = "sparkfun-promini-5v",
-        feature = "trinket-pro",
-        feature = "nano168",
+    #[cfg(all(
+        any(
+            feature = "arduino-diecimila",
+            feature = "arduino-leonardo",
+            feature = "arduino-mega2560",
+            feature = "arduino-mega1280",
+            feature = "arduino-nano",
+            feature = "arduino-uno",
+            feature = "sparkfun-promicro",
+            feature = "sparkfun-promini-5v",
+            feature = "trinket-pro",
+            feature = "nano168",
+        ),
+        not(feature = "internal-clock")
     ))]
     pub type DefaultClock = avr_hal_generic::clock::MHz16;
+    #[cfg(all(
+        any(
+            feature = "arduino-diecimila",
+            feature = "arduino-leonardo",
+            feature = "arduino-mega2560",
+            feature = "arduino-mega1280",
+            feature = "arduino-nano",
+            feature = "arduino-uno",
+            feature = "sparkfun-promicro",
+            feature = "sparkfun-promini-5v",
+            feature = "trinket-pro",
+            feature = "nano168",
+        ),
+        feature = "internal-clock"
+    ))]
+    pub type DefaultClock = avr_hal_generic::clock::MHz8;
     #[cfg(any(feature = "trinket", feature = "sparkfun-promini-3v3"))]
     pub type DefaultClock = avr_hal_generic::clock::MHz8;
 }
