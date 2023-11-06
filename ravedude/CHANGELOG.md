@@ -5,10 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
+## [0.1.6] - 2023-11-06
+### Added
+- Support for *Arduino Mega 1280* ([#362]).
+- Support for *Arduino Duemilanove* ([#404]).
+- Support for *SparkFun ProMini 5V* ([#435]).
+
 ### Fixed
 - Fixed serial console not working on Windows ([#433]).
 
+[#362]: https://github.com/Rahix/avr-hal/pull/362
+[#404]: https://github.com/Rahix/avr-hal/pull/404
 [#433]: https://github.com/Rahix/avr-hal/pull/433
+[#435]: https://github.com/Rahix/avr-hal/pull/435
 
 
 ## [0.1.5] - 2022-09-18
@@ -74,7 +85,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial, miminal version.
 
 
-[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.5...HEAD
+[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.6...HEAD
+[0.1.6]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.5...ravedude-0.1.6
 [0.1.5]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.4...ravedude-0.1.5
 [0.1.4]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.3...ravedude-0.1.4
 [0.1.3]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.2...ravedude-0.1.3
