@@ -5,10 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Support for *Arduino Mega 1280* ([#362]).
+- Support for *Arduino Duemilanove* ([#404]).
+- Support for *SparkFun ProMini 5V* ([#435]).
+
 ### Fixed
 - Fixed serial console not working on Windows ([#433]).
 
+[#362]: https://github.com/Rahix/avr-hal/pull/362
+[#404]: https://github.com/Rahix/avr-hal/pull/404
 [#433]: https://github.com/Rahix/avr-hal/pull/433
+[#435]: https://github.com/Rahix/avr-hal/pull/435
 
 
 ## [0.1.5] - 2022-09-18
