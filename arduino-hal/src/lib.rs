@@ -13,6 +13,7 @@
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
+#![cfg_attr(feature = "sparkfun-promini-3v", doc = "**SparkFun ProMini 3V (8MHz)**.")]
 #![cfg_attr(feature = "sparkfun-promini-5v", doc = "**SparkFun ProMini 5V (16MHz)**.")]
 #![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
 #![cfg_attr(feature = "trinket", doc = "**Trinket**.")]
@@ -60,6 +61,7 @@ compile_error!(
     * arduino-nano
     * arduino-uno
     * sparkfun-promicro
+    * sparkfun-promini-3v
     * sparkfun-promini-5v
     * trinket-pro
     * trinket
