@@ -39,7 +39,3 @@ exclude = [
     # The RAVEDUDE! Yeah!
     "ravedude",
 ]
-
-[patch.crates-io]
-# XXX: Temporary fix for avr-rust/rust#148
-ufmt = { git = "https://github.com/Rahix/ufmt.git", rev = "12225dc1678e42fecb0e8635bf80f501e24817d9" }
