@@ -1,17 +1,15 @@
-pub use atmega_hal::port::{mode, Pin, PinOps, PinMode};
+pub use atmega_hal::port::{mode, Pin, PinMode, PinOps};
 
 avr_hal_generic::renamed_pins! {
-    type Pin = Pin;
-
     /// Pins of the **Arduino Mega 2560** and **Arduino Mega 1280**.
-    /// 
+    ///
     /// mega1280:
     ///     https://www.arduino.cc/en/uploads/Main/arduino-mega-schematic.pdf
     /// mega2560:
     ///     https://www.arduino.cc/en/uploads/Main/arduino-mega2560-schematic.pdf
-    /// 
+    ///
     /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
-    pub struct Pins from atmega_hal::Pins {
+    pub struct Pins {
         /// `D0` / `RX0`
         ///
         /// * `RXD0` (USART0)
@@ -336,5 +334,10 @@ avr_hal_generic::renamed_pins! {
         /// * `ADC15`: A/D converter input 15
         /// * `PCINT23`: External Interrupt (Pin Change)
         pub a15: atmega_hal::port::PK7 = pk7,
+    }
+
+    impl Pins {
+        type Pin = Pin;
+        type McuPins = atmega_hal::Pins;
     }
 }

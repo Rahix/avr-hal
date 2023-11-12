@@ -1,12 +1,10 @@
-pub use atmega_hal::port::{mode, Pin, PinOps, PinMode};
+pub use atmega_hal::port::{mode, Pin, PinMode, PinOps};
 
 avr_hal_generic::renamed_pins! {
-    type Pin = Pin;
-
     /// Pins of the **SparkFun ProMicro**.
     ///
     /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
-    pub struct Pins from atmega_hal::Pins {
+    pub struct Pins {
         /// `RX`
         ///
         /// `RX` (UART)
@@ -73,5 +71,10 @@ avr_hal_generic::renamed_pins! {
         ///
         /// `ADC4` channel
         pub a3: atmega_hal::port::PF4 = pf4,
+    }
+
+    impl Pins {
+        type Pin = Pin;
+        type McuPins = atmega_hal::Pins;
     }
 }

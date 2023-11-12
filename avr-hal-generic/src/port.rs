@@ -463,15 +463,9 @@ impl<PIN: PinOps> Pin<mode::Analog, PIN> {
 #[macro_export]
 macro_rules! impl_port_traditional {
     (
-        enum Ports {
-            $($PortName:ident: ($Port:ty, $port_port_reg:ident, $port_pin_reg:ident, $port_ddr_reg:ident),)+
-        }
-
         $(#[$pins_attr:meta])*
-        pub struct Pins {
-            $($pin:ident: $Pin:ident = ($PinPort:ty, $PinPortName:ident, $pin_num:expr,
-                                        $pin_port_reg:ident, $pin_pin_reg:ident,
-                                        $pin_ddr_reg:ident),)+
+        enum Ports {
+            $($name:ident: $port:ty = [$($pin:literal),+],)+
         }
     ) => {
         /// Type-alias for a pin type which can represent any concrete pin.
@@ -482,29 +476,33 @@ macro_rules! impl_port_traditional {
         /// "dynamic" type.  Do note, however, that using this dynamic type has a runtime cost.
         pub type Pin<MODE, PIN = Dynamic> = $crate::port::Pin<MODE, PIN>;
 
-        $(#[$pins_attr])*
-        pub struct Pins {
-            $(pub $pin: Pin<
-                mode::Input<mode::Floating>,
-                $Pin,
-            >,)+
-        }
+        $crate::paste::paste! {
+            $(#[$pins_attr])*
+            pub struct Pins {
+                $($(pub [<p $name:lower $pin>]: Pin<
+                    mode::Input<mode::Floating>,
+                    [<P $name $pin>],
+                >,)+)+
+            }
 
-        impl Pins {
-            pub fn new(
-                $(_: $Port,)+
-            ) -> Self {
-                Self {
-                    $($pin: $crate::port::Pin::new(
-                        $Pin { _private: (), }
-                    ),)+
+            impl Pins {
+                pub fn new(
+                    $(_: $port,)+
+                ) -> Self {
+                    Self {
+                        $($([<p $name:lower $pin>]: $crate::port::Pin::new(
+                            [<P $name $pin>] { _private: (), }
+                        ),)+)+
+                    }
                 }
             }
         }
 
-        #[repr(u8)]
-        pub enum DynamicPort {
-            $($PortName,)+
+        $crate::paste::paste! {
+            #[repr(u8)]
+            pub enum DynamicPort {
+                $([<PORT $name>]),+
+            }
         }
 
         pub struct Dynamic {
@@ -523,135 +521,74 @@ macro_rules! impl_port_traditional {
             }
         }
 
-        impl $crate::port::PinOps for Dynamic {
-            type Dynamic = Self;
-
-            #[inline]
-            fn into_dynamic(self) -> Self::Dynamic {
-                self
-            }
-
-            #[inline]
-            unsafe fn out_set(&mut self) {
-                match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_port_reg.modify(|r, w| {
-                        w.bits(r.bits() | self.mask)
-                    }),)+
-                }
-            }
-
-            #[inline]
-            unsafe fn out_clear(&mut self) {
-                match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_port_reg.modify(|r, w| {
-                        w.bits(r.bits() & !self.mask)
-                    }),)+
-                }
-            }
-
-            #[inline]
-            unsafe fn out_toggle(&mut self) {
-                match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_pin_reg.write(|w| {
-                        w.bits(self.mask)
-                    }),)+
-                }
-            }
-
-            #[inline]
-            unsafe fn out_get(&self) -> bool {
-                match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_port_reg.read().bits()
-                        & self.mask != 0,)+
-                }
-            }
-
-            #[inline]
-            unsafe fn in_get(&self) -> bool {
-                match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_pin_reg.read().bits()
-                        & self.mask != 0,)+
-                }
-            }
-
-            #[inline]
-            unsafe fn make_output(&mut self) {
-                match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_ddr_reg.modify(|r, w| {
-                        w.bits(r.bits() | self.mask)
-                    }),)+
-                }
-            }
-
-            #[inline]
-            unsafe fn make_input(&mut self, pull_up: bool) {
-                match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).$port_ddr_reg.modify(|r, w| {
-                        w.bits(r.bits() & !self.mask)
-                    }),)+
-                }
-                if pull_up {
-                    self.out_set()
-                } else {
-                    self.out_clear()
-                }
-            }
-        }
-
-        $(
-            pub struct $Pin {
-                _private: ()
-            }
-
-            impl $crate::port::PinOps for $Pin {
-                type Dynamic = Dynamic;
+        $crate::paste::paste! {
+            impl $crate::port::PinOps for Dynamic {
+                type Dynamic = Self;
 
                 #[inline]
                 fn into_dynamic(self) -> Self::Dynamic {
-                    Dynamic::new(DynamicPort::$PinPortName, $pin_num)
+                    self
                 }
 
                 #[inline]
                 unsafe fn out_set(&mut self) {
-                    (*<$PinPort>::ptr()).$pin_port_reg.modify(|r, w| {
-                        w.bits(r.bits() | (1 << $pin_num))
-                    })
+                    match self.port {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
+                            w.bits(r.bits() | self.mask)
+                        }),)+
+                    }
                 }
 
                 #[inline]
                 unsafe fn out_clear(&mut self) {
-                    (*<$PinPort>::ptr()).$pin_port_reg.modify(|r, w| {
-                        w.bits(r.bits() & !(1 << $pin_num))
-                    })
+                    match self.port {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
+                            w.bits(r.bits() & !self.mask)
+                        }),)+
+                    }
                 }
 
                 #[inline]
                 unsafe fn out_toggle(&mut self) {
-                    (*<$PinPort>::ptr()).$pin_pin_reg.write(|w| w.bits(1 << $pin_num))
+                    match self.port {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>].write(|w| {
+                            w.bits(self.mask)
+                        }),)+
+                    }
                 }
 
                 #[inline]
                 unsafe fn out_get(&self) -> bool {
-                    (*<$PinPort>::ptr()).$pin_port_reg.read().bits() & (1 << $pin_num) != 0
+                    match self.port {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>].read().bits()
+                            & self.mask != 0,)+
+                    }
                 }
 
                 #[inline]
                 unsafe fn in_get(&self) -> bool {
-                    (*<$PinPort>::ptr()).$pin_pin_reg.read().bits() & (1 << $pin_num) != 0
+                    match self.port {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<pin $name:lower>].read().bits()
+                            & self.mask != 0,)+
+                    }
                 }
 
                 #[inline]
                 unsafe fn make_output(&mut self) {
-                    (*<$PinPort>::ptr()).$pin_ddr_reg.modify(|r, w| {
-                        w.bits(r.bits() | (1 << $pin_num))
-                    })
+                    match self.port {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<ddr $name:lower>].modify(|r, w| {
+                            w.bits(r.bits() | self.mask)
+                        }),)+
+                    }
                 }
 
                 #[inline]
                 unsafe fn make_input(&mut self, pull_up: bool) {
-                    (*<$PinPort>::ptr()).$pin_ddr_reg.modify(|r, w| {
-                        w.bits(r.bits() & !(1 << $pin_num))
-                    });
+                    match self.port {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<ddr $name:lower>].modify(|r, w| {
+                            w.bits(r.bits() & !self.mask)
+                        }),)+
+                    }
                     if pull_up {
                         self.out_set()
                     } else {
@@ -659,33 +596,101 @@ macro_rules! impl_port_traditional {
                     }
                 }
             }
-        )+
+        }
+
+        $crate::paste::paste! {
+            $($(
+                pub struct [<P $name $pin>] {
+                    _private: ()
+                }
+
+                impl $crate::port::PinOps for [<P $name $pin>] {
+                    type Dynamic = Dynamic;
+
+                    #[inline]
+                    fn into_dynamic(self) -> Self::Dynamic {
+                        Dynamic::new(DynamicPort::[<PORT $name>], $pin)
+                    }
+
+                    #[inline]
+                    unsafe fn out_set(&mut self) {
+                        (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
+                            w.bits(r.bits() | (1 << $pin))
+                        })
+                    }
+
+                    #[inline]
+                    unsafe fn out_clear(&mut self) {
+                        (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
+                            w.bits(r.bits() & !(1 << $pin))
+                        })
+                    }
+
+                    #[inline]
+                    unsafe fn out_toggle(&mut self) {
+                        (*<$port>::ptr()).[<pin $name:lower>].write(|w| w.bits(1 << $pin))
+                    }
+
+                    #[inline]
+                    unsafe fn out_get(&self) -> bool {
+                        (*<$port>::ptr()).[<port $name:lower>].read().bits() & (1 << $pin) != 0
+                    }
+
+                    #[inline]
+                    unsafe fn in_get(&self) -> bool {
+                        (*<$port>::ptr()).[<pin $name:lower>].read().bits() & (1 << $pin) != 0
+                    }
+
+                    #[inline]
+                    unsafe fn make_output(&mut self) {
+                        (*<$port>::ptr()).[<ddr $name:lower>].modify(|r, w| {
+                            w.bits(r.bits() | (1 << $pin))
+                        })
+                    }
+
+                    #[inline]
+                    unsafe fn make_input(&mut self, pull_up: bool) {
+                        (*<$port>::ptr()).[<ddr $name:lower>].modify(|r, w| {
+                            w.bits(r.bits() & !(1 << $pin))
+                        });
+                        if pull_up {
+                            self.out_set()
+                        } else {
+                            self.out_clear()
+                        }
+                    }
+                }
+            )+)+
+        }
     };
 }
 
 #[macro_export]
 macro_rules! renamed_pins {
     (
-        type Pin = $PinType:ident;
-
         $(#[$pins_attr:meta])*
-        pub struct Pins from $McuPins:ty {
-            $($(#[$pin_attr:meta])* pub $pin:ident: $Pin:ty = $pin_orig:ident,)+
+        pub struct Pins {
+            $($(#[$pin_attr:meta])* pub $pin_name:ident: $pin_type:ty = $pin_orig:ident,)+
+        }
+
+        impl Pins {
+            type Pin = $pin_wrapper:ident;
+            type McuPins = $mcu_pins:ty;
         }
     ) => {
         $(#[$pins_attr])*
         pub struct Pins {
             $($(#[$pin_attr])*
-            pub $pin: $PinType<
+            pub $pin_name: $pin_wrapper<
                 $crate::port::mode::Input<$crate::port::mode::Floating>,
-                $Pin,
+                $pin_type,
             >,)+
         }
 
         impl Pins {
-            pub fn with_mcu_pins(pins: $McuPins) -> Self {
+            pub fn with_mcu_pins(pins: $mcu_pins) -> Self {
                 Self {
-                    $($pin: pins.$pin_orig,)+
+                    $($pin_name: pins.$pin_orig,)+
                 }
             }
         }
