@@ -1,12 +1,10 @@
-pub use atmega_hal::port::{mode, Pin, PinOps, PinMode};
+pub use atmega_hal::port::{mode, Pin, PinMode, PinOps};
 
 avr_hal_generic::renamed_pins! {
-    type Pin = Pin;
-
     /// Pins of the **Arduino Diecimila**.
     ///
     /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
-    pub struct Pins from atmega_hal::Pins {
+    pub struct Pins {
         /// `A0`
         ///
         /// * ADC0 (ADC input channel 0)
@@ -124,5 +122,10 @@ avr_hal_generic::renamed_pins! {
         /// * PCINT5 (pin change interrupt 5)
         /// * L LED on Arduino Uno
         pub d13: atmega_hal::port::PB5 = pb5,
+    }
+
+    impl Pins {
+        type Pin = Pin;
+        type McuPins = atmega_hal::Pins;
     }
 }
