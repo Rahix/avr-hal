@@ -182,6 +182,23 @@ impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz12> {
     }
 }
 
+impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz10> {
+    fn delay_us(&mut self, mut us: u16) {
+        // for the 10 crate::clock::MHz clock if somebody is working with USB
+
+        // for a 1 microsecond delay, simply return.  the overhead
+        // of the function call takes 14 (16) cycles, which is 1.5us
+        if us <= 1 {
+            return;
+        } // = 3 cycles, (4 when true)
+
+        // 4 cycles per busy_loop iteration = 0.4 us per busy loop, so 2.5 times to get 1 us
+        us = ((us << 2) + us) >> 1; // x2.5
+
+        busy_loop(us);
+    }
+}
+
 impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz8> {
     fn delay_us(&mut self, mut us: u16) {
         // for the 8 crate::clock::MHz internal clock
