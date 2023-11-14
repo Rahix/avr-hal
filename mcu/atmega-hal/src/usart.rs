@@ -9,14 +9,14 @@ pub type UsartWriter<USART, RX, TX, CLOCK> =
 pub type UsartReader<USART, RX, TX, CLOCK> =
     avr_hal_generic::usart::UsartReader<crate::Atmega, USART, RX, TX, CLOCK>;
 
-#[cfg(any(feature = "atmega168", feature = "atmega328p", feature = "atmega328pb", feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega168", feature = "atmega328p", feature = "atmega328pb", feature = "atmega1284p", feature = "atmega164pa"))]
 pub type Usart0<CLOCK> = Usart<
     crate::pac::USART0,
     port::Pin<port::mode::Input, port::PD0>,
     port::Pin<port::mode::Output, port::PD1>,
     CLOCK,
 >;
-#[cfg(any(feature = "atmega168", feature = "atmega328p", feature = "atmega328pb", feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega168", feature = "atmega328p", feature = "atmega328pb", feature = "atmega1284p", feature = "atmega164pa"))]
 avr_hal_generic::impl_usart_traditional! {
     hal: crate::Atmega,
     peripheral: crate::pac::USART0,
