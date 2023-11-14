@@ -63,7 +63,9 @@ where
     #[inline]
     pub fn erase_byte(&mut self, offset: u16) {
         assert!(offset < Self::CAPACITY);
-        self.p.raw_erase_byte(offset)
+        // Write 0xff here because the erase function is borked.
+        // See also: https://github.com/Rahix/avr-hal/issues/406
+        self.p.raw_write_byte(offset, 0xff)
     }
 
     pub fn read(&self, offset: u16, buf: &mut [u8]) -> Result<(), OutOfBoundsError> {
@@ -179,26 +181,12 @@ macro_rules! impl_eeprom_common {
 
                     // Check if any bits are changed to '1' in the new value.
                     if (diff_mask & data) != 0 {
-                        // Now we know that _some_ bits need to be erased to '1'.
-
-                        // Check if any bits in the new value are '0'.
-                        if data != 0xff {
-                            // Now we know that some bits need to be programmed to '0' also.
-                            self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
-
-                            {
-                                let $periph_ewmode_var = &self;
-                                $set_erasewrite_mode
-                            }
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase+Write operation.
-                        } else {
-                            // Now we know that all bits should be erased.
-                            {
-                                let $periph_emode_var = &self;
-                                $set_erase_mode
-                            }
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase-only operation.
+                        self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
+                        {
+                            let $periph_ewmode_var = &self;
+                            $set_erasewrite_mode
                         }
+                        self.eecr.write(|w| w.eepe().set_bit()); // Start Erase+Write operation.
                     }
                     //Now we know that _no_ bits need to be erased to '1'.
                     else {
