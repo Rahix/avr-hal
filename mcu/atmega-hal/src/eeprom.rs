@@ -14,7 +14,7 @@ avr_hal_generic::impl_eeprom_atmega! {
     },
 }
 
-#[cfg(feature = "atmega168")]
+#[cfg(any(feature = "atmega168", feature = "atmega164pa"))]
 avr_hal_generic::impl_eeprom_atmega! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
