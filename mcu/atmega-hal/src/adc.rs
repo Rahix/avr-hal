@@ -3,54 +3,6 @@
 use crate::port;
 pub use avr_hal_generic::adc::{AdcChannel, AdcOps, ClockDivider};
 
-/// Select the voltage reference for the ADC peripheral
-///
-/// The internal voltage reference options may not be used if an external reference voltage is
-/// being applied to the AREF pin.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u8)]
-pub enum ReferenceVoltage {
-    /// Voltage applied to AREF pin.
-    Aref,
-    /// Default reference voltage (default).
-    AVcc,
-    /// Internal reference voltage.
-    Internal,
-}
-
-impl Default for ReferenceVoltage {
-    fn default() -> Self {
-        Self::AVcc
-    }
-}
-
-/// Configuration for the ADC peripheral.
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AdcSettings {
-    pub clock_divider: ClockDivider,
-    pub ref_voltage: ReferenceVoltage,
-}
-
-fn apply_settings(peripheral: &crate::pac::ADC, settings: AdcSettings) {
-    peripheral.adcsra.write(|w| {
-        w.aden().set_bit();
-        match settings.clock_divider {
-            ClockDivider::Factor2 => w.adps().prescaler_2(),
-            ClockDivider::Factor4 => w.adps().prescaler_4(),
-            ClockDivider::Factor8 => w.adps().prescaler_8(),
-            ClockDivider::Factor16 => w.adps().prescaler_16(),
-            ClockDivider::Factor32 => w.adps().prescaler_32(),
-            ClockDivider::Factor64 => w.adps().prescaler_64(),
-            ClockDivider::Factor128 => w.adps().prescaler_128(),
-        }
-    });
-    peripheral.admux.write(|w| match settings.ref_voltage {
-        ReferenceVoltage::Aref => w.refs().aref(),
-        ReferenceVoltage::AVcc => w.refs().avcc(),
-        ReferenceVoltage::Internal => w.refs().internal(),
-    });
-}
-
 /// Check the [`avr_hal_generic::adc::Adc`] documentation.
 pub type Adc<CLOCK> = avr_hal_generic::adc::Adc<crate::Atmega, crate::pac::ADC, CLOCK>;
 
