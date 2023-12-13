@@ -19,7 +19,11 @@ Install dependencies:
   ```
 - Windows
 
-  Install [Scoop](https://scoop.sh/) using Powershell
+  Use [`winget`](https://learn.microsoft.com/en-us/windows/package-manager/winget/) on Windows 10 & Windows 11:
+  ```
+  winget install AVRDudes.AVRDUDE ZakKemble.avr-gcc
+  ```
+  On older systems you can use [Scoop](https://scoop.sh/) which you first have to install using Powershell:
   ```PowerShell
   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Needed to run a remote script the first time
   irm get.scoop.sh | iex
