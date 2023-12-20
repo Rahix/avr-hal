@@ -23,6 +23,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "trinket" => Box::new(Trinket),
         "nano168" => Box::new(Nano168),
         "duemilanove" => Box::new(ArduinoDuemilanove),
+        "circuit-playground-classic" => Box::new(CircuitPlaygroundClassic),
         _ => return None,
     })
 }
@@ -440,5 +441,32 @@ impl Board for ArduinoDuemilanove {
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         Some(Err(anyhow::anyhow!("Not able to guess port")))
+    }
+}
+
+struct CircuitPlaygroundClassic;
+
+impl Board for CircuitPlaygroundClassic {
+    fn display_name(&self) -> &str {
+        "Circuit Playground Classic"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        Some("Reset the board by pressing the reset button once.")
+    }
+
+    fn dude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "avr109",
+            partno: "atmega32u4",
+            baudrate: None,
+            do_chip_erase: true,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        Some(find_port_from_vid_pid_list(&[
+            (0x239a, 0x8011),
+        ]))
     }
 }
