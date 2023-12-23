@@ -3,7 +3,7 @@
 //! Please take a look at the documentation for [`Pin`] for a detailed explanation.
 
 use core::marker::PhantomData;
-use embedded_hal::digital::v2::{InputPin, OutputPin};
+use embedded_hal_v0::digital::v2::{InputPin, OutputPin};
 
 pub trait PinMode: crate::Sealed {}
 /// GPIO pin modes

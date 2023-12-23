@@ -375,7 +375,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
 /// Created by calling [`Usart::split`].  Splitting a peripheral into reader and writer allows
 /// concurrently receiving and transmitting data from different contexts.
 ///
-/// The writer half most notably implements [`embedded_hal::serial::Write`] and [`ufmt::uWrite`]
+/// The writer half most notably implements [`embedded_hal_v0::serial::Write`] and [`ufmt::uWrite`]
 /// for transmitting data.
 pub struct UsartWriter<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> {
     p: USART,
@@ -390,7 +390,7 @@ pub struct UsartWriter<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> {
 /// Created by calling [`Usart::split`].  Splitting a peripheral into reader and writer allows
 /// concurrently receiving and transmitting data from different contexts.
 ///
-/// The reader half most notably implements [`embedded_hal::serial::Read`] for receiving data.
+/// The reader half most notably implements [`embedded_hal_v0::serial::Read`] for receiving data.
 pub struct UsartReader<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> {
     p: USART,
     rx: RX,

@@ -16,7 +16,7 @@ use arduino_hal::prelude::*;
 use core::cell;
 use panic_halt as _;
 
-use embedded_hal::serial::Read;
+use embedded_hal_v0::serial::Read;
 
 // Possible Values:
 //
