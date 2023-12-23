@@ -16,7 +16,7 @@
 
 use arduino_hal::prelude::*;
 use arduino_hal::spi;
-use embedded_hal::spi::FullDuplex;
+use embedded_hal_v0::spi::FullDuplex;
 use panic_halt as _;
 
 #[arduino_hal::entry]

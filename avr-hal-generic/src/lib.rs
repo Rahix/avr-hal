@@ -2,7 +2,7 @@
 #![cfg_attr(avr_hal_asm_macro, feature(asm_experimental_arch))]
 #![cfg_attr(not(avr_hal_asm_macro), feature(llvm_asm))]
 
-pub extern crate embedded_hal as hal;
+pub extern crate embedded_hal_v0 as hal;
 
 #[doc(hidden)]
 pub extern crate avr_device;
