@@ -8,7 +8,7 @@ publish = false
 [dependencies]
 panic-halt = "0.2.0"
 ufmt = "0.2.0"
-nb = "0.1.2"
+nb = "1.1.0"
 embedded-hal = "0.2.3"
 
 [dependencies.arduino-hal]
