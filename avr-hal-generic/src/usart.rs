@@ -3,8 +3,11 @@
 //! Check the documentation of [`Usart`] for details.
 
 use core::cmp::Ordering;
+use core::convert::Infallible;
 use core::marker;
 use crate::prelude::*;
+
+use embedded_io::ErrorType;
 
 use crate::port;
 
@@ -184,21 +187,21 @@ pub trait UsartOps<H, RX, TX> {
     /// was flushed yet.
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
-    fn raw_flush(&mut self) -> nb::Result<(), core::convert::Infallible>;
+    fn raw_flush(&mut self) -> nb::Result<(), Infallible>;
     /// Write a byte to the TX buffer.
     ///
     /// This operation must be non-blocking and return [`nb::Error::WouldBlock`] until the byte is
     /// enqueued.  The operation should not wait for the byte to have actually been sent.
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
-    fn raw_write(&mut self, byte: u8) -> nb::Result<(), core::convert::Infallible>;
+    fn raw_write(&mut self, byte: u8) -> nb::Result<(), Infallible>;
     /// Read a byte from the RX buffer.
     ///
     /// This operation must be non-blocking and return [`nb::Error::WouldBlock`] if no incoming
     /// byte is available.
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
-    fn raw_read(&mut self) -> nb::Result<u8, core::convert::Infallible>;
+    fn raw_read(&mut self) -> nb::Result<u8, Infallible>;
 
     /// Enable/Disable a certain interrupt.
     ///
@@ -336,7 +339,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK
 }
 
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite for Usart<H, USART, RX, TX, CLOCK> {
-    type Error = core::convert::Infallible;
+    type Error = Infallible;
 
     fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
         for b in s.as_bytes().iter() {
@@ -349,7 +352,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite for Usart<H, USA
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Write<u8>
     for Usart<H, USART, RX, TX, CLOCK>
 {
-    type Error = core::convert::Infallible;
+    type Error = Infallible;
 
     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
         self.p.raw_write(byte)
@@ -360,13 +363,75 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Writ
     }
 }
 
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ErrorType for Usart<H, USART, RX, TX, CLOCK> { type Error = Infallible; }
+
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_io::Write for Usart<H, USART, RX, TX, CLOCK> {
+    fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+        if buf.is_empty() {
+            return Ok(0);
+        }
+        // block for first byte
+        self.write_byte(buf[0]);
+        let mut i = 1;
+
+        // write more bytes if it's possible
+        for byte in buf[1..].iter() {
+            match self.p.raw_write(*byte) {
+                Ok(_) => {
+                    i += 1;
+                }
+                Err(nb::Error::WouldBlock) => {
+                    return Ok(i);
+                }
+                Err(_) => {
+                    unreachable!(); // `raw_write` is `Infallible`
+                }
+            }
+        }
+        Ok(i)
+    }
+
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        self.p.raw_flush().unwrap(); // `raw_write` is `Infallible`
+        Ok(())
+    }
+}
+
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Read<u8>
     for Usart<H, USART, RX, TX, CLOCK>
 {
-    type Error = core::convert::Infallible;
+    type Error = Infallible;
 
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
         self.p.raw_read()
+    }
+}
+
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_io::Read for Usart<H, USART, RX, TX, CLOCK> {
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+        // block for first byte
+        buf[0] = self.read_byte();
+        let mut i = 1;
+
+        // grab more bytes if available
+        loop {
+            match self.p.raw_read() {
+                Ok(byte) => {
+                    buf[i] = byte;
+                    i += 1;
+
+                    if i == buf.len() {
+                        return Ok(i);
+                    }
+                }
+                Err(nb::Error::WouldBlock) => {
+                    return Ok(i);
+                }
+                Err(_) => {
+                    unreachable!(); // `raw_read` is `Infallible`
+                }
+            }
+        }
     }
 }
 
@@ -413,6 +478,14 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> UsartWriter<H, USART, RX, TX,
             _h: marker::PhantomData,
         }
     }
+
+    /// Transmit a byte.
+    ///
+    /// This method will block until the byte has been enqueued for transmission but **not** until
+    /// it was entirely sent.
+    fn write_byte(&mut self, byte: u8) {
+        nb::block!(self.p.raw_write(byte)).unwrap()
+    }
 }
 
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> UsartReader<H, USART, RX, TX, CLOCK> {
@@ -434,7 +507,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> UsartReader<H, USART, RX, TX,
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite
     for UsartWriter<H, USART, RX, TX, CLOCK>
 {
-    type Error = core::convert::Infallible;
+    type Error = Infallible;
 
     fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
         for b in s.as_bytes().iter() {
@@ -447,7 +520,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Write<u8>
     for UsartWriter<H, USART, RX, TX, CLOCK>
 {
-    type Error = core::convert::Infallible;
+    type Error = Infallible;
 
     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
         self.p.raw_write(byte)
@@ -458,13 +531,74 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Writ
     }
 }
 
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ErrorType for UsartWriter<H, USART, RX, TX, CLOCK> { type Error = Infallible; }
+
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_io::Write for UsartWriter<H, USART, RX, TX, CLOCK> {
+    fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+        if buf.is_empty() {
+            return Ok(0);
+        }
+        // block for first byte
+        self.write_byte(buf[0]);
+        let mut i = 1;
+
+        // write more bytes if it's possible
+        for byte in buf[1..].iter() {
+            match self.p.raw_write(*byte) {
+                Ok(_) => {
+                    i += 1;
+                }
+                Err(nb::Error::WouldBlock) => {
+                    return Ok(i);
+                }
+                Err(_) => {
+                    unreachable!(); // `raw_write` is `Infallible`
+                }
+            }
+        }
+        Ok(i)
+    }
+
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        self.p.raw_flush().unwrap(); // `raw_flush` is `Infallible`
+        Ok(())
+    }
+}
+
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Read<u8>
     for UsartReader<H, USART, RX, TX, CLOCK>
 {
-    type Error = core::convert::Infallible;
+    type Error = Infallible;
 
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
         self.p.raw_read()
+    }
+}
+
+
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ErrorType for UsartReader<H, USART, RX, TX, CLOCK> { type Error = Infallible; }
+
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_io::Read for UsartReader<H, USART, RX, TX, CLOCK> {
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+        let mut i = 0;
+        loop {
+            match self.p.raw_read() {
+                Ok(byte) => {
+                    buf[i] = byte;
+                    i += 1;
+
+                    if i == buf.len() {
+                        return Ok(i);
+                    }
+                }
+                Err(nb::Error::WouldBlock) => {
+                    return Ok(i);
+                }
+                Err(_) => {
+                    unreachable!(); // `raw_read` is `Infallible`
+                }
+            }
+        }
     }
 }
 

@@ -13,6 +13,7 @@ embedded-hal = "1.0"
 pwm-pca9685 = "0.3.1"
 infrared = "0.14.1"
 embedded-storage = "0.2"
+embedded-io = "0.6.1"
 
 [dependencies.embedded-hal-v0]
 version = "0.2.3"
