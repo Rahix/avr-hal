@@ -1,7 +1,7 @@
 //! Delay implementations
 
 use core::marker;
-use hal::blocking::delay as delay_v0;
+use embedded_hal_v0::blocking::delay as delay_v0;
 use embedded_hal::delay::DelayNs;
 
 #[cfg(all(target_arch = "avr", avr_hal_asm_macro))]
@@ -18,9 +18,9 @@ use core::arch::asm;
 /// // use attiny_hal as hal;
 ///
 /// use arduino_hal as hal;
-/// use hal::prelude::*;
+/// use embedded_hal_v0::prelude::*;
 ///
-/// let mut delay = hal::delay::Delay::<hal::clock::MHz16>::new();
+/// let mut delay = embedded_hal_v0::delay::Delay::<hal::clock::MHz16>::new();
 ///
 /// // Wait 1 second
 /// delay.delay_ms(1000);
