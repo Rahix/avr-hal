@@ -12,7 +12,6 @@
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
-use arduino_hal::prelude::*;
 use core::cell;
 use panic_halt as _;
 
@@ -85,9 +84,9 @@ fn main() -> ! {
 
     // Wait for a character and print current time once it is received
     loop {
-        let b = nb::block!(serial.read()).void_unwrap();
+        let b = nb::block!(serial.read()).unwrap();
 
         let time = millis();
-        ufmt::uwriteln!(&mut serial, "Got {} after {} ms!\r", b, time).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "Got {} after {} ms!\r", b, time).unwrap();
     }
 }

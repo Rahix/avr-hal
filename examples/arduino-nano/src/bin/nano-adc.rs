@@ -1,7 +1,6 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
 use panic_halt as _;
 
 use arduino_hal::adc;
@@ -19,9 +18,9 @@ fn main() -> ! {
         adc.read_blocking(&adc::channel::Gnd),
         adc.read_blocking(&adc::channel::Temperature),
     );
-    ufmt::uwriteln!(&mut serial, "Vbandgap: {}", vbg).void_unwrap();
-    ufmt::uwriteln!(&mut serial, "Ground: {}", gnd).void_unwrap();
-    ufmt::uwriteln!(&mut serial, "Temperature: {}", tmp).void_unwrap();
+    ufmt::uwriteln!(&mut serial, "Vbandgap: {}", vbg).unwrap();
+    ufmt::uwriteln!(&mut serial, "Ground: {}", gnd).unwrap();
+    ufmt::uwriteln!(&mut serial, "Temperature: {}", tmp).unwrap();
 
     let a0 = pins.a0.into_analog_input(&mut adc);
     let a1 = pins.a1.into_analog_input(&mut adc);
@@ -41,7 +40,7 @@ fn main() -> ! {
         ];
 
         for (i, v) in values.iter().enumerate() {
-            ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).void_unwrap();
+            ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).unwrap();
         }
 
         // Arduino Nano has two more ADC pins A6 and A7.  Accessing them works a bit different from
@@ -50,9 +49,9 @@ fn main() -> ! {
             adc.read_blocking(&adc::channel::ADC6),
             adc.read_blocking(&adc::channel::ADC7),
         );
-        ufmt::uwrite!(&mut serial, "A6: {} A7: {}", a6, a7).void_unwrap();
+        ufmt::uwrite!(&mut serial, "A6: {} A7: {}", a6, a7).unwrap();
 
-        ufmt::uwriteln!(&mut serial, "").void_unwrap();
+        ufmt::uwriteln!(&mut serial, "").unwrap();
         arduino_hal::delay_ms(1000);
     }
 }

@@ -157,7 +157,7 @@ impl crate::usart::UsartOps<
         self.ucsrb.reset();
     }
 
-    fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), avr_hal_generic::void::Void> {
+    fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), core::convert::Infallible> {
         if self.ucsra.read().udre().bit_is_clear() {
             Err(avr_hal_generic::nb::Error::WouldBlock)
         } else {
@@ -165,7 +165,7 @@ impl crate::usart::UsartOps<
         }
     }
 
-    fn raw_write(&mut self, byte: u8) -> avr_hal_generic::nb::Result<(), avr_hal_generic::void::Void> {
+    fn raw_write(&mut self, byte: u8) -> avr_hal_generic::nb::Result<(), core::convert::Infallible> {
         // Call flush to make sure the data-register is empty
         self.raw_flush()?;
 
@@ -173,7 +173,7 @@ impl crate::usart::UsartOps<
         Ok(())
     }
 
-    fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, avr_hal_generic::void::Void> {
+    fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, core::convert::Infallible> {
         if self.ucsra.read().rxc().bit_is_clear() {
             return Err(avr_hal_generic::nb::Error::WouldBlock);
         }
@@ -230,7 +230,7 @@ impl crate::usart::UsartOps<
         self.ucsr1b.reset();
     }
 
-    fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), avr_hal_generic::void::Void> {
+    fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), core::convert::Infallible> {
         if self.ucsr1a.read().udre1().bit_is_clear() {
             Err(avr_hal_generic::nb::Error::WouldBlock)
         } else {
@@ -238,7 +238,7 @@ impl crate::usart::UsartOps<
         }
     }
 
-    fn raw_write(&mut self, byte: u8) -> avr_hal_generic::nb::Result<(), avr_hal_generic::void::Void> {
+    fn raw_write(&mut self, byte: u8) -> avr_hal_generic::nb::Result<(), core::convert::Infallible> {
         // Call flush to make sure the data-register is empty
         self.raw_flush()?;
 
@@ -246,7 +246,7 @@ impl crate::usart::UsartOps<
         Ok(())
     }
 
-    fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, avr_hal_generic::void::Void> {
+    fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, core::convert::Infallible> {
         if self.ucsr1a.read().rxc1().bit_is_clear() {
             return Err(avr_hal_generic::nb::Error::WouldBlock);
         }
@@ -304,7 +304,7 @@ impl crate::usart::UsartOps<
         self.ucsr0b.reset();
     }
 
-    fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), avr_hal_generic::void::Void> {
+    fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), core::convert::Infallible> {
         if self.ucsr0a.read().udre0().bit_is_clear() {
             Err(avr_hal_generic::nb::Error::WouldBlock)
         } else {
@@ -312,7 +312,7 @@ impl crate::usart::UsartOps<
         }
     }
 
-    fn raw_write(&mut self, byte: u8) -> avr_hal_generic::nb::Result<(), avr_hal_generic::void::Void> {
+    fn raw_write(&mut self, byte: u8) -> avr_hal_generic::nb::Result<(), core::convert::Infallible> {
         // Call flush to make sure the data-register is empty
         self.raw_flush()?;
 
@@ -320,7 +320,7 @@ impl crate::usart::UsartOps<
         Ok(())
     }
 
-    fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, avr_hal_generic::void::Void> {
+    fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, core::convert::Infallible> {
         if self.ucsr0a.read().rxc0().bit_is_clear() {
             return Err(avr_hal_generic::nb::Error::WouldBlock);
         }

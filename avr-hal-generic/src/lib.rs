@@ -12,8 +12,6 @@ pub extern crate nb;
 pub extern crate paste;
 #[doc(hidden)]
 pub extern crate ufmt;
-#[doc(hidden)]
-pub extern crate void;
 
 pub mod adc;
 pub mod clock;
@@ -30,8 +28,6 @@ pub mod wdt;
 pub mod prelude {
     pub use hal::prelude::*;
     pub use ufmt::uWrite as _ufmt_uWrite;
-    pub use void::ResultVoidErrExt as _void_ResultVoidErrExt;
-    pub use void::ResultVoidExt as _void_ResultVoidExt;
 }
 
 // For making certain traits unimplementable from outside this crate.

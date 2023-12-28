@@ -18,9 +18,5 @@ version = "0.2.3"
 package = "embedded-hal"
 features = ["unproven"]
 
-[dependencies.void]
-version = "1.0.2"
-default-features = false
-
 [build-dependencies]
 rustversion = "1.0"
