@@ -257,7 +257,7 @@ where
 impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> I2c<H, I2C, SDA, SCL, CLOCK>
 where
     CLOCK: crate::clock::Clock,
-    crate::delay::Delay<CLOCK>: hal::blocking::delay::DelayMs<u16>,
+    crate::delay::Delay<CLOCK>: embedded_hal_v0::blocking::delay::DelayMs<u16>,
 {
     /// Test whether a device answers on a certain address.
     pub fn ping_device(&mut self, address: u8, direction: Direction) -> Result<bool, Error> {
@@ -292,7 +292,7 @@ where
         w: &mut W,
         direction: Direction,
     ) -> Result<(), W::Error> {
-        use hal::blocking::delay::DelayMs;
+        use embedded_hal_v0::blocking::delay::DelayMs;
         let mut delay = crate::delay::Delay::<CLOCK>::new();
 
         w.write_str(
@@ -342,7 +342,7 @@ where
     }
 }
 
-impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::Write
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2c::Write
     for I2c<H, I2C, SDA, SCL, CLOCK>
 {
     type Error = Error;
@@ -355,7 +355,7 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::Write
     }
 }
 
-impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::Read
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2c::Read
     for I2c<H, I2C, SDA, SCL, CLOCK>
 {
     type Error = Error;
@@ -368,7 +368,7 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::Read
     }
 }
 
-impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::WriteRead
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2c::WriteRead
     for I2c<H, I2C, SDA, SCL, CLOCK>
 {
     type Error = Error;

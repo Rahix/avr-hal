@@ -346,7 +346,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite for Usart<H, USA
     }
 }
 
-impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Write<u8>
     for Usart<H, USART, RX, TX, CLOCK>
 {
     type Error = core::convert::Infallible;
@@ -360,7 +360,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
     }
 }
 
-impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Read<u8>
     for Usart<H, USART, RX, TX, CLOCK>
 {
     type Error = core::convert::Infallible;
@@ -444,7 +444,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite
     }
 }
 
-impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Write<u8>
     for UsartWriter<H, USART, RX, TX, CLOCK>
 {
     type Error = core::convert::Infallible;
@@ -458,7 +458,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
     }
 }
 
-impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
+impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> embedded_hal_v0::serial::Read<u8>
     for UsartReader<H, USART, RX, TX, CLOCK>
 {
     type Error = core::convert::Infallible;

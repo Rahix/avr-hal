@@ -85,7 +85,7 @@ pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
 /// output pin, because it implements all the same traits from embedded-hal.
 pub struct ChipSelectPin<CSPIN>(port::Pin<port::mode::Output, CSPIN>);
 
-impl<CSPIN: port::PinOps> hal::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
+impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
     type Error = core::convert::Infallible;
     fn set_low(&mut self) -> Result<(), Self::Error> {
         self.0.set_low();
@@ -97,7 +97,7 @@ impl<CSPIN: port::PinOps> hal::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
     }
 }
 
-impl<CSPIN: port::PinOps> hal::digital::v2::StatefulOutputPin for ChipSelectPin<CSPIN> {
+impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::StatefulOutputPin for ChipSelectPin<CSPIN> {
     fn is_set_low(&self) -> Result<bool, Self::Error> {
         Ok(self.0.is_set_low())
     }
@@ -106,7 +106,7 @@ impl<CSPIN: port::PinOps> hal::digital::v2::StatefulOutputPin for ChipSelectPin<
     }
 }
 
-impl<CSPIN: port::PinOps> hal::digital::v2::ToggleableOutputPin for ChipSelectPin<CSPIN> {
+impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::ToggleableOutputPin for ChipSelectPin<CSPIN> {
     type Error = core::convert::Infallible;
     fn toggle(&mut self) -> Result<(), Self::Error> {
         self.0.toggle();
@@ -267,7 +267,7 @@ where
 }
 
 /// Default Transfer trait implementation. Only 8-bit word size is supported for now.
-impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> hal::blocking::spi::transfer::Default<u8>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal_v0::blocking::spi::transfer::Default<u8>
     for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
     SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
@@ -279,7 +279,7 @@ where
 }
 
 /// Default Write trait implementation. Only 8-bit word size is supported for now.
-impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> hal::blocking::spi::write::Default<u8>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal_v0::blocking::spi::write::Default<u8>
     for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
     SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
