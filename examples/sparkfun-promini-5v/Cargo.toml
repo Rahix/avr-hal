@@ -2,7 +2,7 @@
 name = "sparkfun-promini-5v-examples"
 version = "0.0.0"
 authors = ["Rahix <rahix@rahix.de>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [dependencies]
