@@ -39,3 +39,4 @@ exclude = [
     # The RAVEDUDE! Yeah!
     "ravedude",
 ]
+resolver = "2"

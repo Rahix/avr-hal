@@ -2,7 +2,7 @@
 name = "trinket-examples"
 version = "0.0.0"
 authors = ["Jan Paw <jpaw@virtuslab.com>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [dependencies]
