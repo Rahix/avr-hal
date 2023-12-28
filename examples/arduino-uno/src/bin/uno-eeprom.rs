@@ -4,7 +4,6 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
@@ -15,7 +14,7 @@ fn main() -> ! {
 
     let mut ep = arduino_hal::Eeprom::new(dp.EEPROM);
     let ep_capacity = ep.capacity();
-    ufmt::uwriteln!(&mut serial, "eeprom capacity is:{}\r", ep_capacity).void_unwrap();
+    ufmt::uwriteln!(&mut serial, "eeprom capacity is:{}\r", ep_capacity).unwrap();
 
     // KNOWN ISSUE: Avoid to read entire eeprom capacity at once
     // See: https://github.com/Rahix/avr-hal/issues/410
@@ -24,13 +23,13 @@ fn main() -> ! {
     let _start_address: u16 = 0;
 
     if ep.read(0, &mut data).is_err() {
-        ufmt::uwriteln!(&mut serial, "read eeprom fail:\r").void_unwrap();
+        ufmt::uwriteln!(&mut serial, "read eeprom fail:\r").unwrap();
         loop {}
     }
 
-    ufmt::uwriteln!(&mut serial, "Got:\r").void_unwrap();
+    ufmt::uwriteln!(&mut serial, "Got:\r").unwrap();
     for i in data {
-        ufmt::uwriteln!(&mut serial, "{}", i).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "{}", i).unwrap();
     }
 
     let _=ep.erase(0, arduino_hal::Eeprom::CAPACITY);

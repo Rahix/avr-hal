@@ -34,10 +34,6 @@ ufmt = "0.2.0"
 version = "0.2.3"
 package = "embedded-hal"
 
-[dependencies.void]
-version = "1.0.2"
-default-features = false
-
 [dependencies.avr-hal-generic]
 path = "../avr-hal-generic/"
 

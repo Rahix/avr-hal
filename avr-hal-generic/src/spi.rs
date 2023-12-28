@@ -193,7 +193,7 @@ where
     }
 
     /// Reconfigure the SPI peripheral after initializing
-    pub fn reconfigure(&mut self, settings: Settings) -> nb::Result<(), crate::void::Void> {
+    pub fn reconfigure(&mut self, settings: Settings) -> nb::Result<(), core::convert::Infallible> {
         // wait for any in-flight writes to complete
         self.flush()?;
         self.p.raw_setup(&settings);
@@ -217,7 +217,7 @@ where
         (self.p, self.sclk, self.mosi, self.miso, cs.0)
     }
 
-    fn flush(&mut self) -> nb::Result<(), void::Void> {
+    fn flush(&mut self) -> nb::Result<(), core::convert::Infallible> {
         if self.write_in_progress {
             if self.p.raw_check_iflag() {
                 self.write_in_progress = false;
@@ -250,7 +250,7 @@ where
     MISOPIN: port::PinOps,
     CSPIN: port::PinOps,
 {
-    type Error = void::Void;
+    type Error = core::convert::Infallible;
 
     /// Sets up the device for transmission and sends the data
     fn send(&mut self, byte: u8) -> nb::Result<(), Self::Error> {

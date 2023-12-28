@@ -4,7 +4,6 @@
 
 use core::cmp::Ordering;
 use core::marker;
-use void::ResultVoidExt;
 
 use crate::port;
 
@@ -62,7 +61,7 @@ impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
         Baudrate {
             ubrr: ubrr as u16,
             u2x,
-            _clock: ::core::marker::PhantomData,
+            _clock: marker::PhantomData,
         }
     }
 
@@ -73,7 +72,7 @@ impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
         Baudrate {
             ubrr,
             u2x,
-            _clock: ::core::marker::PhantomData,
+            _clock: marker::PhantomData,
         }
     }
 
@@ -184,21 +183,21 @@ pub trait UsartOps<H, RX, TX> {
     /// was flushed yet.
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
-    fn raw_flush(&mut self) -> nb::Result<(), void::Void>;
+    fn raw_flush(&mut self) -> nb::Result<(), core::convert::Infallible>;
     /// Write a byte to the TX buffer.
     ///
     /// This operation must be non-blocking and return [`nb::Error::WouldBlock`] until the byte is
     /// enqueued.  The operation should not wait for the byte to have actually been sent.
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
-    fn raw_write(&mut self, byte: u8) -> nb::Result<(), void::Void>;
+    fn raw_write(&mut self, byte: u8) -> nb::Result<(), core::convert::Infallible>;
     /// Read a byte from the RX buffer.
     ///
     /// This operation must be non-blocking and return [`nb::Error::WouldBlock`] if no incoming
     /// byte is available.
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
-    fn raw_read(&mut self) -> nb::Result<u8, void::Void>;
+    fn raw_read(&mut self) -> nb::Result<u8, core::convert::Infallible>;
 
     /// Enable/Disable a certain interrupt.
     ///
@@ -220,11 +219,11 @@ pub trait UsartOps<H, RX, TX> {
 ///     57600.into_baudrate(),
 /// );
 ///
-/// ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").void_unwrap();
+/// ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap();
 ///
 /// loop {
-///     let b = nb::block!(serial.read()).void_unwrap();
-///     ufmt::uwriteln!(&mut serial, "Got {}!\r", b).void_unwrap();
+///     let b = nb::block!(serial.read()).unwrap();
+///     ufmt::uwriteln!(&mut serial, "Got {}!\r", b).unwrap();
 /// }
 /// ```
 pub struct Usart<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> {
@@ -279,7 +278,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK
 
     /// Block until all remaining data has been transmitted.
     pub fn flush(&mut self) {
-        nb::block!(self.p.raw_flush()).void_unwrap()
+        nb::block!(self.p.raw_flush()).unwrap()
     }
 
     /// Transmit a byte.
@@ -287,14 +286,14 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK
     /// This method will block until the byte has been enqueued for transmission but **not** until
     /// it was entirely sent.
     pub fn write_byte(&mut self, byte: u8) {
-        nb::block!(self.p.raw_write(byte)).void_unwrap()
+        nb::block!(self.p.raw_write(byte)).unwrap()
     }
 
     /// Receive a byte.
     ///
     /// This method will block until a byte could be received.
     pub fn read_byte(&mut self) -> u8 {
-        nb::block!(self.p.raw_read()).void_unwrap()
+        nb::block!(self.p.raw_read()).unwrap()
     }
 
     /// Enable the interrupt for [`Event`].
@@ -336,7 +335,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK
 }
 
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite for Usart<H, USART, RX, TX, CLOCK> {
-    type Error = void::Void;
+    type Error = core::convert::Infallible;
 
     fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
         for b in s.as_bytes().iter() {
@@ -349,7 +348,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite for Usart<H, USA
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
     for Usart<H, USART, RX, TX, CLOCK>
 {
-    type Error = void::Void;
+    type Error = core::convert::Infallible;
 
     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
         self.p.raw_write(byte)
@@ -363,7 +362,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
     for Usart<H, USART, RX, TX, CLOCK>
 {
-    type Error = void::Void;
+    type Error = core::convert::Infallible;
 
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
         self.p.raw_read()
@@ -434,11 +433,11 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> UsartReader<H, USART, RX, TX,
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite
     for UsartWriter<H, USART, RX, TX, CLOCK>
 {
-    type Error = void::Void;
+    type Error = core::convert::Infallible;
 
     fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
         for b in s.as_bytes().iter() {
-            nb::block!(self.p.raw_write(*b)).void_unwrap()
+            nb::block!(self.p.raw_write(*b)).unwrap()
         }
         Ok(())
     }
@@ -447,7 +446,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
     for UsartWriter<H, USART, RX, TX, CLOCK>
 {
-    type Error = void::Void;
+    type Error = core::convert::Infallible;
 
     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
         self.p.raw_write(byte)
@@ -461,7 +460,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Write<u8>
 impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> hal::serial::Read<u8>
     for UsartReader<H, USART, RX, TX, CLOCK>
 {
-    type Error = void::Void;
+    type Error = core::convert::Infallible;
 
     fn read(&mut self) -> nb::Result<u8, Self::Error> {
         self.p.raw_read()
@@ -509,7 +508,7 @@ macro_rules! impl_usart_traditional {
                     self.[<ucsr $n b>].reset();
                 }
 
-                fn raw_flush(&mut self) -> $crate::nb::Result<(), $crate::void::Void> {
+                fn raw_flush(&mut self) -> $crate::nb::Result<(), core::convert::Infallible> {
                     if self.[<ucsr $n a>].read().[<udre $n>]().bit_is_clear() {
                         Err($crate::nb::Error::WouldBlock)
                     } else {
@@ -517,7 +516,7 @@ macro_rules! impl_usart_traditional {
                     }
                 }
 
-                fn raw_write(&mut self, byte: u8) -> $crate::nb::Result<(), $crate::void::Void> {
+                fn raw_write(&mut self, byte: u8) -> $crate::nb::Result<(), core::convert::Infallible> {
                     // Call flush to make sure the data-register is empty
                     self.raw_flush()?;
 
@@ -525,7 +524,7 @@ macro_rules! impl_usart_traditional {
                     Ok(())
                 }
 
-                fn raw_read(&mut self) -> $crate::nb::Result<u8, $crate::void::Void> {
+                fn raw_read(&mut self) -> $crate::nb::Result<u8, core::convert::Infallible> {
                     if self.[<ucsr $n a>].read().[<rxc $n>]().bit_is_clear() {
                         return Err($crate::nb::Error::WouldBlock);
                     }

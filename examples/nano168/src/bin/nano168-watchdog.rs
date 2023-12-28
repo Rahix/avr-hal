@@ -2,7 +2,6 @@
 #![no_main]
 
 use arduino_hal::hal::wdt;
-use arduino_hal::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
@@ -14,22 +13,22 @@ fn main() -> ! {
     let mut led = pins.d13.into_output();
     led.set_high();
 
-    ufmt::uwriteln!(&mut serial, "Setup started...").void_unwrap();
+    ufmt::uwriteln!(&mut serial, "Setup started...").unwrap();
 
     for _ in 0..20 {
-        ufmt::uwrite!(&mut serial, ".").void_unwrap();
+        ufmt::uwrite!(&mut serial, ".").unwrap();
         led.toggle();
         arduino_hal::delay_ms(100);
     }
-    ufmt::uwriteln!(&mut serial, "\nEnabling watchdog...").void_unwrap();
+    ufmt::uwriteln!(&mut serial, "\nEnabling watchdog...").unwrap();
 
     let mut watchdog = wdt::Wdt::new(dp.WDT, &dp.CPU.mcusr);
     watchdog.start(wdt::Timeout::Ms4000).unwrap();
 
-    ufmt::uwriteln!(&mut serial, "\nWatchdog on watch...").void_unwrap();
+    ufmt::uwriteln!(&mut serial, "\nWatchdog on watch...").unwrap();
 
     loop {
-        ufmt::uwriteln!(&mut serial, "\nWaiting...").void_unwrap();
+        ufmt::uwriteln!(&mut serial, "\nWaiting...").unwrap();
 
         led.toggle();
         arduino_hal::delay_ms(1000);
