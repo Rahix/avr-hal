@@ -10,8 +10,6 @@ pub use avr_device;
 pub use nb;
 #[doc(hidden)]
 pub use paste;
-#[doc(hidden)]
-pub use ufmt;
 
 pub mod adc;
 pub mod clock;
