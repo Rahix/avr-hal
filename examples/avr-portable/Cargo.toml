@@ -1,0 +1,14 @@
+[package]
+name = "avr-portable"
+version = "0.1.0"
+authors = ["Robert Forsman <git@thoth.purplefrog.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nb = "*"
+ufmt = "*"
+void = { version="*", default-features = false }
+avr-hal-generic = { path="../../avr-hal-generic" }
+embedded-hal = "*"

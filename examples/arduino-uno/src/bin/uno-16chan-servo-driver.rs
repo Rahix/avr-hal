@@ -57,7 +57,8 @@ fn main() -> ! {
         arduino_hal::delay_ms(500);
 
         pwm.set_channel_off(Channel::C0, current).unwrap();
-        pwm.set_channel_off(Channel::C1, servo_min + (servo_max - current)).unwrap();
+        pwm.set_channel_off(Channel::C1, servo_min + (servo_max - current))
+            .unwrap();
 
         if current == servo_max {
             factor -= 1;
