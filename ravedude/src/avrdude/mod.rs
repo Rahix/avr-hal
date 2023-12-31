@@ -49,6 +49,7 @@ impl Avrdude {
 
     pub fn run(
         options: &AvrdudeOptions,
+        do_eeprom: bool,
         port: Option<impl AsRef<path::Path>>,
         bin: &path::Path,
     ) -> anyhow::Result<Self> {
@@ -94,6 +95,26 @@ impl Avrdude {
         }
 
         command = command.arg("-D").arg("-U").arg(flash_instruction);
+
+        // Check whether we should program the EEPROM. The command can be
+        // appended to the command-line, but avrdude will return with a
+        // nonzero error code if the ELF file didn't have an `.eeprom` section.
+        // So we conditionally add it.
+        if do_eeprom {
+            let fp = std::fs::File::open(bin).context("could not read ELF file")?;
+            let mut elf = elf::ElfStream::<elf::endian::LittleEndian, _>::open_stream(fp).context("parsing ELF file failed")?;
+
+            if elf.section_header_by_name(".eeprom")
+                  .context("error parsing ELF section headers")?
+                  .is_some()
+            {
+                let mut eeprom_instruction: std::ffi::OsString = "eeprom:w:".into();
+                eeprom_instruction.push(bin);
+                eeprom_instruction.push(":e");
+
+                command = command.arg("-U").arg(eeprom_instruction);
+            }
+        }
 
         let process = command.spawn().context("failed starting avrdude")?;
 

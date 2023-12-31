@@ -17,6 +17,7 @@ serialport = "4.0.0"
 anyhow = "1.0.38"
 git-version = "0.3.4"
 ctrlc = "3.2.1"
+elf = "0.7.2"
 
 [dependencies.structopt]
 version = "0.3.21"
