@@ -55,8 +55,8 @@ pub type Channel = avr_hal_generic::adc::Channel<crate::Attiny, crate::pac::ADC>
 ///
 /// # Example
 /// ```
-/// let dp = atmega_hal::Peripherals::take().unwrap();
-/// let mut adc = atmega_hal::Adc::new(dp.ADC, Default::default());
+/// let dp = attiny_hal::Peripherals::take().unwrap();
+/// let mut adc = attiny_hal::Adc::new(dp.ADC, Default::default());
 ///
 /// let value = adc.read_blocking(&channel::Vbg);
 /// ```
