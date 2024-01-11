@@ -99,7 +99,7 @@ jobs:
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: nightly-2022-06-13
+          toolchain: nightly-2023-12-28
           components: rust-src
       - name: Install avr-gcc, binutils, and libc
         run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
