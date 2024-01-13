@@ -17,6 +17,7 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
@@ -32,12 +33,12 @@ fn main() -> ! {
         50000,
     );
 
-    ufmt::uwriteln!(&mut serial, "Write direction test:\r").unwrap();
+    ufmt::uwriteln!(&mut serial, "Write direction test:\r").unwrap_infallible();
     i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Write)
-        .unwrap();
-    ufmt::uwriteln!(&mut serial, "\r\nRead direction test:\r").unwrap();
+        .unwrap_infallible();
+    ufmt::uwriteln!(&mut serial, "\r\nRead direction test:\r").unwrap_infallible();
     i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Read)
-        .unwrap();
+        .unwrap_infallible();
 
     loop {
         arduino_hal::delay_ms(1000);

@@ -28,6 +28,7 @@ pub mod wdt;
 pub mod prelude {
     pub use hal::prelude::*;
     pub use ufmt::uWrite as _ufmt_uWrite;
+    pub use unwrap_infallible::UnwrapInfallible as _unwrap_infallible_UnwrapInfallible;
 }
 
 // For making certain traits unimplementable from outside this crate.

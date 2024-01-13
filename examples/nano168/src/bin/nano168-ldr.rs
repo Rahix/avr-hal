@@ -25,6 +25,7 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
@@ -55,9 +56,9 @@ fn main() -> ! {
         };
 
         // output to the serial
-        ufmt::uwrite!(&mut serial, "This is a {} room! – ", worded).unwrap();
-        ufmt::uwrite!(&mut serial, "Raw value: {} ", sensor_value).unwrap();
-        ufmt::uwriteln!(&mut serial, "").unwrap();
+        ufmt::uwrite!(&mut serial, "This is a {} room! – ", worded).unwrap_infallible();
+        ufmt::uwrite!(&mut serial, "Raw value: {} ", sensor_value).unwrap_infallible();
+        ufmt::uwriteln!(&mut serial, "").unwrap_infallible();
 
         // wait for half a second then measure again
         arduino_hal::delay_ms(500);
