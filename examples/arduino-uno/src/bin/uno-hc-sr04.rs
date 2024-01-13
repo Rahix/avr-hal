@@ -13,6 +13,7 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
@@ -49,7 +50,7 @@ fn main() -> ! {
                     &mut serial,
                     "Nothing was detected and jump to outer loop.\r"
                 )
-                .unwrap();
+                .unwrap_infallible();
                 continue 'outer;
             }
         }
@@ -72,7 +73,7 @@ fn main() -> ! {
                     &mut serial,
                     "Nothing was detected and jump to outer loop.\r"
                 )
-                .unwrap();
+                .unwrap_infallible();
                 continue 'outer;
             }
             _ => temp_timer / 58,
@@ -87,6 +88,6 @@ fn main() -> ! {
             "Hello, we are {} cms away from target!\r",
             value
         )
-        .unwrap();
+        .unwrap_infallible();
     }
 }

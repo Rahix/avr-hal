@@ -12,6 +12,7 @@ paste = "1.0.0"
 avr-device = "0.5.3"
 embedded-storage = "0.2"
 embedded-hal = "1.0"
+unwrap-infallible = "0.1.5"
 
 [dependencies.embedded-hal-v0]
 version = "0.2.3"

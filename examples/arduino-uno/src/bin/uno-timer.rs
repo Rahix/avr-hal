@@ -11,6 +11,7 @@ and then modernized to account for API drift since 2020
 
 use arduino_hal::port::mode::Output;
 use arduino_hal::port::Pin;
+use arduino_hal::prelude::*;
 use avr_device::atmega328p::tc1::tccr1b::CS1_A;
 use avr_device::atmega328p::TC1;
 use core::mem;
@@ -29,7 +30,7 @@ fn main() -> ! {
     let pins = arduino_hal::pins!(dp);
 
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
-    ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap();
+    ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap_infallible();
 
     let led = pins.d13.into_output();
 
@@ -61,7 +62,7 @@ fn main() -> ! {
         "configured timer output compare register = {}",
         tmr1.ocr1a.read().bits()
     )
-    .unwrap();
+    .unwrap_infallible();
 
     loop {
         avr_device::asm::sleep()
@@ -76,7 +77,7 @@ pub const fn calc_overflow(clock_hz: u32, target_hz: u32, prescale: u32) -> u32 
     clock_hz / target_hz / prescale - 1
 }
 
-pub fn rig_timer<W: uWrite<Error = core::convert::Infallible>>(tmr1: &TC1, serial: &mut W) {
+pub fn rig_timer<W: uWrite<Error = ::core::convert::Infallible>>(tmr1: &TC1, serial: &mut W) {
     /*
      https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
      section 15.11
@@ -93,7 +94,7 @@ pub fn rig_timer<W: uWrite<Error = core::convert::Infallible>>(tmr1: &TC1, seria
         CS1_A::PRESCALE_1024 => 1024,
         CS1_A::NO_CLOCK | CS1_A::EXT_FALLING | CS1_A::EXT_RISING => {
             uwriteln!(serial, "uhoh, code tried to set the clock source to something other than a static prescaler {}", CLOCK_SOURCE as usize)
-                .unwrap();
+                .unwrap_infallible();
             1
         }
     };
@@ -104,7 +105,7 @@ pub fn rig_timer<W: uWrite<Error = core::convert::Infallible>>(tmr1: &TC1, seria
         "configuring timer output compare register = {}",
         ticks
     )
-    .unwrap();
+    .unwrap_infallible();
 
     tmr1.tccr1a.write(|w| w.wgm1().bits(0b00));
     tmr1.tccr1b.write(|w| {

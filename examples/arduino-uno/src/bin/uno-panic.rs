@@ -7,6 +7,7 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::prelude::*;
 
 // Documentation build does not like this and fails with the following error, even though
 // everything is fine when compiling the binary.
@@ -31,7 +32,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
     // Print out panic location
-    ufmt::uwriteln!(&mut serial, "Firmware panic!\r").unwrap();
+    ufmt::uwriteln!(&mut serial, "Firmware panic!\r").unwrap_infallible();
     if let Some(loc) = info.location() {
         ufmt::uwriteln!(
             &mut serial,
@@ -40,7 +41,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
             loc.line(),
             loc.column(),
         )
-        .unwrap();
+        .unwrap_infallible();
     }
 
     // Blink LED rapidly
@@ -57,8 +58,8 @@ fn main() -> ! {
     let pins = arduino_hal::pins!(dp);
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap();
-    ufmt::uwriteln!(&mut serial, "Panic in 5 seconds!\r").unwrap();
+    ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap_infallible();
+    ufmt::uwriteln!(&mut serial, "Panic in 5 seconds!\r").unwrap_infallible();
 
     arduino_hal::delay_ms(5000);
 

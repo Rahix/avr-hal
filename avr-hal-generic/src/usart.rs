@@ -4,6 +4,7 @@
 
 use core::cmp::Ordering;
 use core::marker;
+use crate::prelude::*;
 
 use crate::port;
 
@@ -219,11 +220,11 @@ pub trait UsartOps<H, RX, TX> {
 ///     57600.into_baudrate(),
 /// );
 ///
-/// ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap();
+/// ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap_infallible();
 ///
 /// loop {
-///     let b = nb::block!(serial.read()).unwrap();
-///     ufmt::uwriteln!(&mut serial, "Got {}!\r", b).unwrap();
+///     let b = nb::block!(serial.read()).unwrap_infallible();
+///     ufmt::uwriteln!(&mut serial, "Got {}!\r", b).unwrap_infallible();
 /// }
 /// ```
 pub struct Usart<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> {
@@ -278,7 +279,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK
 
     /// Block until all remaining data has been transmitted.
     pub fn flush(&mut self) {
-        nb::block!(self.p.raw_flush()).unwrap()
+        nb::block!(self.p.raw_flush()).unwrap_infallible()
     }
 
     /// Transmit a byte.
@@ -286,14 +287,14 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> Usart<H, USART, RX, TX, CLOCK
     /// This method will block until the byte has been enqueued for transmission but **not** until
     /// it was entirely sent.
     pub fn write_byte(&mut self, byte: u8) {
-        nb::block!(self.p.raw_write(byte)).unwrap()
+        nb::block!(self.p.raw_write(byte)).unwrap_infallible()
     }
 
     /// Receive a byte.
     ///
     /// This method will block until a byte could be received.
     pub fn read_byte(&mut self) -> u8 {
-        nb::block!(self.p.raw_read()).unwrap()
+        nb::block!(self.p.raw_read()).unwrap_infallible()
     }
 
     /// Enable the interrupt for [`Event`].
@@ -437,7 +438,7 @@ impl<H, USART: UsartOps<H, RX, TX>, RX, TX, CLOCK> ufmt::uWrite
 
     fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
         for b in s.as_bytes().iter() {
-            nb::block!(self.p.raw_write(*b)).unwrap()
+            nb::block!(self.p.raw_write(*b)).unwrap_infallible()
         }
         Ok(())
     }

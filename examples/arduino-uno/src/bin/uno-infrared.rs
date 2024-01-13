@@ -27,6 +27,7 @@ use arduino_hal::{
     pac::tc0::tccr0b::CS0_A,
     port::mode::{Floating, Input, Output},
     port::Pin,
+    prelude::*,
 };
 use avr_device::interrupt::Mutex;
 
@@ -77,7 +78,7 @@ fn main() -> ! {
     // Enable interrupts globally
     unsafe { avr_device::interrupt::enable() };
 
-    ufmt::uwriteln!(&mut serial, "Hello from Arduino and Irdroino!\r").unwrap();
+    ufmt::uwriteln!(&mut serial, "Hello from Arduino and Irdroino!\r").unwrap_infallible();
 
     loop {
         if let Some(cmd) = avr_device::interrupt::free(|cs| CMD.borrow(cs).take()) {
@@ -88,7 +89,7 @@ fn main() -> ! {
                 cmd.cmd,
                 cmd.repeat
             )
-            .unwrap();
+            .unwrap_infallible();
         }
 
         arduino_hal::delay_ms(100);

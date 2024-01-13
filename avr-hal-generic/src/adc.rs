@@ -132,7 +132,7 @@ impl<H, ADC: AdcOps<H>> AdcChannel<H, ADC> for Channel<H, ADC> {
 /// let voltage = adc.read_blocking(&a0);
 ///
 /// // alternatively, a non-blocking interface exists
-/// let voltage = nb::block!(adc.read_nonblocking(&a0)).unwrap();
+/// let voltage = nb::block!(adc.read_nonblocking(&a0)).unwrap_infallible();
 /// ```
 pub struct Adc<H, ADC: AdcOps<H>, CLOCK> {
     p: ADC,
