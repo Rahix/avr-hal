@@ -14,6 +14,10 @@
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
 #![cfg_attr(
+    feature = "sparkfun-promini-3v3",
+    doc = "**SparkFun ProMini 3.3V (8MHz)**."
+)]
+#![cfg_attr(
     feature = "sparkfun-promini-5v",
     doc = "**SparkFun ProMini 5V (16MHz)**."
 )]
@@ -63,6 +67,7 @@ compile_error!(
     * arduino-nano
     * arduino-uno
     * sparkfun-promicro
+    * sparkfun-promini-3v3
     * sparkfun-promini-5v
     * trinket-pro
     * trinket
@@ -265,7 +270,8 @@ macro_rules! default_serial {
 #[cfg(any(
     feature = "arduino-nano",
     feature = "nano168",
-    feature = "sparkfun-promini-5v"
+    feature = "sparkfun-promini-3v3",
+    feature = "sparkfun-promini-5v",
 ))]
 #[macro_export]
 macro_rules! default_serial {
