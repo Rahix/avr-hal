@@ -61,7 +61,7 @@ struct Args {
     /// * mega1280
     /// * diecimila
     /// * promicro
-    /// * promini-3v
+    /// * promini-3v3
     /// * promini-5v
     /// * trinket-pro
     /// * trinket

@@ -18,7 +18,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "mega1280" => Box::new(ArduinoMega1280),
         "diecimila" => Box::new(ArduinoDiecimila),
         "promicro" => Box::new(SparkFunProMicro),
-        "promini-3v" => Box::new(SparkFunProMini3V),
+        "promini-3v3" => Box::new(SparkFunProMini3V),
         "promini-5v" => Box::new(SparkFunProMini5V),
         "trinket-pro" => Box::new(TrinketPro),
         "trinket" => Box::new(Trinket),

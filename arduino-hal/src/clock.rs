@@ -27,6 +27,6 @@ pub(crate) mod default {
         feature = "nano168",
     ))]
     pub type DefaultClock = avr_hal_generic::clock::MHz16;
-    #[cfg(any(feature = "trinket", feature = "sparkfun-promini-3v"))]
+    #[cfg(any(feature = "trinket", feature = "sparkfun-promini-3v3"))]
     pub type DefaultClock = avr_hal_generic::clock::MHz8;
 }

@@ -1,5 +1,5 @@
 [package]
-name = "sparkfun-promini-3v-examples"
+name = "sparkfun-promini-3v3-examples"
 version = "0.0.0"
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -17,4 +17,4 @@ package = "embedded-hal"
 
 [dependencies.arduino-hal]
 path = "../../arduino-hal/"
-features = ["sparkfun-promini-3v"]
+features = ["sparkfun-promini-3v3"]

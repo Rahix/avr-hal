@@ -34,7 +34,7 @@ jobs:
             name: sparkfun-promicro
             examples: true
           - type: board
-            name: sparkfun-promini-3v
+            name: sparkfun-promini-3v3
             examples: true
           - type: board
             name: sparkfun-promini-5v
