@@ -284,17 +284,7 @@ impl<SPEED> DelayNs for Delay<SPEED>
     fn delay_ns(&mut self, ns: u32) {
         // quick-win to get an initial implementation.
         // note that the trait does not guarantee nanosecond-accuracy.
-
-        let mut us = ns / 1000;
-
-        // ensure that we wait _at least_ as long as specified.
-        // (we truncate the integer, so if we don't do this we'd wait 1us instead of 2us when specifying 1999ns).
-        let diff = ns - (us * 1000);
-        if diff > 0 {
-            us += 1;
-        }
-
-        delay_v0::DelayUs::<u32>::delay_us(self, us);
+        delay_v0::DelayUs::<u32>::delay_us(self, ns.saturating_add(999) / 1000)
     }
 
     fn delay_us(&mut self, us: u32) {
