@@ -1,7 +1,7 @@
 //! SPI Implementation
 use crate::port;
 use core::marker::PhantomData;
-use embedded_hal::spi;
+use embedded_hal_v0::spi;
 
 /// Oscillator Clock Frequency division options.
 ///
@@ -85,7 +85,7 @@ pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
 /// output pin, because it implements all the same traits from embedded-hal.
 pub struct ChipSelectPin<CSPIN>(port::Pin<port::mode::Output, CSPIN>);
 
-impl<CSPIN: port::PinOps> hal::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
+impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
     type Error = core::convert::Infallible;
     fn set_low(&mut self) -> Result<(), Self::Error> {
         self.0.set_low();
@@ -97,7 +97,7 @@ impl<CSPIN: port::PinOps> hal::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
     }
 }
 
-impl<CSPIN: port::PinOps> hal::digital::v2::StatefulOutputPin for ChipSelectPin<CSPIN> {
+impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::StatefulOutputPin for ChipSelectPin<CSPIN> {
     fn is_set_low(&self) -> Result<bool, Self::Error> {
         Ok(self.0.is_set_low())
     }
@@ -106,7 +106,7 @@ impl<CSPIN: port::PinOps> hal::digital::v2::StatefulOutputPin for ChipSelectPin<
     }
 }
 
-impl<CSPIN: port::PinOps> hal::digital::v2::ToggleableOutputPin for ChipSelectPin<CSPIN> {
+impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::ToggleableOutputPin for ChipSelectPin<CSPIN> {
     type Error = core::convert::Infallible;
     fn toggle(&mut self) -> Result<(), Self::Error> {
         self.0.toggle();
@@ -193,7 +193,7 @@ where
     }
 
     /// Reconfigure the SPI peripheral after initializing
-    pub fn reconfigure(&mut self, settings: Settings) -> nb::Result<(), crate::void::Void> {
+    pub fn reconfigure(&mut self, settings: Settings) -> nb::Result<(), core::convert::Infallible> {
         // wait for any in-flight writes to complete
         self.flush()?;
         self.p.raw_setup(&settings);
@@ -217,7 +217,7 @@ where
         (self.p, self.sclk, self.mosi, self.miso, cs.0)
     }
 
-    fn flush(&mut self) -> nb::Result<(), void::Void> {
+    fn flush(&mut self) -> nb::Result<(), core::convert::Infallible> {
         if self.write_in_progress {
             if self.p.raw_check_iflag() {
                 self.write_in_progress = false;
@@ -250,7 +250,7 @@ where
     MISOPIN: port::PinOps,
     CSPIN: port::PinOps,
 {
-    type Error = void::Void;
+    type Error = core::convert::Infallible;
 
     /// Sets up the device for transmission and sends the data
     fn send(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
@@ -267,7 +267,7 @@ where
 }
 
 /// Default Transfer trait implementation. Only 8-bit word size is supported for now.
-impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> hal::blocking::spi::transfer::Default<u8>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal_v0::blocking::spi::transfer::Default<u8>
     for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
     SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
@@ -279,7 +279,7 @@ where
 }
 
 /// Default Write trait implementation. Only 8-bit word size is supported for now.
-impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> hal::blocking::spi::write::Default<u8>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal_v0::blocking::spi::write::Default<u8>
     for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
     SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,

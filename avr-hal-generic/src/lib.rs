@@ -2,18 +2,14 @@
 #![cfg_attr(avr_hal_asm_macro, feature(asm_experimental_arch))]
 #![cfg_attr(not(avr_hal_asm_macro), feature(llvm_asm))]
 
-pub extern crate embedded_hal as hal;
+pub use embedded_hal_v0 as hal;
 
 #[doc(hidden)]
-pub extern crate avr_device;
+pub use avr_device;
 #[doc(hidden)]
-pub extern crate nb;
+pub use nb;
 #[doc(hidden)]
-pub extern crate paste;
-#[doc(hidden)]
-pub extern crate ufmt;
-#[doc(hidden)]
-pub extern crate void;
+pub use paste;
 
 pub mod adc;
 pub mod clock;
@@ -28,10 +24,9 @@ pub mod wdt;
 
 /// Prelude containing all HAL traits
 pub mod prelude {
-    pub use hal::prelude::*;
+    pub use crate::hal::prelude::*;
     pub use ufmt::uWrite as _ufmt_uWrite;
-    pub use void::ResultVoidErrExt as _void_ResultVoidErrExt;
-    pub use void::ResultVoidExt as _void_ResultVoidExt;
+    pub use unwrap_infallible::UnwrapInfallible as _unwrap_infallible_UnwrapInfallible;
 }
 
 // For making certain traits unimplementable from outside this crate.

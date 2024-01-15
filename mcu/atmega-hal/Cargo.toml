@@ -2,7 +2,7 @@
 name = "atmega-hal"
 version = "0.1.0"
 authors = ["Rahix <rahix@rahix.de>"]
-edition = "2018"
+edition = "2021"
 
 [features]
 rt = ["avr-device/rt"]

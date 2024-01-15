@@ -4,7 +4,7 @@
 use arduino_hal::prelude::*;
 use panic_halt as _;
 
-use embedded_hal::serial::Read;
+use embedded_hal_v0::serial::Read;
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -12,13 +12,13 @@ fn main() -> ! {
     let pins = arduino_hal::pins!(dp);
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").void_unwrap();
+    ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap_infallible();
 
     loop {
         // Read a byte from the serial connection default
-        let b = nb::block!(serial.read()).void_unwrap();
+        let b = nb::block!(serial.read()).unwrap_infallible();
 
         // Answer
-        ufmt::uwriteln!(&mut serial, "Got {}!\r", b).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "Got {}!\r", b).unwrap_infallible();
     }
 }

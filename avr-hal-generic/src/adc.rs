@@ -132,7 +132,7 @@ impl<H, ADC: AdcOps<H>> AdcChannel<H, ADC> for Channel<H, ADC> {
 /// let voltage = adc.read_blocking(&a0);
 ///
 /// // alternatively, a non-blocking interface exists
-/// let voltage = nb::block!(adc.read_nonblocking(&a0)).void_unwrap();
+/// let voltage = nb::block!(adc.read_nonblocking(&a0)).unwrap_infallible();
 /// ```
 pub struct Adc<H, ADC: AdcOps<H>, CLOCK> {
     p: ADC,
@@ -177,7 +177,7 @@ where
     pub fn read_nonblocking<PIN: AdcChannel<H, ADC>>(
         &mut self,
         pin: &PIN,
-    ) -> nb::Result<u16, void::Void> {
+    ) -> nb::Result<u16, core::convert::Infallible> {
         match (&self.reading_channel, self.p.raw_is_converting()) {
             // Measurement on current pin is ongoing
             (Some(channel), true) if *channel == pin.channel() => Err(nb::Error::WouldBlock),

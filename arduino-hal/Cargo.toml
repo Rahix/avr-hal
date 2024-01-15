@@ -2,7 +2,7 @@
 name = "arduino-hal"
 version = "0.1.0"
 authors = ["Rahix <rahix@rahix.de>"]
-edition = "2018"
+edition = "2021"
 
 [features]
 default = ["rt"]
@@ -27,12 +27,12 @@ nano168 = ["mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc", 
 
 [dependencies]
 cfg-if = "1"
-embedded-hal = "0.2.3"
+embedded-hal = "1.0"
 ufmt = "0.2.0"
 
-[dependencies.void]
-version = "1.0.2"
-default-features = false
+[dependencies.embedded-hal-v0]
+version = "0.2.3"
+package = "embedded-hal"
 
 [dependencies.avr-hal-generic]
 path = "../avr-hal-generic/"

@@ -78,7 +78,7 @@ fn main() -> ! {
     // Enable interrupts globally
     unsafe { avr_device::interrupt::enable() };
 
-    ufmt::uwriteln!(&mut serial, "Hello from Arduino and Irdroino!\r").void_unwrap();
+    ufmt::uwriteln!(&mut serial, "Hello from Arduino and Irdroino!\r").unwrap_infallible();
 
     loop {
         if let Some(cmd) = avr_device::interrupt::free(|cs| CMD.borrow(cs).take()) {
@@ -89,7 +89,7 @@ fn main() -> ! {
                 cmd.cmd,
                 cmd.repeat
             )
-            .void_unwrap();
+            .unwrap_infallible();
         }
 
         arduino_hal::delay_ms(100);

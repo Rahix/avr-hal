@@ -40,7 +40,7 @@ where
     pub fn new(p: EEPROM) -> Self {
         Self {
             p,
-            _h: ::core::marker::PhantomData,
+            _h: marker::PhantomData,
         }
     }
     #[inline]
