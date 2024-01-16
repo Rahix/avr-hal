@@ -67,6 +67,13 @@ pub trait AdcOps<H> {
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
     fn raw_enable_channel(&mut self, channel: Self::Channel);
+
+    /// Clear the DIDR (Digital Input Disable) for a certain channel.
+    ///
+    /// Enables digital logic on the corresponding pin after it has been used as an ADC channel.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_disable_channel(&mut self, channel: Self::Channel);
 }
 
 /// Trait marking a type as an ADC channel for a certain ADC.
@@ -164,6 +171,11 @@ where
     #[inline]
     pub(crate) fn enable_pin<PIN: AdcChannel<H, ADC>>(&mut self, pin: &PIN) {
         self.p.raw_enable_channel(pin.channel());
+    }
+
+    #[inline]
+    pub(crate) fn disable_pin<PIN: AdcChannel<H, ADC>>(&mut self, pin: &PIN) {
+        self.p.raw_disable_channel(pin.channel());
     }
 
     pub fn read_blocking<PIN: AdcChannel<H, ADC>>(&mut self, pin: &PIN) -> u16 {
@@ -265,6 +277,18 @@ macro_rules! impl_adc {
                     $(
                         x if x == $pin_channel => {
                             $(self.$didr.modify(|_, w| w.$didr_method().set_bit());)?
+                        }
+                    )+
+                    _ => unreachable!(),
+                }
+            }
+
+            #[inline]
+            fn raw_disable_channel(&mut self, channel: Self::Channel) {
+                match channel {
+                    $(
+                        x if x == $pin_channel => {
+                            $(self.$didr.modify(|_, w| w.$didr_method().clear_bit());)?
                         }
                     )+
                     _ => unreachable!(),
