@@ -529,6 +529,28 @@ impl<PIN: PinOps> Pin<mode::Analog, PIN> {
     {
         crate::adc::Channel::new(self)
     }
+
+    /// Convert this pin to a floating digital input pin.
+    ///
+    /// The pin is re-enabled in the digital input buffer and is no longer usable as an analog
+    /// input. You can get to other digital modes by calling one of the usual `into_...` methods
+    /// on the return value of this function.
+    pub fn into_digital<H, ADC, CLOCK>(
+        mut self,
+        adc: &mut crate::adc::Adc<H, ADC, CLOCK>,
+    ) -> Pin<mode::Input<mode::Floating>, PIN>
+    where
+        Pin<mode::Analog, PIN>: crate::adc::AdcChannel<H, ADC>,
+        ADC: crate::adc::AdcOps<H>,
+        CLOCK: crate::clock::Clock,
+    {
+        unsafe { self.pin.make_input(false) };
+        adc.disable_pin(&self);
+        Pin {
+            pin: self.pin,
+            _mode: PhantomData,
+        }
+    }
 }
 
 #[macro_export]
