@@ -207,11 +207,12 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
         ADC: crate::adc::AdcOps<H>,
         CLOCK: crate::clock::Clock,
     {
-        let new = Pin {
+        let mut new = Pin {
             pin: self.pin,
             _mode: PhantomData,
         };
         adc.enable_pin(&new);
+        unsafe { new.pin.make_input(false) };
         new
     }
 }
@@ -536,7 +537,7 @@ impl<PIN: PinOps> Pin<mode::Analog, PIN> {
     /// input. You can get to other digital modes by calling one of the usual `into_...` methods
     /// on the return value of this function.
     pub fn into_digital<H, ADC, CLOCK>(
-        mut self,
+        self,
         adc: &mut crate::adc::Adc<H, ADC, CLOCK>,
     ) -> Pin<mode::Input<mode::Floating>, PIN>
     where
@@ -544,7 +545,6 @@ impl<PIN: PinOps> Pin<mode::Analog, PIN> {
         ADC: crate::adc::AdcOps<H>,
         CLOCK: crate::clock::Clock,
     {
-        unsafe { self.pin.make_input(false) };
         adc.disable_pin(&self);
         Pin {
             pin: self.pin,
