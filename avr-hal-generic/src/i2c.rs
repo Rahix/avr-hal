@@ -388,6 +388,118 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2
     }
 }
 
+struct Transaction<'i, H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL> {
+    p: &'i mut I2C,
+    address: u8,
+    state: Option<Direction>,
+    _phantom: PhantomData<(H, SDA, SCL)>,
+}
+
+impl<'i, H, I2C, SDA, SCL> Transaction<'i, H, I2C, SDA, SCL>
+where
+    I2C: I2cOps<H, SDA, SCL>,
+{
+    fn new(p: &'i mut I2C, address: u8) -> Self {
+        Self {
+            p,
+            address,
+            state: None,
+            _phantom: Default::default(),
+        }
+    }
+
+    fn exec<'o: 'i>(&mut self, op: &mut hal::blocking::i2c::Operation<'o>) -> Result<(), Error> {
+        match self.state {
+            None => {
+                // Process the first operation and find the data direction
+                let dir = match op {
+                    hal::blocking::i2c::Operation::Write(bytes) => {
+                        self.p.raw_start(self.address, Direction::Write)?;
+                        self.p.raw_write(bytes)?;
+                        Direction::Write
+                    }
+                    hal::blocking::i2c::Operation::Read(buffer) => {
+                        self.p.raw_start(self.address, Direction::Read)?;
+                        self.p.raw_read(buffer)?;
+                        Direction::Read
+                    }
+                };
+
+                self.state = Some(dir);
+            }
+
+            Some(cur_dir) => {
+                match op {
+                    hal::blocking::i2c::Operation::Write(bytes) => {
+                        if cur_dir != Direction::Write {
+                            // Was reading, now writing
+                            self.p.raw_start(self.address, Direction::Write)?;
+                            self.state = Some(Direction::Write);
+                        }
+                        self.p.raw_write(bytes)?;
+                    }
+                    hal::blocking::i2c::Operation::Read(buffer) => {
+                        if cur_dir != Direction::Read {
+                            // Was writing, now reading
+                            self.p.raw_start(self.address, Direction::Read)?;
+                            self.state = Some(Direction::Read);
+                        }
+                        self.p.raw_read(buffer)?;
+                    }
+                }
+            }
+        };
+
+        Ok(())
+    }
+
+    fn commit(self) -> Result<(), Error> {
+        match self.state {
+            None => Ok(()),
+            Some(..) => self.p.raw_stop(),
+        }
+    }
+}
+
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::Transactional
+    for I2c<H, I2C, SDA, SCL, CLOCK>
+{
+    type Error = Error;
+
+    fn exec<'a>(
+        &mut self,
+        address: u8,
+        operations: &mut [hal::blocking::i2c::Operation<'a>],
+    ) -> Result<(), Self::Error> {
+        let mut transaction = Transaction::new(&mut self.p, address);
+
+        for op in operations.iter_mut() {
+            transaction.exec(op)?;
+        }
+
+        transaction.commit()
+    }
+}
+
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> hal::blocking::i2c::TransactionalIter
+    for I2c<H, I2C, SDA, SCL, CLOCK>
+{
+    type Error = Error;
+
+    fn exec_iter<'a, O>(&mut self, address: u8, operations: O) -> Result<(), Self::Error>
+    where
+        O: IntoIterator<Item = hal::blocking::i2c::Operation<'a>>,
+    {
+        let mut transaction = Transaction::new(&mut self.p, address);
+
+        for mut op in operations.into_iter() {
+            transaction.exec(&mut op)?;
+        }
+
+        transaction.commit()
+    }
+}
+
 #[macro_export]
 macro_rules! impl_i2c_twi {
     (
