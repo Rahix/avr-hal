@@ -27,9 +27,9 @@ pub use leonardo::*;
 mod mega;
 #[cfg(any(feature = "arduino-mega2560", feature = "arduino-mega1280"))]
 pub use mega::*;
-#[cfg(any(feature = "arduino-nano", feature = "arduino-uno", feature = "nano168", feature = "sparkfun-promini-5v"))]
+#[cfg(any(feature = "arduino-nano", feature = "arduino-uno", feature = "nano168", feature = "sparkfun-promini-5v", feature = "atmega168"))]
 mod uno;
-#[cfg(any(feature = "arduino-nano", feature = "arduino-uno", feature = "nano168", feature = "sparkfun-promini-5v"))]
+#[cfg(any(feature = "arduino-nano", feature = "arduino-uno", feature = "nano168", feature = "sparkfun-promini-5v", feature = "atmega168"))]
 pub use uno::*;
 #[cfg(feature = "sparkfun-promicro")]
 mod promicro;

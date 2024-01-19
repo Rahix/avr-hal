@@ -17,6 +17,7 @@
 #![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
 #![cfg_attr(feature = "trinket", doc = "**Trinket**.")]
 #![cfg_attr(feature = "nano168", doc = "**Nano clone (ATmega168)**.")]
+#![cfg_attr(feature = "atmega168", doc = "**ATmega168**.")]
 //! This means that only items which are available for this board are visible.  If you are using a
 //! different board, try building the documentation locally with
 //!
@@ -64,6 +65,7 @@ compile_error!(
     * trinket-pro
     * trinket
     * nano168
+    * atmega168
     "
 );
 
@@ -259,7 +261,7 @@ macro_rules! default_serial {
         )
     };
 }
-#[cfg(any(feature = "arduino-nano", feature = "nano168", feature = "sparkfun-promini-5v"))]
+#[cfg(any(feature = "arduino-nano", feature = "nano168", feature = "sparkfun-promini-5v", feature = "atmega168"))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
