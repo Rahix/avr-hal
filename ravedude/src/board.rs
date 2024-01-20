@@ -170,16 +170,14 @@ impl Board for ArduinoLeonardo {
     fn needs_reset(&self) -> Option<&str> {
         let a = self.guess_port();
         match a {
-            Some(Ok(name)) => {
-                match serialport::new(name.to_str().unwrap(), 1200).open() {
-                    Ok(_) => {
-                        std::thread::sleep(core::time::Duration::from_secs(1));
-                        None
-                    },
-                    Err(_) => Some("Reset the board by pressing the reset button once.")
+            Some(Ok(name)) => match serialport::new(name.to_str().unwrap(), 1200).open() {
+                Ok(_) => {
+                    std::thread::sleep(core::time::Duration::from_secs(1));
+                    None
                 }
+                Err(_) => Some("Reset the board by pressing the reset button once."),
             },
-            _ => Some("Reset the board by pressing the reset button once.")
+            _ => Some("Reset the board by pressing the reset button once."),
         }
     }
 
@@ -202,7 +200,6 @@ impl Board for ArduinoLeonardo {
     }
 }
 
-
 struct ArduinoMega1280;
 
 impl Board for ArduinoMega1280 {
@@ -224,11 +221,10 @@ impl Board for ArduinoMega1280 {
     }
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-       // This board uses a generic serial interface id 0403:6001 which is too common for auto detection.
-       Some(Err(anyhow::anyhow!("Unable to guess port.")))
+        // This board uses a generic serial interface id 0403:6001 which is too common for auto detection.
+        Some(Err(anyhow::anyhow!("Unable to guess port.")))
     }
 }
-
 
 struct ArduinoMega2560;
 
@@ -416,7 +412,6 @@ impl Board for Nano168 {
         Some(Err(anyhow::anyhow!("Not able to guess port")))
     }
 }
-
 
 struct ArduinoDuemilanove;
 
