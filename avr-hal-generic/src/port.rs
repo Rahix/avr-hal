@@ -606,10 +606,10 @@ macro_rules! impl_port_traditional {
         }
 
         impl Dynamic {
-            fn new(port: DynamicPort, pin_num: u8) -> Self {
+            fn new(port: DynamicPort, num: u8) -> Self {
                 Self {
                     port,
-                    mask: 1 << pin_num,
+                    mask: 1u8 << num,
                 }
             }
         }
@@ -653,16 +653,18 @@ macro_rules! impl_port_traditional {
                 #[inline]
                 unsafe fn out_get(&self) -> bool {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>].read().bits()
-                            & self.mask != 0,)+
+                        $(DynamicPort::[<PORT $name>] => {
+                            (*<$port>::ptr()).[<port $name:lower>].read().bits() & self.mask != 0
+                        })+
                     }
                 }
 
                 #[inline]
                 unsafe fn in_get(&self) -> bool {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<pin $name:lower>].read().bits()
-                            & self.mask != 0,)+
+                        $(DynamicPort::[<PORT $name>] => {
+                            (*<$port>::ptr()).[<pin $name:lower>].read().bits() & self.mask != 0
+                        })+
                     }
                 }
 
@@ -707,44 +709,46 @@ macro_rules! impl_port_traditional {
 
                     #[inline]
                     unsafe fn out_set(&mut self) {
-                        (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
-                            w.bits(r.bits() | (1 << $pin))
+                        (*<$port>::ptr()).[<port $name:lower>].modify(|_, w| {
+                            w.[<p $name:lower $pin>]().set_bit()
                         })
                     }
 
                     #[inline]
                     unsafe fn out_clear(&mut self) {
-                        (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
-                            w.bits(r.bits() & !(1 << $pin))
+                        (*<$port>::ptr()).[<port $name:lower>].modify(|_, w| {
+                            w.[<p $name:lower $pin>]().clear_bit()
                         })
                     }
 
                     #[inline]
                     unsafe fn out_toggle(&mut self) {
-                        (*<$port>::ptr()).[<pin $name:lower>].write(|w| w.bits(1 << $pin))
+                        (*<$port>::ptr()).[<pin $name:lower>].write(|w| {
+                            w.[<p $name:lower $pin>]().set_bit()
+                        })
                     }
 
                     #[inline]
                     unsafe fn out_get(&self) -> bool {
-                        (*<$port>::ptr()).[<port $name:lower>].read().bits() & (1 << $pin) != 0
+                        (*<$port>::ptr()).[<port $name:lower>].read().[<p $name:lower $pin>]().bit()
                     }
 
                     #[inline]
                     unsafe fn in_get(&self) -> bool {
-                        (*<$port>::ptr()).[<pin $name:lower>].read().bits() & (1 << $pin) != 0
+                        (*<$port>::ptr()).[<pin $name:lower>].read().[<p $name:lower $pin>]().bit()
                     }
 
                     #[inline]
                     unsafe fn make_output(&mut self) {
-                        (*<$port>::ptr()).[<ddr $name:lower>].modify(|r, w| {
-                            w.bits(r.bits() | (1 << $pin))
+                        (*<$port>::ptr()).[<ddr $name:lower>].modify(|_, w| {
+                            w.[<p $name:lower $pin>]().set_bit()
                         })
                     }
 
                     #[inline]
                     unsafe fn make_input(&mut self, pull_up: bool) {
-                        (*<$port>::ptr()).[<ddr $name:lower>].modify(|r, w| {
-                            w.bits(r.bits() & !(1 << $pin))
+                        (*<$port>::ptr()).[<ddr $name:lower>].modify(|_, w| {
+                            w.[<p $name:lower $pin>]().clear_bit()
                         });
                         if pull_up {
                             self.out_set()
