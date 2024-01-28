@@ -23,7 +23,7 @@ avr_hal_generic::impl_port_traditional! {
 avr_hal_generic::impl_port_traditional! {
     enum Ports {
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
-        C: crate::pac::PORTC = [0, 1, 2, 3, 4, 5, 6, 7],
+        C: crate::pac::PORTC = [0, 1, 2, 3, 4, 5, 6],
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
         E: crate::pac::PORTE = [0, 1, 2, 3],
     }
@@ -36,7 +36,7 @@ avr_hal_generic::impl_port_traditional! {
         C: crate::pac::PORTC = [6, 7],
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
         E: crate::pac::PORTE = [2, 6],
-        F: crate::pac::PORTF = [0, 1, 2, 3, 4, 5, 6, 7],
+        F: crate::pac::PORTF = [0, 1, 4, 5, 6, 7],
     }
 }
 
@@ -49,7 +49,7 @@ avr_hal_generic::impl_port_traditional! {
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
         E: crate::pac::PORTE = [0, 1, 2, 3, 4, 5, 6, 7],
         F: crate::pac::PORTF = [0, 1, 2, 3, 4, 5, 6, 7],
-        G: crate::pac::PORTG = [0, 1, 2, 3, 4, 5],
+        G: crate::pac::PORTG = [0, 1, 2, 3, 4],
     }
 }
 
