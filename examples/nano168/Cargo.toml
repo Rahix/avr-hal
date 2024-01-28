@@ -21,4 +21,4 @@ path = "../../arduino-hal/"
 features = ["nano168"]
 
 [dependencies.avr-device]
-version = "0.5.3"
+version = "0.5.4"
