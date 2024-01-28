@@ -644,7 +644,7 @@ macro_rules! impl_port_traditional {
                 #[inline]
                 unsafe fn out_toggle(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>].write(|w| {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<pin $name:lower>].write(|w| {
                             w.bits(self.mask)
                         }),)+
                     }
