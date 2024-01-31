@@ -1,7 +1,8 @@
 //! SPI Implementation
 use crate::port;
+use core::cmp::Ordering;
 use core::marker::PhantomData;
-use embedded_hal_v0::spi;
+use embedded_hal::spi;
 
 /// Oscillator Clock Frequency division options.
 ///
@@ -75,6 +76,10 @@ pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
     fn raw_check_iflag(&self) -> bool;
     fn raw_read(&self) -> u8;
     fn raw_write(&mut self, byte: u8);
+
+    fn raw_read_buf(&self, buf: &mut [u8]);
+    fn raw_write_buf(&mut self, buf: &[u8]);
+    fn raw_read_write_buf(&mut self, buffer: &mut [u8], bytes: &[u8]);
 }
 
 /// Wrapper for the CS pin
@@ -106,11 +111,39 @@ impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::StatefulOutputPin for Ch
     }
 }
 
-impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::ToggleableOutputPin for ChipSelectPin<CSPIN> {
+impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::ToggleableOutputPin
+    for ChipSelectPin<CSPIN>
+{
     type Error = core::convert::Infallible;
     fn toggle(&mut self) -> Result<(), Self::Error> {
         self.0.toggle();
         Ok(())
+    }
+}
+
+impl<CSPIN: port::PinOps> embedded_hal::digital::ErrorType for ChipSelectPin<CSPIN> {
+    type Error = core::convert::Infallible;
+}
+
+impl<CSPIN: port::PinOps> embedded_hal::digital::OutputPin for ChipSelectPin<CSPIN> {
+    fn set_high(&mut self) -> Result<(), Self::Error> {
+        self.0.set_high();
+        Ok(())
+    }
+
+    fn set_low(&mut self) -> Result<(), Self::Error> {
+        self.0.set_low();
+        Ok(())
+    }
+}
+
+impl<CSPIN: port::PinOps> embedded_hal::digital::StatefulOutputPin for ChipSelectPin<CSPIN> {
+    fn is_set_high(&mut self) -> Result<bool, Self::Error> {
+        Ok(self.0.is_set_high())
+    }
+
+    fn is_set_low(&mut self) -> Result<bool, Self::Error> {
+        Ok(self.0.is_set_low())
     }
 }
 
@@ -119,6 +152,9 @@ impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::ToggleableOutputPin for 
 /// Stores the SPI peripheral for register access.  In addition, it takes
 /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
 /// Instantiate with the `new` method.
+///
+/// This can be used both with the embedded-hal 0.2 spi::FullDuplex trait, and
+/// with the embedded-hal 1.0 spi::SpiBus trait.
 pub struct Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> {
     p: SPI,
     sclk: port::Pin<port::mode::Output, SCLKPIN>,
@@ -241,7 +277,7 @@ where
 /// FullDuplex trait implementation, allowing this struct to be provided to
 /// drivers that require it for operation.  Only 8-bit word size is supported
 /// for now.
-impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> spi::FullDuplex<u8>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal_v0::spi::FullDuplex<u8>
     for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
     SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
@@ -288,6 +324,70 @@ where
     MISOPIN: port::PinOps,
     CSPIN: port::PinOps,
 {
+}
+
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal::spi::ErrorType
+    for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
+where
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+    CSPIN: port::PinOps,
+{
+    type Error = core::convert::Infallible;
+}
+
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal::spi::SpiBus
+    for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
+where
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+    CSPIN: port::PinOps,
+{
+    fn read(&mut self, read: &mut [u8]) -> Result<(), Self::Error> {
+        Ok(self.p.raw_read_buf(read))
+    }
+
+    fn write(&mut self, write: &[u8]) -> Result<(), Self::Error> {
+        Ok(self.p.raw_write_buf(write))
+    }
+
+    fn transfer(&mut self, read: &mut [u8], write: &[u8]) -> Result<(), Self::Error> {
+        match read.len().cmp(&write.len()) {
+            Ordering::Less => {
+                let (write1, write2) = write.split_at(read.len());
+                self.p.raw_read_write_buf(read, write1);
+                self.p.raw_write_buf(write2);
+            }
+            Ordering::Equal => self.p.raw_read_write_buf(read, write),
+            Ordering::Greater => {
+                let (read1, read2) = read.split_at_mut(write.len());
+                self.p.raw_read_write_buf(read1, write);
+                self.p.raw_read_buf(read2);
+            }
+        }
+        Ok(())
+    }
+
+    fn transfer_in_place(&mut self, buffer: &mut [u8]) -> Result<(), Self::Error> {
+        let write = unsafe {
+            let p = buffer.as_ptr();
+            core::slice::from_raw_parts(p, buffer.len())
+        };
+        self.p.raw_read_write_buf(buffer, write);
+        Ok(())
+    }
+
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        if self.write_in_progress {
+            while !self.p.raw_check_iflag() {}
+            self.write_in_progress = false;
+        }
+        Ok(())
+    }
 }
 
 /// Implement traits for a SPI interface
@@ -369,6 +469,39 @@ macro_rules! impl_spi {
             /// automatically.
             fn raw_write(&mut self, byte: u8) {
                 self.spdr.write(|w| unsafe { w.bits(byte) });
+            }
+
+            /// Read n bytes from the data register, n being to the size of
+            /// the given buffer.
+            fn raw_read_buf(&self, buf: &mut [u8]) {
+                buf.iter_mut().for_each(|b| *b = self.spdr.read().bits())
+            }
+
+            /// Write n bytes to the data register, n being the size of the
+            /// given buffer.
+            fn raw_write_buf(&mut self, buf: &[u8]) {
+                buf.iter().for_each(|b| {
+                    self.spdr.write(|w| unsafe { w.bits(*b) });
+                    while self.spsr.read().spif().bit_is_clear() {}
+                })
+            }
+
+            /// Read and write n bytes at the same time, n being the size of
+            /// the given buffers.
+            ///
+            /// <div class="warning">The input and output buffers must have
+            /// the same size</div>
+            fn raw_read_write_buf(&mut self, buffer: &mut [u8], bytes: &[u8]) {
+                assert_eq!(buffer.len(), bytes.len());
+
+                let mut buffer_it = buffer.iter_mut();
+                let mut bytes_it = bytes.iter();
+                while let Some(byte) = bytes_it.next() {
+                    self.raw_write(*byte);
+                    while self.spsr.read().spif().bit_is_clear() {}
+                    let mut data = buffer_it.next().unwrap();
+                    *data = self.raw_read();
+                }
             }
         }
     };
