@@ -129,7 +129,7 @@ avr_hal_generic::impl_simple_pwm! {
 
 #[cfg(feature = "attiny85")]
 avr_hal_generic::impl_simple_pwm! {
-    /// Use `TC1` for PWM (pins `PB4`)
+    /// Use `TC1` for PWM (pins `~PB3`, `PB4`)
     ///
     /// # Example
     /// ```
@@ -154,6 +154,15 @@ avr_hal_generic::impl_simple_pwm! {
             });
         },
         pins: {
+            PB3: {
+                ocr: ocr1b,
+                into_pwm: |tim | if enable {
+                    tim.gtccr.modify(|_, w| w.com1b().bits(0b01));
+                } else {
+                    tim.gtccr.modify(|_, w| w.com1b().disconnected());
+                },
+            },
+
             PB4: {
                 ocr: ocr1b,
                 into_pwm: |tim| if enable {
