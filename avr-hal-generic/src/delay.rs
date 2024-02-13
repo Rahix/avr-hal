@@ -301,7 +301,7 @@ impl<SPEED> DelayNs for Delay<SPEED>
     fn delay_ns(&mut self, ns: u32) {
         // quick-win to get an initial implementation.
         // note that the trait does not guarantee nanosecond-accuracy.
-        delay_v0::DelayUs::<u32>::delay_us(self, ns.saturating_add(999) / 1000)
+        delay_v0::DelayUs::<u32>::delay_us(self, ns.div_ceil(1000))
     }
 
     fn delay_us(&mut self, us: u32) {
