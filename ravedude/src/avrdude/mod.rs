@@ -52,6 +52,8 @@ impl Avrdude {
         port: Option<impl AsRef<path::Path>>,
         bin: &path::Path,
     ) -> anyhow::Result<Self> {
+        let avrdude_version = Self::get_avrdude_version()?;
+
         let config = tempfile::Builder::new()
             .prefix(".avrdude-")
             .suffix(".conf")
@@ -62,8 +64,13 @@ impl Avrdude {
             use std::io::Write;
 
             let mut f = std::fs::File::create(&config).context("could not create avrdude.conf")?;
-            f.write_all(include_bytes!("avrdude.conf"))
-                .context("could not write avrdude.conf")?;
+            if avrdude_version.0 == 6 {
+                f.write_all(include_bytes!("avrdude-6.conf"))
+                    .context("could not write avrdude.conf for avrdude 6.X")?;
+            } else {
+                f.write_all(include_bytes!("avrdude-7.conf"))
+                    .context("could not write avrdude.conf for avrdude 7.X")?;
+            }
             f.flush().unwrap();
         }
 
