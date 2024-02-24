@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
+## [0.1.7] - 2024-02-24
 ### Added
 - Added support for using `ravedude` with `avrdude` version 7.x ([#508]).
 
@@ -93,7 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial, miminal version.
 
 
-[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.6...HEAD
+[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.7...HEAD
+[0.1.7]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.6...ravedude-0.1.7
 [0.1.6]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.5...ravedude-0.1.6
 [0.1.5]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.4...ravedude-0.1.5
 [0.1.4]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.3...ravedude-0.1.4
