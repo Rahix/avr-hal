@@ -48,6 +48,10 @@ struct Args {
     #[structopt(short = "d", long = "reset-delay")]
     reset_delay: Option<u64>,
 
+    /// Print the avrdude command that is executed for flashing the binary.
+    #[structopt(long = "debug-avrdude")]
+    debug_avrdude: bool,
+
     /// Which board to interact with.
     ///
     /// Must be one of the known board identifiers:
@@ -137,7 +141,12 @@ fn ravedude() -> anyhow::Result<()> {
             task_message!("Programming", "{}", bin.display(),);
         }
 
-        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), port.as_ref(), bin)?;
+        let mut avrdude = avrdude::Avrdude::run(
+            &board.avrdude_options(),
+            port.as_ref(),
+            bin,
+            args.debug_avrdude,
+        )?;
         avrdude.wait()?;
 
         task_message!("Programmed", "{}", bin.display());

@@ -51,6 +51,7 @@ impl Avrdude {
         options: &AvrdudeOptions,
         port: Option<impl AsRef<path::Path>>,
         bin: &path::Path,
+        debug: bool,
     ) -> anyhow::Result<Self> {
         let avrdude_version = Self::get_avrdude_version()?;
 
@@ -101,6 +102,19 @@ impl Avrdude {
         }
 
         command = command.arg("-D").arg("-U").arg(flash_instruction);
+
+        if debug {
+            crate::task_message!(
+                "Dbg.Command",
+                "{} {}",
+                command.get_program().to_string_lossy(),
+                command
+                    .get_args()
+                    .map(|s| s.to_string_lossy())
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            );
+        }
 
         let process = command.spawn().context("failed starting avrdude")?;
 
