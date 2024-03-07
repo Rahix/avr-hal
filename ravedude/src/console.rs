@@ -31,6 +31,16 @@ pub fn open(port: &std::path::Path, baudrate: u32) -> anyhow::Result<()> {
 
         match rx.read(&mut buf) {
             Ok(count) => {
+                #[cfg(target_os = "windows")]
+                {
+                    // On windows, we must ensure that we are not sending anything outside of the
+                    // ASCII range.
+                    for byte in &mut buf[..count] {
+                        if *byte & 0x80 != 0 {
+                            *byte = '?'.try_into().unwrap();
+                        }
+                    }
+                }
                 stdout.write(&buf[..count]).unwrap();
                 stdout.flush().unwrap();
             }
