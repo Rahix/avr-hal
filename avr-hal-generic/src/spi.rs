@@ -75,6 +75,10 @@ pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
     fn raw_check_iflag(&self) -> bool;
     fn raw_read(&self) -> u8;
     fn raw_write(&mut self, byte: u8);
+
+    fn raw_read_buf(&self, buf: &mut [u8]);
+    fn raw_write_buf(&mut self, buf: &[u8]);
+    fn raw_read_write_buf(&mut self, buffer: &mut [u8], bytes: &[u8]);
 }
 
 /// Wrapper for the CS pin
@@ -140,11 +144,19 @@ impl<CSPIN: port::PinOps> embedded_hal::digital::StatefulOutputPin for ChipSelec
     }
 }
 
+
+
 /// Behavior for a SPI interface.
 ///
 /// Stores the SPI peripheral for register access.  In addition, it takes
 /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
 /// Instantiate with the `new` method.
+/// 
+/// This can be used both with the embedded-hal 0.2 [`spi::FullDuplex`] trait, and
+/// with the embedded-hal 1.0 [`spi::SpiBus`] trait.
+///
+/// [`spi::FullDuplex`]: `embedded_hal_v0::spi::FullDuplex`
+/// [`spi::SpiBus`]: `embedded_hal::spi::SpiBus`
 pub struct Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> {
     p: SPI,
     sclk: port::Pin<port::mode::Output, SCLKPIN>,
@@ -292,6 +304,63 @@ where
     }
 }
 
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal::spi::ErrorType
+    for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
+where
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+    CSPIN: port::PinOps,
+{
+    type Error = core::convert::Infallible;
+}
+
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal::spi::SpiBus
+    for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
+where
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+    CSPIN: port::PinOps,
+{
+    fn read(&mut self, read: &mut [u8]) -> Result<(), Self::Error> {
+        Ok(self.p.raw_read_buf(read))
+    }
+
+    fn write(&mut self, write: &[u8]) -> Result<(), Self::Error> {
+        Ok(self.p.raw_write_buf(write))
+    }
+
+    fn transfer(&mut self, read: &mut [u8], write: &[u8]) -> Result<(), Self::Error> {
+        let common_length = read.len().min(write.len()); 
+        let (write1, write2) = write.split_at(common_length); 
+        let (read1, read2) = read.split_at_mut(common_length); 
+        self.p.raw_read_write_buf( read1, write1); 
+        
+        debug_assert!(write2.len() == 0 || read2.len() == 0); 
+        self.p.raw_write_buf(write2); 
+        self.p.raw_read_buf(read2);
+        Ok(())
+    }
+    fn transfer_in_place(&mut self, buffer: &mut [u8]) -> Result<(), Self::Error> {
+        let write = unsafe {
+            let p = buffer.as_ptr();
+            core::slice::from_raw_parts(p, buffer.len())
+        };
+        self.p.raw_read_write_buf(buffer, write);
+        Ok(())
+    }
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        if self.write_in_progress {
+            while !self.p.raw_check_iflag() {}
+            self.write_in_progress = false;
+        }
+        Ok(())
+    }
+}
+
 /// Default Transfer trait implementation. Only 8-bit word size is supported for now.
 impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal_v0::blocking::spi::transfer::Default<u8>
     for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
@@ -395,6 +464,40 @@ macro_rules! impl_spi {
             /// automatically.
             fn raw_write(&mut self, byte: u8) {
                 self.spdr.write(|w| unsafe { w.bits(byte) });
+            }
+
+            /// Read n bytes from the data register, n being to the size of
+            /// the given buffer.
+            fn raw_read_buf(&self, buf: &mut [u8]) { 
+                for b in buf.iter_mut() { 
+                    // We send 0x00 on MOSI during "pure" reading 
+                    self.spdr.write(|w| unsafe { w.bits(0x00) }); 
+                    while self.spsr.read().spif().bit_is_clear() {} 
+                    *b = self.spdr.read().bits(); 
+                } 
+            }
+            
+            /// Write n bytes to the data register, n being the size of the
+            /// given buffer.
+            fn raw_write_buf(&mut self, buf: &[u8]) {
+                for b in buf.iter() {
+                    self.spdr.write(|w| unsafe { w.bits(*b) });
+                    while self.spsr.read().spif().bit_is_clear() {}
+                }
+            }
+
+            /// Read and write n bytes at the same time, n being the size of
+            /// the given buffers.
+            ///
+            /// **The read and write buffers must have the same size**
+            fn raw_read_write_buf(&mut self, buf: &mut [u8], bytes: &[u8]) {
+                assert_eq!(buf.len(), bytes.len());
+
+                for (b, byte) in buf.iter_mut().zip(bytes.iter()) { 
+                    self.raw_write(*byte); 
+                    while self.spsr.read().spif().bit_is_clear() {} 
+                    *b = self.raw_read(); 
+                }
             }
         }
     };
