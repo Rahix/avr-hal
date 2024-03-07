@@ -1,7 +1,7 @@
 //! SPI Implementation
 use crate::port;
 use core::marker::PhantomData;
-use embedded_hal_v0::spi;
+use embedded_hal::spi;
 
 /// Oscillator Clock Frequency division options.
 ///
@@ -111,6 +111,32 @@ impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::ToggleableOutputPin for 
     fn toggle(&mut self) -> Result<(), Self::Error> {
         self.0.toggle();
         Ok(())
+    }
+}
+
+impl<CSPIN: port::PinOps> embedded_hal::digital::ErrorType for ChipSelectPin<CSPIN> {
+    type Error = core::convert::Infallible;
+}
+
+impl<CSPIN: port::PinOps> embedded_hal::digital::OutputPin for ChipSelectPin<CSPIN> {
+    fn set_high(&mut self) -> Result<(), Self::Error> {
+        self.0.set_high();
+        Ok(())
+    }
+
+    fn set_low(&mut self) -> Result<(), Self::Error> {
+        self.0.set_low();
+        Ok(())
+    }
+}
+
+impl<CSPIN: port::PinOps> embedded_hal::digital::StatefulOutputPin for ChipSelectPin<CSPIN> {
+    fn is_set_high(&mut self) -> Result<bool, Self::Error> {
+        Ok(self.0.is_set_high())
+    }
+
+    fn is_set_low(&mut self) -> Result<bool, Self::Error> {
+        Ok(self.0.is_set_low())
     }
 }
 
@@ -241,7 +267,7 @@ where
 /// FullDuplex trait implementation, allowing this struct to be provided to
 /// drivers that require it for operation.  Only 8-bit word size is supported
 /// for now.
-impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> spi::FullDuplex<u8>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal_v0::spi::FullDuplex<u8>
     for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
     SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
