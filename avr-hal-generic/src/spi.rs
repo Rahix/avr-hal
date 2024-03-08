@@ -78,7 +78,9 @@ pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
 
     fn raw_read_buf(&self, buf: &mut [u8]);
     fn raw_write_buf(&mut self, buf: &[u8]);
+    
     fn raw_read_write_buf(&mut self, buffer: &mut [u8], bytes: &[u8]);
+    fn raw_read_write_in_place(&mut self, buf: &mut [u8]);
 }
 
 /// Wrapper for the CS pin
@@ -345,11 +347,7 @@ where
         Ok(())
     }
     fn transfer_in_place(&mut self, buffer: &mut [u8]) -> Result<(), Self::Error> {
-        let write = unsafe {
-            let p = buffer.as_ptr();
-            core::slice::from_raw_parts(p, buffer.len())
-        };
-        self.p.raw_read_write_buf(buffer, write);
+        self.p.raw_read_write_in_place(buffer);
         Ok(())
     }
     fn flush(&mut self) -> Result<(), Self::Error> {
@@ -497,6 +495,14 @@ macro_rules! impl_spi {
                     self.raw_write(*byte); 
                     while self.spsr.read().spif().bit_is_clear() {} 
                     *b = self.raw_read(); 
+                }
+            }
+
+            fn raw_read_write_in_place(&mut self, buf: &mut [u8]){
+                for b in buf.iter_mut() {
+                    self.raw_write(*b);
+                    while self.spsr.read().spif().bit_is_clear() {} 
+                    *b = self.raw_read();
                 }
             }
         }
