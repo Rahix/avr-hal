@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the `--debug-avrdude` option to print the `avrdude` invocation used to
   flash the binary.
 
+### Fixed
+- Fixed a crash on Windows when attempting to print non-ascii bytes that were
+  received on the serial console ([#516]).
+
+[#516]: https://github.com/Rahix/avr-hal/pull/516
+
 
 ## [0.1.7] - 2024-02-24
 ### Added
