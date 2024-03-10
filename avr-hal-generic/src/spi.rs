@@ -1,7 +1,7 @@
 //! SPI Implementation
 use crate::port;
 use core::marker::PhantomData;
-use embedded_hal::spi;
+use embedded_hal::spi::{self,SpiBus};
 
 /// Oscillator Clock Frequency division options.
 ///
@@ -318,7 +318,7 @@ where
     type Error = core::convert::Infallible;
 }
 
-impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal::spi::SpiBus
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> SpiBus
     for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
     SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
@@ -327,15 +327,34 @@ where
     MISOPIN: port::PinOps,
     CSPIN: port::PinOps,
 {
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        if self.write_in_progress {
+            while !self.p.raw_check_iflag() {}
+            self.write_in_progress = false;
+        }
+        Ok(())
+    }
     fn read(&mut self, read: &mut [u8]) -> Result<(), Self::Error> {
+        // Must flush() first, if asynchronous operations happened before this.
+        // To be removed if in the future we "only" implement embedded_hal 1.0
+        SpiBus::flush(self)?;
+        
         Ok(self.p.raw_read_buf(read))
     }
 
     fn write(&mut self, write: &[u8]) -> Result<(), Self::Error> {
+        // Must flush() first, if asynchronous operations happened before this.
+        // To be removed if in the future we "only" implement embedded_hal 1.0
+        SpiBus::flush(self)?;
+
         Ok(self.p.raw_write_buf(write))
     }
 
     fn transfer(&mut self, read: &mut [u8], write: &[u8]) -> Result<(), Self::Error> {
+        // Must flush() first, if asynchronous operations happened before this.
+        // To be removed if in the future we "only" implement embedded_hal 1.0
+        SpiBus::flush(self)?;
+
         let common_length = read.len().min(write.len()); 
         let (write1, write2) = write.split_at(common_length); 
         let (read1, read2) = read.split_at_mut(common_length); 
@@ -347,16 +366,14 @@ where
         Ok(())
     }
     fn transfer_in_place(&mut self, buffer: &mut [u8]) -> Result<(), Self::Error> {
+        // Must flush() first, if asynchronous operations happened before this.
+        // To be removed if in the future we "only" implement embedded_hal 1.0
+        SpiBus::flush(self)?;
+
         self.p.raw_read_write_in_place(buffer);
         Ok(())
     }
-    fn flush(&mut self) -> Result<(), Self::Error> {
-        if self.write_in_progress {
-            while !self.p.raw_check_iflag() {}
-            self.write_in_progress = false;
-        }
-        Ok(())
-    }
+    
 }
 
 /// Default Transfer trait implementation. Only 8-bit word size is supported for now.
@@ -471,7 +488,7 @@ macro_rules! impl_spi {
                     // We send 0x00 on MOSI during "pure" reading 
                     self.spdr.write(|w| unsafe { w.bits(0x00) }); 
                     while self.spsr.read().spif().bit_is_clear() {} 
-                    *b = self.spdr.read().bits(); 
+                    *b = self.raw_read(); 
                 } 
             }
             
