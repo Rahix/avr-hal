@@ -23,6 +23,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "trinket" => Box::new(Trinket),
         "nano168" => Box::new(Nano168),
         "duemilanove" => Box::new(ArduinoDuemilanove),
+        "atmega168" => Box::new(Atmega168),
         _ => return None,
     })
 }
@@ -430,6 +431,31 @@ impl Board for ArduinoDuemilanove {
             partno: "atmega328p",
             baudrate: Some(57600),
             do_chip_erase: true,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        Some(Err(anyhow::anyhow!("Not able to guess port")))
+    }
+}
+
+struct Atmega168;
+
+impl Board for Atmega168 {
+    fn display_name(&self) -> &str {
+        "ATmega168"
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        None
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "arduino",
+            partno: "atmega168",
+            baudrate: Some(19200),
+            do_chip_erase: false,
         }
     }
 

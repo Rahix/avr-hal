@@ -70,6 +70,7 @@ struct Args {
     /// * trinket
     /// * nano168
     /// * duemilanove
+    /// * atmega168
     #[structopt(name = "BOARD", verbatim_doc_comment)]
     board: String,
 
