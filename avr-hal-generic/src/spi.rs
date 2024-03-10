@@ -69,18 +69,22 @@ impl Default for Settings {
 /// intermediate abstraction ontop of which the [`Spi`] API is built.  **Prefer using the
 /// [`Spi`] API instead of this trait.**
 pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
+    /// Sets up the control/status registers with the right settings for this secondary device
     fn raw_setup(&mut self, settings: &Settings);
+    /// Disable the peripheral
     fn raw_release(&mut self);
 
+    /// Check the interrupt flag to see if the write has completed
+    /// 
+    /// Returns `true` if the bus is idle
     fn raw_check_iflag(&self) -> bool;
+    /// Read a byte from the data register
     fn raw_read(&self) -> u8;
+    /// Write a byte to the data register, which begins transmission
+    /// automatically.
     fn raw_write(&mut self, byte: u8);
-
-    fn raw_read_buf(&self, buf: &mut [u8]);
-    fn raw_write_buf(&mut self, buf: &[u8]);
-    
-    fn raw_read_write_buf(&mut self, buffer: &mut [u8], bytes: &[u8]);
-    fn raw_read_write_in_place(&mut self, buf: &mut [u8]);
+    /// Perform a transaction of a single byte
+    fn raw_transaction(&mut self, byte: u8) -> u8;
 }
 
 /// Wrapper for the CS pin
@@ -332,14 +336,20 @@ where
             while !self.p.raw_check_iflag() {}
             self.write_in_progress = false;
         }
+
         Ok(())
     }
     fn read(&mut self, read: &mut [u8]) -> Result<(), Self::Error> {
         // Must flush() first, if asynchronous operations happened before this.
         // To be removed if in the future we "only" implement embedded_hal 1.0
         SpiBus::flush(self)?;
+
+        for b in read.iter_mut() {
+            // We send 0x00 on MOSI during "pure" reading 
+            *b = self.p.raw_transaction(0x00);
+        }
         
-        Ok(self.p.raw_read_buf(read))
+        Ok(())
     }
 
     fn write(&mut self, write: &[u8]) -> Result<(), Self::Error> {
@@ -347,7 +357,11 @@ where
         // To be removed if in the future we "only" implement embedded_hal 1.0
         SpiBus::flush(self)?;
 
-        Ok(self.p.raw_write_buf(write))
+        for b in write.iter() {
+            self.p.raw_transaction(*b);
+        }
+
+        Ok(())
     }
 
     fn transfer(&mut self, read: &mut [u8], write: &[u8]) -> Result<(), Self::Error> {
@@ -355,14 +369,14 @@ where
         // To be removed if in the future we "only" implement embedded_hal 1.0
         SpiBus::flush(self)?;
 
-        let common_length = read.len().min(write.len()); 
-        let (write1, write2) = write.split_at(common_length); 
-        let (read1, read2) = read.split_at_mut(common_length); 
-        self.p.raw_read_write_buf( read1, write1); 
-        
-        debug_assert!(write2.len() == 0 || read2.len() == 0); 
-        self.p.raw_write_buf(write2); 
-        self.p.raw_read_buf(read2);
+        let longest = read.len().max(write.len());
+        for i in 0..=longest {
+            let r = self.p.raw_transaction(*write.get(i).unwrap_or(&0x00));
+            if i < read.len() {
+                read[i] = r;
+            }
+        }
+
         Ok(())
     }
     fn transfer_in_place(&mut self, buffer: &mut [u8]) -> Result<(), Self::Error> {
@@ -370,7 +384,10 @@ where
         // To be removed if in the future we "only" implement embedded_hal 1.0
         SpiBus::flush(self)?;
 
-        self.p.raw_read_write_in_place(buffer);
+        for b in buffer.iter_mut() {
+            *b = self.p.raw_transaction(*b)
+        }
+
         Ok(())
     }
     
@@ -412,7 +429,7 @@ macro_rules! impl_spi {
         cs: $cspin:ty,
     ) => {
         impl $crate::spi::SpiOps<$HAL, $sclkpin, $mosipin, $misopin, $cspin> for $SPI {
-            /// Sets up the control/status registers with the right settings for this secondary device
+            
             fn raw_setup(&mut self, settings: &Settings) {
                 use $crate::hal::spi;
 
@@ -460,67 +477,27 @@ macro_rules! impl_spi {
                 });
             }
 
-            /// Disable the peripheral
             fn raw_release(&mut self) {
                 self.spcr.write(|w| w.spe().clear_bit());
             }
 
-            /// Check the interrupt flag to see if the write has completed
             fn raw_check_iflag(&self) -> bool {
                 self.spsr.read().spif().bit_is_set()
             }
 
-            /// Read a byte from the data register
             fn raw_read(&self) -> u8 {
                 self.spdr.read().bits()
             }
 
-            /// Write a byte to the data register, which begins transmission
-            /// automatically.
+            
             fn raw_write(&mut self, byte: u8) {
                 self.spdr.write(|w| unsafe { w.bits(byte) });
             }
 
-            /// Read n bytes from the data register, n being to the size of
-            /// the given buffer.
-            fn raw_read_buf(&self, buf: &mut [u8]) { 
-                for b in buf.iter_mut() { 
-                    // We send 0x00 on MOSI during "pure" reading 
-                    self.spdr.write(|w| unsafe { w.bits(0x00) }); 
-                    while self.spsr.read().spif().bit_is_clear() {} 
-                    *b = self.raw_read(); 
-                } 
-            }
-            
-            /// Write n bytes to the data register, n being the size of the
-            /// given buffer.
-            fn raw_write_buf(&mut self, buf: &[u8]) {
-                for b in buf.iter() {
-                    self.spdr.write(|w| unsafe { w.bits(*b) });
-                    while self.spsr.read().spif().bit_is_clear() {}
-                }
-            }
-
-            /// Read and write n bytes at the same time, n being the size of
-            /// the given buffers.
-            ///
-            /// **The read and write buffers must have the same size**
-            fn raw_read_write_buf(&mut self, buf: &mut [u8], bytes: &[u8]) {
-                assert_eq!(buf.len(), bytes.len());
-
-                for (b, byte) in buf.iter_mut().zip(bytes.iter()) { 
-                    self.raw_write(*byte); 
-                    while self.spsr.read().spif().bit_is_clear() {} 
-                    *b = self.raw_read(); 
-                }
-            }
-
-            fn raw_read_write_in_place(&mut self, buf: &mut [u8]){
-                for b in buf.iter_mut() {
-                    self.raw_write(*b);
-                    while self.spsr.read().spif().bit_is_clear() {} 
-                    *b = self.raw_read();
-                }
+            fn raw_transaction(&mut self, byte: u8) -> u8 {
+                self.raw_write(byte);
+                while !self.raw_check_iflag() {}
+                self.raw_read()
             }
         }
     };
