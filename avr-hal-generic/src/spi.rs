@@ -370,7 +370,7 @@ where
         SpiBus::flush(self)?;
 
         let longest = read.len().max(write.len());
-        for i in 0..=longest {
+        for i in 0..longest {
             let r = self.p.raw_transaction(*write.get(i).unwrap_or(&0x00));
             if i < read.len() {
                 read[i] = r;
