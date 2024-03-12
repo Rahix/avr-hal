@@ -256,7 +256,6 @@ avr_hal_generic::impl_adc! {
     },
 }
 
-
 #[cfg(any(feature = "atmega2560", feature = "atmega1280"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,

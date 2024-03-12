@@ -55,9 +55,7 @@ avr_hal_generic::impl_eeprom_atmega! {
     },
 }
 
-#[cfg(any(
-    feature = "atmega8"
-))]
+#[cfg(any(feature = "atmega8"))]
 avr_hal_generic::impl_eeprom_atmega_old! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
@@ -68,9 +66,7 @@ avr_hal_generic::impl_eeprom_atmega_old! {
     },
 }
 
-#[cfg(any(
-    feature = "atmega32a"
-))]
+#[cfg(any(feature = "atmega32a"))]
 avr_hal_generic::impl_eeprom_atmega_old! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
@@ -81,9 +77,7 @@ avr_hal_generic::impl_eeprom_atmega_old! {
     },
 }
 
-#[cfg(any(
-    feature = "atmega128a",
-))]
+#[cfg(any(feature = "atmega128a",))]
 avr_hal_generic::impl_eeprom_atmega_old! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
@@ -93,4 +87,3 @@ avr_hal_generic::impl_eeprom_atmega_old! {
         peripheral.eear.write(|w| w.bits(address));
     },
 }
-

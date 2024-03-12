@@ -50,6 +50,12 @@ compile_error!(
 /// Reexport of `atmega1280` from `avr-device`
 #[cfg(feature = "atmega1280")]
 pub use avr_device::atmega1280 as pac;
+/// Reexport of `atmega1284p` from `avr-device`
+#[cfg(feature = "atmega1284p")]
+pub use avr_device::atmega1284p as pac;
+/// Reexport of `atmega128a` from `avr-device`
+#[cfg(feature = "atmega128a")]
+pub use avr_device::atmega128a as pac;
 /// Reexport of `atmega164pa` from `avr-device`
 #[cfg(feature = "atmega164pa")]
 pub use avr_device::atmega164pa as pac;
@@ -74,12 +80,6 @@ pub use avr_device::atmega32u4 as pac;
 /// Reexport of `atmega48p` from `avr-device`
 #[cfg(feature = "atmega48p")]
 pub use avr_device::atmega48p as pac;
-/// Reexport of `atmega128a` from `avr-device`
-#[cfg(feature = "atmega128a")]
-pub use avr_device::atmega128a as pac;
-/// Reexport of `atmega1284p` from `avr-device`
-#[cfg(feature = "atmega1284p")]
-pub use avr_device::atmega1284p as pac;
 /// Reexport of `atmega8` from `avr-device`
 #[cfg(feature = "atmega8")]
 pub use avr_device::atmega8 as pac;
@@ -132,7 +132,6 @@ pub use wdt::Wdt;
 pub mod eeprom;
 #[cfg(feature = "device-selected")]
 pub use eeprom::Eeprom;
-
 
 pub struct Atmega;
 
@@ -190,9 +189,7 @@ macro_rules! pins {
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new(
-            $p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD,
-        )
+        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
     };
 }
 
@@ -200,8 +197,6 @@ macro_rules! pins {
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new(
-            $p.PORTB, $p.PORTC, $p.PORTD,
-        )
+        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD)
     };
 }
