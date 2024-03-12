@@ -264,7 +264,6 @@ macro_rules! impl_eeprom_atmega_old {
         impl $crate::eeprom::EepromOps<$HAL> for $EEPROM {
             const CAPACITY: u16 = $capacity;
 
-
             fn raw_read_byte(&self, address: u16) -> u8 {
                 unsafe {
                     atmega_helper::set_address(&self, address);
@@ -279,14 +278,9 @@ macro_rules! impl_eeprom_atmega_old {
                 }
 
                 //Start EEPROM read operation
-                self.eedr.write(|w| unsafe {
-                    w.bits(data)
-                });
+                self.eedr.write(|w| unsafe { w.bits(data) });
 
-                self.eecr.write(|w|
-                    w
-                        .eemwe().set_bit()
-                        .eewe().clear_bit());
+                self.eecr.write(|w| w.eemwe().set_bit().eewe().clear_bit());
 
                 self.eecr.write(|w| w.eewe().set_bit());
             }
