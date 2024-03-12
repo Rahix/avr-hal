@@ -1,7 +1,7 @@
 //! SPI Implementation
 use crate::port;
 use core::marker::PhantomData;
-use embedded_hal_v0::spi;
+use embedded_hal::spi::{self,SpiBus};
 
 /// Oscillator Clock Frequency division options.
 ///
@@ -69,12 +69,22 @@ impl Default for Settings {
 /// intermediate abstraction ontop of which the [`Spi`] API is built.  **Prefer using the
 /// [`Spi`] API instead of this trait.**
 pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
+    /// Sets up the control/status registers with the right settings for this secondary device
     fn raw_setup(&mut self, settings: &Settings);
+    /// Disable the peripheral
     fn raw_release(&mut self);
 
+    /// Check the interrupt flag to see if the write has completed
+    /// 
+    /// Returns `true` if the bus is idle
     fn raw_check_iflag(&self) -> bool;
+    /// Read a byte from the data register
     fn raw_read(&self) -> u8;
+    /// Write a byte to the data register, which begins transmission
+    /// automatically.
     fn raw_write(&mut self, byte: u8);
+    /// Perform a transaction of a single byte
+    fn raw_transaction(&mut self, byte: u8) -> u8;
 }
 
 /// Wrapper for the CS pin
@@ -114,11 +124,45 @@ impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::ToggleableOutputPin for 
     }
 }
 
+impl<CSPIN: port::PinOps> embedded_hal::digital::ErrorType for ChipSelectPin<CSPIN> {
+    type Error = core::convert::Infallible;
+}
+
+impl<CSPIN: port::PinOps> embedded_hal::digital::OutputPin for ChipSelectPin<CSPIN> {
+    fn set_high(&mut self) -> Result<(), Self::Error> {
+        self.0.set_high();
+        Ok(())
+    }
+
+    fn set_low(&mut self) -> Result<(), Self::Error> {
+        self.0.set_low();
+        Ok(())
+    }
+}
+
+impl<CSPIN: port::PinOps> embedded_hal::digital::StatefulOutputPin for ChipSelectPin<CSPIN> {
+    fn is_set_high(&mut self) -> Result<bool, Self::Error> {
+        Ok(self.0.is_set_high())
+    }
+
+    fn is_set_low(&mut self) -> Result<bool, Self::Error> {
+        Ok(self.0.is_set_low())
+    }
+}
+
+
+
 /// Behavior for a SPI interface.
 ///
 /// Stores the SPI peripheral for register access.  In addition, it takes
 /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
 /// Instantiate with the `new` method.
+/// 
+/// This can be used both with the embedded-hal 0.2 [`spi::FullDuplex`] trait, and
+/// with the embedded-hal 1.0 [`spi::SpiBus`] trait.
+///
+/// [`spi::FullDuplex`]: `embedded_hal_v0::spi::FullDuplex`
+/// [`spi::SpiBus`]: `embedded_hal::spi::SpiBus`
 pub struct Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> {
     p: SPI,
     sclk: port::Pin<port::mode::Output, SCLKPIN>,
@@ -241,7 +285,7 @@ where
 /// FullDuplex trait implementation, allowing this struct to be provided to
 /// drivers that require it for operation.  Only 8-bit word size is supported
 /// for now.
-impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> spi::FullDuplex<u8>
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal_v0::spi::FullDuplex<u8>
     for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
 where
     SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
@@ -264,6 +308,89 @@ where
         self.flush()?;
         Ok(self.receive())
     }
+}
+
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> embedded_hal::spi::ErrorType
+    for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
+where
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+    CSPIN: port::PinOps,
+{
+    type Error = core::convert::Infallible;
+}
+
+impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> SpiBus
+    for Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
+where
+    SPI: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+    CSPIN: port::PinOps,
+{
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        if self.write_in_progress {
+            while !self.p.raw_check_iflag() {}
+            self.write_in_progress = false;
+        }
+
+        Ok(())
+    }
+    fn read(&mut self, read: &mut [u8]) -> Result<(), Self::Error> {
+        // Must flush() first, if asynchronous operations happened before this.
+        // To be removed if in the future we "only" implement embedded_hal 1.0
+        SpiBus::flush(self)?;
+
+        for b in read.iter_mut() {
+            // We send 0x00 on MOSI during "pure" reading 
+            *b = self.p.raw_transaction(0x00);
+        }
+        
+        Ok(())
+    }
+
+    fn write(&mut self, write: &[u8]) -> Result<(), Self::Error> {
+        // Must flush() first, if asynchronous operations happened before this.
+        // To be removed if in the future we "only" implement embedded_hal 1.0
+        SpiBus::flush(self)?;
+
+        for b in write.iter() {
+            self.p.raw_transaction(*b);
+        }
+
+        Ok(())
+    }
+
+    fn transfer(&mut self, read: &mut [u8], write: &[u8]) -> Result<(), Self::Error> {
+        // Must flush() first, if asynchronous operations happened before this.
+        // To be removed if in the future we "only" implement embedded_hal 1.0
+        SpiBus::flush(self)?;
+
+        let longest = read.len().max(write.len());
+        for i in 0..longest {
+            let r = self.p.raw_transaction(*write.get(i).unwrap_or(&0x00));
+            if i < read.len() {
+                read[i] = r;
+            }
+        }
+
+        Ok(())
+    }
+    fn transfer_in_place(&mut self, buffer: &mut [u8]) -> Result<(), Self::Error> {
+        // Must flush() first, if asynchronous operations happened before this.
+        // To be removed if in the future we "only" implement embedded_hal 1.0
+        SpiBus::flush(self)?;
+
+        for b in buffer.iter_mut() {
+            *b = self.p.raw_transaction(*b)
+        }
+
+        Ok(())
+    }
+    
 }
 
 /// Default Transfer trait implementation. Only 8-bit word size is supported for now.
@@ -302,7 +429,7 @@ macro_rules! impl_spi {
         cs: $cspin:ty,
     ) => {
         impl $crate::spi::SpiOps<$HAL, $sclkpin, $mosipin, $misopin, $cspin> for $SPI {
-            /// Sets up the control/status registers with the right settings for this secondary device
+            
             fn raw_setup(&mut self, settings: &Settings) {
                 use $crate::hal::spi;
 
@@ -350,25 +477,27 @@ macro_rules! impl_spi {
                 });
             }
 
-            /// Disable the peripheral
             fn raw_release(&mut self) {
                 self.spcr.write(|w| w.spe().clear_bit());
             }
 
-            /// Check the interrupt flag to see if the write has completed
             fn raw_check_iflag(&self) -> bool {
                 self.spsr.read().spif().bit_is_set()
             }
 
-            /// Read a byte from the data register
             fn raw_read(&self) -> u8 {
                 self.spdr.read().bits()
             }
 
-            /// Write a byte to the data register, which begins transmission
-            /// automatically.
+            
             fn raw_write(&mut self, byte: u8) {
                 self.spdr.write(|w| unsafe { w.bits(byte) });
+            }
+
+            fn raw_transaction(&mut self, byte: u8) -> u8 {
+                self.raw_write(byte);
+                while !self.raw_check_iflag() {}
+                self.raw_read()
             }
         }
     };
