@@ -1,7 +1,7 @@
 //! SPI Implementation
 use crate::port;
 use core::marker::PhantomData;
-use embedded_hal::spi::{self,SpiBus};
+use embedded_hal::spi::{self, SpiBus};
 
 /// Oscillator Clock Frequency division options.
 ///
@@ -75,7 +75,7 @@ pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
     fn raw_release(&mut self);
 
     /// Check the interrupt flag to see if the write has completed
-    /// 
+    ///
     /// Returns `true` if the bus is idle
     fn raw_check_iflag(&self) -> bool;
     /// Read a byte from the data register
@@ -116,7 +116,9 @@ impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::StatefulOutputPin for Ch
     }
 }
 
-impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::ToggleableOutputPin for ChipSelectPin<CSPIN> {
+impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::ToggleableOutputPin
+    for ChipSelectPin<CSPIN>
+{
     type Error = core::convert::Infallible;
     fn toggle(&mut self) -> Result<(), Self::Error> {
         self.0.toggle();
@@ -150,14 +152,12 @@ impl<CSPIN: port::PinOps> embedded_hal::digital::StatefulOutputPin for ChipSelec
     }
 }
 
-
-
 /// Behavior for a SPI interface.
 ///
 /// Stores the SPI peripheral for register access.  In addition, it takes
 /// ownership of the MOSI and MISO pins to ensure they are in the correct mode.
 /// Instantiate with the `new` method.
-/// 
+///
 /// This can be used both with the embedded-hal 0.2 [`spi::FullDuplex`] trait, and
 /// with the embedded-hal 1.0 [`spi::SpiBus`] trait.
 ///
@@ -345,10 +345,10 @@ where
         SpiBus::flush(self)?;
 
         for b in read.iter_mut() {
-            // We send 0x00 on MOSI during "pure" reading 
+            // We send 0x00 on MOSI during "pure" reading
             *b = self.p.raw_transaction(0x00);
         }
-        
+
         Ok(())
     }
 
@@ -379,6 +379,7 @@ where
 
         Ok(())
     }
+
     fn transfer_in_place(&mut self, buffer: &mut [u8]) -> Result<(), Self::Error> {
         // Must flush() first, if asynchronous operations happened before this.
         // To be removed if in the future we "only" implement embedded_hal 1.0
@@ -390,7 +391,6 @@ where
 
         Ok(())
     }
-    
 }
 
 /// Default Transfer trait implementation. Only 8-bit word size is supported for now.
@@ -429,7 +429,6 @@ macro_rules! impl_spi {
         cs: $cspin:ty,
     ) => {
         impl $crate::spi::SpiOps<$HAL, $sclkpin, $mosipin, $misopin, $cspin> for $SPI {
-            
             fn raw_setup(&mut self, settings: &Settings) {
                 use $crate::hal::spi;
 
@@ -489,7 +488,6 @@ macro_rules! impl_spi {
                 self.spdr.read().bits()
             }
 
-            
             fn raw_write(&mut self, byte: u8) {
                 self.spdr.write(|w| unsafe { w.bits(byte) });
             }
