@@ -1,4 +1,4 @@
-pub use avr_hal_generic::simple_pwm::{IntoPwmPin, PwmPinOps, Prescaler};
+pub use avr_hal_generic::simple_pwm::{IntoPwmPin, Prescaler, PwmPinOps};
 
 #[allow(unused_imports)]
 use crate::port::*;
@@ -994,9 +994,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(
-    feature = "atmega8",
-))]
+#[cfg(any(feature = "atmega8",))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC1` for PWM (pins `PB1`, `PB2`)
     ///
@@ -1048,9 +1046,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(
-    feature = "atmega8",
-))]
+#[cfg(any(feature = "atmega8",))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC2` for PWM (pins `PB3`, `PD3`)
     ///
