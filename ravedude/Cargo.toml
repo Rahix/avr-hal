@@ -1,6 +1,6 @@
 [package]
 name = "ravedude"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
 description = "Tool to easily flash code onto an AVR microcontroller with avrdude"
