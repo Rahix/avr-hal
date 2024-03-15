@@ -10,9 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   flash the binary.
 
 ### Fixed
+- Fixed incompatibility with `avrdude` versions 7.0 to 7.2 ([#513]).  All
+  `avrdude` versions should work again with this release.
 - Fixed a crash on Windows when attempting to print non-ascii bytes that were
   received on the serial console ([#516]).
 
+[#513]: https://github.com/Rahix/avr-hal/pull/513
 [#516]: https://github.com/Rahix/avr-hal/pull/516
 
 
