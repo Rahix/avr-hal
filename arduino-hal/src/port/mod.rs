@@ -53,3 +53,7 @@ pub use trinket_pro::*;
 mod trinket;
 #[cfg(feature = "trinket")]
 pub use trinket::*;
+#[cfg(feature = "feather-32u4")]
+mod feather_32u4;
+#[cfg(feature = "feather-32u4")]
+pub use feather_32u4::*;

@@ -24,6 +24,7 @@ sparkfun-promicro = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
 sparkfun-promini-5v = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
 trinket = ["mcu-attiny", "attiny-hal/attiny85", "board-selected"]
 nano168 = ["mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc", "board-selected"]
+feather-32u4 = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
 
 [dependencies]
 cfg-if = "1"
