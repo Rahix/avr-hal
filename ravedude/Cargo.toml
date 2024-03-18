@@ -17,6 +17,8 @@ serialport = "4.0.0"
 anyhow = "1.0.38"
 git-version = "0.3.4"
 ctrlc = "3.2.1"
+serde = { version = "1.0.197", features = ["serde_derive"] }
+toml = "0.8.11"
 
 [dependencies.structopt]
 version = "0.3.21"
