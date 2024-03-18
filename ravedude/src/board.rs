@@ -28,7 +28,7 @@ pub fn get_board(board: &str) -> anyhow::Result<Box<dyn Board>> {
         "duemilanove" => Box::new(ArduinoDuemilanove),
         // TODO: figure out custom board integration into ravedude. like if the Ravedude.toml path should be configurable etc
         "custom" => Box::new(CustomBoard::from_file()?),
-        _ => return Err(anyhow::anyhow!("Invalid board: {board}")),
+        _ => return Err(anyhow::anyhow!("Invalid board: {}", board)),
     })
 }
 
