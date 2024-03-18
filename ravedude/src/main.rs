@@ -7,6 +7,7 @@ use std::time::Duration;
 
 mod avrdude;
 mod board;
+mod config;
 mod console;
 mod ui;
 
@@ -95,7 +96,7 @@ fn ravedude() -> anyhow::Result<()> {
     let args: Args = structopt::StructOpt::from_args();
     avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
 
-    let board = board::get_board(&args.board).expect("board not found");
+    let board = board::get_board(&args.board)?;
 
     task_message!("Board", "{}", board.display_name());
 
