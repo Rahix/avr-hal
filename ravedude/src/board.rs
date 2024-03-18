@@ -1,4 +1,6 @@
-use crate::avrdude;
+use std::num::NonZeroU32;
+
+use crate::{avrdude, config};
 
 pub trait Board {
     fn display_name(&self) -> &str;
@@ -7,8 +9,8 @@ pub trait Board {
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>>;
 }
 
-pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
-    Some(match board {
+pub fn get_board(board: &str) -> anyhow::Result<Box<dyn Board>> {
+    Ok(match board {
         "uno" => Box::new(ArduinoUno),
         "nano" => Box::new(ArduinoNano),
         "nano-new" => Box::new(ArduinoNanoNew),
@@ -24,7 +26,9 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "trinket" => Box::new(Trinket),
         "nano168" => Box::new(Nano168),
         "duemilanove" => Box::new(ArduinoDuemilanove),
-        _ => return None,
+        // TODO: figure out custom board integration into ravedude. like if the Ravedude.toml path should be configurable etc
+        "custom" => Box::new(CustomBoard::from_file()?),
+        _ => return Err(anyhow::anyhow!("Invalid board: {board}")),
     })
 }
 
@@ -461,5 +465,49 @@ impl Board for ArduinoDuemilanove {
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         Some(Err(anyhow::anyhow!("Not able to guess port")))
+    }
+}
+
+struct CustomBoard(config::BoardConfig);
+
+impl CustomBoard {
+    fn from_file() -> anyhow::Result<Self> {
+        use std::fs;
+
+        let file_contents = fs::read_to_string("Ravedude.toml")
+            .map_err(|_| anyhow::anyhow!("couldn't find Ravedude.toml in project"))?;
+        let config = toml::from_str(&file_contents)?;
+
+        Ok(Self(config))
+    }
+}
+
+impl Board for CustomBoard {
+    fn display_name(&self) -> &str {
+        &self.0.name
+    }
+
+    fn needs_reset(&self) -> Option<&str> {
+        self.0.reset_message.as_deref()
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        let avrdude_config = &self.0.avrdude;
+        avrdude::AvrdudeOptions {
+            programmer: &avrdude_config.programmer,
+            partno: &avrdude_config.partno,
+            baudrate: avrdude_config.baudrate.map(NonZeroU32::get),
+            do_chip_erase: avrdude_config.do_chip_erase,
+        }
+    }
+
+    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        // TODO: figure out when to return `None`
+        match self.0.usb_info.as_ref().and_then(|i| i.port_ids.as_ref()) {
+            None => Some(Err(anyhow::anyhow!("Not able to guess port"))),
+            Some(ports) => Some(find_port_from_vid_pid_list(
+                &ports.iter().map(|id| (id.pid, id.vid)).collect::<Vec<_>>(),
+            )),
+        }
     }
 }
