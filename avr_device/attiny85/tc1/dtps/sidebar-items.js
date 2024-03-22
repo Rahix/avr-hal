@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["DTPS_A"],"struct":["DTPS_SPEC","R","W"],"type":["DTPS_R","DTPS_W"]};
