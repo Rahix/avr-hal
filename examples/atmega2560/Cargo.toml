@@ -17,5 +17,5 @@ version = "0.2.3"
 package = "embedded-hal"
 
 [dependencies.atmega-hal]
-path = "../../atmega-hal/"
+path = "../../mcu/atmega-hal/"
 features = ["atmega2560"]
