@@ -1,7 +1,7 @@
 [package]
-name = "arduino-mega2560-examples"
+name = "atmega2560-examples"
 version = "0.0.0"
-authors = ["Rahix <rahix@rahix.de>"]
+authors = ["Rahix <rahix@rahix.de>", "Armandas Jarušauskas <jarusauskas@gmail.com>"]
 edition = "2021"
 publish = false
 
@@ -10,11 +10,12 @@ panic-halt = "0.2.0"
 ufmt = "0.2.0"
 nb = "1.1.0"
 embedded-hal = "1.0"
+avr-device = { version = "0.5.4", features = ["rt"] }
 
 [dependencies.embedded-hal-v0]
 version = "0.2.3"
 package = "embedded-hal"
 
-[dependencies.arduino-hal]
-path = "../../arduino-hal/"
-features = ["arduino-mega2560"]
+[dependencies.atmega-hal]
+path = "../../atmega-hal/"
+features = ["atmega2560"]
