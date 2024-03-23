@@ -1,0 +1,8 @@
+[build]
+target = "../../avr-specs/avr-atmega2560.json"
+
+[target.'cfg(target_arch = "avr")']
+runner = "ravedude -cb 57600 mega2560"
+
+[unstable]
+build-std = ["core"]
