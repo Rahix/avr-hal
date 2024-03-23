@@ -1,50 +1,56 @@
 //! This example demonstrates how to set up a SPI interface and communicate
-//! over it.  The physical hardware configuation consists of connecting a
-//! jumper directly from pin `~11` to pin `~12`.
+//! over it.  The physical hardware configuration consists of connecting a
+//! jumper directly from pin `PB2` to pin `PB3`.
 //!
-//! Once this program is written to the board, the serial output can be
-//! accessed with
-//!
-//! ```
-//! sudo screen /dev/ttyACM0 57600
-//! ```
-//!
-//! You should see it output the line `data: 15` repeatedly (aka 0b00001111).
+//! Run the program using `cargo run`.
+//! You should see it output the line `data: 42` repeatedly.
 //! If the output you see is `data: 255`, you may need to check your jumper.
 
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
-use arduino_hal::spi;
-use embedded_hal_v0::spi::FullDuplex;
+use atmega_hal::clock;
+use atmega_hal::spi;
+use atmega_hal::usart::{Baudrate, Usart};
+use atmega_hal::delay::Delay;
+use embedded_hal::delay::DelayNs;
+use embedded_hal::spi::SpiBus;
 use panic_halt as _;
 
-#[arduino_hal::entry]
+#[avr_device::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = atmega_hal::Peripherals::take().unwrap();
+    let pins = atmega_hal::pins!(dp);
+
+    let mut delay = Delay::<clock::MHz16>::new();
 
     // set up serial interface for text output
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let mut serial = Usart::new(
+        dp.USART0,
+        pins.pe0,
+        pins.pe1.into_output(),
+        Baudrate::<clock::MHz16>::new(57600),
+    );
 
     // Create SPI interface.
-    let (mut spi, _) = arduino_hal::Spi::new(
+    let (mut spi, _) = spi::Spi::new(
         dp.SPI,
-        pins.d52.into_output(),
-        pins.d51.into_output(),
-        pins.d50.into_pull_up_input(),
-        pins.d53.into_output(),
+        pins.pb1.into_output(),
+        pins.pb2.into_output(),
+        pins.pb3.into_pull_up_input(),
+        pins.pb0.into_output(),
         spi::Settings::default(),
     );
 
     loop {
         // Send a byte
-        nb::block!(spi.send(0b00001111)).unwrap_infallible();
+        let data_out: [u8; 1] = [42];
+        let mut data_in: [u8; 1] = [0];
+        // Send a byte
         // Because MISO is connected to MOSI, the read data should be the same
-        let data = nb::block!(spi.read()).unwrap_infallible();
+        spi.transfer(&mut data_in, &data_out).unwrap();
 
-        ufmt::uwriteln!(&mut serial, "data: {}\r", data).unwrap_infallible();
-        arduino_hal::delay_ms(1000);
+        ufmt::uwriteln!(&mut serial, "data: {}\r", data_in[0]).unwrap();
+        delay.delay_ms(1000);
     }
 }
