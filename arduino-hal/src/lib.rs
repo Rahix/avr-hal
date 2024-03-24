@@ -20,6 +20,7 @@
 #![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
 #![cfg_attr(feature = "trinket", doc = "**Trinket**.")]
 #![cfg_attr(feature = "nano168", doc = "**Nano clone (ATmega168)**.")]
+#![cfg_attr(feature = "circuit-playground-classic", doc = "**Adafruit Circuit Playground Classic (ATmega32u4)**.")]
 //! This means that only items which are available for this board are visible.  If you are using a
 //! different board, try building the documentation locally with
 //!
@@ -67,6 +68,7 @@ compile_error!(
     * trinket-pro
     * trinket
     * nano168
+    * circuit-playground-classic
     "
 );
 

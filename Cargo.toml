@@ -29,6 +29,7 @@ members = [
     "examples/arduino-mega1280",
     "examples/arduino-nano",
     "examples/arduino-uno",
+    "examples/circuit-playground-classic",
     "examples/nano168",
     "examples/sparkfun-promicro",
     "examples/sparkfun-promini-5v",

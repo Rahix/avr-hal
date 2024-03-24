@@ -53,3 +53,7 @@ pub use trinket_pro::*;
 mod trinket;
 #[cfg(feature = "trinket")]
 pub use trinket::*;
+#[cfg(feature = "circuit-playground-classic")]
+mod circuit_playground_classic;
+#[cfg(feature = "circuit-playground-classic")]
+pub use circuit_playground_classic::*;
