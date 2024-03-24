@@ -97,9 +97,11 @@ impl pwm::Error for PwmError {
     }
 }
 
-impl<TC, PIN: PwmPinOps<TC>> ErrorType for Pin<mode::PwmOutput<TC>, PIN> { type Error = PwmError; }
+impl<TC, PIN: PwmPinOps<TC>> ErrorType for Pin<mode::PwmOutput<TC>, PIN> {
+    type Error = PwmError;
+}
 
-impl<TC, PIN: PwmPinOps<TC, Duty=u8>> SetDutyCycle for Pin<mode::PwmOutput<TC>, PIN> {
+impl<TC, PIN: PwmPinOps<TC, Duty = u8>> SetDutyCycle for Pin<mode::PwmOutput<TC>, PIN> {
     fn max_duty_cycle(&self) -> u16 {
         self.get_max_duty() as u16
     }

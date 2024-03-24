@@ -2,9 +2,9 @@
 //!
 //! Check the documentation of [`Usart`] for details.
 
+use crate::prelude::*;
 use core::cmp::Ordering;
 use core::marker;
-use crate::prelude::*;
 
 use crate::port;
 
@@ -151,7 +151,7 @@ pub enum Event {
     RxComplete,
 
     /// A compete byte was sent.
-    /// 
+    ///
     /// Corresponds to the `USART_TX` or `USART#_TX` interrupt.  Please refer to the datasheet for
     /// your MCU for details.
     TxComplete,

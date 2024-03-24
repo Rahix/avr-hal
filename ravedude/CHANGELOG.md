@@ -5,10 +5,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
+## [0.1.8] - 2024-03-15
+### Added
+- Added the `--debug-avrdude` option to print the `avrdude` invocation used to
+  flash the binary.
+
+### Fixed
+- Fixed incompatibility with `avrdude` versions 7.0 to 7.2 ([#513]).  All
+  `avrdude` versions should work again with this release.
+- Fixed a crash on Windows when attempting to print non-ascii bytes that were
+  received on the serial console ([#516]).
+
+[#513]: https://github.com/Rahix/avr-hal/pull/513
+[#516]: https://github.com/Rahix/avr-hal/pull/516
+
+
+## [0.1.7] - 2024-02-24
+### Added
+- Added support for using `ravedude` with `avrdude` version 7.x ([#508]).
+
 ### Fixed
 - Added missing signature for ATmega328PB ([#462]).
 
 [#462]: https://github.com/Rahix/avr-hal/pull/462
+[#508]: https://github.com/Rahix/avr-hal/pull/508
 
 
 ## [0.1.6] - 2023-11-06
@@ -89,7 +111,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial, miminal version.
 
 
-[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.6...HEAD
+[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.8...HEAD
+[0.1.8]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.7...ravedude-0.1.8
+[0.1.7]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.6...ravedude-0.1.7
 [0.1.6]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.5...ravedude-0.1.6
 [0.1.5]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.4...ravedude-0.1.5
 [0.1.4]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.3...ravedude-0.1.4

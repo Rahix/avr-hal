@@ -261,7 +261,12 @@ macro_rules! default_serial {
         )
     };
 }
-#[cfg(any(feature = "arduino-nano", feature = "nano168", feature = "sparkfun-promini-3v3", feature="sparkfun-promini-5v"))]
+#[cfg(any(
+    feature = "arduino-nano",
+    feature = "nano168",
+    feature = "sparkfun-promini-3v3"
+    feature = "sparkfun-promini-5v"
+))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {

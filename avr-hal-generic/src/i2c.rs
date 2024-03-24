@@ -2,6 +2,8 @@
 //!
 //! Check the documentation of [`I2c`] for details.
 
+use embedded_hal::i2c::SevenBitAddress;
+
 use crate::port;
 use core::marker::PhantomData;
 
@@ -116,6 +118,28 @@ pub enum Error {
     BusError,
     /// An unknown error occured.  The bus might be in an unknown state.
     Unknown,
+}
+
+impl embedded_hal::i2c::Error for Error {
+    fn kind(&self) -> embedded_hal::i2c::ErrorKind {
+        match *self {
+            Error::ArbitrationLost => embedded_hal::i2c::ErrorKind::ArbitrationLoss,
+            Error::AddressNack => embedded_hal::i2c::ErrorKind::NoAcknowledge(
+                embedded_hal::i2c::NoAcknowledgeSource::Address,
+            ),
+            Error::DataNack => embedded_hal::i2c::ErrorKind::NoAcknowledge(
+                embedded_hal::i2c::NoAcknowledgeSource::Data,
+            ),
+            Error::BusError => embedded_hal::i2c::ErrorKind::Bus,
+            Error::Unknown => embedded_hal::i2c::ErrorKind::Other,
+        }
+    }
+}
+
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal::i2c::ErrorType
+    for I2c<H, I2C, SDA, SCL, CLOCK>
+{
+    type Error = Error;
 }
 
 /// I2C Transfer Direction
@@ -384,6 +408,41 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2
         self.p.raw_start(address, Direction::Read)?;
         self.p.raw_read(buffer)?;
         self.p.raw_stop()?;
+        Ok(())
+    }
+}
+
+impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal::i2c::I2c<SevenBitAddress>
+    for I2c<H, I2C, SDA, SCL, CLOCK>
+{
+    fn transaction(
+        &mut self,
+        address: u8,
+        operations: &mut [embedded_hal::i2c::Operation<'_>],
+    ) -> Result<(), Self::Error> {
+        let mut previous_direction = Direction::Read;
+        for (idx, operation) in operations.iter_mut().enumerate() {
+            match operation {
+                embedded_hal::i2c::Operation::Read(buffer) => {
+                    if idx == 0 || previous_direction != Direction::Read {
+                        self.p.raw_start(address, Direction::Read)?;
+                    }
+                    self.p.raw_read(buffer)?;
+                    previous_direction = Direction::Read;
+                }
+                embedded_hal::i2c::Operation::Write(bytes) => {
+                    if idx == 0 || previous_direction != Direction::Write {
+                        self.p.raw_start(address, Direction::Write)?;
+                    }
+                    self.p.raw_write(bytes)?;
+                    previous_direction = Direction::Write;
+                }
+            }
+        }
+        if operations.len() > 0 {
+            self.p.raw_stop()?;
+        }
+
         Ok(())
     }
 }

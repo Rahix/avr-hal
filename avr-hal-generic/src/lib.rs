@@ -2,7 +2,8 @@
 #![cfg_attr(avr_hal_asm_macro, feature(asm_experimental_arch))]
 #![cfg_attr(not(avr_hal_asm_macro), feature(llvm_asm))]
 
-pub use embedded_hal_v0 as hal;
+pub use embedded_hal as hal;
+pub use embedded_hal_v0 as hal_v0;
 
 #[doc(hidden)]
 pub use avr_device;
@@ -24,7 +25,7 @@ pub mod wdt;
 
 /// Prelude containing all HAL traits
 pub mod prelude {
-    pub use crate::hal::prelude::*;
+    pub use crate::hal_v0::prelude::*;
     pub use ufmt::uWrite as _ufmt_uWrite;
     pub use unwrap_infallible::UnwrapInfallible as _unwrap_infallible_UnwrapInfallible;
 }

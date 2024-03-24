@@ -6,20 +6,19 @@
 #![no_main]
 
 use embedded_hal::delay::DelayNs;
-use embedded_hal::digital::OutputPin;
+use embedded_hal::digital::StatefulOutputPin;
 
 use panic_halt as _;
 
-fn blink(led: &mut impl OutputPin, delay: &mut impl DelayNs) -> ! {
+fn blink(led: &mut impl StatefulOutputPin, delay: &mut impl DelayNs) -> ! {
     loop {
-        // TODO: once embedded-hal v1.0.0 is released switch to `StatefulOutputPin` & use `toggle` (not part of RC 3)
-        led.set_low().unwrap();
+        led.toggle().unwrap();
         delay.delay_ms(100);
-        led.set_high().unwrap();
+        led.toggle().unwrap();
         delay.delay_ms(100);
-        led.set_low().unwrap();
+        led.toggle().unwrap();
         delay.delay_ms(100);
-        led.set_high().unwrap();
+        led.toggle().unwrap();
         delay.delay_ms(800);
     }
 }

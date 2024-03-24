@@ -2,8 +2,8 @@ use anyhow::Context as _;
 use colored::Colorize as _;
 use structopt::clap::AppSettings;
 
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
 
 mod avrdude;
 mod board;
@@ -47,6 +47,10 @@ struct Args {
     /// Set this value to 0 to skip the board reset question instantly.
     #[structopt(short = "d", long = "reset-delay")]
     reset_delay: Option<u64>,
+
+    /// Print the avrdude command that is executed for flashing the binary.
+    #[structopt(long = "debug-avrdude")]
+    debug_avrdude: bool,
 
     /// Which board to interact with.
     ///
@@ -95,15 +99,15 @@ fn ravedude() -> anyhow::Result<()> {
 
     task_message!("Board", "{}", board.display_name());
 
-    if let Some(wait_time) = args.reset_delay{
+    if let Some(wait_time) = args.reset_delay {
         if wait_time > 0 {
             println!("Waiting {} ms before proceeding", wait_time);
             let wait_time = Duration::from_millis(wait_time);
             thread::sleep(wait_time);
-        }else{
+        } else {
             println!("Assuming board has been reset");
         }
-    }else{
+    } else {
         if let Some(msg) = board.needs_reset() {
             warning!("this board cannot reset itself.");
             eprintln!("");
@@ -138,7 +142,12 @@ fn ravedude() -> anyhow::Result<()> {
             task_message!("Programming", "{}", bin.display(),);
         }
 
-        let mut avrdude = avrdude::Avrdude::run(&board.avrdude_options(), port.as_ref(), bin)?;
+        let mut avrdude = avrdude::Avrdude::run(
+            &board.avrdude_options(),
+            port.as_ref(),
+            bin,
+            args.debug_avrdude,
+        )?;
         avrdude.wait()?;
 
         task_message!("Programmed", "{}", bin.display());
@@ -158,11 +167,7 @@ fn ravedude() -> anyhow::Result<()> {
         let port = port.context("console can only be opened for devices with USB-to-Serial")?;
 
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
-        task_message!(
-            "",
-            "{}",
-            "CTRL+C to exit.".dimmed()
-        );
+        task_message!("", "{}", "CTRL+C to exit.".dimmed());
         // Empty line for visual consistency
         eprintln!();
         console::open(&port, baudrate)?;

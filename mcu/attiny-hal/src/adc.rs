@@ -12,20 +12,14 @@ pub use avr_hal_generic::adc::{AdcChannel, AdcOps, ClockDivider};
 #[repr(u8)]
 pub enum ReferenceVoltage {
     /// Voltage applied to AREF pin.
-    #[cfg(any(
-        feature = "attiny85",
-        feature = "attiny167",
-    ))]
+    #[cfg(any(feature = "attiny85", feature = "attiny167",))]
     Aref,
     /// Default reference voltage (default).
     AVcc,
     /// Internal 1.1V reference.
     Internal1_1,
     /// Internal 2.56V reference.
-    #[cfg(any(
-        feature = "attiny85",
-        feature = "attiny167",
-    ))]
+    #[cfg(any(feature = "attiny85", feature = "attiny167",))]
     Internal2_56,
 }
 
@@ -83,7 +77,6 @@ fn apply_clock(peripheral: &crate::pac::ADC, settings: AdcSettings) {
     });
 }
 
-
 #[cfg(feature = "attiny85")]
 avr_hal_generic::impl_adc! {
     hal: crate::Attiny,
@@ -114,7 +107,6 @@ avr_hal_generic::impl_adc! {
         channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
     },
 }
-
 
 #[cfg(feature = "attiny88")]
 avr_hal_generic::impl_adc! {
@@ -148,7 +140,6 @@ avr_hal_generic::impl_adc! {
         channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
     },
 }
-
 
 #[cfg(feature = "attiny167")]
 avr_hal_generic::impl_adc! {

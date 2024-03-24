@@ -6,6 +6,7 @@
 //!
 //! **Note**: This version of the documentation was built for
 #![cfg_attr(feature = "atmega48p", doc = "**ATmega48P**.")]
+#![cfg_attr(feature = "atmega164pa", doc = "**ATmega164PA**.")]
 #![cfg_attr(feature = "atmega168", doc = "**ATmega168**.")]
 #![cfg_attr(feature = "atmega328p", doc = "**ATmega328P**.")]
 #![cfg_attr(feature = "atmega328pb", doc = "**ATmega328PB**.")]
@@ -33,6 +34,7 @@ compile_error!(
     Please select one of the following
 
     * atmega48p
+    * atmega164pa
     * atmega168
     * atmega328p
     * atmega328pb
@@ -48,6 +50,15 @@ compile_error!(
 /// Reexport of `atmega1280` from `avr-device`
 #[cfg(feature = "atmega1280")]
 pub use avr_device::atmega1280 as pac;
+/// Reexport of `atmega1284p` from `avr-device`
+#[cfg(feature = "atmega1284p")]
+pub use avr_device::atmega1284p as pac;
+/// Reexport of `atmega128a` from `avr-device`
+#[cfg(feature = "atmega128a")]
+pub use avr_device::atmega128a as pac;
+/// Reexport of `atmega164pa` from `avr-device`
+#[cfg(feature = "atmega164pa")]
+pub use avr_device::atmega164pa as pac;
 /// Reexport of `atmega168` from `avr-device`
 #[cfg(feature = "atmega168")]
 pub use avr_device::atmega168 as pac;
@@ -69,12 +80,6 @@ pub use avr_device::atmega32u4 as pac;
 /// Reexport of `atmega48p` from `avr-device`
 #[cfg(feature = "atmega48p")]
 pub use avr_device::atmega48p as pac;
-/// Reexport of `atmega128a` from `avr-device`
-#[cfg(feature = "atmega128a")]
-pub use avr_device::atmega128a as pac;
-/// Reexport of `atmega1284p` from `avr-device`
-#[cfg(feature = "atmega1284p")]
-pub use avr_device::atmega1284p as pac;
 /// Reexport of `atmega8` from `avr-device`
 #[cfg(feature = "atmega8")]
 pub use avr_device::atmega8 as pac;
@@ -128,7 +133,6 @@ pub mod eeprom;
 #[cfg(feature = "device-selected")]
 pub use eeprom::Eeprom;
 
-
 pub struct Atmega;
 
 #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
@@ -136,6 +140,13 @@ pub struct Atmega;
 macro_rules! pins {
     ($p:expr) => {
         $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD)
+    };
+}
+#[cfg(any(feature = "atmega164pa"))]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
     };
 }
 #[cfg(feature = "atmega328pb")]
@@ -178,9 +189,7 @@ macro_rules! pins {
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new(
-            $p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD,
-        )
+        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
     };
 }
 
@@ -188,8 +197,6 @@ macro_rules! pins {
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new(
-            $p.PORTB, $p.PORTC, $p.PORTD,
-        )
+        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD)
     };
 }

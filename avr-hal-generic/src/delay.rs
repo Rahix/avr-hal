@@ -1,8 +1,8 @@
 //! Delay implementations
 
 use core::marker;
-use embedded_hal_v0::blocking::delay as delay_v0;
 use embedded_hal::delay::DelayNs;
+use embedded_hal_v0::blocking::delay as delay_v0;
 
 #[cfg(all(target_arch = "avr", avr_hal_asm_macro))]
 use core::arch::asm;
@@ -182,6 +182,23 @@ impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz12> {
     }
 }
 
+impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz10> {
+    fn delay_us(&mut self, mut us: u16) {
+        // for the 10 crate::clock::MHz clock if somebody is working with USB
+
+        // for a 1 microsecond delay, simply return.  the overhead
+        // of the function call takes 14 (16) cycles, which is 1.5us
+        if us <= 1 {
+            return;
+        } // = 3 cycles, (4 when true)
+
+        // 4 cycles per busy_loop iteration = 0.4 us per busy loop, so 2.5 times to get 1 us
+        us = ((us << 2) + us) >> 1; // x2.5
+
+        busy_loop(us);
+    }
+}
+
 impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz8> {
     fn delay_us(&mut self, mut us: u16) {
         // for the 8 crate::clock::MHz internal clock
@@ -220,9 +237,9 @@ impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz1> {
 
         // compensate for the time taken by the preceeding and next commands (about 22 cycles)
         us -= 22; // = 2 cycles
-        // the following loop takes 4 microseconds (4 cycles)
-        // per iteration, so execute it us/4 times
-        // us is at least 4, divided by 4 gives us 1 (no zero delay bug)
+                  // the following loop takes 4 microseconds (4 cycles)
+                  // per iteration, so execute it us/4 times
+                  // us is at least 4, divided by 4 gives us 1 (no zero delay bug)
         us >>= 2; // us div 4, = 4 cycles
 
         busy_loop(us);
@@ -232,8 +249,8 @@ impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz1> {
 // ------------------------------------------------------------------------ }}}
 
 impl<SPEED> delay_v0::DelayUs<u8> for Delay<SPEED>
-    where
-        Delay<SPEED>: delay_v0::DelayUs<u16>,
+where
+    Delay<SPEED>: delay_v0::DelayUs<u16>,
 {
     fn delay_us(&mut self, us: u8) {
         delay_v0::DelayUs::<u16>::delay_us(self, us as u16);
@@ -241,8 +258,8 @@ impl<SPEED> delay_v0::DelayUs<u8> for Delay<SPEED>
 }
 
 impl<SPEED> delay_v0::DelayUs<u32> for Delay<SPEED>
-    where
-        Delay<SPEED>: delay_v0::DelayUs<u16>,
+where
+    Delay<SPEED>: delay_v0::DelayUs<u16>,
 {
     fn delay_us(&mut self, us: u32) {
         // TODO: Somehow fix the overhead induced by this loop
@@ -261,8 +278,8 @@ impl<SPEED> delay_v0::DelayUs<u32> for Delay<SPEED>
 }
 
 impl<SPEED> delay_v0::DelayMs<u16> for Delay<SPEED>
-    where
-        Delay<SPEED>: delay_v0::DelayUs<u32>,
+where
+    Delay<SPEED>: delay_v0::DelayUs<u32>,
 {
     fn delay_ms(&mut self, ms: u16) {
         delay_v0::DelayUs::<u32>::delay_us(self, ms as u32 * 1000);
@@ -270,8 +287,8 @@ impl<SPEED> delay_v0::DelayMs<u16> for Delay<SPEED>
 }
 
 impl<SPEED> delay_v0::DelayMs<u8> for Delay<SPEED>
-    where
-        Delay<SPEED>: delay_v0::DelayMs<u16>,
+where
+    Delay<SPEED>: delay_v0::DelayMs<u16>,
 {
     fn delay_ms(&mut self, ms: u8) {
         delay_v0::DelayMs::<u16>::delay_ms(self, ms as u16);
@@ -279,22 +296,13 @@ impl<SPEED> delay_v0::DelayMs<u8> for Delay<SPEED>
 }
 
 impl<SPEED> DelayNs for Delay<SPEED>
-    where
-        Delay<SPEED>: delay_v0::DelayUs<u16>, {
+where
+    Delay<SPEED>: delay_v0::DelayUs<u16>,
+{
     fn delay_ns(&mut self, ns: u32) {
         // quick-win to get an initial implementation.
         // note that the trait does not guarantee nanosecond-accuracy.
-
-        let mut us = ns / 1000;
-
-        // ensure that we wait _at least_ as long as specified.
-        // (we truncate the integer, so if we don't do this we'd wait 1us instead of 2us when specifying 1999ns).
-        let diff = ns - (us * 1000);
-        if diff > 0 {
-            us += 1;
-        }
-
-        delay_v0::DelayUs::<u32>::delay_us(self, us);
+        delay_v0::DelayUs::<u32>::delay_us(self, ns.div_ceil(1000))
     }
 
     fn delay_us(&mut self, us: u32) {

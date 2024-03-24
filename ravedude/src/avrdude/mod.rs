@@ -2,6 +2,8 @@ use anyhow::Context as _;
 use std::path;
 use std::process;
 
+use std::io::Write;
+
 #[derive(Debug)]
 pub struct AvrdudeOptions<'a> {
     pub programmer: &'a str,
@@ -13,7 +15,7 @@ pub struct AvrdudeOptions<'a> {
 #[derive(Debug)]
 pub struct Avrdude {
     #[allow(dead_code)]
-    config: tempfile::NamedTempFile,
+    config: Option<tempfile::NamedTempFile>,
     process: process::Child,
 }
 
@@ -51,26 +53,31 @@ impl Avrdude {
         options: &AvrdudeOptions,
         port: Option<impl AsRef<path::Path>>,
         bin: &path::Path,
+        debug: bool,
     ) -> anyhow::Result<Self> {
-        let config = tempfile::Builder::new()
-            .prefix(".avrdude-")
-            .suffix(".conf")
-            .tempfile()
-            .unwrap();
+        let avrdude_version = Self::get_avrdude_version()?;
 
-        {
-            use std::io::Write;
+        let mut command = &mut process::Command::new("avrdude");
 
+        let config = if avrdude_version <= (7, 0) {
+            let config = tempfile::Builder::new()
+                .prefix(".avrdude-")
+                .suffix(".conf")
+                .tempfile()
+                .unwrap();
             let mut f = std::fs::File::create(&config).context("could not create avrdude.conf")?;
-            f.write_all(include_bytes!("avrdude.conf"))
-                .context("could not write avrdude.conf")?;
+            f.write_all(include_bytes!("avrdude-6.conf"))
+                .context("could not write avrdude.conf for avrdude <=7.0")?;
             f.flush().unwrap();
-        }
 
-        let mut command = process::Command::new("avrdude");
+            command = command.arg("-C").arg(&config.as_ref());
+            Some(config)
+        } else {
+            // For avrdude versions >=7.1, we don't supply a custom configuration file for now.
+            None
+        };
+
         let mut command = command
-            .arg("-C")
-            .arg(&config.as_ref())
             .arg("-c")
             .arg(options.programmer)
             .arg("-p")
@@ -94,6 +101,19 @@ impl Avrdude {
         }
 
         command = command.arg("-D").arg("-U").arg(flash_instruction);
+
+        if debug {
+            crate::task_message!(
+                "Dbg.Command",
+                "{} {}",
+                command.get_program().to_string_lossy(),
+                command
+                    .get_args()
+                    .map(|s| s.to_string_lossy())
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            );
+        }
 
         let process = command.spawn().context("failed starting avrdude")?;
 
