@@ -8,6 +8,7 @@ edition = "2021"
 rt = ["avr-device/rt"]
 device-selected = []
 attiny84 = ["avr-device/attiny84", "device-selected"]
+attiny84a = ["avr-device/attiny84a", "device-selected"]
 attiny85 = ["avr-device/attiny85", "device-selected"]
 attiny88 = ["avr-device/attiny88", "device-selected"]
 attiny167 = ["avr-device/attiny167", "device-selected"]

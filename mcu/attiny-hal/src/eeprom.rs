@@ -24,6 +24,17 @@ avr_hal_generic::impl_eeprom_attiny! {
     },
 }
 
+#[cfg(feature = "attiny84a")]
+avr_hal_generic::impl_eeprom_attiny! {
+    hal: crate::Attiny,
+    peripheral: crate::pac::EEPROM,
+    capacity: 512,
+    addr_width: u16,
+    set_address: |peripheral, address| {
+        peripheral.eear.write(|w| w.bits(address));
+    },
+}
+
 #[cfg(feature = "attiny88")]
 avr_hal_generic::impl_eeprom_attiny! {
     hal: crate::Attiny,
