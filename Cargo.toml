@@ -34,6 +34,7 @@ members = [
     "examples/sparkfun-promini-5v",
     "examples/trinket-pro",
     "examples/trinket",
+    "examples/digispark"
 ]
 exclude = [
     # The RAVEDUDE! Yeah!
