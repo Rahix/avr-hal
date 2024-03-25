@@ -4,13 +4,7 @@ use std::process;
 
 use std::io::Write;
 
-#[derive(Debug)]
-pub struct AvrdudeOptions<'a> {
-    pub programmer: &'a str,
-    pub partno: &'a str,
-    pub baudrate: Option<u32>,
-    pub do_chip_erase: bool,
-}
+use crate::config::BoardAvrdudeOptions;
 
 #[derive(Debug)]
 pub struct Avrdude {
@@ -50,7 +44,7 @@ impl Avrdude {
     }
 
     pub fn run(
-        options: &AvrdudeOptions,
+        options: &BoardAvrdudeOptions,
         port: Option<impl AsRef<path::Path>>,
         bin: &path::Path,
         debug: bool,
@@ -79,9 +73,9 @@ impl Avrdude {
 
         let mut command = command
             .arg("-c")
-            .arg(options.programmer)
+            .arg(&options.programmer)
             .arg("-p")
-            .arg(options.partno);
+            .arg(&options.partno);
 
         if let Some(port) = port {
             command = command.arg("-P").arg(port.as_ref());

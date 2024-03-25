@@ -29,6 +29,14 @@ const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
         fallback = "unknown"
     ))]
 struct Args {
+    /// Utility flag for dumping a config of a named board to TOML.
+    /// ```sh
+    /// # Create a new Ravedude.toml with the default Arduino UNO Config.
+    /// ravedude --dump-config uno > Ravedude.toml
+    /// ```
+    #[structopt(long = "dump-config")]
+    dump_config: bool,
+
     /// After successfully flashing the program, open a serial console to see output sent by the
     /// board and possibly interact with it.
     #[structopt(short = "c", long = "open-console")]
@@ -71,9 +79,9 @@ struct Args {
     /// * trinket-pro
     /// * trinket
     /// * nano168
-    /// * duemilanove
+    /// * duemilanovepriori
     #[structopt(name = "BOARD", verbatim_doc_comment)]
-    board: String,
+    board: Option<String>,
 
     /// The binary to be flashed.
     ///
@@ -93,12 +101,22 @@ fn main() {
 }
 
 fn ravedude() -> anyhow::Result<()> {
-    let args: Args = structopt::StructOpt::from_args();
+    let mut args: Args = structopt::StructOpt::from_args();
+    if args.dump_config {
+        return dump_config(args.board.as_deref());
+    }
+
+    // Due to the ordering of the arguments, board is prioritized before bin.
+    // There doesn't seem to be an way to change the argument priority like this.
+    if args.board.is_some() && args.bin.is_none() {
+        args.bin = Some(std::path::PathBuf::from(args.board.take().unwrap()));
+    }
+
     avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
 
-    let board = board::get_board(&args.board)?;
+    let board = board::get_board(args.board.as_deref())?;
 
-    task_message!("Board", "{}", board.display_name());
+    task_message!("Board", "{}", &board.name);
 
     if let Some(wait_time) = args.reset_delay {
         if wait_time > 0 {
@@ -109,7 +127,7 @@ fn ravedude() -> anyhow::Result<()> {
             println!("Assuming board has been reset");
         }
     } else {
-        if let Some(msg) = board.needs_reset() {
+        if let Some(ref msg) = board.reset_message {
             warning!("this board cannot reset itself.");
             eprintln!("");
             eprintln!("    {}", msg);
@@ -143,12 +161,8 @@ fn ravedude() -> anyhow::Result<()> {
             task_message!("Programming", "{}", bin.display(),);
         }
 
-        let mut avrdude = avrdude::Avrdude::run(
-            &board.avrdude_options(),
-            port.as_ref(),
-            bin,
-            args.debug_avrdude,
-        )?;
+        let mut avrdude =
+            avrdude::Avrdude::run(&board.avrdude, port.as_ref(), bin, args.debug_avrdude)?;
         avrdude.wait()?;
 
         task_message!("Programmed", "{}", bin.display());
@@ -175,6 +189,14 @@ fn ravedude() -> anyhow::Result<()> {
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
     }
+
+    Ok(())
+}
+
+fn dump_config(board_name: Option<&str>) -> anyhow::Result<()> {
+    let board = board::get_board(board_name)?;
+
+    println!("{}", toml::to_string_pretty(&board)?);
 
     Ok(())
 }
