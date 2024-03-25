@@ -114,7 +114,9 @@ fn ravedude() -> anyhow::Result<()> {
 
     avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
 
-    let board = board::get_board(args.board.as_deref())?;
+    let mut board = board::get_board(args.board.as_deref())?;
+
+    board.overrides.apply_overrides(&mut args);
 
     task_message!("Board", "{}", &board.name);
 
