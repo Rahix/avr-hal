@@ -107,6 +107,7 @@ impl BoardConfig {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "kebab-case")]
 pub struct BoardOverrides {
     open_console: Option<bool>,
     serial_baudrate: Option<NonZeroU32>,
