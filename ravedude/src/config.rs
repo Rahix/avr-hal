@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::num::NonZeroU32;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "kebab-case")]
 pub struct BoardConfig {
     pub name: String,
     #[serde(
@@ -15,10 +16,9 @@ pub struct BoardConfig {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
-struct ResetOptions<'a> {
+struct ResetOptions {
     automatic: bool,
-    #[serde(default)]
-    message: Option<&'a str>,
+    message: Option<String>,
 }
 
 fn serialize_reset_message<S>(val: &Option<String>, serializer: S) -> Result<S::Ok, S::Error>
@@ -27,7 +27,7 @@ where
 {
     let reset_options = ResetOptions {
         automatic: val.is_none(),
-        message: val.as_deref(),
+        message: val.clone(),
     };
 
     reset_options.serialize(serializer)
@@ -50,10 +50,11 @@ where
         ));
     }
 
-    Ok(reset_options.message.map(ToOwned::to_owned))
+    Ok(reset_options.message)
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[serde(rename_all = "kebab-case")]
 pub struct BoardAvrdudeOptions {
     pub programmer: String,
     pub partno: String,
@@ -62,12 +63,40 @@ pub struct BoardAvrdudeOptions {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct BoardUSBInfo {
-    pub port_ids: Option<Vec<BoardPortID>>,
+#[serde(rename_all = "kebab-case")]
+pub enum BoardUSBInfo {
+    PortIds(Vec<BoardPortID>),
+    #[serde(rename = "error")]
+    Error(String),
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct BoardPortID {
     pub vid: u16,
     pub pid: u16,
+}
+
+impl BoardConfig {
+    pub fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
+        match &self.usb_info {
+            Some(BoardUSBInfo::Error(err)) => Some(Err(anyhow::anyhow!(err.clone()))),
+            Some(BoardUSBInfo::PortIds(ports)) => {
+                for serialport::SerialPortInfo {
+                    port_name,
+                    port_type,
+                } in serialport::available_ports().unwrap()
+                {
+                    if let serialport::SerialPortType::UsbPort(usb_info) = port_type {
+                        for &BoardPortID { vid, pid } in ports {
+                            if usb_info.vid == vid && usb_info.pid == pid {
+                                return Some(Ok(port_name.into()));
+                            }
+                        }
+                    }
+                }
+                Some(Err(anyhow::anyhow!("Serial port not found.")))
+            }
+            None => None,
+        }
+    }
 }
