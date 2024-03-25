@@ -1,0 +1,240 @@
+[uno]
+    name = "Arduino Uno"
+
+    [uno.reset]
+    automatic = true
+
+    [uno.avrdude]
+    programmer = "arduino"
+    partno = "atmega328p"
+    do-chip-erase = true
+
+    [uno.usb-info]
+    port-ids = [
+        { vid = 0x2341, pid = 0x0043 },
+        { vid = 0x2341, pid = 0x0001 },
+        { vid = 0x2A03, pid = 0x0043 },
+        { vid = 0x2341, pid = 0x0243 },
+    ]
+
+[nano]
+    name = "Arduino Nano"
+
+    [nano.reset]
+    automatic = true
+
+    [nano.avrdude]
+    programmer = "arduino"
+    partno = "atmega328p"
+    baudrate = 57600
+    do-chip-erase = true
+
+    [nano.usb-info]
+    error = "Not able to guess port"
+
+[nano-new]
+    name = "Arduino Nano (New Bootloader)"
+
+    [nano-new.reset]
+    automatic = true
+
+    [nano-new.avrdude]
+    programmer = "arduino"
+    partno = "atmega328p"
+    baudrate = 115200
+    do-chip-erase = true
+
+    [nano-new.usb-info]
+    error = "Not able to guess port"
+
+[leonardo]
+    name = "Arduino Leonardo"
+
+    [leonardo.reset]
+    automatic = false
+    message = "Reset the board by pressing the reset button once."
+
+    [leonardo.avrdude]
+    programmer = "avr109"
+    partno = "atmega32u4"
+    do-chip-erase = true
+
+    [leonardo.usb-info]
+    port-ids = [
+        { vid = 0x2341, pid = 0x0036 },
+        { vid = 0x2341, pid = 0x8036 },
+        { vid = 0x2A03, pid = 0x0036 },
+        { vid = 0x2A03, pid = 0x8036 },
+    ]
+
+[micro]
+    name = "Arduino Micro"
+
+    [micro.reset]
+    automatic = false
+    message = "Reset the board by pressing the reset button once."
+
+    [micro.avrdude]
+    programmer = "avr109"
+    partno = "atmega32u4"
+    baudrate = 115200
+    do-chip-erase = true
+
+    [micro.usb-info]
+    port-ids = [
+        { vid = 0x2341, pid = 0x0037 },
+        { vid = 0x2341, pid = 0x8037 },
+        { vid = 0x2A03, pid = 0x0037 },
+        { vid = 0x2A03, pid = 0x8037 },
+        { vid = 0x2341, pid = 0x0237 },
+        { vid = 0x2341, pid = 0x8237 },
+    ]
+
+[mega2560]
+    name = "Arduino Mega 2560"
+
+    [mega2560.reset]
+    automatic = true
+
+    [mega2560.avrdude]
+    programmer = "wiring"
+    partno = "atmega2560"
+    baudrate = 115200
+    do-chip-erase = false
+
+    [mega2560.usb-info]
+    port-ids = [
+        { vid = 0x2341, pid = 0x0010 },
+        { vid = 0x2341, pid = 0x0042 },
+        { vid = 0x2A03, pid = 0x0010 },
+        { vid = 0x2A03, pid = 0x0042 },
+        { vid = 0x2341, pid = 0x0210 },
+        { vid = 0x2341, pid = 0x0242 },
+    ]
+
+[mega1280]
+    name = "Arduino Mega 1280"
+
+    [mega1280.reset]
+    automatic = true
+
+    [mega1280.avrdude]
+    programmer = "wiring"
+    partno = "atmega1280"
+    baudrate = 57600
+    do-chip-erase = false
+
+    [mega1280.usb-info]
+    # This board uses a generic serial interface id 0403:6001 which is too common for auto detection.
+    error = "Not able to guess port"
+
+[diecimila]
+    name = "Arduino Diecimila"
+
+    [diecimila.reset]
+    automatic = true
+
+    [diecimila.avrdude]
+    programmer = "arduino"
+    partno = "atmega168"
+    baudrate = 19200
+    do-chip-erase = false
+
+    [diecimila.usb-info]
+    # No IDs known.
+    error = "Not able to guess port"
+
+[promicro]
+    name = "SparkFun Pro Micro"
+
+    [promicro.reset]
+    automatic = false
+    message = "Reset the board by quickly pressing the reset button **twice**."
+
+    [promicro.avrdude]
+    programmer = "avr109"
+    partno = "atmega32u4"
+    do-chip-erase = true
+
+    [promicro.usb-info]
+    port-ids = [
+        { vid = 0x1B4F, pid = 0x9205 }, # 5V
+        { vid = 0x1B4F, pid = 0x9206 }, # 5V
+        { vid = 0x1B4F, pid = 0x9203 }, # 3.3V
+        { vid = 0x1B4F, pid = 0x9204 }, # 3.3V
+    ]
+
+[promini-5v]
+    name = "SparkFun Pro Mini 5V (16MHz)"
+
+    [promini-5v.reset]
+    automatic = true
+
+    [promini-5v.avrdude]
+    programmer = "arduino"
+    partno = "atmega328p"
+    baudrate = 57600
+    do-chip-erase = true
+
+    [promini-5v.usb-info]
+    error = "Not able to guess port"
+
+[trinket-pro]
+    name = "Trinket Pro"
+
+    [trinket-pro.reset]
+    automatic = false
+    message = "Reset the board by pressing the reset button once."
+
+    [trinket-pro.avrdude]
+    programmer = "usbtiny"
+    partno = "atmega328p"
+    do-chip-erase = false
+
+    # The Trinket Pro does not have USB-Serial, thus no port is known or needed.
+
+[trinket]
+    name = "Trinket"
+
+    [trinket.reset]
+    automatic = false
+    message = "Reset the board by pressing the reset button once."
+
+    [trinket.avrdude]
+    programmer = "usbtiny"
+    partno = "atmega328p"
+    do-chip-erase = true
+
+    # The Trinket does not have USB-Serial, thus no port is known or needed.
+
+[nano168]
+    name = "Nano Clone (ATmega168)"
+
+    [nano168.reset]
+    automatic = true
+
+    [nano168.avrdude]
+    programmer = "arduino"
+    partno = "atmega168"
+    baudrate = 19200
+    do-chip-erase = false
+
+    [nano168.usb-info]
+    # No IDs here because the Nano 168 uses a generic USB-Serial chip.
+    error = "Not able to guess port"
+
+[duemilanove]
+    name = "Arduino Duemilanove"
+
+    [duemilanove.reset]
+    automatic = true
+
+    [duemilanove.avrdude]
+    programmer = "arduino"
+    partno = "atmega328p"
+    baudrate = 57600
+    do-chip-erase = true
+
+    [duemilanove.usb-info]
+    # No IDs here because the Nano 168 uses a generic USB-Serial chip.
+    error = "Not able to guess port"
