@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::num::NonZeroU32;
 
+use crate::warning;
+
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub struct BoardConfig {
@@ -13,6 +15,9 @@ pub struct BoardConfig {
     pub reset_message: Option<String>,
     pub avrdude: BoardAvrdudeOptions,
     pub usb_info: Option<BoardUSBInfo>,
+
+    #[serde(flatten)]
+    pub overrides: BoardOverrides,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -97,6 +102,64 @@ impl BoardConfig {
                 Some(Err(anyhow::anyhow!("Serial port not found.")))
             }
             None => None,
+        }
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+pub struct BoardOverrides {
+    open_console: Option<bool>,
+    serial_baudrate: Option<NonZeroU32>,
+    port: Option<std::path::PathBuf>,
+    reset_delay: Option<u64>,
+}
+
+impl BoardOverrides {
+    pub fn apply_overrides(&mut self, args: &mut crate::Args) {
+        // command line args take priority over Ravedude.toml
+        if let Some(open_console) = self.open_console {
+            if args.open_console {
+                warning!(
+                    "Overriding console with {} (was {} in Ravedude.toml)",
+                    args.open_console,
+                    open_console,
+                );
+            } else {
+                args.open_console = open_console;
+            }
+        }
+        if let Some(serial_baudrate) = self.serial_baudrate {
+            if let Some(args_baudrate) = args.baudrate {
+                warning!(
+                    "Overriding baudrate with {} (was {} in Ravedude.toml)",
+                    args_baudrate,
+                    serial_baudrate
+                );
+            } else {
+                args.baudrate = Some(serial_baudrate.get());
+            }
+        }
+        if let Some(port) = self.port.take() {
+            if let Some(ref args_port) = args.port {
+                warning!(
+                    "Overriding port with {} (was {} in Ravedude.toml)",
+                    port.to_str().unwrap(),
+                    args_port.to_str().unwrap()
+                );
+            } else {
+                args.port = Some(port);
+            }
+        }
+        if let Some(reset_delay) = self.reset_delay {
+            if let Some(args_reset_delay) = args.reset_delay {
+                warning!(
+                    "Overriding reset delay with {} (was {} in Ravedude.toml)",
+                    args_reset_delay,
+                    reset_delay
+                );
+            } else {
+                args.reset_delay = Some(reset_delay);
+            }
         }
     }
 }
