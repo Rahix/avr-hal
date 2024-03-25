@@ -19,6 +19,7 @@ git-version = "0.3.4"
 ctrlc = "3.2.1"
 serde = { version = "1.0.197", features = ["serde_derive"] }
 toml = "0.8.11"
+either = "1.10.0"
 
 [dependencies.structopt]
 version = "0.3.21"
