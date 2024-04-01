@@ -125,9 +125,6 @@ pub use delay::{delay_ms, delay_us, Delay};
 #[cfg(feature = "board-selected")]
 pub mod port;
 
-#[cfg(feature = "board-selected")]
-pub mod simple_pwm;
-
 #[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use port::Pins;
@@ -179,6 +176,10 @@ pub mod usart {
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
 
+#[doc(no_inline)]
+#[cfg(feature = "mcu-atmega")]
+pub use usart::Usart;
+
 #[cfg(feature = "board-selected")]
 pub mod eeprom {
     pub use crate::hal::eeprom::{Eeprom, EepromOps, OutOfBoundsError};
@@ -187,9 +188,14 @@ pub mod eeprom {
 #[cfg(feature = "board-selected")]
 pub use eeprom::Eeprom;
 
-#[doc(no_inline)]
-#[cfg(feature = "mcu-atmega")]
-pub use usart::Usart;
+#[cfg(feature = "board-selected")]
+pub mod simple_pwm {
+    #[cfg(feature = "mcu-atmega")]
+    pub use atmega_hal::simple_pwm::*;
+
+    #[cfg(feature = "mcu-attiny")]
+    pub use attiny_hal::simple_pwm::*;
+}
 
 #[cfg(feature = "mcu-atmega")]
 pub mod prelude {
