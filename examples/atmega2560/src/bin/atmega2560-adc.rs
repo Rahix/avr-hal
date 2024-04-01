@@ -2,27 +2,29 @@
 #![no_main]
 
 use atmega_hal::adc::channel;
-use atmega_hal::clock;
 use atmega_hal::delay::Delay;
 use atmega_hal::usart::{Baudrate, Usart};
 use embedded_hal::delay::DelayNs;
 use panic_halt as _;
 
-type Adc = atmega_hal::adc::Adc<clock::MHz16>;
+// Define core clock in the root crate
+type CoreClock = atmega_hal::clock::MHz16;
+// Use it as follows in the rest of the project
+type Adc = atmega_hal::adc::Adc<crate::CoreClock>;
 
 #[avr_device::entry]
 fn main() -> ! {
     let dp = atmega_hal::Peripherals::take().unwrap();
     let pins = atmega_hal::pins!(dp);
 
-    let mut delay = Delay::<clock::MHz16>::new();
+    let mut delay = Delay::<crate::CoreClock>::new();
 
     // set up serial interface for text output
     let mut serial = Usart::new(
         dp.USART0,
         pins.pe0,
         pins.pe1.into_output(),
-        Baudrate::<clock::MHz16>::new(57600),
+        Baudrate::<crate::CoreClock>::new(57600),
     );
 
     let mut adc = Adc::new(dp.ADC, Default::default());

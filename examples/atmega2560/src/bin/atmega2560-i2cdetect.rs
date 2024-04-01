@@ -1,11 +1,13 @@
 #![no_std]
 #![no_main]
 
-use atmega_hal::clock;
 use atmega_hal::usart::{Baudrate, Usart};
 use panic_halt as _;
 
-type I2c = atmega_hal::i2c::I2c<clock::MHz16>;
+// Define core clock in the root crate
+type CoreClock = atmega_hal::clock::MHz16;
+// Use it as follows in the rest of the project
+type I2c = atmega_hal::i2c::I2c<crate::CoreClock>;
 
 #[avr_device::entry]
 fn main() -> ! {
@@ -17,7 +19,7 @@ fn main() -> ! {
         dp.USART0,
         pins.pe0,
         pins.pe1.into_output(),
-        Baudrate::<clock::MHz16>::new(57600),
+        Baudrate::<crate::CoreClock>::new(57600),
     );
 
     let mut i2c = I2c::new(
