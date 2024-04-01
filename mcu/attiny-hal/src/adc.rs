@@ -62,6 +62,7 @@ pub mod channel {
     pub struct Temperature;
 }
 
+#[cfg(not(feature = "attiny84a"))]
 fn apply_clock(peripheral: &crate::pac::ADC, settings: AdcSettings) {
     peripheral.adcsra.write(|w| {
         w.aden().set_bit();
