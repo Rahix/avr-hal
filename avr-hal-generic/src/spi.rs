@@ -95,6 +95,27 @@ pub trait SpiOps<H, SCLK, MOSI, MISO, CS> {
 /// output pin, because it implements all the same traits from embedded-hal.
 pub struct ChipSelectPin<CSPIN>(port::Pin<port::mode::Output, CSPIN>);
 
+impl<CSPIN: port::PinOps> ChipSelectPin<CSPIN> {
+    /// Convert this `ChipSelectPin` into the underlying "real" `Pin<>` object.
+    ///
+    /// Safety
+    /// ======
+    /// This function is unsafe because the underlying pin can be converted into a non-output mode
+    /// which would break SPI functionality.  The user must ensure the pin is only used in output
+    /// modes after calling this function.
+    pub unsafe fn into_pin_unchecked(self) -> port::Pin<port::mode::Output, CSPIN> {
+        self.0
+    }
+
+    /// (Re)create a `ChipSelectPin` from a real `Pin<>` object.
+    ///
+    /// This function is only meant to be used when the pin was previously moved out of the
+    /// `ChipSelectPin` using [`ChipSelectPin::into_pin_unchecked()`].
+    pub unsafe fn from_pin(pin: port::Pin<port::mode::Output, CSPIN>) -> Self {
+        Self(pin)
+    }
+}
+
 impl<CSPIN: port::PinOps> embedded_hal_v0::digital::v2::OutputPin for ChipSelectPin<CSPIN> {
     type Error = core::convert::Infallible;
     fn set_low(&mut self) -> Result<(), Self::Error> {
