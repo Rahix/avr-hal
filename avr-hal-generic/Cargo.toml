@@ -10,6 +10,12 @@ repository = "https://github.com/rahix/avr-hal"
 keywords = ["avr", "arduino"]
 categories = ["no-std", "embedded", "hardware-support"]
 
+[package.metadata.docs.rs]
+features = ["docsrs"]
+
+[features]
+docsrs = ["avr-device/docsrs"]
+
 [dependencies]
 cfg-if = "0.1.7"
 nb = "1.1.0"
