@@ -51,6 +51,10 @@ jobs:
           - type: board
             name: nano168
             examples: true
+          - type: board
+            # Not really a board, but also an examples crate
+            name: atmega2560
+            examples: true
           - type: mcu
             name: atmega1280
             spec: atmega1280
