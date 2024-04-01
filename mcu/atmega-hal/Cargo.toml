@@ -32,6 +32,9 @@ critical-section-impl = ["avr-device/critical-section-impl"]
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
 
+# We must select a microcontroller to build on docs.rs
+docsrs = ["atmega328p"]
+
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
@@ -45,3 +48,6 @@ version = "0.5.4"
 # error will be shown and ours won't which leads to a degraded user experience
 # as the displayed error message does not really tell what needs to be done...
 features = ["device-selected"]
+
+[package.metadata.docs.rs]
+features = ["docsrs"]
