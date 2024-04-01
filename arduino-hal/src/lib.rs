@@ -209,7 +209,7 @@ pub mod prelude {
     }
 }
 
-/// Convenience macro to instanciate the [`Pins`] struct for this board.
+/// Convenience macro to instantiate the [`Pins`] struct for this board.
 ///
 /// # Example
 /// ```no_run
@@ -224,6 +224,14 @@ macro_rules! pins {
     };
 }
 
+/// Convenience macro to instantiate the [`Usart`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::default_serial!(dp, pins, 57600);
+/// ```
 #[cfg(any(feature = "arduino-leonardo"))]
 #[macro_export]
 macro_rules! default_serial {
@@ -236,6 +244,15 @@ macro_rules! default_serial {
         )
     };
 }
+
+/// Convenience macro to instantiate the [`Usart`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::default_serial!(dp, pins, 57600);
+/// ```
 #[cfg(any(feature = "sparkfun-promicro"))]
 #[macro_export]
 macro_rules! default_serial {
@@ -248,8 +265,30 @@ macro_rules! default_serial {
         )
     };
 }
-// See comment in avr-hal-generic/src/usart.rs for why these boards use
-// the BaudrateArduinoExt trait instead of BaudrateExt
+
+/// Convenience macro to instantiate the [`Usart`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::default_serial!(dp, pins, 57600);
+/// ```
+///
+/// This is equivalent to manually configuring the driver:
+///
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::Usart::new(
+///     dp.USART1,
+///     pins.d0,
+///     pins.d1.into_output(),
+///     // See src/usart.rs for why some boards use the BaudrateArduinoExt trait
+///     // instead of BaudrateExt.
+///     arduino_hal::hal::usart::BaudrateArduinoExt::into_baudrate(57600),
+/// );
+/// ```
 #[cfg(any(
     feature = "arduino-diecimila",
     feature = "arduino-mega2560",
@@ -263,10 +302,21 @@ macro_rules! default_serial {
             $p.USART0,
             $pins.d0,
             $pins.d1.into_output(),
+            // See comment in avr-hal-generic/src/usart.rs for why these boards use the
+            // BaudrateArduinoExt trait instead of BaudrateExt
             $crate::hal::usart::BaudrateArduinoExt::into_baudrate($baud),
         )
     };
 }
+
+/// Convenience macro to instantiate the [`Usart`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::default_serial!(dp, pins, 57600);
+/// ```
 #[cfg(any(
     feature = "arduino-nano",
     feature = "nano168",
