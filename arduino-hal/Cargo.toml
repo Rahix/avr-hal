@@ -32,6 +32,9 @@ sparkfun-promini-5v = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable
 trinket = ["mcu-attiny", "attiny-hal/attiny85", "board-selected"]
 nano168 = ["mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc", "board-selected"]
 
+# We must select a board to build on docs.rs
+docsrs = ["arduino-uno"]
+
 [dependencies]
 cfg-if = "1"
 embedded-hal = "1.0"
@@ -68,3 +71,6 @@ version = "0.5.4"
 # error will be shown and ours won't which leads to a degraded user experience
 # as the displayed error message does not really tell what needs to be done...
 features = ["device-selected"]
+
+[package.metadata.docs.rs]
+features = ["docsrs"]
