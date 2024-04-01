@@ -1,8 +1,14 @@
 [package]
 name = "attiny-hal"
 version = "0.1.0"
+
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
+description = "HAL crate for ATtiny-series AVR microcontrollers"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rahix/avr-hal"
+keywords = ["avr", "arduino"]
+categories = ["no-std", "embedded", "hardware-support"]
 
 [features]
 rt = ["avr-device/rt"]

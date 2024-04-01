@@ -1,8 +1,14 @@
 [package]
 name = "avr-hal-generic"
 version = "0.1.0"
+
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
+description = "MCU-generic meta-HAL crate for AVR microcontrollers"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rahix/avr-hal"
+keywords = ["avr", "arduino"]
+categories = ["no-std", "embedded", "hardware-support"]
 
 [dependencies]
 cfg-if = "0.1.7"
