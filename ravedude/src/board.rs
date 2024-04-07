@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::config;
 
-fn get_all_boards() -> anyhow::Result<HashMap<String, config::BoardConfig>> {
+fn get_all_boards() -> anyhow::Result<HashMap<String, config::BoardOptions>> {
     toml::from_str(include_str!("boards.toml")).map_err(|err| {
         if cfg!(test) {
             anyhow::anyhow!(
@@ -18,35 +18,40 @@ fn get_all_boards() -> anyhow::Result<HashMap<String, config::BoardConfig>> {
     })
 }
 
-pub fn get_board(board_name: Option<&str>) -> anyhow::Result<config::BoardConfig> {
-    match board_name {
+pub fn get_board(board_name: Option<&str>) -> anyhow::Result<config::RavedudeConfig> {
+    Ok(match board_name {
         Some(board_name) => {
             let mut all_boards = get_all_boards()?;
 
-            all_boards.remove(board_name).ok_or_else(|| {
-                let mut msg = format!("invalid board: {board_name}\n");
+            config::RavedudeConfig {
+                board_config: all_boards.remove(board_name).ok_or_else(|| {
+                    let mut msg = format!("invalid board: {board_name}\n");
 
-                msg.push_str("valid boards:");
+                    msg.push_str("valid boards:");
 
-                for board in all_boards.keys() {
-                    msg.push('\n');
-                    msg.push_str(&board);
-                }
-                anyhow::anyhow!(msg)
-            })
+                    for board in all_boards.keys() {
+                        msg.push('\n');
+                        msg.push_str(&board);
+                    }
+                    anyhow::anyhow!(msg)
+                })?,
+                ..Default::default()
+            }
         }
         None => {
             let file_contents = std::fs::read_to_string("Ravedude.toml")
                 .map_err(|_| anyhow::anyhow!("no board given and couldn't find Ravedude.toml in project, either pass a board as an argument or make a Ravedude.toml."))?;
 
-            let mut board: config::BoardConfig = toml::from_str(&file_contents)?;
-            if let Some(inherit) = board.inherit.as_deref() {
-                let base_board = get_board(Some(inherit))?;
-                board = board.merge(base_board);
+            let mut board: config::RavedudeConfig = toml::from_str(&file_contents)
+                .map_err(|err| anyhow::anyhow!("invalid Ravedude.toml:\n{}", err))?;
+
+            if let Some(inherit) = board.board_config.inherit.as_deref() {
+                let base_board = get_board(Some(inherit))?.board_config;
+                board.board_config = board.board_config.merge(base_board);
             }
-            Ok(board)
+            board
         }
-    }
+    })
 }
 
 #[cfg(test)]

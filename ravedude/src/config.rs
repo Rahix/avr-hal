@@ -1,24 +1,85 @@
 use serde::{Deserialize, Serialize};
 use std::num::NonZeroU32;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Default)]
 #[serde(rename_all = "kebab-case")]
-pub struct BoardConfig {
+pub struct RavedudeConfig {
+    #[serde(rename = "general")]
+    pub general_options: RavedudeGeneralOptions,
+
+    #[serde(rename = "board")]
+    pub board_config: BoardOptions,
+}
+
+impl RavedudeConfig {
+    pub fn from_args(args: &crate::Args) -> anyhow::Result<Self> {
+        Ok(Self {
+            general_options: RavedudeGeneralOptions {
+                open_console: args.open_console.then_some(true),
+                serial_baudrate: match args.baudrate {
+                    Some(serial_baudrate) => Some(
+                        NonZeroU32::new(serial_baudrate)
+                            .ok_or_else(|| anyhow::anyhow!("baudrate must not be 0"))?,
+                    ),
+                    None => None,
+                },
+                port: args.port.clone(),
+                reset_delay: args.reset_delay,
+            },
+            board_config: BoardOptions {
+                inherit: args.board.clone(),
+                ..Default::default()
+            },
+        })
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Default)]
+#[serde(rename_all = "kebab-case")]
+pub struct RavedudeGeneralOptions {
+    pub open_console: Option<bool>,
+    pub serial_baudrate: Option<NonZeroU32>,
+    pub port: Option<std::path::PathBuf>,
+    pub reset_delay: Option<u64>,
+}
+
+impl RavedudeGeneralOptions {
+    pub fn apply_overrides(&mut self, args: &crate::Args) -> anyhow::Result<()> {
+        // command line args take priority over Ravedude.toml
+        if args.open_console {
+            self.open_console = Some(true);
+        }
+        if let Some(serial_baudrate) = args.baudrate {
+            self.serial_baudrate = Some(
+                NonZeroU32::new(serial_baudrate)
+                    .ok_or_else(|| anyhow::anyhow!("baudrate must not be 0"))?,
+            );
+        }
+        if let Some(port) = args.port.clone() {
+            self.port = Some(port);
+        }
+        if let Some(reset_delay) = args.reset_delay {
+            self.reset_delay = Some(reset_delay);
+        }
+        Ok(())
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Default)]
+#[serde(rename_all = "kebab-case")]
+pub struct BoardOptions {
     pub name: Option<String>,
     pub inherit: Option<String>,
     pub reset: Option<ResetOptions>,
     pub avrdude: Option<BoardAvrdudeOptions>,
     pub usb_info: Option<BoardUSBInfo>,
-
-    #[serde(flatten)]
-    pub overrides: BoardOverrides,
 }
 
-impl BoardConfig {
-    pub fn merge(self, base: BoardConfig) -> Self {
+impl BoardOptions {
+    pub fn merge(self, base: BoardOptions) -> Self {
         Self {
             name: self.name.or(base.name),
-            // inherit is used to decide what BoardConfig to inherit and isn't used anywhere else
+            // inherit is used to decide what BoardGeneralOptions to inherit and isn't used anywhere else
             inherit: None,
             reset: self.reset.or(base.reset),
             avrdude: match self.avrdude {
@@ -26,9 +87,6 @@ impl BoardConfig {
                 None => base.avrdude,
             },
             usb_info: self.usb_info.or(base.usb_info),
-
-            // overrides aren't related to the board
-            overrides: self.overrides,
         }
     }
 }
@@ -97,7 +155,7 @@ pub struct BoardPortID {
     pub pid: u16,
 }
 
-impl BoardConfig {
+impl BoardOptions {
     pub fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         match &self.usb_info {
             Some(BoardUSBInfo::Error(err)) => Some(Err(anyhow::anyhow!(err.clone()))),
@@ -118,33 +176,6 @@ impl BoardConfig {
                 Some(Err(anyhow::anyhow!("Serial port not found.")))
             }
             None => None,
-        }
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-#[serde(rename_all = "kebab-case")]
-pub struct BoardOverrides {
-    open_console: Option<bool>,
-    serial_baudrate: Option<NonZeroU32>,
-    port: Option<std::path::PathBuf>,
-    reset_delay: Option<u64>,
-}
-
-impl BoardOverrides {
-    pub fn apply_overrides(&mut self, args: &mut crate::Args) {
-        // command line args take priority over Ravedude.toml
-        if let Some(open_console) = self.open_console {
-            args.open_console = open_console;
-        }
-        if let Some(serial_baudrate) = self.serial_baudrate {
-            args.baudrate = Some(serial_baudrate.get());
-        }
-        if let Some(port) = self.port.take() {
-            args.port = Some(port);
-        }
-        if let Some(reset_delay) = self.reset_delay {
-            args.reset_delay = Some(reset_delay);
         }
     }
 }
