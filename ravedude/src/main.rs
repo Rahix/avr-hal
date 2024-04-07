@@ -99,27 +99,43 @@ fn main() {
 fn ravedude() -> anyhow::Result<()> {
     let mut args: Args = structopt::StructOpt::from_args();
     if args.dump_config {
-        return dump_config(args.board.as_deref());
+        println!(
+            "{}",
+            toml::to_string(&board::get_board(args.board.as_deref())?)?
+        );
+        return Ok(());
     }
 
-    // Due to the ordering of the arguments, board is prioritized before bin.
-    // There doesn't seem to be an way to change the argument priority like this.
-    //
-    // TODO: this is currently a breaking change (for users that use `board` but not `bin`), how do we handle this?
-    if args.board.is_some() && args.bin.is_none() {
-        args.bin = Some(std::path::PathBuf::from(args.board.take().unwrap()));
+    let ravedude_config_exists = std::path::Path::new("Ravedude.toml").try_exists()?;
+
+    if ravedude_config_exists {
+        if let Some(board) = args.board.take() {
+            if args.bin.is_none() {
+                // The board arg is taken before the binary, so rearrange the args when Ravedude.toml exists
+                args.bin = Some(std::path::PathBuf::from(board));
+            } else {
+                anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `inherit = \"{}\"` under [board] in Ravedude.toml", board)
+            }
+        }
+    } else {
+        warning!(
+            "Passing the board as command-line argument is deprecated, use Ravedude.toml instead:\n\n# Ravedude.toml\n{}",
+            toml::to_string(&config::RavedudeConfig::from_args(&args)?)?
+        );
     }
 
     avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
 
-    let mut board = board::get_board(args.board.as_deref())?;
+    let mut ravedude_config = board::get_board(args.board.as_deref())?;
+
+    ravedude_config.general_options.apply_overrides(&mut args)?;
+
+    let mut board = ravedude_config.board_config;
 
     let board_avrdude_options = board
         .avrdude
         .take()
         .ok_or_else(|| anyhow::anyhow!("board has no avrdude options"))?;
-
-    board.overrides.apply_overrides(&mut args);
 
     task_message!(
         "Board",
@@ -143,21 +159,21 @@ fn ravedude() -> anyhow::Result<()> {
         {
             warning!("this board cannot reset itself.");
             if let Some(msg) = message.as_deref() {
-                eprintln!("");
+                eprintln!();
                 eprintln!("    {msg}");
             }
-            eprintln!("");
+            eprintln!();
             eprint!("Once reset, press ENTER here: ");
             std::io::stdin().read_line(&mut String::new())?;
         }
     }
 
-    let port = match args.port {
+    let port = match ravedude_config.general_options.port {
         Some(port) => Ok(Some(port)),
         None => match board.guess_port() {
             Some(Ok(port)) => Ok(Some(port)),
             p @ Some(Err(_)) => p.transpose().context(
-                "no matching serial port found, use -P or set RAVEDUDE_PORT in your environment",
+                "no matching serial port found, use -P, add a serial-port entry under [general] in Ravedude.toml, or set RAVEDUDE_PORT in your environment",
             ),
             None => Ok(None),
         },
@@ -193,7 +209,7 @@ fn ravedude() -> anyhow::Result<()> {
         );
     }
 
-    if args.open_console {
+    if ravedude_config.general_options.open_console == Some(true) {
         let baudrate = args
             .baudrate
             .context("-b/--baudrate is needed for the serial console")?;
@@ -208,14 +224,6 @@ fn ravedude() -> anyhow::Result<()> {
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
     }
-
-    Ok(())
-}
-
-fn dump_config(board_name: Option<&str>) -> anyhow::Result<()> {
-    let board = board::get_board(board_name)?;
-
-    println!("{}", toml::to_string(&board)?);
 
     Ok(())
 }
