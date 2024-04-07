@@ -118,7 +118,13 @@ fn ravedude() -> anyhow::Result<()> {
 
     board.overrides.apply_overrides(&mut args);
 
-    task_message!("Board", "{}", &board.name);
+    task_message!(
+        "Board",
+        "{}",
+        &board.name.as_deref().ok_or_else(|| anyhow::anyhow!(
+            "Base board doesn't have a name. This is a bug, please report it!"
+        ))?
+    );
 
     if let Some(wait_time) = args.reset_delay {
         if wait_time > 0 {
@@ -132,7 +138,12 @@ fn ravedude() -> anyhow::Result<()> {
         if let Some(ref msg) = board.reset_message {
             warning!("this board cannot reset itself.");
             eprintln!("");
-            eprintln!("    {}", msg);
+            eprintln!(
+                "    {}",
+                msg.as_ref().ok_or_else(|| anyhow::anyhow!(
+                    "Base board doesn't have a reset message. This is a bug, please report it!"
+                ))?
+            );
             eprintln!("");
             eprint!("Once reset, press ENTER here: ");
             std::io::stdin().read_line(&mut String::new())?;
@@ -163,8 +174,16 @@ fn ravedude() -> anyhow::Result<()> {
             task_message!("Programming", "{}", bin.display(),);
         }
 
-        let mut avrdude =
-            avrdude::Avrdude::run(&board.avrdude, port.as_ref(), bin, args.debug_avrdude)?;
+        let mut avrdude = avrdude::Avrdude::run(
+            &board.avrdude.ok_or_else(|| {
+                anyhow::anyhow!(
+                    "Base board doesn't have avrdude options. This is a bug, please report it!"
+                )
+            })?,
+            port.as_ref(),
+            bin,
+            args.debug_avrdude,
+        )?;
         avrdude.wait()?;
 
         task_message!("Programmed", "{}", bin.display());
@@ -198,7 +217,7 @@ fn ravedude() -> anyhow::Result<()> {
 fn dump_config(board_name: Option<&str>) -> anyhow::Result<()> {
     let board = board::get_board(board_name)?;
 
-    println!("{}", toml::to_string_pretty(&board)?);
+    println!("{}", toml::to_string(&board)?);
 
     Ok(())
 }
