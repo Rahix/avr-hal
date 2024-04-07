@@ -73,16 +73,32 @@ impl Avrdude {
 
         let mut command = command
             .arg("-c")
-            .arg(&options.programmer)
+            .arg(options.programmer.as_ref().ok_or_else(|| {
+                anyhow::anyhow!(
+                    "Base board doesn't have a programmer. This is a bug, please report it!"
+                )
+            })?)
             .arg("-p")
-            .arg(&options.partno);
+            .arg(options.partno.as_ref().ok_or_else(|| {
+                anyhow::anyhow!(
+                    "Base board doesn't have a part number. This is a bug, please report it!"
+                )
+            })?);
 
         if let Some(port) = port {
             command = command.arg("-P").arg(port.as_ref());
         }
 
         if let Some(baudrate) = options.baudrate {
-            command = command.arg("-b").arg(baudrate.to_string());
+            command = command.arg("-b").arg(
+                baudrate
+                    .ok_or_else(|| {
+                        anyhow::anyhow!(
+                            "Base board doesn't have a baudrate. This is a bug, please report it!"
+                        )
+                    })?
+                    .to_string(),
+            );
         }
 
         // TODO: Check that `bin` does not contain :
@@ -90,7 +106,11 @@ impl Avrdude {
         flash_instruction.push(bin);
         flash_instruction.push(":e");
 
-        if options.do_chip_erase {
+        if options.do_chip_erase.ok_or_else(|| {
+            anyhow::anyhow!(
+            "Base board doesn't specify whether to erase the chip. This is a bug, please report it!"
+        )
+        })? {
             command = command.arg("-e");
         }
 
