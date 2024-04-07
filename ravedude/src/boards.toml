@@ -7,6 +7,7 @@
     [uno.avrdude]
     programmer = "arduino"
     partno = "atmega328p"
+    baudrate = -1
     do-chip-erase = true
 
     [uno.usb-info]
@@ -57,6 +58,7 @@
     [leonardo.avrdude]
     programmer = "avr109"
     partno = "atmega32u4"
+    baudrate = -1
     do-chip-erase = true
 
     [leonardo.usb-info]
@@ -154,6 +156,7 @@
     [promicro.avrdude]
     programmer = "avr109"
     partno = "atmega32u4"
+    baudrate = -1
     do-chip-erase = true
 
     [promicro.usb-info]
@@ -189,6 +192,7 @@
     [trinket-pro.avrdude]
     programmer = "usbtiny"
     partno = "atmega328p"
+    baudrate = -1
     do-chip-erase = false
 
     # The Trinket Pro does not have USB-Serial, thus no port is known or needed.
@@ -203,6 +207,7 @@
     [trinket.avrdude]
     programmer = "usbtiny"
     partno = "atmega328p"
+    baudrate = -1
     do-chip-erase = true
 
     # The Trinket does not have USB-Serial, thus no port is known or needed.
