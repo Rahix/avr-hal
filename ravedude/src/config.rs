@@ -6,12 +6,7 @@ use std::num::NonZeroU32;
 pub struct BoardConfig {
     pub name: Option<String>,
     pub inherit: Option<String>,
-    #[serde(
-        serialize_with = "serialize_reset_message",
-        deserialize_with = "deserialize_reset_message",
-        rename = "reset"
-    )]
-    pub reset_message: Option<Option<String>>,
+    pub reset: Option<ResetOptions>,
     pub avrdude: Option<BoardAvrdudeOptions>,
     pub usb_info: Option<BoardUSBInfo>,
 
@@ -25,10 +20,11 @@ impl BoardConfig {
             name: self.name.or(base.name),
             // inherit is used to decide what BoardConfig to inherit and isn't used anywhere else
             inherit: None,
-            reset_message: self.reset_message.or(base.reset_message),
-            avrdude: self
-                .avrdude
-                .and_then(|avrdude| base.avrdude.map(|base_avrdude| avrdude.merge(base_avrdude))),
+            reset: self.reset.or(base.reset),
+            avrdude: match self.avrdude {
+                Some(avrdude) => base.avrdude.map(|base_avrdude| avrdude.merge(base_avrdude)),
+                None => base.avrdude,
+            },
             usb_info: self.usb_info.or(base.usb_info),
 
             // overrides aren't related to the board
@@ -38,46 +34,9 @@ impl BoardConfig {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
-struct ResetOptions {
-    automatic: bool,
-    message: Option<String>,
-}
-
-fn serialize_reset_message<S>(
-    val: &Option<Option<String>>,
-    serializer: S,
-) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    let reset_options = val.as_ref().map(|val| ResetOptions {
-        automatic: val.is_none(),
-        message: val.clone(),
-    });
-
-    reset_options.serialize(serializer)
-}
-
-fn deserialize_reset_message<'de, D>(deserializer: D) -> Result<Option<Option<String>>, D::Error>
-where
-    D: serde::Deserializer<'de>,
-{
-    let Some(reset_options) = Option::<ResetOptions>::deserialize(deserializer)? else {
-        return Ok(None);
-    };
-
-    if reset_options.automatic && reset_options.message.is_some() {
-        return Err(serde::de::Error::custom(
-            "cannot have automatic reset with a message for non-automatic reset",
-        ));
-    }
-    if !reset_options.automatic && reset_options.message.is_none() {
-        return Err(serde::de::Error::custom(
-            "non-automatic reset option must have a message with it",
-        ));
-    }
-
-    Ok(Some(reset_options.message))
+pub struct ResetOptions {
+    pub automatic: bool,
+    pub message: Option<String>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -115,17 +74,13 @@ fn deserialize_baudrate<'de, D>(deserializer: D) -> Result<Option<Option<NonZero
 where
     D: serde::Deserializer<'de>,
 {
-    let Some(baudrate) = Option::<i32>::deserialize(deserializer)? else {
-        return Ok(None);
-    };
-
-    match NonZeroU32::new(baudrate as _) {
-        None if baudrate == -1 => Ok(Some(None)),
-        Some(nonzero_baudrate) => Ok(Some(Some(nonzero_baudrate))),
-        _ => Err(serde::de::Error::custom(format!(
-            "invalid baudrate: {baudrate}"
-        ))),
-    }
+    Ok(match Option::<i32>::deserialize(deserializer)? {
+        None => None,
+        Some(-1) => Some(None),
+        Some(baudrate) => Some(Some(NonZeroU32::new(baudrate as _).ok_or_else(|| {
+            serde::de::Error::custom(format!("invalid baudrate: {baudrate}"))
+        })?)),
+    })
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
