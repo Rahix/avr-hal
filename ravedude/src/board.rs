@@ -60,7 +60,7 @@ mod tests {
         for board in all_boards.values() {
             assert!(board.name.is_some());
             assert!(board.inherit.is_none());
-            assert!(board.reset_message.is_some());
+            assert!(board.reset.is_some());
             assert!(board.avrdude.is_some());
             let avrdude = board.avrdude.as_ref().unwrap();
             assert!(avrdude.programmer.is_some());

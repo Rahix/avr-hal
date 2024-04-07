@@ -114,14 +114,17 @@ fn ravedude() -> anyhow::Result<()> {
 
     let mut board = board::get_board(args.board.as_deref())?;
 
+    let board_avrdude_options = board
+        .avrdude
+        .take()
+        .ok_or_else(|| anyhow::anyhow!("board has no avrdude options"))?;
+
     board.overrides.apply_overrides(&mut args);
 
     task_message!(
         "Board",
         "{}",
-        &board.name.as_deref().ok_or_else(|| anyhow::anyhow!(
-            "Base board doesn't have a name. This is a bug, please report it!"
-        ))?
+        &board.name.as_deref().unwrap_or("Unnamed Board")
     );
 
     if let Some(wait_time) = args.reset_delay {
@@ -133,15 +136,16 @@ fn ravedude() -> anyhow::Result<()> {
             println!("Assuming board has been reset");
         }
     } else {
-        if let Some(ref msg) = board.reset_message {
+        if let Some(config::ResetOptions {
+            automatic: false,
+            message,
+        }) = board.reset.as_ref()
+        {
             warning!("this board cannot reset itself.");
-            eprintln!("");
-            eprintln!(
-                "    {}",
-                msg.as_ref().ok_or_else(|| anyhow::anyhow!(
-                    "Base board doesn't have a reset message. This is a bug, please report it!"
-                ))?
-            );
+            if let Some(msg) = message.as_deref() {
+                eprintln!("");
+                eprintln!("    {msg}");
+            }
             eprintln!("");
             eprint!("Once reset, press ENTER here: ");
             std::io::stdin().read_line(&mut String::new())?;
@@ -173,11 +177,7 @@ fn ravedude() -> anyhow::Result<()> {
         }
 
         let mut avrdude = avrdude::Avrdude::run(
-            &board.avrdude.ok_or_else(|| {
-                anyhow::anyhow!(
-                    "Base board doesn't have avrdude options. This is a bug, please report it!"
-                )
-            })?,
+            &board_avrdude_options,
             port.as_ref(),
             bin,
             args.debug_avrdude,

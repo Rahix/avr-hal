@@ -73,32 +73,26 @@ impl Avrdude {
 
         let mut command = command
             .arg("-c")
-            .arg(options.programmer.as_ref().ok_or_else(|| {
-                anyhow::anyhow!(
-                    "Base board doesn't have a programmer. This is a bug, please report it!"
-                )
-            })?)
+            .arg(
+                options
+                    .programmer
+                    .as_ref()
+                    .ok_or_else(|| anyhow::anyhow!("board has no programmer"))?,
+            )
             .arg("-p")
-            .arg(options.partno.as_ref().ok_or_else(|| {
-                anyhow::anyhow!(
-                    "Base board doesn't have a part number. This is a bug, please report it!"
-                )
-            })?);
+            .arg(
+                options
+                    .partno
+                    .as_ref()
+                    .ok_or_else(|| anyhow::anyhow!("board has no part number"))?,
+            );
 
         if let Some(port) = port {
             command = command.arg("-P").arg(port.as_ref());
         }
 
-        if let Some(baudrate) = options.baudrate {
-            command = command.arg("-b").arg(
-                baudrate
-                    .ok_or_else(|| {
-                        anyhow::anyhow!(
-                            "Base board doesn't have a baudrate. This is a bug, please report it!"
-                        )
-                    })?
-                    .to_string(),
-            );
+        if let Some(baudrate) = options.baudrate.flatten() {
+            command = command.arg("-b").arg(baudrate.to_string());
         }
 
         // TODO: Check that `bin` does not contain :
