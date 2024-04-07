@@ -30,10 +30,6 @@ const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
     ))]
 struct Args {
     /// Utility flag for dumping a config of a named board to TOML.
-    /// ```sh
-    /// # Create a new Ravedude.toml with the default Arduino UNO Config.
-    /// ravedude --dump-config uno > Ravedude.toml
-    /// ```
     #[structopt(long = "dump-config")]
     dump_config: bool,
 
@@ -46,7 +42,7 @@ struct Args {
     #[structopt(short = "b", long = "baudrate")]
     baudrate: Option<u32>,
 
-    /// Overwrite which port to use.  By default ravedude will try to find a connected board by
+    /// Overwrite which port to use. By default ravedude will try to find a connected board by
     /// itself.
     #[structopt(short = "P", long = "port", parse(from_os_str), env = "RAVEDUDE_PORT")]
     port: Option<std::path::PathBuf>,
@@ -108,6 +104,8 @@ fn ravedude() -> anyhow::Result<()> {
 
     // Due to the ordering of the arguments, board is prioritized before bin.
     // There doesn't seem to be an way to change the argument priority like this.
+    //
+    // TODO: this is currently a breaking change (for users that use `board` but not `bin`), how do we handle this?
     if args.board.is_some() && args.bin.is_none() {
         args.bin = Some(std::path::PathBuf::from(args.board.take().unwrap()));
     }
