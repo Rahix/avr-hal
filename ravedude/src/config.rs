@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::num::NonZeroU32;
 
-use crate::warning;
-
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub struct BoardConfig {
@@ -182,48 +180,16 @@ impl BoardOverrides {
     pub fn apply_overrides(&mut self, args: &mut crate::Args) {
         // command line args take priority over Ravedude.toml
         if let Some(open_console) = self.open_console {
-            if args.open_console {
-                warning!(
-                    "Overriding console with {} (was {} in Ravedude.toml)",
-                    args.open_console,
-                    open_console,
-                );
-            } else {
-                args.open_console = open_console;
-            }
+            args.open_console = open_console;
         }
         if let Some(serial_baudrate) = self.serial_baudrate {
-            if let Some(args_baudrate) = args.baudrate {
-                warning!(
-                    "Overriding baudrate with {} (was {} in Ravedude.toml)",
-                    args_baudrate,
-                    serial_baudrate
-                );
-            } else {
-                args.baudrate = Some(serial_baudrate.get());
-            }
+            args.baudrate = Some(serial_baudrate.get());
         }
         if let Some(port) = self.port.take() {
-            if let Some(ref args_port) = args.port {
-                warning!(
-                    "Overriding port with {} (was {} in Ravedude.toml)",
-                    port.to_str().unwrap(),
-                    args_port.to_str().unwrap()
-                );
-            } else {
-                args.port = Some(port);
-            }
+            args.port = Some(port);
         }
         if let Some(reset_delay) = self.reset_delay {
-            if let Some(args_reset_delay) = args.reset_delay {
-                warning!(
-                    "Overriding reset delay with {} (was {} in Ravedude.toml)",
-                    args_reset_delay,
-                    reset_delay
-                );
-            } else {
-                args.reset_delay = Some(reset_delay);
-            }
+            args.reset_delay = Some(reset_delay);
         }
     }
 }
