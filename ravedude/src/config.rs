@@ -5,16 +5,38 @@ use std::num::NonZeroU32;
 #[serde(rename_all = "kebab-case")]
 pub struct RavedudeConfig {
     #[serde(rename = "general")]
-    pub general_options: RavedudeGeneralOptions,
+    pub general_options: RavedudeGeneralConfig,
 
     #[serde(rename = "board")]
-    pub board_config: BoardOptions,
+    pub board_config: Option<BoardConfig>,
+}
+
+fn serialize_baudrate<S>(val: &Option<Option<NonZeroU32>>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    let baudrate = val.as_ref().map(|val| val.map_or(-1, |x| x.get() as i32));
+
+    baudrate.serialize(serializer)
+}
+
+fn deserialize_baudrate<'de, D>(deserializer: D) -> Result<Option<Option<NonZeroU32>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    Ok(match Option::<i32>::deserialize(deserializer)? {
+        None => None,
+        Some(-1) => Some(None),
+        Some(baudrate) => Some(Some(NonZeroU32::new(baudrate as _).ok_or_else(|| {
+            serde::de::Error::custom(format!("invalid baudrate: {baudrate}"))
+        })?)),
+    })
 }
 
 impl RavedudeConfig {
     pub fn from_args(args: &crate::Args) -> anyhow::Result<Self> {
         Ok(Self {
-            general_options: RavedudeGeneralOptions {
+            general_options: RavedudeGeneralConfig {
                 open_console: args.open_console.then_some(true),
                 serial_baudrate: match args.baudrate {
                     Some(serial_baudrate) => Some(
@@ -25,25 +47,24 @@ impl RavedudeConfig {
                 },
                 port: args.port.clone(),
                 reset_delay: args.reset_delay,
+                board: args.board.clone(),
             },
-            board_config: BoardOptions {
-                inherit: args.board.clone(),
-                ..Default::default()
-            },
+            board_config: Default::default(),
         })
     }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default)]
 #[serde(rename_all = "kebab-case")]
-pub struct RavedudeGeneralOptions {
+pub struct RavedudeGeneralConfig {
     pub open_console: Option<bool>,
     pub serial_baudrate: Option<NonZeroU32>,
     pub port: Option<std::path::PathBuf>,
     pub reset_delay: Option<u64>,
+    pub board: Option<String>,
 }
 
-impl RavedudeGeneralOptions {
+impl RavedudeGeneralConfig {
     pub fn apply_overrides(&mut self, args: &crate::Args) -> anyhow::Result<()> {
         // command line args take priority over Ravedude.toml
         if args.open_console {
@@ -67,7 +88,7 @@ impl RavedudeGeneralOptions {
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default)]
 #[serde(rename_all = "kebab-case")]
-pub struct BoardOptions {
+pub struct BoardConfig {
     pub name: Option<String>,
     pub inherit: Option<String>,
     pub reset: Option<ResetOptions>,
@@ -75,8 +96,8 @@ pub struct BoardOptions {
     pub usb_info: Option<BoardUSBInfo>,
 }
 
-impl BoardOptions {
-    pub fn merge(self, base: BoardOptions) -> Self {
+impl BoardConfig {
+    pub fn merge(self, base: BoardConfig) -> Self {
         Self {
             name: self.name.or(base.name),
             // inherit is used to decide what BoardGeneralOptions to inherit and isn't used anywhere else
@@ -119,27 +140,6 @@ impl BoardAvrdudeOptions {
         }
     }
 }
-fn serialize_baudrate<S>(val: &Option<Option<NonZeroU32>>, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    let baudrate = val.as_ref().map(|val| val.map_or(-1, |x| x.get() as i32));
-
-    baudrate.serialize(serializer)
-}
-
-fn deserialize_baudrate<'de, D>(deserializer: D) -> Result<Option<Option<NonZeroU32>>, D::Error>
-where
-    D: serde::Deserializer<'de>,
-{
-    Ok(match Option::<i32>::deserialize(deserializer)? {
-        None => None,
-        Some(-1) => Some(None),
-        Some(baudrate) => Some(Some(NonZeroU32::new(baudrate as _).ok_or_else(|| {
-            serde::de::Error::custom(format!("invalid baudrate: {baudrate}"))
-        })?)),
-    })
-}
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 #[serde(rename_all = "kebab-case")]
@@ -155,7 +155,7 @@ pub struct BoardPortID {
     pub pid: u16,
 }
 
-impl BoardOptions {
+impl BoardConfig {
     pub fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         match &self.usb_info {
             Some(BoardUSBInfo::Error(err)) => Some(Err(anyhow::anyhow!(err.clone()))),

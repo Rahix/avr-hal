@@ -114,7 +114,7 @@ fn ravedude() -> anyhow::Result<()> {
                 // The board arg is taken before the binary, so rearrange the args when Ravedude.toml exists
                 args.bin = Some(std::path::PathBuf::from(board));
             } else {
-                anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `inherit = \"{}\"` under [board] in Ravedude.toml", board)
+                anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = \"{}\"` under [general] in Ravedude.toml", board)
             }
         }
     } else {
@@ -130,7 +130,9 @@ fn ravedude() -> anyhow::Result<()> {
 
     ravedude_config.general_options.apply_overrides(&mut args)?;
 
-    let mut board = ravedude_config.board_config;
+    let Some(mut board) = ravedude_config.board_config else {
+        anyhow::bail!("no named board given and no board options provided");
+    };
 
     let board_avrdude_options = board
         .avrdude
