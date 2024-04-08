@@ -100,11 +100,10 @@ impl Avrdude {
         flash_instruction.push(bin);
         flash_instruction.push(":e");
 
-        if options.do_chip_erase.ok_or_else(|| {
-            anyhow::anyhow!(
-            "Base board doesn't specify whether to erase the chip. This is a bug, please report it!"
-        )
-        })? {
+        if options
+            .do_chip_erase
+            .ok_or_else(|| anyhow::anyhow!("board doesn't specify whether to erase the chip"))?
+        {
             command = command.arg("-e");
         }
 
