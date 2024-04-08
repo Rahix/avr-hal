@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::config;
 
-fn get_all_boards() -> anyhow::Result<HashMap<String, config::BoardOptions>> {
+fn get_all_boards() -> anyhow::Result<HashMap<String, config::BoardConfig>> {
     toml::from_str(include_str!("boards.toml")).map_err(|err| {
         if cfg!(test) {
             anyhow::anyhow!(
@@ -24,7 +24,7 @@ pub fn get_board(board_name: Option<&str>) -> anyhow::Result<config::RavedudeCon
             let mut all_boards = get_all_boards()?;
 
             config::RavedudeConfig {
-                board_config: all_boards.remove(board_name).ok_or_else(|| {
+                board_config: Some(all_boards.remove(board_name).ok_or_else(|| {
                     let mut msg = format!("invalid board: {board_name}\n");
 
                     msg.push_str("valid boards:");
@@ -34,7 +34,7 @@ pub fn get_board(board_name: Option<&str>) -> anyhow::Result<config::RavedudeCon
                         msg.push_str(&board);
                     }
                     anyhow::anyhow!(msg)
-                })?,
+                })?),
                 ..Default::default()
             }
         }
@@ -45,9 +45,19 @@ pub fn get_board(board_name: Option<&str>) -> anyhow::Result<config::RavedudeCon
             let mut board: config::RavedudeConfig = toml::from_str(&file_contents)
                 .map_err(|err| anyhow::anyhow!("invalid Ravedude.toml:\n{}", err))?;
 
-            if let Some(inherit) = board.board_config.inherit.as_deref() {
-                let base_board = get_board(Some(inherit))?.board_config;
-                board.board_config = board.board_config.merge(base_board);
+            if let Some(board_config) = board.board_config.as_ref() {
+                if let Some(board_name) = board.general_options.board.as_deref() {
+                    anyhow::bail!(
+                        "can't both have board in [general] and [board] section; set inherit = \"{}\" under [board] to inherit its options", board_name
+                    )
+                }
+                if let Some(inherit) = board_config.inherit.as_deref() {
+                    let base_board = get_board(Some(inherit))?.board_config.unwrap();
+                    board.board_config = Some(board.board_config.take().unwrap().merge(base_board));
+                }
+            } else if let Some(board_name) = board.general_options.board.as_deref() {
+                let base_board = get_board(Some(board_name))?.board_config.unwrap();
+                board.board_config = Some(base_board);
             }
             board
         }
