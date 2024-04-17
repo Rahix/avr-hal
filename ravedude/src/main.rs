@@ -212,9 +212,14 @@ fn ravedude() -> anyhow::Result<()> {
     }
 
     if ravedude_config.general_options.open_console == Some(true) {
-        let baudrate = args
-            .baudrate
-            .context("-b/--baudrate is needed for the serial console")?;
+        let baudrate = ravedude_config
+            .general_options
+            .serial_baudrate
+            .context(if ravedude_config_exists {
+                "`serial-baudrate` under [general] in Ravedude.toml is needed for the serial console"
+            }else{
+                "-b/--baudrate is needed for the serial console"
+            })?;
 
         let port = port.context("console can only be opened for devices with USB-to-Serial")?;
 
@@ -222,7 +227,7 @@ fn ravedude() -> anyhow::Result<()> {
         task_message!("", "{}", "CTRL+C to exit.".dimmed());
         // Empty line for visual consistency
         eprintln!();
-        console::open(&port, baudrate)?;
+        console::open(&port, baudrate.get())?;
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
     }
