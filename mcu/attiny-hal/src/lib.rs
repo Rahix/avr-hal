@@ -88,6 +88,11 @@ pub mod eeprom;
 #[cfg(feature = "device-selected")]
 pub use eeprom::Eeprom;
 
+#[cfg(feature = "device-selected")]
+pub mod spi;
+#[cfg(feature = "device-selected")]
+pub use spi::Spi;
+
 pub struct Attiny;
 
 #[cfg(feature = "attiny84")]
