@@ -60,7 +60,7 @@ fn main() -> ! {
     ufmt::uwriteln!(
         &mut serial,
         "configured timer output compare register = {}",
-        tmr1.ocr1a.read().bits()
+        tmr1.ocr1a().read().bits()
     )
     .unwrap_infallible();
 
@@ -107,16 +107,16 @@ pub fn rig_timer<W: uWrite<Error = ::core::convert::Infallible>>(tmr1: &TC1, ser
     )
     .unwrap_infallible();
 
-    tmr1.tccr1a.write(|w| w.wgm1().bits(0b00));
-    tmr1.tccr1b.write(|w| {
+    tmr1.tccr1a().write(|w| w.wgm1().set(0b00));
+    tmr1.tccr1b().write(|w| {
         w.cs1()
             //.prescale_256()
             .variant(CLOCK_SOURCE)
             .wgm1()
-            .bits(0b01)
+            .set(0b01)
     });
-    tmr1.ocr1a.write(|w| w.bits(ticks));
-    tmr1.timsk1.write(|w| w.ocie1a().set_bit()); //enable this specific interrupt
+    tmr1.ocr1a().write(|w| w.set(ticks));
+    tmr1.timsk1().write(|w| w.ocie1a().set_bit()); //enable this specific interrupt
 }
 
 #[avr_device::interrupt(atmega328p)]

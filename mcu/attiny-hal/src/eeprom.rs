@@ -29,7 +29,7 @@ avr_hal_generic::impl_eeprom_attiny! {
     capacity: 128,
     addr_width: u8,
     set_address: |peripheral, address| {
-        peripheral.eear.write(|w| w.bits(address));
+        peripheral.eear().write(|w| w.bits(address));
     },
 }
 
@@ -40,7 +40,7 @@ avr_hal_generic::impl_eeprom_attiny! {
     capacity: 512,
     addr_width: u16,
     set_address: |peripheral, address| {
-        peripheral.eear.write(|w| w.bits(address));
+        peripheral.eear().write(|w| w.bits(address));
     },
 }
 
@@ -51,6 +51,6 @@ avr_hal_generic::impl_eeprom_attiny! {
     capacity: 64,
     addr_width: u8,
     set_address: |peripheral, address| {
-        peripheral.eearl.write(|w| w.bits(address));
+        peripheral.eearl().write(|w| w.bits(address));
     },
 }
