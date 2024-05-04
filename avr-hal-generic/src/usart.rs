@@ -484,18 +484,18 @@ macro_rules! impl_usart_traditional {
                 $crate::port::Pin<$crate::port::mode::Output, $txpin>,
             > for $USART {
                 fn raw_init<CLOCK>(&mut self, baudrate: $crate::usart::Baudrate<CLOCK>) {
-                    self.[<ubrr $n>].write(|w| unsafe { w.bits(baudrate.ubrr) });
-                    self.[<ucsr $n a>].write(|w| w.[<u2x $n>]().bit(baudrate.u2x));
+                    self.[<ubrr $n>]().write(|w| unsafe { w.bits(baudrate.ubrr) });
+                    self.[<ucsr $n a>]().write(|w| w.[<u2x $n>]().bit(baudrate.u2x));
 
                     // Enable receiver and transmitter but leave interrupts disabled.
-                    self.[<ucsr $n b>].write(|w| w
+                    self.[<ucsr $n b>]().write(|w| w
                         .[<txen $n>]().set_bit()
                         .[<rxen $n>]().set_bit()
                     );
 
                     // Set frame format to 8n1 for now.  At some point, this should be made
                     // configurable, similar to what is done in other HALs.
-                    self.[<ucsr $n c>].write(|w| w
+                    self.[<ucsr $n c>]().write(|w| w
                         .[<umsel $n>]().usart_async()
                         .[<ucsz $n>]().chr8()
                         .[<usbs $n>]().stop1()
@@ -506,11 +506,11 @@ macro_rules! impl_usart_traditional {
                 fn raw_deinit(&mut self) {
                     // Wait for any ongoing transfer to finish.
                     $crate::nb::block!(self.raw_flush()).ok();
-                    self.[<ucsr $n b>].reset();
+                    self.[<ucsr $n b>]().reset();
                 }
 
                 fn raw_flush(&mut self) -> $crate::nb::Result<(), core::convert::Infallible> {
-                    if self.[<ucsr $n a>].read().[<udre $n>]().bit_is_clear() {
+                    if self.[<ucsr $n a>]().read().[<udre $n>]().bit_is_clear() {
                         Err($crate::nb::Error::WouldBlock)
                     } else {
                         Ok(())
@@ -521,26 +521,26 @@ macro_rules! impl_usart_traditional {
                     // Call flush to make sure the data-register is empty
                     self.raw_flush()?;
 
-                    self.[<udr $n>].write(|w| unsafe { w.bits(byte) });
+                    self.[<udr $n>]().write(|w| unsafe { w.bits(byte) });
                     Ok(())
                 }
 
                 fn raw_read(&mut self) -> $crate::nb::Result<u8, core::convert::Infallible> {
-                    if self.[<ucsr $n a>].read().[<rxc $n>]().bit_is_clear() {
+                    if self.[<ucsr $n a>]().read().[<rxc $n>]().bit_is_clear() {
                         return Err($crate::nb::Error::WouldBlock);
                     }
 
-                    Ok(self.[<udr $n>].read().bits())
+                    Ok(self.[<udr $n>]().read().bits())
                 }
 
                 fn raw_interrupt(&mut self, event: $crate::usart::Event, state: bool) {
                     match event {
                         $crate::usart::Event::RxComplete =>
-                            self.[<ucsr $n b>].modify(|_, w| w.[<rxcie $n>]().bit(state)),
+                            self.[<ucsr $n b>]().modify(|_, w| w.[<rxcie $n>]().bit(state)),
                         $crate::usart::Event::TxComplete =>
-                            self.[<ucsr $n b>].modify(|_, w| w.[<txcie $n>]().bit(state)),
+                            self.[<ucsr $n b>]().modify(|_, w| w.[<txcie $n>]().bit(state)),
                         $crate::usart::Event::DataRegisterEmpty =>
-                            self.[<ucsr $n b>].modify(|_, w| w.[<udrie $n>]().bit(state)),
+                            self.[<ucsr $n b>]().modify(|_, w| w.[<udrie $n>]().bit(state)),
                     }
                 }
             }
