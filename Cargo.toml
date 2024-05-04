@@ -42,3 +42,6 @@ exclude = [
     "ravedude",
 ]
 resolver = "2"
+
+[patch.crates-io]
+avr-device = { git = "https://github.com/rahix/avr-device", rev = "330cdf1fb1a7301b9d6cf62491c16e69d6aa7312" }
