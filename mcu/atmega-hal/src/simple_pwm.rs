@@ -26,8 +26,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer0Pwm {
         timer: crate::pac::TC0,
         init: |tim, prescaler| {
-            tim.tccr0a.modify(|_r, w| w.wgm0().pwm_fast());
-            tim.tccr0b.modify(|_r, w| match prescaler {
+            tim.tccr0a().modify(|_r, w| w.wgm0().pwm_fast());
+            tim.tccr0b().modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs0().direct(),
                 Prescaler::Prescale8 => w.cs0().prescale_8(),
                 Prescaler::Prescale64 => w.cs0().prescale_64(),
@@ -39,18 +39,18 @@ avr_hal_generic::impl_simple_pwm! {
             PD6: {
                 ocr: ocr0a,
                 into_pwm: |tim| if enable {
-                    tim.tccr0a.modify(|_r, w| w.com0a().match_clear());
+                    tim.tccr0a().modify(|_r, w| w.com0a().match_clear());
                 } else {
-                    tim.tccr0a.modify(|_r, w| w.com0a().disconnected());
+                    tim.tccr0a().modify(|_r, w| w.com0a().disconnected());
                 },
             },
 
             PD5: {
                 ocr: ocr0b,
                 into_pwm: |tim| if enable {
-                    tim.tccr0a.modify(|_r, w| w.com0b().match_clear());
+                    tim.tccr0a().modify(|_r, w| w.com0b().match_clear());
                 } else {
-                    tim.tccr0a.modify(|_r, w| w.com0b().disconnected());
+                    tim.tccr0a().modify(|_r, w| w.com0b().disconnected());
                 },
             },
         },
@@ -80,9 +80,9 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer1Pwm {
         timer: crate::pac::TC1,
         init: |tim, prescaler| {
-            tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
-            tim.tccr1b.modify(|_r, w| {
-                w.wgm1().bits(0b01);
+            tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
+            tim.tccr1b().modify(|_r, w| {
+                w.wgm1().set(0b01);
 
                 match prescaler {
                     Prescaler::Direct => w.cs1().direct(),
@@ -97,18 +97,18 @@ avr_hal_generic::impl_simple_pwm! {
             PB1: {
                 ocr: ocr1a,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1a().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1a().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1a().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1a().disconnected());
                 },
             },
 
             PB2: {
                 ocr: ocr1b,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1b().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1b().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1b().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1b().disconnected());
                 },
             },
         },
@@ -138,8 +138,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer2Pwm {
         timer: crate::pac::TC2,
         init: |tim, prescaler| {
-            tim.tccr2a.modify(|_r, w| w.wgm2().pwm_fast());
-            tim.tccr2b.modify(|_r, w| match prescaler {
+            tim.tccr2a().modify(|_r, w| w.wgm2().pwm_fast());
+            tim.tccr2b().modify(|_r, w| match prescaler {
                     Prescaler::Direct => w.cs2().direct(),
                     Prescaler::Prescale8 => w.cs2().prescale_8(),
                     Prescaler::Prescale64 => w.cs2().prescale_64(),
@@ -151,18 +151,18 @@ avr_hal_generic::impl_simple_pwm! {
             PB3: {
                 ocr: ocr2a,
                 into_pwm: |tim| if enable {
-                    tim.tccr2a.modify(|_r, w| w.com2a().match_clear());
+                    tim.tccr2a().modify(|_r, w| w.com2a().match_clear());
                 } else {
-                    tim.tccr2a.modify(|_r, w| w.com2a().disconnected());
+                    tim.tccr2a().modify(|_r, w| w.com2a().disconnected());
                 },
             },
 
             PD3: {
                 ocr: ocr2b,
                 into_pwm: |tim| if enable {
-                    tim.tccr2a.modify(|_r, w| w.com2b().match_clear());
+                    tim.tccr2a().modify(|_r, w| w.com2b().match_clear());
                 } else {
-                    tim.tccr2a.modify(|_r, w| w.com2b().disconnected());
+                    tim.tccr2a().modify(|_r, w| w.com2b().disconnected());
                 },
             },
         },
@@ -175,8 +175,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer3Pwm {
         timer: crate::pac::TC3,
         init: |tim, prescaler| {
-            tim.tccr3a.modify(|_r, w| w.wgm3().bits(0b01));
-            tim.tccr3b.modify(|_r, w| {
+            tim.tccr3a().modify(|_r, w| w.wgm3().set(0b01));
+            tim.tccr3b().modify(|_r, w| {
                 unsafe { w.wgm3().bits(0b01) };
 
                 match prescaler {
@@ -192,18 +192,18 @@ avr_hal_generic::impl_simple_pwm! {
             PD0: {
                 ocr: ocr3a,
                 into_pwm: |tim| if enable {
-                    tim.tccr3a.modify(|_r, w| w.com3a().match_clear());
+                    tim.tccr3a().modify(|_r, w| w.com3a().match_clear());
                 } else {
-                    tim.tccr3a.modify(|_r, w| w.com3a().disconnected());
+                    tim.tccr3a().modify(|_r, w| w.com3a().disconnected());
                 },
             },
 
             PD2: {
                 ocr: ocr3b,
                 into_pwm: |tim| if enable {
-                    tim.tccr3a.modify(|_r, w| w.com3b().match_clear());
+                    tim.tccr3a().modify(|_r, w| w.com3b().match_clear());
                 } else {
-                    tim.tccr3a.modify(|_r, w| w.com3b().disconnected());
+                    tim.tccr3a().modify(|_r, w| w.com3b().disconnected());
                 },
             },
         },
@@ -216,8 +216,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer4Pwm {
         timer: crate::pac::TC4,
         init: |tim, prescaler| {
-            tim.tccr4a.modify(|_r, w| w.wgm4().bits(0b01));
-            tim.tccr4b.modify(|_r, w| {
+            tim.tccr4a().modify(|_r, w| w.wgm4().set(0b01));
+            tim.tccr4b().modify(|_r, w| {
                 unsafe { w.wgm4().bits(0b01) };
 
                 match prescaler {
@@ -233,18 +233,18 @@ avr_hal_generic::impl_simple_pwm! {
             PD1: {
                 ocr: ocr4a,
                 into_pwm: |tim| if enable {
-                    tim.tccr4a.modify(|_r, w| w.com4a().match_clear());
+                    tim.tccr4a().modify(|_r, w| w.com4a().match_clear());
                 } else {
-                    tim.tccr4a.modify(|_r, w| w.com4a().disconnected());
+                    tim.tccr4a().modify(|_r, w| w.com4a().disconnected());
                 },
             },
 
             PD2: {
                 ocr: ocr4b,
                 into_pwm: |tim| if enable {
-                    tim.tccr4a.modify(|_r, w| w.com4b().match_clear());
+                    tim.tccr4a().modify(|_r, w| w.com4b().match_clear());
                 } else {
-                    tim.tccr4a.modify(|_r, w| w.com4b().disconnected());
+                    tim.tccr4a().modify(|_r, w| w.com4b().disconnected());
                 },
             },
         },
@@ -268,8 +268,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer0Pwm {
         timer: crate::pac::TC0,
         init: |tim, prescaler| {
-            tim.tccr0a.modify(|_r, w| w.wgm0().pwm_fast());
-            tim.tccr0b.modify(|_r, w| match prescaler {
+            tim.tccr0a().modify(|_r, w| w.wgm0().pwm_fast());
+            tim.tccr0b().modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs0().direct(),
                 Prescaler::Prescale8 => w.cs0().prescale_8(),
                 Prescaler::Prescale64 => w.cs0().prescale_64(),
@@ -281,18 +281,18 @@ avr_hal_generic::impl_simple_pwm! {
             PB7: {
                 ocr: ocr0a,
                 into_pwm: |tim| if enable {
-                    tim.tccr0a.modify(|_r, w| w.com0a().match_clear());
+                    tim.tccr0a().modify(|_r, w| w.com0a().match_clear());
                 } else {
-                    tim.tccr0a.modify(|_r, w| w.com0a().disconnected());
+                    tim.tccr0a().modify(|_r, w| w.com0a().disconnected());
                 },
             },
 
             PG5: {
                 ocr: ocr0b,
                 into_pwm: |tim| if enable {
-                    tim.tccr0a.modify(|_r, w| w.com0b().match_clear());
+                    tim.tccr0a().modify(|_r, w| w.com0b().match_clear());
                 } else {
-                    tim.tccr0a.modify(|_r, w| w.com0b().disconnected());
+                    tim.tccr0a().modify(|_r, w| w.com0b().disconnected());
                 },
             },
         },
@@ -317,9 +317,9 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer1Pwm {
         timer: crate::pac::TC1,
         init: |tim, prescaler| {
-            tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
-            tim.tccr1b.modify(|_r, w| {
-                w.wgm1().bits(0b01);
+            tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
+            tim.tccr1b().modify(|_r, w| {
+                w.wgm1().set(0b01);
 
                 match prescaler {
                     Prescaler::Direct => w.cs1().direct(),
@@ -334,27 +334,27 @@ avr_hal_generic::impl_simple_pwm! {
             PB5: {
                 ocr: ocr1a,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1a().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1a().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1a().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1a().disconnected());
                 },
             },
 
             PB6: {
                 ocr: ocr1b,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1b().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1b().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1b().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1b().disconnected());
                 },
             },
 
             PB7: {
                 ocr: ocr1c,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1c().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1c().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1c().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1c().disconnected());
                 },
             },
         },
@@ -379,8 +379,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer2Pwm {
         timer: crate::pac::TC2,
         init: |tim, prescaler| {
-            tim.tccr2a.modify(|_r, w| w.wgm2().bits(0b01));
-            tim.tccr2b.modify(|_r, w| {
+            tim.tccr2a().modify(|_r, w| w.wgm2().set(0b01));
+            tim.tccr2b().modify(|_r, w| {
                 w.wgm22().clear_bit();
 
                 match prescaler {
@@ -396,18 +396,18 @@ avr_hal_generic::impl_simple_pwm! {
             PB4: {
                 ocr: ocr2a,
                 into_pwm: |tim| if enable {
-                    tim.tccr2a.modify(|_r, w| w.com2a().match_clear());
+                    tim.tccr2a().modify(|_r, w| w.com2a().match_clear());
                 } else {
-                    tim.tccr2a.modify(|_r, w| w.com2a().disconnected());
+                    tim.tccr2a().modify(|_r, w| w.com2a().disconnected());
                 },
             },
 
             PH6: {
                 ocr: ocr2b,
                 into_pwm: |tim| if enable {
-                    tim.tccr2a.modify(|_r, w| w.com2b().match_clear());
+                    tim.tccr2a().modify(|_r, w| w.com2b().match_clear());
                 } else {
-                    tim.tccr2a.modify(|_r, w| w.com2b().disconnected());
+                    tim.tccr2a().modify(|_r, w| w.com2b().disconnected());
                 },
             },
         },
@@ -432,9 +432,9 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer3Pwm {
         timer: crate::pac::TC3,
         init: |tim, prescaler| {
-            tim.tccr3a.modify(|_r, w| w.wgm3().bits(0b01));
-            tim.tccr3b.modify(|_r, w| {
-                w.wgm3().bits(0b01);
+            tim.tccr3a().modify(|_r, w| w.wgm3().set(0b01));
+            tim.tccr3b().modify(|_r, w| {
+                w.wgm3().set(0b01);
 
                 match prescaler {
                     Prescaler::Direct => w.cs3().direct(),
@@ -449,27 +449,27 @@ avr_hal_generic::impl_simple_pwm! {
             PE3: {
                 ocr: ocr3a,
                 into_pwm: |tim| if enable {
-                    tim.tccr3a.modify(|_r, w| w.com3a().match_clear());
+                    tim.tccr3a().modify(|_r, w| w.com3a().match_clear());
                 } else {
-                    tim.tccr3a.modify(|_r, w| w.com3a().disconnected());
+                    tim.tccr3a().modify(|_r, w| w.com3a().disconnected());
                 },
             },
 
             PE4: {
                 ocr: ocr3b,
                 into_pwm: |tim| if enable {
-                    tim.tccr3a.modify(|_r, w| w.com3b().match_clear());
+                    tim.tccr3a().modify(|_r, w| w.com3b().match_clear());
                 } else {
-                    tim.tccr3a.modify(|_r, w| w.com3b().disconnected());
+                    tim.tccr3a().modify(|_r, w| w.com3b().disconnected());
                 },
             },
 
             PE5: {
                 ocr: ocr3c,
                 into_pwm: |tim| if enable {
-                    tim.tccr3a.modify(|_r, w| w.com3c().match_clear());
+                    tim.tccr3a().modify(|_r, w| w.com3c().match_clear());
                 } else {
-                    tim.tccr3a.modify(|_r, w| w.com3c().disconnected());
+                    tim.tccr3a().modify(|_r, w| w.com3c().disconnected());
                 },
             },
 
@@ -495,9 +495,9 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer4Pwm {
         timer: crate::pac::TC4,
         init: |tim, prescaler| {
-            tim.tccr4a.modify(|_r, w| w.wgm4().bits(0b01));
-            tim.tccr4b.modify(|_r, w| {
-                w.wgm4().bits(0b01);
+            tim.tccr4a().modify(|_r, w| w.wgm4().set(0b01));
+            tim.tccr4b().modify(|_r, w| {
+                w.wgm4().set(0b01);
 
                 match prescaler {
                     Prescaler::Direct => w.cs4().direct(),
@@ -512,27 +512,27 @@ avr_hal_generic::impl_simple_pwm! {
             PH3: {
                 ocr: ocr4a,
                 into_pwm: |tim| if enable {
-                    tim.tccr4a.modify(|_r, w| w.com4a().match_clear());
+                    tim.tccr4a().modify(|_r, w| w.com4a().match_clear());
                 } else {
-                    tim.tccr4a.modify(|_r, w| w.com4a().disconnected());
+                    tim.tccr4a().modify(|_r, w| w.com4a().disconnected());
                 },
             },
 
             PH4: {
                 ocr: ocr4b,
                 into_pwm: |tim| if enable {
-                    tim.tccr4a.modify(|_r, w| w.com4b().match_clear());
+                    tim.tccr4a().modify(|_r, w| w.com4b().match_clear());
                 } else {
-                    tim.tccr4a.modify(|_r, w| w.com4b().disconnected());
+                    tim.tccr4a().modify(|_r, w| w.com4b().disconnected());
                 },
             },
 
             PH5: {
                 ocr: ocr4c,
                 into_pwm: |tim| if enable {
-                    tim.tccr4a.modify(|_r, w| w.com4c().match_clear());
+                    tim.tccr4a().modify(|_r, w| w.com4c().match_clear());
                 } else {
-                    tim.tccr4a.modify(|_r, w| w.com4c().disconnected());
+                    tim.tccr4a().modify(|_r, w| w.com4c().disconnected());
                 },
             },
 
@@ -558,9 +558,9 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer5Pwm {
         timer: crate::pac::TC5,
         init: |tim, prescaler| {
-            tim.tccr5a.modify(|_r, w| w.wgm5().bits(0b01));
-            tim.tccr5b.modify(|_r, w| {
-                w.wgm5().bits(0b01);
+            tim.tccr5a().modify(|_r, w| w.wgm5().set(0b01));
+            tim.tccr5b().modify(|_r, w| {
+                w.wgm5().set(0b01);
 
                 match prescaler {
                     Prescaler::Direct => w.cs5().direct(),
@@ -575,27 +575,27 @@ avr_hal_generic::impl_simple_pwm! {
             PL3: {
                 ocr: ocr5a,
                 into_pwm: |tim| if enable {
-                    tim.tccr5a.modify(|_r, w| w.com5a().match_clear());
+                    tim.tccr5a().modify(|_r, w| w.com5a().match_clear());
                 } else {
-                    tim.tccr5a.modify(|_r, w| w.com5a().disconnected());
+                    tim.tccr5a().modify(|_r, w| w.com5a().disconnected());
                 },
             },
 
             PL4: {
                 ocr: ocr5b,
                 into_pwm: |tim| if enable {
-                    tim.tccr5a.modify(|_r, w| w.com5b().match_clear());
+                    tim.tccr5a().modify(|_r, w| w.com5b().match_clear());
                 } else {
-                    tim.tccr5a.modify(|_r, w| w.com5b().disconnected());
+                    tim.tccr5a().modify(|_r, w| w.com5b().disconnected());
                 },
             },
 
             PL5: {
                 ocr: ocr5c,
                 into_pwm: |tim| if enable {
-                    tim.tccr5a.modify(|_r, w| w.com5c().match_clear());
+                    tim.tccr5a().modify(|_r, w| w.com5c().match_clear());
                 } else {
-                    tim.tccr5a.modify(|_r, w| w.com5c().disconnected());
+                    tim.tccr5a().modify(|_r, w| w.com5c().disconnected());
                 },
             },
 
@@ -620,8 +620,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer0Pwm {
         timer: crate::pac::TC0,
         init: |tim, prescaler| {
-            tim.tccr0a.modify(|_r, w| w.wgm0().pwm_fast());
-            tim.tccr0b.modify(|_r, w| match prescaler {
+            tim.tccr0a().modify(|_r, w| w.wgm0().pwm_fast());
+            tim.tccr0b().modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs0().direct(),
                 Prescaler::Prescale8 => w.cs0().prescale_8(),
                 Prescaler::Prescale64 => w.cs0().prescale_64(),
@@ -633,18 +633,18 @@ avr_hal_generic::impl_simple_pwm! {
             PB7: {
                 ocr: ocr0a,
                 into_pwm: |tim| if enable {
-                    tim.tccr0a.modify(|_r, w| w.com0a().match_clear());
+                    tim.tccr0a().modify(|_r, w| w.com0a().match_clear());
                 } else {
-                    tim.tccr0a.modify(|_r, w| w.com0a().disconnected());
+                    tim.tccr0a().modify(|_r, w| w.com0a().disconnected());
                 },
             },
 
             PD0: {
                 ocr: ocr0b,
                 into_pwm: |tim| if enable {
-                    tim.tccr0a.modify(|_r, w| w.com0b().match_clear());
+                    tim.tccr0a().modify(|_r, w| w.com0b().match_clear());
                 } else {
-                    tim.tccr0a.modify(|_r, w| w.com0b().disconnected());
+                    tim.tccr0a().modify(|_r, w| w.com0b().disconnected());
                 },
             },
         },
@@ -669,10 +669,10 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer1Pwm {
         timer: crate::pac::TC1,
         init: |tim, prescaler| {
-            tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
-            tim.tccr1b.modify(|_r, w| w.wgm1().bits(0b01));
+            tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
+            tim.tccr1b().modify(|_r, w| w.wgm1().set(0b01));
 
-            tim.tccr1b.modify(|_r, w| match prescaler {
+            tim.tccr1b().modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs1().direct(),
                 Prescaler::Prescale8 => w.cs1().prescale_8(),
                 Prescaler::Prescale64 => w.cs1().prescale_64(),
@@ -684,27 +684,27 @@ avr_hal_generic::impl_simple_pwm! {
             PB5: {
                 ocr: ocr1a,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1a().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1a().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1a().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1a().disconnected());
                 },
             },
 
             PB6: {
                 ocr: ocr1b,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1b().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1b().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1b().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1b().disconnected());
                 },
             },
 
             PB7: {
                 ocr: ocr1c,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1c().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1c().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1c().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1c().disconnected());
                 },
             },
         },
@@ -727,10 +727,10 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer3Pwm {
         timer: crate::pac::TC3,
         init: |tim, prescaler| {
-            tim.tccr3a.modify(|_r, w| w.wgm3().bits(0b01));
-            tim.tccr3b.modify(|_r, w| w.wgm3().bits(0b01));
+            tim.tccr3a().modify(|_r, w| w.wgm3().set(0b01));
+            tim.tccr3b().modify(|_r, w| w.wgm3().set(0b01));
 
-            tim.tccr3b.modify(|_r, w| match prescaler {
+            tim.tccr3b().modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs3().direct(),
                 Prescaler::Prescale8 => w.cs3().prescale_8(),
                 Prescaler::Prescale64 => w.cs3().prescale_64(),
@@ -742,9 +742,9 @@ avr_hal_generic::impl_simple_pwm! {
             PC6: {
                 ocr: ocr3a,
                 into_pwm: |tim| if enable {
-                    tim.tccr3a.modify(|_r, w| w.com3a().match_clear());
+                    tim.tccr3a().modify(|_r, w| w.com3a().match_clear());
                 } else {
-                    tim.tccr3a.modify(|_r, w| w.com3a().disconnected());
+                    tim.tccr3a().modify(|_r, w| w.com3a().disconnected());
                 },
             },
         },
@@ -769,11 +769,11 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer4Pwm {
         timer: crate::pac::TC4,
         init: |tim, prescaler| {
-            tim.tccr4a.modify(|_r, w| w.pwm4a().set_bit());
-            tim.tccr4a.modify(|_r, w| w.pwm4b().set_bit());
-            tim.tccr4c.modify(|_r, w| w.pwm4d().set_bit());
+            tim.tccr4a().modify(|_r, w| w.pwm4a().set_bit());
+            tim.tccr4a().modify(|_r, w| w.pwm4b().set_bit());
+            tim.tccr4c().modify(|_r, w| w.pwm4d().set_bit());
 
-            tim.tccr4b.modify(|_r, w| match prescaler {
+            tim.tccr4b().modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs4().direct(),
                 Prescaler::Prescale8 => w.cs4().prescale_8(),
                 Prescaler::Prescale64 => w.cs4().prescale_64(),
@@ -785,27 +785,27 @@ avr_hal_generic::impl_simple_pwm! {
             PB6: {
                 ocr: ocr4b,
                 into_pwm: |tim| if enable {
-                    tim.tccr4a.modify(|_r, w| w.com4b().match_clear());
+                    tim.tccr4a().modify(|_r, w| w.com4b().match_clear());
                 } else {
-                    tim.tccr4a.modify(|_r, w| w.com4b().disconnected());
+                    tim.tccr4a().modify(|_r, w| w.com4b().disconnected());
                 },
             },
 
             PC7: {
                 ocr: ocr4a,
                 into_pwm: |tim| if enable {
-                    tim.tccr4a.modify(|_r, w| w.com4a().match_clear());
+                    tim.tccr4a().modify(|_r, w| w.com4a().match_clear());
                 } else {
-                    tim.tccr4a.modify(|_r, w| w.com4a().disconnected());
+                    tim.tccr4a().modify(|_r, w| w.com4a().disconnected());
                 },
             },
 
             PD7: {
                 ocr: ocr4d,
                 into_pwm: |tim| if enable {
-                    tim.tccr4c.modify(|_r, w| w.com4d().match_clear());
+                    tim.tccr4c().modify(|_r, w| w.com4d().match_clear());
                 } else {
-                    tim.tccr4c.modify(|_r, w| w.com4d().disconnected());
+                    tim.tccr4c().modify(|_r, w| w.com4d().disconnected());
                 },
             },
         },
@@ -829,8 +829,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer0Pwm {
         timer: crate::pac::TC0,
         init: |tim, prescaler| {
-            tim.tccr0a.modify(|_r, w| w.wgm0().pwm_fast());
-            tim.tccr0b.modify(|_r, w| match prescaler {
+            tim.tccr0a().modify(|_r, w| w.wgm0().pwm_fast());
+            tim.tccr0b().modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs0().direct(),
                 Prescaler::Prescale8 => w.cs0().prescale_8(),
                 Prescaler::Prescale64 => w.cs0().prescale_64(),
@@ -842,18 +842,18 @@ avr_hal_generic::impl_simple_pwm! {
             PB3: {
                 ocr: ocr0a,
                 into_pwm: |tim| if enable {
-                    tim.tccr0a.modify(|_r, w| w.com0a().match_clear());
+                    tim.tccr0a().modify(|_r, w| w.com0a().match_clear());
                 } else {
-                    tim.tccr0a.modify(|_r, w| w.com0a().disconnected());
+                    tim.tccr0a().modify(|_r, w| w.com0a().disconnected());
                 },
             },
 
             PB4: {
                 ocr: ocr0b,
                 into_pwm: |tim| if enable {
-                    tim.tccr0a.modify(|_r, w| w.com0b().match_clear());
+                    tim.tccr0a().modify(|_r, w| w.com0b().match_clear());
                 } else {
-                    tim.tccr0a.modify(|_r, w| w.com0b().disconnected());
+                    tim.tccr0a().modify(|_r, w| w.com0b().disconnected());
                 },
             },
         },
@@ -877,9 +877,9 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer1Pwm {
         timer: crate::pac::TC1,
         init: |tim, prescaler| {
-            tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
-            tim.tccr1b.modify(|_r, w| {
-                w.wgm1().bits(0b01);
+            tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
+            tim.tccr1b().modify(|_r, w| {
+                w.wgm1().set(0b01);
 
                 match prescaler {
                     Prescaler::Direct => w.cs1().direct(),
@@ -894,18 +894,18 @@ avr_hal_generic::impl_simple_pwm! {
             PD5: {
                 ocr: ocr1a,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1a().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1a().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1a().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1a().disconnected());
                 },
             },
 
             PD4: {
                 ocr: ocr1b,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1b().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1b().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1b().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1b().disconnected());
                 },
             },
         },
@@ -929,8 +929,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer2Pwm {
         timer: crate::pac::TC2,
         init: |tim, prescaler| {
-            tim.tccr2a.modify(|_r, w| w.wgm2().pwm_fast());
-            tim.tccr2b.modify(|_r, w| match prescaler {
+            tim.tccr2a().modify(|_r, w| w.wgm2().pwm_fast());
+            tim.tccr2b().modify(|_r, w| match prescaler {
                     Prescaler::Direct => w.cs2().direct(),
                     Prescaler::Prescale8 => w.cs2().prescale_8(),
                     Prescaler::Prescale64 => w.cs2().prescale_64(),
@@ -942,18 +942,18 @@ avr_hal_generic::impl_simple_pwm! {
             PD7: {
                 ocr: ocr2a,
                 into_pwm: |tim| if enable {
-                    tim.tccr2a.modify(|_r, w| w.com2a().match_clear());
+                    tim.tccr2a().modify(|_r, w| w.com2a().match_clear());
                 } else {
-                    tim.tccr2a.modify(|_r, w| w.com2a().disconnected());
+                    tim.tccr2a().modify(|_r, w| w.com2a().disconnected());
                 },
             },
 
             PD6: {
                 ocr: ocr2b,
                 into_pwm: |tim| if enable {
-                    tim.tccr2a.modify(|_r, w| w.com2b().match_clear());
+                    tim.tccr2a().modify(|_r, w| w.com2b().match_clear());
                 } else {
-                    tim.tccr2a.modify(|_r, w| w.com2b().disconnected());
+                    tim.tccr2a().modify(|_r, w| w.com2b().disconnected());
                 },
             },
         },
@@ -966,9 +966,9 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer3Pwm {
         timer: crate::pac::TC3,
         init: |tim, prescaler| {
-            tim.tccr3a.modify(|_r, w| w.wgm3().bits(0b01));
-            tim.tccr3b.modify(|_r, w| {
-                w.wgm3().bits(0b01);
+            tim.tccr3a().modify(|_r, w| w.wgm3().set(0b01));
+            tim.tccr3b().modify(|_r, w| {
+                w.wgm3().set(0b01);
 
                 match prescaler {
                     Prescaler::Direct => w.cs3().direct(),
@@ -983,18 +983,18 @@ avr_hal_generic::impl_simple_pwm! {
             PB6: {
                 ocr: ocr3a,
                 into_pwm: |tim| if enable {
-                    tim.tccr3a.modify(|_r, w| w.com3a().match_clear());
+                    tim.tccr3a().modify(|_r, w| w.com3a().match_clear());
                 } else {
-                    tim.tccr3a.modify(|_r, w| w.com3a().disconnected());
+                    tim.tccr3a().modify(|_r, w| w.com3a().disconnected());
                 },
             },
 
             PB7: {
                 ocr: ocr3b,
                 into_pwm: |tim| if enable {
-                    tim.tccr3a.modify(|_r, w| w.com3b().match_clear());
+                    tim.tccr3a().modify(|_r, w| w.com3b().match_clear());
                 } else {
-                    tim.tccr3a.modify(|_r, w| w.com3b().disconnected());
+                    tim.tccr3a().modify(|_r, w| w.com3b().disconnected());
                 },
             },
         },
@@ -1018,9 +1018,9 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer1Pwm {
         timer: crate::pac::TC1,
         init: |tim, prescaler| {
-            tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
-            tim.tccr1b.modify(|_r, w| {
-                w.wgm1().bits(0b01);
+            tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
+            tim.tccr1b().modify(|_r, w| {
+                w.wgm1().set(0b01);
 
                 match prescaler {
                     Prescaler::Direct => w.cs1().direct(),
@@ -1035,18 +1035,18 @@ avr_hal_generic::impl_simple_pwm! {
             PB1: {
                 ocr: ocr1a,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1a().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1a().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1a().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1a().disconnected());
                 },
             },
 
             PB2: {
                 ocr: ocr1b,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1b().match_clear());
+                    tim.tccr1a().modify(|_r, w| w.com1b().match_clear());
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1b().disconnected());
+                    tim.tccr1a().modify(|_r, w| w.com1b().disconnected());
                 },
             },
         },
@@ -1070,8 +1070,8 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer2Pwm {
         timer: crate::pac::TC2,
         init: |tim, prescaler| {
-            tim.tccr2.modify(|_r, w| w.wgm20().set_bit().wgm21().set_bit());
-            tim.tccr2.modify(|_r, w| match prescaler {
+            tim.tccr2().modify(|_r, w| w.wgm20().set_bit().wgm21().set_bit());
+            tim.tccr2().modify(|_r, w| match prescaler {
                     Prescaler::Direct => w.cs2().direct(),
                     Prescaler::Prescale8 => w.cs2().prescale_8(),
                     Prescaler::Prescale64 => w.cs2().prescale_64(),
@@ -1083,9 +1083,9 @@ avr_hal_generic::impl_simple_pwm! {
             PB3: {
                 ocr: ocr2,
                 into_pwm: |tim| if enable {
-                    tim.tccr2.modify(|_r, w| w.com2().match_clear());
+                    tim.tccr2().modify(|_r, w| w.com2().match_clear());
                 } else {
-                    tim.tccr2.modify(|_r, w| w.com2().disconnected());
+                    tim.tccr2().modify(|_r, w| w.com2().disconnected());
                 },
             },
         },
@@ -1108,10 +1108,10 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer0Pwm {
         timer: crate::pac::TC0,
         init: |tim, prescaler| {
-            tim.tccr0a.modify(|_r, w| w.wgm0().bits(0b11));
-            tim.tccr0a.modify(|_r, w| w.com0a().bits(0b00));
+            tim.tccr0a().modify(|_r, w| w.wgm0().set(0b11));
+            tim.tccr0a().modify(|_r, w| w.com0a().set(0b00));
 
-            tim.tccr0b.modify(|_r, w| match prescaler {
+            tim.tccr0b().modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs0().running_no_prescaling(),
                 Prescaler::Prescale8 => w.cs0().running_clk_8(),
                 Prescaler::Prescale64 => w.cs0().running_clk_64(),
@@ -1123,9 +1123,9 @@ avr_hal_generic::impl_simple_pwm! {
             PB3: {
                 ocr: ocr0a,
                 into_pwm: |tim| if enable {
-                    tim.tccr0a.modify(|_r, w| w.com0a().bits(0b11));
+                    tim.tccr0a().modify(|_r, w| w.com0a().set(0b11));
                 } else {
-                    tim.tccr0a.modify(|_r, w| w.com0a().bits(0b00));
+                    tim.tccr0a().modify(|_r, w| w.com0a().set(0b00));
                 },
             },
         },
@@ -1151,11 +1151,11 @@ avr_hal_generic::impl_simple_pwm! {
     pub struct Timer1Pwm {
         timer: crate::pac::TC1,
         init: |tim, prescaler| {
-            tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
-            tim.tccr1a.modify(|_r, w| w.com1a().bits(0b00));
-            tim.tccr1a.modify(|_r, w| w.com1b().bits(0b00));
+            tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
+            tim.tccr1a().modify(|_r, w| w.com1a().set(0b00));
+            tim.tccr1a().modify(|_r, w| w.com1b().set(0b00));
             #[cfg(any(feature = "atmega164pa"))]
-            tim.tccr1b.modify(|_r, w| match prescaler {
+            tim.tccr1b().modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs1().running_no_prescaling(),
                 Prescaler::Prescale8 => w.cs1().running_clk_8(),
                 Prescaler::Prescale64 => w.cs1().running_clk_64(),
@@ -1175,17 +1175,17 @@ avr_hal_generic::impl_simple_pwm! {
             PD4: {
                 ocr: ocr1a,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1a().bits(0b11));
+                    tim.tccr1a().modify(|_r, w| w.com1a().set(0b11));
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1a().bits(0b00));
+                    tim.tccr1a().modify(|_r, w| w.com1a().set(0b00));
                 },
             },
             PD5: {
                 ocr: ocr1b,
                 into_pwm: |tim| if enable {
-                    tim.tccr1a.modify(|_r, w| w.com1b().bits(0b11));
+                    tim.tccr1a().modify(|_r, w| w.com1b().set(0b11));
                 } else {
-                    tim.tccr1a.modify(|_r, w| w.com1b().bits(0b00));
+                    tim.tccr1a().modify(|_r, w| w.com1b().set(0b00));
                 },
             },
         },

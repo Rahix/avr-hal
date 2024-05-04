@@ -478,23 +478,23 @@ macro_rules! impl_i2c_twi {
             fn raw_setup<CLOCK: $crate::clock::Clock>(&mut self, speed: u32) {
                 // Calculate TWBR register value
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                self.twbr
+                self.twbr()
                     .write(|w| unsafe { w.bits(twbr.try_into().unwrap()) });
 
                 // Disable prescaler
-                self.twsr.write(|w| w.twps().prescaler_1());
+                self.twsr().write(|w| w.twps().prescaler_1());
             }
 
             #[inline]
             fn raw_start(&mut self, address: u8, direction: Direction) -> Result<(), Error> {
                 // Write start condition
-                self.twcr
+                self.twcr()
                     .write(|w| w.twen().set_bit().twint().set_bit().twsta().set_bit());
                 // wait()
-                while self.twcr.read().twint().bit_is_clear() {}
+                while self.twcr().read().twint().bit_is_clear() {}
 
                 // Validate status
-                match self.twsr.read().tws().bits() {
+                match self.twsr().read().tws().bits() {
                     $crate::i2c::twi_status::TW_START | $crate::i2c::twi_status::TW_REP_START => (),
                     $crate::i2c::twi_status::TW_MT_ARB_LOST
                     | $crate::i2c::twi_status::TW_MR_ARB_LOST => {
@@ -515,13 +515,13 @@ macro_rules! impl_i2c_twi {
                     0
                 };
                 let rawaddr = (address << 1) | dirbit;
-                self.twdr.write(|w| unsafe { w.bits(rawaddr) });
+                self.twdr().write(|w| unsafe { w.bits(rawaddr) });
                 // transact()
-                self.twcr.write(|w| w.twen().set_bit().twint().set_bit());
-                while self.twcr.read().twint().bit_is_clear() {}
+                self.twcr().write(|w| w.twen().set_bit().twint().set_bit());
+                while self.twcr().read().twint().bit_is_clear() {}
 
                 // Check if the slave responded
-                match self.twsr.read().tws().bits() {
+                match self.twsr().read().tws().bits() {
                     $crate::i2c::twi_status::TW_MT_SLA_ACK
                     | $crate::i2c::twi_status::TW_MR_SLA_ACK => (),
                     $crate::i2c::twi_status::TW_MT_SLA_NACK
@@ -548,12 +548,12 @@ macro_rules! impl_i2c_twi {
             #[inline]
             fn raw_write(&mut self, bytes: &[u8]) -> Result<(), Error> {
                 for byte in bytes {
-                    self.twdr.write(|w| unsafe { w.bits(*byte) });
+                    self.twdr().write(|w| unsafe { w.bits(*byte) });
                     // transact()
-                    self.twcr.write(|w| w.twen().set_bit().twint().set_bit());
-                    while self.twcr.read().twint().bit_is_clear() {}
+                    self.twcr().write(|w| w.twen().set_bit().twint().set_bit());
+                    while self.twcr().read().twint().bit_is_clear() {}
 
-                    match self.twsr.read().tws().bits() {
+                    match self.twsr().read().tws().bits() {
                         $crate::i2c::twi_status::TW_MT_DATA_ACK => (),
                         $crate::i2c::twi_status::TW_MT_DATA_NACK => {
                             self.raw_stop()?;
@@ -578,17 +578,17 @@ macro_rules! impl_i2c_twi {
                 let last = buffer.len() - 1;
                 for (i, byte) in buffer.iter_mut().enumerate() {
                     if i != last || !last_read {
-                        self.twcr
+                        self.twcr()
                             .write(|w| w.twint().set_bit().twen().set_bit().twea().set_bit());
                         // wait()
-                        while self.twcr.read().twint().bit_is_clear() {}
+                        while self.twcr().read().twint().bit_is_clear() {}
                     } else {
-                        self.twcr.write(|w| w.twint().set_bit().twen().set_bit());
+                        self.twcr().write(|w| w.twint().set_bit().twen().set_bit());
                         // wait()
-                        while self.twcr.read().twint().bit_is_clear() {}
+                        while self.twcr().read().twint().bit_is_clear() {}
                     }
 
-                    match self.twsr.read().tws().bits() {
+                    match self.twsr().read().tws().bits() {
                         $crate::i2c::twi_status::TW_MR_DATA_ACK
                         | $crate::i2c::twi_status::TW_MR_DATA_NACK => (),
                         $crate::i2c::twi_status::TW_MR_ARB_LOST => {
@@ -602,14 +602,14 @@ macro_rules! impl_i2c_twi {
                         }
                     }
 
-                    *byte = self.twdr.read().bits();
+                    *byte = self.twdr().read().bits();
                 }
                 Ok(())
             }
 
             #[inline]
             fn raw_stop(&mut self) -> Result<(), Error> {
-                self.twcr
+                self.twcr()
                     .write(|w| w.twen().set_bit().twint().set_bit().twsto().set_bit());
                 Ok(())
             }
