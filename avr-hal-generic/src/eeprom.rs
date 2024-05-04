@@ -159,8 +159,8 @@ macro_rules! impl_eeprom_common {
                         $set_address
                     }
 
-                    self.eecr.write(|w| w.eere().set_bit());
-                    self.eedr.read().bits()
+                    self.eecr().write(|w| w.eere().set_bit());
+                    self.eedr().read().bits()
                 }
             }
 
@@ -173,8 +173,8 @@ macro_rules! impl_eeprom_common {
                     }
 
                     //Start EEPROM read operation
-                    self.eecr.write(|w| w.eere().set_bit());
-                    let old_value = self.eedr.read().bits();
+                    self.eecr().write(|w| w.eere().set_bit());
+                    let old_value = self.eedr().read().bits();
                     let diff_mask = old_value ^ data;
 
                     // Check if any bits are changed to '1' in the new value.
@@ -184,20 +184,20 @@ macro_rules! impl_eeprom_common {
                         // Check if any bits in the new value are '0'.
                         if data != 0xff {
                             // Now we know that some bits need to be programmed to '0' also.
-                            self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
+                            self.eedr().write(|w| w.bits(data)); // Set EEPROM data register.
 
                             {
                                 let $periph_ewmode_var = &self;
                                 $set_erasewrite_mode
                             }
-                            self.eecr.modify(|_, w| w.eepe().set_bit()); // Start Erase+Write operation.
+                            self.eecr().modify(|_, w| w.eepe().set_bit()); // Start Erase+Write operation.
                         } else {
                             // Now we know that all bits should be erased.
                             {
                                 let $periph_emode_var = &self;
                                 $set_erase_mode
                             }
-                            self.eecr.modify(|_, w| w.eepe().set_bit()); // Start Erase-only operation.
+                            self.eecr().modify(|_, w| w.eepe().set_bit()); // Start Erase-only operation.
                         }
                     }
                     //Now we know that _no_ bits need to be erased to '1'.
@@ -205,12 +205,12 @@ macro_rules! impl_eeprom_common {
                         // Check if any bits are changed from '1' in the old value.
                         if diff_mask != 0 {
                             // Now we know that _some_ bits need to the programmed to '0'.
-                            self.eedr.write(|w| w.bits(data)); // Set EEPROM data register.
+                            self.eedr().write(|w| w.bits(data)); // Set EEPROM data register.
                             {
                                 let $periph_wmode_var = &self;
                                 $set_write_mode
                             }
-                            self.eecr.modify(|_, w| w.eepe().set_bit()); // Start Write-only operation.
+                            self.eecr().modify(|_, w| w.eepe().set_bit()); // Start Write-only operation.
                         }
                     }
                 }
@@ -229,7 +229,7 @@ macro_rules! impl_eeprom_common {
                         $set_erase_mode
                     }
                     // Start Erase-only operation.
-                    self.eecr.modify(|_, w| w.eepe().set_bit());
+                    self.eecr().modify(|_, w| w.eepe().set_bit());
                 }
             }
         }
@@ -249,7 +249,7 @@ macro_rules! impl_eeprom_atmega_old {
             #[inline]
             pub unsafe fn wait_read(regs: &$EEPROM) {
                 //Wait for completion of previous write.
-                while regs.eecr.read().eewe().bit_is_set() {}
+                while regs.eecr().read().eewe().bit_is_set() {}
             }
 
             #[inline]
@@ -268,8 +268,8 @@ macro_rules! impl_eeprom_atmega_old {
                 unsafe {
                     atmega_helper::set_address(&self, address);
                 }
-                self.eecr.write(|w| w.eere().set_bit());
-                self.eedr.read().bits()
+                self.eecr().write(|w| w.eere().set_bit());
+                self.eedr().read().bits()
             }
 
             fn raw_write_byte(&mut self, address: u16, data: u8) {
@@ -278,11 +278,12 @@ macro_rules! impl_eeprom_atmega_old {
                 }
 
                 //Start EEPROM read operation
-                self.eedr.write(|w| unsafe { w.bits(data) });
+                self.eedr().write(|w| unsafe { w.bits(data) });
 
-                self.eecr.write(|w| w.eemwe().set_bit().eewe().clear_bit());
+                self.eecr()
+                    .write(|w| w.eemwe().set_bit().eewe().clear_bit());
 
-                self.eecr.write(|w| w.eewe().set_bit());
+                self.eecr().write(|w| w.eewe().set_bit());
             }
 
             fn raw_erase_byte(&mut self, address: u16) {
@@ -305,7 +306,7 @@ macro_rules! impl_eeprom_atmega {
             #[inline]
             pub unsafe fn wait_read(regs: &$EEPROM) {
                 //Wait for completion of previous write.
-                while regs.eecr.read().eepe().bit_is_set() {}
+                while regs.eecr().read().eepe().bit_is_set() {}
             }
             #[inline]
             pub unsafe fn set_address(regs: &$EEPROM, address: $addrwidth) {
@@ -316,21 +317,21 @@ macro_rules! impl_eeprom_atmega {
             }
             #[inline]
             pub unsafe fn set_erasewrite_mode(regs: &$EEPROM) {
-                regs.eecr.write(|w| {
+                regs.eecr().write(|w| {
                     // Set Master Write Enable bit, and and Erase+Write mode mode..
                     w.eempe().set_bit().eepm().val_0x00()
                 })
             }
             #[inline]
             pub unsafe fn set_erase_mode(regs: &$EEPROM) {
-                regs.eecr.write(|w| {
+                regs.eecr().write(|w| {
                     // Set Master Write Enable bit, and Erase-only mode..
                     w.eempe().set_bit().eepm().val_0x01()
                 });
             }
             #[inline]
             pub unsafe fn set_write_mode(regs: &$EEPROM) {
-                regs.eecr.write(|w| {
+                regs.eecr().write(|w| {
                     // Set Master Write Enable bit, and Write-only mode..
                     w.eempe().set_bit().eepm().val_0x02()
                 });
@@ -362,7 +363,7 @@ macro_rules! impl_eeprom_attiny {
         mod attiny_helper {
             #[inline]
             pub unsafe fn wait_read(regs: &$EEPROM) {
-                while regs.eecr.read().eepe().bit_is_set() {}
+                while regs.eecr().read().eepe().bit_is_set() {}
             }
             #[inline]
             pub unsafe fn set_address(regs: &$EEPROM, address: $addrwidth) {
@@ -373,21 +374,21 @@ macro_rules! impl_eeprom_attiny {
             }
             #[inline]
             pub unsafe fn set_erasewrite_mode(regs: &$EEPROM) {
-                regs.eecr.write(|w| {
+                regs.eecr().write(|w| {
                     // Set Master Write Enable bit...and and Erase+Write mode mode..
                     w.eempe().set_bit().eepm().atomic()
                 });
             }
             #[inline]
             pub unsafe fn set_erase_mode(regs: &$EEPROM) {
-                regs.eecr.write(|w| {
+                regs.eecr().write(|w| {
                     // Set Master Write Enable bit, and Erase-only mode..
                     w.eempe().set_bit().eepm().erase()
                 });
             }
             #[inline]
             pub unsafe fn set_write_mode(regs: &$EEPROM) {
-                regs.eecr.write(|w| {
+                regs.eecr().write(|w| {
                     // Set Master Write Enable bit, and Write-only mode..
                     w.eempe().set_bit().eepm().write()
                 });

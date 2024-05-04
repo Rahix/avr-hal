@@ -250,17 +250,17 @@ macro_rules! impl_adc {
 
             #[inline]
             fn raw_read_adc(&self) -> u16 {
-                self.adc.read().bits()
+                self.adc().read().bits()
             }
 
             #[inline]
             fn raw_is_converting(&self) -> bool {
-                self.adcsra.read().adsc().bit_is_set()
+                self.adcsra().read().adsc().bit_is_set()
             }
 
             #[inline]
             fn raw_start_conversion(&mut self) {
-                self.adcsra.modify(|_, w| w.adsc().set_bit());
+                self.adcsra().modify(|_, w| w.adsc().set_bit());
             }
 
             #[inline]
@@ -276,7 +276,7 @@ macro_rules! impl_adc {
                 match channel {
                     $(
                         x if x == $pin_channel => {
-                            $(self.$didr.modify(|_, w| w.$didr_method().set_bit());)?
+                            $(self.$didr().modify(|_, w| w.$didr_method().set_bit());)?
                         }
                     )+
                     _ => unreachable!(),
@@ -288,7 +288,7 @@ macro_rules! impl_adc {
                 match channel {
                     $(
                         x if x == $pin_channel => {
-                            $(self.$didr.modify(|_, w| w.$didr_method().clear_bit());)?
+                            $(self.$didr().modify(|_, w| w.$didr_method().clear_bit());)?
                         }
                     )+
                     _ => unreachable!(),

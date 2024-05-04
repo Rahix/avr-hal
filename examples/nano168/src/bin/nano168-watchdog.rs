@@ -23,7 +23,7 @@ fn main() -> ! {
     }
     ufmt::uwriteln!(&mut serial, "\nEnabling watchdog...").unwrap_infallible();
 
-    let mut watchdog = wdt::Wdt::new(dp.WDT, &dp.CPU.mcusr);
+    let mut watchdog = wdt::Wdt::new(dp.WDT, &dp.CPU.mcusr());
     watchdog.start(wdt::Timeout::Ms4000).unwrap();
 
     ufmt::uwriteln!(&mut serial, "\nWatchdog on watch...").unwrap_infallible();
