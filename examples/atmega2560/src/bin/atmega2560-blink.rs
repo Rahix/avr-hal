@@ -1,8 +1,8 @@
 #![no_std]
 #![no_main]
 
-use panic_halt as _;
 use embedded_hal::delay::DelayNs;
+use panic_halt as _;
 
 // Define core clock. This can be used in the rest of the project.
 type CoreClock = atmega_hal::clock::MHz16;

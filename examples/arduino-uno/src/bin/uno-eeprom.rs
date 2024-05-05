@@ -20,7 +20,7 @@ fn main() -> ! {
     // KNOWN ISSUE: Avoid to read entire eeprom capacity at once
     // See: https://github.com/Rahix/avr-hal/issues/410
     let mut data = [0_u8; 10];
-    
+
     let _start_address: u16 = 0;
 
     if ep.read(0, &mut data).is_err() {
@@ -33,7 +33,7 @@ fn main() -> ! {
         ufmt::uwriteln!(&mut serial, "{}", i).unwrap_infallible();
     }
 
-    let _=ep.erase(0, arduino_hal::Eeprom::CAPACITY);
+    let _ = ep.erase(0, arduino_hal::Eeprom::CAPACITY);
 
     loop {}
 }

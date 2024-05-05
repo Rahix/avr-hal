@@ -5,9 +5,9 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::simple_pwm::*;
 use embedded_hal::delay::DelayNs;
 use embedded_hal::pwm::SetDutyCycle;
-use arduino_hal::simple_pwm::*;
 use panic_halt as _;
 
 fn fade(led: &mut impl SetDutyCycle, delay: &mut impl DelayNs) -> ! {
