@@ -29,7 +29,7 @@ pub type Spi = avr_hal_generic::spi::Spi<
     port::PA4,
     port::PA2,
     port::PA6,
-    >;
+>;
 #[cfg(feature = "attiny167")]
 avr_hal_generic::impl_spi! {
     hal: crate::Attiny,
