@@ -1,11 +1,11 @@
 /*!
- * 
+ *
  * Code sample to work with 74HC595 shift register,
  * wired as in https://lastminuteengineers.com/74hc595-shift-register-arduino-tutorial/
- * 
+ *
  * Connections
  * -----------
- * 
+ *
  * - D4: SER (14)
  * - D5: RCLK (12)
  * - D6: SRCLK (11)
@@ -66,7 +66,7 @@ fn main() -> ! {
 
         for i in 0..8 {
             data |= 1 << i;
-            
+
             update_shift_register(&mut data_pin, &mut latch_pin, &mut clock_pin, &data);
             arduino_hal::delay_ms(500);
         }
