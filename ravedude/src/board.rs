@@ -48,8 +48,9 @@ pub fn get_board_from_manifest(manifest_path: &Path) -> anyhow::Result<config::R
         if let Some(board_config) = board.board_config.as_ref() {
             if let Some(board_name) = board.general_options.board.as_deref() {
                 anyhow::bail!(
-                        "can't both have board in [general] and [board] section; set inherit = \"{}\" under [board] to inherit its options", board_name
-                    )
+                    "can't both have board in [general] and [board] section; set inherit = \"{}\" under [board] to inherit its options",
+                    board_name
+                )
             }
             if let Some(inherit) = board_config.inherit.as_deref() {
                 let base_board = get_board_from_name(inherit)?.board_config.unwrap();
@@ -71,16 +72,40 @@ mod tests {
     fn validate_board_list() -> anyhow::Result<()> {
         let all_boards = get_all_boards()?;
 
-        for board in all_boards.values() {
-            assert!(board.name.is_some());
-            assert!(board.inherit.is_none());
-            assert!(board.reset.is_some());
-            assert!(board.avrdude.is_some());
+        for (name, board) in all_boards.iter() {
+            assert!(
+                board.name.is_some(),
+                "Board {name:?} doesn't have a `name` key"
+            );
+            assert!(
+                board.inherit.is_none(),
+                "Board {name:?} has illegal `inherit` key"
+            );
+            assert!(
+                board.reset.is_some(),
+                "Board {name:?} doesn't have a `reset` key"
+            );
+            assert!(
+                board.avrdude.is_some(),
+                "Board {name:?} doesn't have an `avrdude` key"
+            );
             let avrdude = board.avrdude.as_ref().unwrap();
-            assert!(avrdude.programmer.is_some());
-            assert!(avrdude.partno.is_some());
-            assert!(avrdude.baudrate.is_some());
-            assert!(avrdude.do_chip_erase.is_some());
+            assert!(
+                avrdude.programmer.is_some(),
+                "Board {name:?}'s avrdude options doesn't have a `programmer` key"
+            );
+            assert!(
+                avrdude.partno.is_some(),
+                "Board {name:?}'s avrdude options doesn't have a `partno` key"
+            );
+            assert!(
+                avrdude.baudrate.is_some(),
+                "Board {name:?}'s avrdude options doesn't have a `baudrate` key"
+            );
+            assert!(
+                avrdude.do_chip_erase.is_some(),
+                "Board {name:?}'s avrdude options doesn't have a `do_chip_erase` key"
+            );
         }
 
         Ok(())
