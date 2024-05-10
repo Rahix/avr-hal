@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::Path};
 
 use crate::config;
 
@@ -18,49 +18,48 @@ fn get_all_boards() -> anyhow::Result<HashMap<String, config::BoardConfig>> {
     })
 }
 
-pub fn get_board(board_name: Option<&str>) -> anyhow::Result<config::RavedudeConfig> {
-    Ok(match board_name {
-        Some(board_name) => {
-            let mut all_boards = get_all_boards()?;
+pub fn get_board_from_name(board_name: &str) -> anyhow::Result<config::RavedudeConfig> {
+    let mut all_boards = get_all_boards()?;
 
-            config::RavedudeConfig {
-                board_config: Some(all_boards.remove(board_name).ok_or_else(|| {
-                    let mut msg = format!("invalid board: {board_name}\n");
+    Ok(config::RavedudeConfig {
+        board_config: Some(all_boards.remove(board_name).ok_or_else(|| {
+            let mut msg = format!("invalid board: {board_name}\n");
 
-                    msg.push_str("valid boards:");
+            msg.push_str("valid boards:");
 
-                    for board in all_boards.keys() {
-                        msg.push('\n');
-                        msg.push_str(&board);
-                    }
-                    anyhow::anyhow!(msg)
-                })?),
-                ..Default::default()
+            for board in all_boards.keys() {
+                msg.push('\n');
+                msg.push_str(&board);
             }
-        }
-        None => {
-            let file_contents = std::fs::read_to_string("Ravedude.toml")
-                .map_err(|_| anyhow::anyhow!("no board given and couldn't find Ravedude.toml in project, either pass a board as an argument or make a Ravedude.toml."))?;
+            anyhow::anyhow!(msg)
+        })?),
+        ..Default::default()
+    })
+}
 
-            let mut board: config::RavedudeConfig = toml::from_str(&file_contents)
-                .map_err(|err| anyhow::anyhow!("invalid Ravedude.toml:\n{}", err))?;
+pub fn get_board_from_manifest(manifest_path: &Path) -> anyhow::Result<config::RavedudeConfig> {
+    Ok({
+        let file_contents = std::fs::read_to_string(manifest_path)
+            .map_err(|err| anyhow::anyhow!("Ravedude.toml read error:\n{}", err))?;
 
-            if let Some(board_config) = board.board_config.as_ref() {
-                if let Some(board_name) = board.general_options.board.as_deref() {
-                    anyhow::bail!(
+        let mut board: config::RavedudeConfig = toml::from_str(&file_contents)
+            .map_err(|err| anyhow::anyhow!("invalid Ravedude.toml:\n{}", err))?;
+
+        if let Some(board_config) = board.board_config.as_ref() {
+            if let Some(board_name) = board.general_options.board.as_deref() {
+                anyhow::bail!(
                         "can't both have board in [general] and [board] section; set inherit = \"{}\" under [board] to inherit its options", board_name
                     )
-                }
-                if let Some(inherit) = board_config.inherit.as_deref() {
-                    let base_board = get_board(Some(inherit))?.board_config.unwrap();
-                    board.board_config = Some(board.board_config.take().unwrap().merge(base_board));
-                }
-            } else if let Some(board_name) = board.general_options.board.as_deref() {
-                let base_board = get_board(Some(board_name))?.board_config.unwrap();
-                board.board_config = Some(base_board);
             }
-            board
+            if let Some(inherit) = board_config.inherit.as_deref() {
+                let base_board = get_board_from_name(inherit)?.board_config.unwrap();
+                board.board_config = Some(board.board_config.take().unwrap().merge(base_board));
+            }
+        } else if let Some(board_name) = board.general_options.board.as_deref() {
+            let base_board = get_board_from_name(board_name)?.board_config.unwrap();
+            board.board_config = Some(base_board);
         }
+        board
     })
 }
 
