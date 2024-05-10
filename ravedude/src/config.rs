@@ -47,7 +47,14 @@ impl RavedudeConfig {
                 },
                 port: args.port.clone(),
                 reset_delay: args.reset_delay,
-                board: args.board.clone(),
+                board: match args.board.clone() {
+                    Some(board_osstring) => Some(
+                        board_osstring
+                            .into_string()
+                            .map_err(|_| anyhow::anyhow!("board is not valid utf-8"))?,
+                    ),
+                    None => None,
+                },
             },
             board_config: Default::default(),
         })

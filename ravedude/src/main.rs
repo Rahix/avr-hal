@@ -2,6 +2,7 @@ use anyhow::Context as _;
 use colored::Colorize as _;
 use structopt::clap::AppSettings;
 
+use std::ffi::OsString;
 use std::path::Path;
 use std::thread;
 use std::time::Duration;
@@ -78,7 +79,7 @@ struct Args {
     /// * nano168
     /// * duemilanove
     #[structopt(name = "BOARD", verbatim_doc_comment)]
-    board: Option<String>,
+    board: Option<OsString>,
 
     /// The binary to be flashed.
     ///
@@ -121,7 +122,7 @@ fn ravedude() -> anyhow::Result<()> {
                 // The board arg is taken before the binary, so rearrange the args when Ravedude.toml exists
                 args.bin = Some(std::path::PathBuf::from(board));
             } else {
-                anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = \"{}\"` under [general] in Ravedude.toml", board)
+                anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board)
             }
         }
     } else if args.board.is_some() {
@@ -133,7 +134,14 @@ fn ravedude() -> anyhow::Result<()> {
 
     let mut ravedude_config = match manifest_path.as_deref() {
         Some(path) => board::get_board_from_manifest(path)?,
-        None => board::get_board_from_name(args.board.as_deref().ok_or_else(||anyhow::anyhow!("no board given and couldn't find Ravedude.toml in project, either pass a board as an argument or make a Ravedude.toml."))?)?
+        None => board::get_board_from_name(
+            args
+            .board
+            .as_deref()
+            .ok_or_else(|| anyhow::anyhow!("no board given and couldn't find Ravedude.toml in project, either pass a board as an argument or make a Ravedude.toml."))?
+            .to_str()
+            .ok_or_else(|| anyhow::anyhow!("board name isn't valid UTF-8"))?
+        )?
     };
 
     if args.dump_config {
