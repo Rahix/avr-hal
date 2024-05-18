@@ -171,23 +171,6 @@ fn ravedude() -> anyhow::Result<()> {
         &board.name.as_deref().unwrap_or("Unnamed Board")
     );
 
-    if let Some(wait_time) = args.reset_delay {
-        if wait_time > 0 {
-            println!("Waiting {} ms before proceeding", wait_time);
-            let wait_time = Duration::from_millis(wait_time);
-            thread::sleep(wait_time);
-        } else {
-            println!("Assuming board has been reset");
-        }
-    } else {
-        if matches!(board.reset, Some(config::ResetOptions { automatic: false })) {
-            warning!("this board cannot reset itself.");
-            eprintln!();
-            eprint!("Once reset, press ENTER here: ");
-            std::io::stdin().read_line(&mut String::new())?;
-        }
-    }
-
     let port = match ravedude_config.general_options.port {
         Some(port) => Ok(Some(port)),
         None => match board.guess_port() {
@@ -200,6 +183,21 @@ fn ravedude() -> anyhow::Result<()> {
     }?;
 
     if let Some(bin) = args.bin.as_ref() {
+        if let Some(wait_time) = args.reset_delay {
+            if wait_time > 0 {
+                println!("Waiting {} ms before proceeding", wait_time);
+                let wait_time = Duration::from_millis(wait_time);
+                thread::sleep(wait_time);
+            } else {
+                println!("Assuming board has been reset");
+            }
+        } else if matches!(board.reset, Some(config::ResetOptions { automatic: false })) {
+            warning!("this board cannot reset itself.");
+            eprintln!();
+            eprint!("Once reset, press ENTER here: ");
+            std::io::stdin().read_line(&mut String::new())?;
+        }
+
         if let Some(port) = port.as_ref() {
             task_message!(
                 "Programming",
