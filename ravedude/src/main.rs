@@ -177,16 +177,8 @@ fn ravedude() -> anyhow::Result<()> {
             println!("Assuming board has been reset");
         }
     } else {
-        if let Some(config::ResetOptions {
-            automatic: false,
-            message,
-        }) = board.reset.as_ref()
-        {
+        if matches!(board.reset, Some(config::ResetOptions { automatic: false })) {
             warning!("this board cannot reset itself.");
-            if let Some(msg) = message.as_deref() {
-                eprintln!();
-                eprintln!("    {msg}");
-            }
             eprintln!();
             eprint!("Once reset, press ENTER here: ");
             std::io::stdin().read_line(&mut String::new())?;
@@ -234,7 +226,7 @@ fn ravedude() -> anyhow::Result<()> {
         );
     }
 
-    if ravedude_config.general_options.open_console == Some(true) {
+    if ravedude_config.general_options.open_console {
         let baudrate = ravedude_config
             .general_options
             .serial_baudrate
