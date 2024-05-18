@@ -79,6 +79,8 @@ struct Args {
     /// * nano168
     /// * duemilanove
     #[structopt(name = "BOARD", verbatim_doc_comment)]
+    // When Ravedude.toml exists, the binary is placed where the board should be. This is an OsString to not lose
+    // informaton when we have to take the board as the binary.
     board: Option<OsString>,
 
     /// The binary to be flashed.
