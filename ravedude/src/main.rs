@@ -125,9 +125,12 @@ fn ravedude() -> anyhow::Result<()> {
                 anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board)
             }
         }
-    } else if args.board.is_some() {
+    } else if args.board.is_some() && !args.dump_config {
         warning!(
-            "Passing the board as command-line argument is deprecated, use Ravedude.toml instead:\n\n# Ravedude.toml\n{}",
+            "Passing the board as command-line argument is deprecated, use Ravedude.toml instead:"
+        );
+        eprintln!(
+            "\n# Ravedude.toml\n{}",
             toml::to_string(&config::RavedudeConfig::from_args(&args)?)?
         );
     }
@@ -144,14 +147,14 @@ fn ravedude() -> anyhow::Result<()> {
         )?
     };
 
+    ravedude_config.general_options.apply_overrides(&mut args)?;
+
     if args.dump_config {
         println!("{}", toml::to_string(&ravedude_config)?);
         return Ok(());
     }
 
     avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
-
-    ravedude_config.general_options.apply_overrides(&mut args)?;
 
     let Some(mut board) = ravedude_config.board_config else {
         anyhow::bail!("no named board given and no board options provided");
