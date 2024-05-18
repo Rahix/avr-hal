@@ -53,8 +53,7 @@
 
     [leonardo.reset]
     automatic = false
-    message = "Reset the board by pressing the reset button once."
-
+    
     [leonardo.avrdude]
     programmer = "avr109"
     partno = "atmega32u4"
@@ -74,8 +73,7 @@
 
     [micro.reset]
     automatic = false
-    message = "Reset the board by pressing the reset button once."
-
+    
     [micro.avrdude]
     programmer = "avr109"
     partno = "atmega32u4"
@@ -151,8 +149,7 @@
 
     [promicro.reset]
     automatic = false
-    message = "Reset the board by quickly pressing the reset button **twice**."
-
+    
     [promicro.avrdude]
     programmer = "avr109"
     partno = "atmega32u4"
@@ -187,8 +184,7 @@
 
     [trinket-pro.reset]
     automatic = false
-    message = "Reset the board by pressing the reset button once."
-
+    
     [trinket-pro.avrdude]
     programmer = "usbtiny"
     partno = "atmega328p"
@@ -202,8 +198,7 @@
 
     [trinket.reset]
     automatic = false
-    message = "Reset the board by pressing the reset button once."
-
+    
     [trinket.avrdude]
     programmer = "usbtiny"
     partno = "atmega328p"

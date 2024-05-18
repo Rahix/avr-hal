@@ -37,7 +37,7 @@ impl RavedudeConfig {
     pub fn from_args(args: &crate::Args) -> anyhow::Result<Self> {
         Ok(Self {
             general_options: RavedudeGeneralConfig {
-                open_console: args.open_console.then_some(true),
+                open_console: args.open_console,
                 serial_baudrate: match args.baudrate {
                     Some(serial_baudrate) => Some(
                         NonZeroU32::new(serial_baudrate)
@@ -64,7 +64,7 @@ impl RavedudeConfig {
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default)]
 #[serde(rename_all = "kebab-case")]
 pub struct RavedudeGeneralConfig {
-    pub open_console: Option<bool>,
+    pub open_console: bool,
     pub serial_baudrate: Option<NonZeroU32>,
     pub port: Option<std::path::PathBuf>,
     pub reset_delay: Option<u64>,
@@ -75,7 +75,7 @@ impl RavedudeGeneralConfig {
     pub fn apply_overrides(&mut self, args: &crate::Args) -> anyhow::Result<()> {
         // command line args take priority over Ravedude.toml
         if args.open_console {
-            self.open_console = Some(true);
+            self.open_console = true;
         }
         if let Some(serial_baudrate) = args.baudrate {
             self.serial_baudrate = Some(
@@ -107,7 +107,7 @@ impl BoardConfig {
     pub fn merge(self, base: BoardConfig) -> Self {
         Self {
             name: self.name.or(base.name),
-            // inherit is used to decide what BoardGeneralOptions to inherit and isn't used anywhere else
+            // inherit is used to decide what BoardConfig to inherit and isn't used anywhere else
             inherit: None,
             reset: self.reset.or(base.reset),
             avrdude: match self.avrdude {
@@ -122,7 +122,6 @@ impl BoardConfig {
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct ResetOptions {
     pub automatic: bool,
-    pub message: Option<String>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
