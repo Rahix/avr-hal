@@ -134,6 +134,8 @@ pub struct BoardAvrdudeOptions {
         serialize_with = "serialize_baudrate",
         deserialize_with = "deserialize_baudrate"
     )]
+    // Inner option to represent whether the baudrate exists, outer option to allow for overriding.
+    // Option<if baudrate == -1 { None } else { NonZeroU32(baudrate) }>
     pub baudrate: Option<Option<NonZeroU32>>,
     pub do_chip_erase: Option<bool>,
 }
