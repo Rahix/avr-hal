@@ -64,6 +64,7 @@ impl RavedudeConfig {
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default)]
 #[serde(rename_all = "kebab-case")]
 pub struct RavedudeGeneralConfig {
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub open_console: bool,
     pub serial_baudrate: Option<NonZeroU32>,
     pub port: Option<std::path::PathBuf>,
