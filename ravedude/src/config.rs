@@ -48,6 +48,9 @@ impl RavedudeConfig {
                 port: args.port.clone(),
                 reset_delay: args.reset_delay,
                 board: args.legacy_board_name().clone(),
+                output_mode: args.output_mode,
+                newline_after: None,
+                newline_on: None,
             },
             board_config: Default::default(),
         })
@@ -63,6 +66,9 @@ pub struct RavedudeGeneralConfig {
     pub port: Option<std::path::PathBuf>,
     pub reset_delay: Option<u64>,
     pub board: Option<String>,
+    pub output_mode: Option<OutputMode>,
+    pub newline_on: Option<char>,
+    pub newline_after: Option<u8>,
 }
 
 impl RavedudeGeneralConfig {
@@ -82,6 +88,9 @@ impl RavedudeGeneralConfig {
         }
         if let Some(reset_delay) = args.reset_delay {
             self.reset_delay = Some(reset_delay);
+        }
+        if let Some(output_mode) = args.output_mode {
+            self.output_mode = Some(output_mode);
         }
         Ok(())
     }
@@ -180,4 +189,12 @@ impl BoardConfig {
             None => None,
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
+pub enum OutputMode {
+    Ascii,
+    Hex,
+    Dec,
+    Bin,
 }

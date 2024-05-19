@@ -91,10 +91,12 @@
 //! ```
 //!
 //! For reference, take a look at [`boards.toml`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml).
-use anyhow::Context as _;
+use anyhow::{bail, Context as _};
 use colored::Colorize as _;
+use config::OutputMode;
 
 use std::path::Path;
+use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 
@@ -106,6 +108,64 @@ mod ui;
 
 /// This represents the minimum (Major, Minor) version raverdude requires avrdude to meet.
 const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
+
+impl FromStr for OutputMode {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ascii" => Ok(Self::Ascii),
+            "hex" => Ok(Self::Hex),
+            "dec" => Ok(Self::Dec),
+            "bin" => Ok(Self::Bin),
+            _ => Err(anyhow::anyhow!("unknown output mode")),
+        }
+    }
+}
+
+// this could have fewer nested if’s, but this produces better error messages
+fn parse_newline_on(s: &str) -> Result<char, anyhow::Error> {
+    if let Ok(c) = s.parse::<char>() {
+        Ok(c)
+
+    // if it starts with 0x then parse the hex byte
+    } else if &s[0..2] == "0x" {
+        if s.len() == 4 {
+            if let Ok(n) = u8::from_str_radix(&s[2..4], 16) {
+                Ok(n as char)
+            } else {
+                bail!("invalid hex byte")
+            }
+        } else {
+            bail!("hex byte must have 2 characters")
+        }
+    // if it starts with 0b then parse the binary byte
+    } else if &s[0..2] == "0b" {
+        if s.len() == 10 {
+            if let Ok(n) = u8::from_str_radix(&s[2..10], 2) {
+                Ok(n as char)
+            } else {
+                bail!("invalid binary byte")
+            }
+        } else {
+            bail!("binary byte must have 8 characters")
+        }
+    } else {
+        bail!("must be a single character or a byte in hex or binary notation")
+    }
+}
+
+#[test]
+fn test_parse_newline_on() {
+    assert_eq!(parse_newline_on("a").unwrap(), 'a');
+    assert_eq!(parse_newline_on("\n").unwrap(), '\n');
+    assert_eq!(parse_newline_on("0x41").unwrap(), 'A');
+    assert_eq!(parse_newline_on("0b01000001").unwrap(), 'A');
+    assert!(parse_newline_on("not a char").is_err());
+    assert!(parse_newline_on("0x").is_err());
+    assert!(parse_newline_on("0xzz").is_err());
+    assert!(parse_newline_on("0b").is_err());
+    assert!(parse_newline_on("0b0a0a0a0a").is_err());
+}
 
 /// ravedude is a rust wrapper around avrdude for providing the smoothest possible development
 /// experience with rust on AVR microcontrollers.
@@ -159,7 +219,13 @@ struct Args {
     /// Should not be used in newer configurations.
     #[clap(name = "LEGACY BINARY", value_parser)]
     bin_legacy: Option<std::path::PathBuf>,
+
+    /// Output mode.
+    /// Can be ascii, hex, dec or bin
+    #[clap(short = 'o', long = "output-mode")]
+    output_mode: Option<OutputMode>,
 }
+
 impl Args {
     /// Get the board name for legacy configurations.
     /// `None` if the configuration isn't a legacy configuration or the board name doesn't exist.
@@ -222,7 +288,7 @@ fn ravedude() -> anyhow::Result<()> {
 
     let mut ravedude_config = match (manifest_path.as_deref(), args.legacy_board_name()) {
         (Some(_), Some(board_name)) => {
-            anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board_name);
+            bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board_name);
         }
         (Some(path), None) => board::get_board_from_manifest(path)?,
         (None, Some(board_name)) => {
@@ -237,7 +303,7 @@ fn ravedude() -> anyhow::Result<()> {
             board::get_board_from_name(&board_name)?
         }
         (None, None) => {
-            anyhow::bail!("couldn't find Ravedude.toml in project");
+            bail!("couldn't find Ravedude.toml in project");
         }
     };
 
@@ -254,8 +320,14 @@ fn ravedude() -> anyhow::Result<()> {
     avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
 
     let Some(mut board) = ravedude_config.board_config else {
-        anyhow::bail!("no named board given and no board options provided");
+        bail!("no named board given and no board options provided");
     };
+
+    if ravedude_config.general_options.newline_on.is_some()
+        && ravedude_config.general_options.newline_after.is_some()
+    {
+        bail!("newline_on and newline_after cannot be used at the same time");
+    }
 
     let board_avrdude_options = board
         .avrdude
@@ -336,11 +408,21 @@ fn ravedude() -> anyhow::Result<()> {
 
         let port = port.context("console can only be opened for devices with USB-to-Serial")?;
 
+        let output_mode = ravedude_config.general_options.output_mode;
+        let newline_on = ravedude_config.general_options.newline_on;
+        let newline_after = ravedude_config.general_options.newline_after;
+
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
         task_message!("", "{}", "CTRL+C to exit.".dimmed());
         // Empty line for visual consistency
         eprintln!();
-        console::open(&port, baudrate.get())?;
+        console::open(
+            &port,
+            baudrate.get(),
+            output_mode,
+            newline_on,
+            newline_after,
+        )?;
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
     }
