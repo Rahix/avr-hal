@@ -67,7 +67,7 @@ pub struct RavedudeGeneralConfig {
     pub reset_delay: Option<u64>,
     pub board: Option<String>,
     pub output_mode: Option<OutputMode>,
-    pub newline_on: Option<char>,
+    pub newline_on: Option<String>,
     pub newline_after: Option<u8>,
 }
 
