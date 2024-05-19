@@ -409,7 +409,11 @@ fn ravedude() -> anyhow::Result<()> {
         let port = port.context("console can only be opened for devices with USB-to-Serial")?;
 
         let output_mode = ravedude_config.general_options.output_mode;
-        let newline_on = ravedude_config.general_options.newline_on;
+        let newline_on = if let Some(newline_on) = ravedude_config.general_options.newline_on {
+            Some(parse_newline_on(newline_on.as_str()))
+        } else {
+            None
+        };
         let newline_after = ravedude_config.general_options.newline_after;
 
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
@@ -420,7 +424,7 @@ fn ravedude() -> anyhow::Result<()> {
             &port,
             baudrate.get(),
             output_mode,
-            newline_on,
+            parse_newline_on(newline_on),
             newline_after,
         )?;
     } else if args.bin.is_none() && port.is_some() {
