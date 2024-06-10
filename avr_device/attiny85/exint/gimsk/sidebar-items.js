@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["GIMSK_SPEC","R","W"],"type":["INT0_R","INT0_W","PCIE_R","PCIE_W"]};

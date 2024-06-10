@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["PCMSK0_SPEC","R","W"],"type":["PCINT_R","PCINT_W"]};
