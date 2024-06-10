@@ -2,11 +2,14 @@ use anyhow::Context as _;
 use colored::Colorize as _;
 use structopt::clap::AppSettings;
 
+use std::ffi::OsString;
+use std::path::Path;
 use std::thread;
 use std::time::Duration;
 
 mod avrdude;
 mod board;
+mod config;
 mod console;
 mod ui;
 
@@ -28,6 +31,10 @@ const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
         fallback = "unknown"
     ))]
 struct Args {
+    /// Utility flag for dumping a config of a named board to TOML.
+    #[structopt(long = "dump-config")]
+    dump_config: bool,
+
     /// After successfully flashing the program, open a serial console to see output sent by the
     /// board and possibly interact with it.
     #[structopt(short = "c", long = "open-console")]
@@ -37,7 +44,7 @@ struct Args {
     #[structopt(short = "b", long = "baudrate")]
     baudrate: Option<u32>,
 
-    /// Overwrite which port to use.  By default ravedude will try to find a connected board by
+    /// Overwrite which port to use. By default ravedude will try to find a connected board by
     /// itself.
     #[structopt(short = "P", long = "port", parse(from_os_str), env = "RAVEDUDE_PORT")]
     port: Option<std::path::PathBuf>,
@@ -72,7 +79,9 @@ struct Args {
     /// * nano168
     /// * duemilanove
     #[structopt(name = "BOARD", verbatim_doc_comment)]
-    board: String,
+    // When Ravedude.toml exists, the binary is placed where the board should be. This is an OsString to not lose
+    // informaton when we have to take the board as the binary.
+    board: Option<OsString>,
 
     /// The binary to be flashed.
     ///
@@ -92,44 +101,105 @@ fn main() {
 }
 
 fn ravedude() -> anyhow::Result<()> {
-    let args: Args = structopt::StructOpt::from_args();
-    avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
+    let mut args: Args = structopt::StructOpt::from_args();
 
-    let board = board::get_board(&args.board).expect("board not found");
+    let manifest_path = 'manifest_path: {
+        // By default Cargo scans the current dir and all of its parents for Cargo.toml,
+        // so we mirror its behavior here.
+        let current_dir = std::env::current_dir()?;
 
-    task_message!("Board", "{}", board.display_name());
-
-    if let Some(wait_time) = args.reset_delay {
-        if wait_time > 0 {
-            println!("Waiting {} ms before proceeding", wait_time);
-            let wait_time = Duration::from_millis(wait_time);
-            thread::sleep(wait_time);
-        } else {
-            println!("Assuming board has been reset");
+        for dir_to_test in current_dir.ancestors() {
+            let path_to_test = dir_to_test.join(Path::new("Ravedude.toml"));
+            if path_to_test.exists() {
+                break 'manifest_path Some(path_to_test);
+            }
         }
-    } else {
-        if let Some(msg) = board.needs_reset() {
-            warning!("this board cannot reset itself.");
-            eprintln!("");
-            eprintln!("    {}", msg);
-            eprintln!("");
-            eprint!("Once reset, press ENTER here: ");
-            std::io::stdin().read_line(&mut String::new())?;
+
+        None
+    };
+
+    if manifest_path.is_some() {
+        if let Some(board) = args.board.take() {
+            if args.bin.is_none() {
+                // The board arg is taken before the binary, so rearrange the args when Ravedude.toml exists
+                args.bin = Some(std::path::PathBuf::from(board));
+            } else {
+                anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board)
+            }
         }
+    } else if args.board.is_some() && !args.dump_config {
+        warning!(
+            "Passing the board as command-line argument is deprecated, use Ravedude.toml instead:"
+        );
+        eprintln!(
+            "\n# Ravedude.toml\n{}",
+            toml::to_string(&config::RavedudeConfig::from_args(&args)?)?
+        );
     }
 
-    let port = match args.port {
+    let mut ravedude_config = match manifest_path.as_deref() {
+        Some(path) => board::get_board_from_manifest(path)?,
+        None => board::get_board_from_name(
+            args
+            .board
+            .as_deref()
+            .ok_or_else(|| anyhow::anyhow!("no board given and couldn't find Ravedude.toml in project, either pass a board as an argument or make a Ravedude.toml."))?
+            .to_str()
+            .ok_or_else(|| anyhow::anyhow!("board name isn't valid UTF-8"))?
+        )?
+    };
+
+    ravedude_config.general_options.apply_overrides(&mut args)?;
+
+    if args.dump_config {
+        println!("{}", toml::to_string(&ravedude_config)?);
+        return Ok(());
+    }
+
+    avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
+
+    let Some(mut board) = ravedude_config.board_config else {
+        anyhow::bail!("no named board given and no board options provided");
+    };
+
+    let board_avrdude_options = board
+        .avrdude
+        .take()
+        .ok_or_else(|| anyhow::anyhow!("board has no avrdude options"))?;
+
+    task_message!(
+        "Board",
+        "{}",
+        &board.name.as_deref().unwrap_or("Unnamed Board")
+    );
+
+    let port = match ravedude_config.general_options.port {
         Some(port) => Ok(Some(port)),
         None => match board.guess_port() {
             Some(Ok(port)) => Ok(Some(port)),
             p @ Some(Err(_)) => p.transpose().context(
-                "no matching serial port found, use -P or set RAVEDUDE_PORT in your environment",
+                "no matching serial port found, use -P, add a serial-port entry under [general] in Ravedude.toml, or set RAVEDUDE_PORT in your environment",
             ),
             None => Ok(None),
         },
     }?;
 
     if let Some(bin) = args.bin.as_ref() {
+        if let Some(wait_time) = args.reset_delay {
+            if wait_time > 0 {
+                println!("Waiting {} ms before proceeding", wait_time);
+                let wait_time = Duration::from_millis(wait_time);
+                thread::sleep(wait_time);
+            } else {
+                println!("Assuming board has been reset");
+            }
+        } else if matches!(board.reset, Some(config::ResetOptions { automatic: false })) {
+            warning!("this board cannot reset itself.");
+            eprintln!();
+            eprint!("Once reset, press ENTER here: ");
+            std::io::stdin().read_line(&mut String::new())?;
+        }
+
         if let Some(port) = port.as_ref() {
             task_message!(
                 "Programming",
@@ -143,7 +213,7 @@ fn ravedude() -> anyhow::Result<()> {
         }
 
         let mut avrdude = avrdude::Avrdude::run(
-            &board.avrdude_options(),
+            &board_avrdude_options,
             port.as_ref(),
             bin,
             args.debug_avrdude,
@@ -159,10 +229,15 @@ fn ravedude() -> anyhow::Result<()> {
         );
     }
 
-    if args.open_console {
-        let baudrate = args
-            .baudrate
-            .context("-b/--baudrate is needed for the serial console")?;
+    if ravedude_config.general_options.open_console {
+        let baudrate = ravedude_config
+            .general_options
+            .serial_baudrate
+            .context(if manifest_path.is_some() {
+                "`serial-baudrate` under [general] in Ravedude.toml is needed for the serial console"
+            }else{
+                "-b/--baudrate is needed for the serial console"
+            })?;
 
         let port = port.context("console can only be opened for devices with USB-to-Serial")?;
 
@@ -170,7 +245,7 @@ fn ravedude() -> anyhow::Result<()> {
         task_message!("", "{}", "CTRL+C to exit.".dimmed());
         // Empty line for visual consistency
         eprintln!();
-        console::open(&port, baudrate)?;
+        console::open(&port, baudrate.get())?;
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
     }
