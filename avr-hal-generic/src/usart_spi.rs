@@ -36,11 +36,11 @@ macro_rules! impl_usart_spi {
                         w.[<umsel $n>]().spi_master();
 
                         match settings.data_order {
-                            DataOrder::MostSignificantFirst => match settings.mode.phase {
+                            crate::spi::DataOrder::MostSignificantFirst => match settings.mode.phase {
                                 spi::Phase::CaptureOnFirstTransition => w.[<ucsz $n>]().chr5(),
                                 spi::Phase::CaptureOnSecondTransition => w.[<ucsz $n>]().chr6(),
                             },
-                            DataOrder::LeastSignificantFirst => match settings.mode.phase {
+                            crate::spi::DataOrder::LeastSignificantFirst => match settings.mode.phase {
                                 spi::Phase::CaptureOnFirstTransition => w.[<ucsz $n>]().chr7(),
                                 spi::Phase::CaptureOnSecondTransition => w.[<ucsz $n>]().chr8(),
                             },
