@@ -42,3 +42,6 @@ exclude = [
     "ravedude",
 ]
 resolver = "2"
+
+[patch.crates-io]
+avr-device = { path = "../avr-device" }

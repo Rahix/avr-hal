@@ -63,7 +63,7 @@ pub mod channel {
 }
 
 fn apply_clock(peripheral: &crate::pac::ADC, settings: AdcSettings) {
-    peripheral.adcsra.write(|w| {
+    peripheral.adcsra().write(|w| {
         w.aden().set_bit();
         match settings.clock_divider {
             ClockDivider::Factor2 => w.adps().prescaler_2(),
@@ -84,7 +84,7 @@ avr_hal_generic::impl_adc! {
     settings: AdcSettings,
     apply_settings: |peripheral, settings| {
         apply_clock(peripheral, settings);
-        peripheral.admux.write(|w| match settings.ref_voltage {
+        peripheral.admux().write(|w| match settings.ref_voltage {
             ReferenceVoltage::Aref => w.refs().aref(),
             ReferenceVoltage::AVcc => w.refs().vcc(),
             ReferenceVoltage::Internal1_1 => w.refs().internal().refs2().clear_bit(),
@@ -93,7 +93,7 @@ avr_hal_generic::impl_adc! {
     },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
         port::PB5: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
@@ -115,14 +115,14 @@ avr_hal_generic::impl_adc! {
     settings: AdcSettings,
     apply_settings: |peripheral, settings| {
         apply_clock(peripheral, settings);
-        peripheral.admux.write(|w| match settings.ref_voltage {
+        peripheral.admux().write(|w| match settings.ref_voltage {
             ReferenceVoltage::AVcc => w.refs0().avcc(),
             ReferenceVoltage::Internal1_1 => w.refs0().internal(),
         });
     },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
         port::PC0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
@@ -148,11 +148,11 @@ avr_hal_generic::impl_adc! {
     settings: AdcSettings,
     apply_settings: |peripheral, settings| {
         apply_clock(peripheral, settings);
-        peripheral.amiscr.write(|w| match settings.ref_voltage {
+        peripheral.amiscr().write(|w| match settings.ref_voltage {
             ReferenceVoltage::Aref => w.arefen().set_bit(),
             _ => w.arefen().clear_bit(),
         });
-        peripheral.admux.write(|w| match settings.ref_voltage {
+        peripheral.admux().write(|w| match settings.ref_voltage {
             ReferenceVoltage::Aref => w.refs().avcc(),
             ReferenceVoltage::AVcc => w.refs().avcc(),
             ReferenceVoltage::Internal1_1 => w.refs().internal_11(),
@@ -161,7 +161,7 @@ avr_hal_generic::impl_adc! {
     },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
         port::PA0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
