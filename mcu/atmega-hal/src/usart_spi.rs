@@ -99,3 +99,37 @@ avr_hal_generic::impl_usart_spi! {
     miso: port::PJ0,
     cs: port::Dynamic,
 }
+
+#[cfg(any(
+    feature = "atmega168",
+    feature = "atmega328p",
+    feature = "atmega328pb",
+    feature = "atmega1284p",
+    feature = "atmega164pa",
+    feature = "atmega48p"
+))]
+pub type Usart0Spi = avr_hal_generic::usart_spi::UsartSpi<
+    crate::Atmega,
+    crate::pac::USART0,
+    port::PD4,
+    port::PD1,
+    port::PD0,
+    port::Dynamic,
+>;
+#[cfg(any(
+    feature = "atmega168",
+    feature = "atmega328p",
+    feature = "atmega328pb",
+    feature = "atmega1284p",
+    feature = "atmega164pa",
+    feature = "atmega48p"
+))]
+avr_hal_generic::impl_usart_spi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::USART0,
+    register_suffix: 0,
+    sclk: port::PD4,
+    mosi: port::PD1,
+    miso: port::PD0,
+    cs: port::Dynamic,
+}
