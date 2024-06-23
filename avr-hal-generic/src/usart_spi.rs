@@ -1,6 +1,5 @@
 //! MSPIM Implimentation
 use crate::spi;
-use core::marker::PhantomData;
 
 // This module just impliments a macro for SpiOps, since underlyingly, the Spi type can still be used since it just needs SpiOps
 
