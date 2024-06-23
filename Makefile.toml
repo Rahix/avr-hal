@@ -1,0 +1,11 @@
+[config]
+default_to_workspace = false
+
+
+[tasks.default]
+alias = "run_tests"
+
+[tasks.run_tests]
+# Builds the required packages, using the correct settings. Mirrors what the github CI does.
+script_runner = "@rust"
+script = { file = "makefile.rs" }
