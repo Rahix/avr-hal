@@ -1,14 +1,20 @@
+//! USART MSPIM implimentations
+//!
 //! The following list details how many USARTs and if the USARTs support MSPIM for each board choosable.
 //!
 //! | Board | USARTs | SPI |
 //! |-------|--------|-----|
 //! | `atmega48p` | 1 | Yes |
-//! | `atmega164pa`, `atmega1284p` | 2 | Yes |
-//! | `atmega328p`, `atmega328pb` | 1 | Yes |
+//! | `atmega164pa`| 2 | Yes |
+//! | `atmega168` | 1 | Yes |
+//! | `atmega328p` | 1 | Yes |
+//! | `atmega328pb` | 1 | Yes |
 //! | `atmega32a` | 1 | No |
 //! | `atmega32u4` | 1 | Yes |
-//! | `atmega2560`, `atmega1280` | 4 | Yes |
+//! | `atmega2560` | 4 | Yes |
 //! | `atmega128a` | 2 | No |
+//! | `atmega1280` | 4 | Yes |
+//! | `atmega1284p` | 2 | Yes |
 //! | `atmega8` | 1 | No |
 
 use crate::port;
