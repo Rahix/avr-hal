@@ -32,66 +32,6 @@ avr_hal_generic::impl_spi! {
 }
 
 #[cfg(any(
-    feature = "atmega128a",
-    feature = "atmega1280",
-    feature = "atmega2560",
-    feature = "atmega32u4"
-))]
-pub type Usart0Spi = avr_hal_generic::usart_spi::UsartSpi<
-    crate::Atmega,
-    crate::pac::USART0,
-    port::PE2,
-    port::PE1,
-    port::PE0,
-    port::Dynamic,
->;
-#[cfg(any(
-    feature = "atmega128a",
-    feature = "atmega1280",
-    feature = "atmega2560",
-    feature = "atmega32u4"
-))]
-avr_hal_generic::impl_usart_spi! {
-    hal: crate::Atmega,
-    peripheral: crate::pac::USART0,
-    register_suffix: 0,
-    sclk: port::PE2,
-    mosi: port::PE1,
-    miso: port::PE0,
-    cs: port::Dynamic,
-}
-
-#[cfg(any(
-    feature = "atmega168",
-    feature = "atmega328p",
-    feature = "atmega48p",
-    feature = "atmega8"
-))]
-pub type Usart0Spi = avr_hal_generic::usart_spi::UsartSpi<
-    crate::Atmega,
-    crate::pac::USART0,
-    port::PD4,
-    port::PD1,
-    port::PD0,
-    port::Dynamic,
->;
-#[cfg(any(
-    feature = "atmega168",
-    feature = "atmega328p",
-    feature = "atmega48p",
-    feature = "atmega8"
-))]
-avr_hal_generic::impl_usart_spi! {
-    hal: crate::Atmega,
-    peripheral: crate::pac::USART0,
-    register_suffix: 0,
-    sclk: port::PD4,
-    mosi: port::PD1,
-    miso: port::PD0,
-    cs: port::Dynamic,
-}
-
-#[cfg(any(
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega48p",
