@@ -25,7 +25,7 @@ macro_rules! impl_usart_spi {
 
                     // Setup control registers
                     // We start by setting the UBBRn to 0
-                    self.[<ubrr $n>].write(|w| w.bits(0));
+                    self.[<ubrr $n>].write(|w| unsafe {w.bits(0)});
 
                     // We have to translate the character size register into the 2 bits which are the MSB/LSB and the phase
                     // 5 Bit Char = MSB and 1st
@@ -60,7 +60,7 @@ macro_rules! impl_usart_spi {
                     );
 
                     // Set the baudrate of the UBRRn, idk what it should be set to, so for now, it'll be set to 0
-                    self.[<ubrr $n>].write(|w| w.bits(0));
+                    self.[<ubrr $n>].write(|w| unsafe{w.bits(0)});
                 }
 
                 fn raw_release(&mut self) {
