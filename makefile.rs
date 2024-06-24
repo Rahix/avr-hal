@@ -3,9 +3,9 @@
 //! owo-colors  = "*"
 //! ```
 
-use owo_colors::colors::*;
+#![allow(unused_assignments)]
+
 use owo_colors::OwoColorize;
-use std::env;
 use std::process::{Command, ExitCode};
 
 #[derive(Debug)]
@@ -45,6 +45,9 @@ fn main() -> ExitCode {
         CompilationType::Mcu("attiny167", "attiny167", "attiny-hal"),
         CompilationType::Mcu("attiny2313", "attiny2313", "attiny-hal"),
     ];
+
+    let mut status = Vec::new();
+    let mut error_len = 0;
 
     for comp in matrix {
         let mut directory = String::new();
@@ -88,17 +91,37 @@ fn main() -> ExitCode {
             .expect("Something fucked up.");
         let res = child.wait().unwrap();
 
-        println!("Exited with code: {}", res.bold());
         if !res.success() {
-            return ExitCode::from(res.code().unwrap() as u8);
+            println!("Exited with code: {}", res.bold());
+            status.push((false, res.code().unwrap(), comp));
+            error_len += 1;
+            continue;
         }
-        println!("--- {} ---", "BUILT".green().bold());
+        status.push((true, 0, comp));
+        // println!("--- {} ---", "BUILT".green().bold());
     }
 
+    println!("");
+
+    let length = status.len();
     println!(
-        "{} All tests succesfully passed!",
-        "Success!".green().bold()
+        "{} {} out of {} built.",
+        "Finished!".green().bold(),
+        length - error_len,
+        length.underline()
     );
+    for (success, _code, details) in status {
+        let name = match details {
+            CompilationType::Board(name, _) => name,
+            CompilationType::Mcu(name, _, _) => name,
+        };
+
+        if success {
+            println!("{}... {}", name.italic(), "SUCCESS".green().bold());
+        } else {
+            println!("{}... {}", name.italic(), "FAIL".red().bold());
+        }
+    }
 
     ExitCode::SUCCESS
 }
