@@ -17,7 +17,7 @@
 //! | `atmega1284p` | 2 | Yes |
 //! | `atmega8` | 1 | No |
 
-// Supress warning because it doesn't recognise us usign it in macros properly.
+// Supress warning because it doesn't recognise us using it in macros properly.
 #[allow(unused_imports)]
 use crate::port;
 
@@ -69,8 +69,6 @@ avr_hal_generic::add_usart_spi! {
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega328pb",
-    feature = "atmega1284p",
-    feature = "atmega164pa",
     feature = "atmega48p"
 ))]
 avr_hal_generic::add_usart_spi! {
@@ -80,5 +78,27 @@ avr_hal_generic::add_usart_spi! {
     sclk: port::PD4,
     mosi: port::PD1,
     miso: port::PD0,
+    cs: port::Dynamic,
+}
+
+#[cfg(any(feature = "atmega1284p", feature = "atmega164pa",))]
+avr_hal_generic::add_usart_spi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::USART0,
+    register_suffix: 0,
+    sclk: port::PB0,
+    mosi: port::PD1,
+    miso: port::PD0,
+    cs: port::Dynamic,
+}
+
+#[cfg(any(feature = "atmega1284p", feature = "atmega164pa",))]
+avr_hal_generic::add_usart_spi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::USART1,
+    register_suffix: 1,
+    sclk: port::PD4,
+    mosi: port::PD3,
+    miso: port::PD2,
     cs: port::Dynamic,
 }
