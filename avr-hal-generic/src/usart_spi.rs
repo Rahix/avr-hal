@@ -8,7 +8,7 @@ pub type UsartSpi<H, USART, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> =
 
 // Impliment SpiOps trait for USART
 #[macro_export]
-macro_rules! impl_usart_spi {
+macro_rules! add_usart_spi {
     (
         hal: $HAL:ty,
         peripheral: $USART_SPI:ty,
@@ -19,8 +19,10 @@ macro_rules! impl_usart_spi {
         cs: $cspin:ty,
     ) => {
         $crate::paste::paste! {
+            pub type [<Usart $n Spi>] = avr_hal_generic::usart_spi::UsartSpi<$HAL, $USART_SPI, $sclkpin, $mosipin, $misopin, $cspin>;
+
             impl $crate::spi::SpiOps<$HAL, $sclkpin, $mosipin, $misopin, $cspin> for $USART_SPI {
-                fn raw_setup(&mut self, settings: &Settings) {
+                fn raw_setup(&mut self, settings: &crate::spi::Settings) {
                     use $crate::hal::spi;
 
                     // Setup control registers
