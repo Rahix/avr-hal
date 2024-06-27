@@ -145,6 +145,9 @@ pub mod eeprom;
 #[cfg(feature = "device-selected")]
 pub use eeprom::Eeprom;
 
+#[cfg(feature = "device-selected")]
+pub mod usart_spi;
+
 pub struct Atmega;
 
 #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
