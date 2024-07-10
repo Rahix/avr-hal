@@ -2,7 +2,6 @@ use anyhow::Context as _;
 use colored::Colorize as _;
 use structopt::clap::AppSettings;
 
-use std::ffi::OsString;
 use std::path::Path;
 use std::thread;
 use std::time::Duration;
@@ -59,35 +58,30 @@ struct Args {
     #[structopt(long = "debug-avrdude")]
     debug_avrdude: bool,
 
-    /// Which board to interact with.
-    ///
-    /// Must be one of the known board identifiers:
-    ///
-    /// * uno
-    /// * nano
-    /// * nano-new
-    /// * leonardo
-    /// * micro
-    /// * mega2560
-    /// * mega1280
-    /// * diecimila
-    /// * promicro
-    /// * promini-3v3
-    /// * promini-5v
-    /// * trinket-pro
-    /// * trinket
-    /// * nano168
-    /// * duemilanove
-    #[structopt(name = "BOARD", verbatim_doc_comment)]
-    // When Ravedude.toml exists, the binary is placed where the board should be. This is an OsString to not lose
-    // informaton when we have to take the board as the binary.
-    board: Option<OsString>,
-
+    #[structopt(name = "BINARY", parse(from_os_str))]
     /// The binary to be flashed.
     ///
     /// If no binary is given, flashing will be skipped.
-    #[structopt(name = "BINARY", parse(from_os_str))]
+    // (Note: this is where the board is stored in legacy configurations.)
     bin: Option<std::path::PathBuf>,
+
+    /// Deprecated binary for old configurations of ravedude without `Ravedude.toml`.
+    /// Should not be used in newer configurations.
+    #[structopt(name = "LEGACY BINARY", parse(from_os_str))]
+    bin_legacy: Option<std::path::PathBuf>,
+}
+impl Args {
+    /// Get the board name for legacy configurations.
+    /// `None` if the configuration isn't a legacy configuration or the board name doesn't exist.
+    fn legacy_board_name(&self) -> Option<String> {
+        if self.bin_legacy.is_none() {
+            None
+        } else {
+            self.bin
+                .as_deref()
+                .and_then(|board| board.to_str().map(String::from))
+        }
+    }
 }
 
 fn main() {
@@ -100,56 +94,56 @@ fn main() {
     }
 }
 
-fn ravedude() -> anyhow::Result<()> {
-    let mut args: Args = structopt::StructOpt::from_args();
-
-    let manifest_path = 'manifest_path: {
-        // By default Cargo scans the current dir and all of its parents for Cargo.toml,
-        // so we mirror its behavior here.
-        let current_dir = std::env::current_dir()?;
-
-        for dir_to_test in current_dir.ancestors() {
-            let path_to_test = dir_to_test.join(Path::new("Ravedude.toml"));
-            if path_to_test.exists() {
-                break 'manifest_path Some(path_to_test);
-            }
-        }
-
-        None
-    };
-
-    if manifest_path.is_some() {
-        if let Some(board) = args.board.take() {
-            if args.bin.is_none() {
-                // The board arg is taken before the binary, so rearrange the args when Ravedude.toml exists
-                args.bin = Some(std::path::PathBuf::from(board));
-            } else {
-                anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board)
-            }
-        }
-    } else if args.board.is_some() && !args.dump_config {
-        warning!(
-            "Passing the board as command-line argument is deprecated, use Ravedude.toml instead:"
-        );
-        eprintln!(
-            "\n# Ravedude.toml\n{}",
-            toml::to_string(&config::RavedudeConfig::from_args(&args)?)?
-        );
+/// Finds the location of a `Ravedude.toml` or `None` if not found.
+fn find_manifest() -> anyhow::Result<Option<std::path::PathBuf>> {
+    if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+        let path = Path::new(&manifest_dir).join("Ravedude.toml");
+        return Ok(path.exists().then_some(path));
     }
 
-    let mut ravedude_config = match manifest_path.as_deref() {
-        Some(path) => board::get_board_from_manifest(path)?,
-        None => board::get_board_from_name(
-            args
-            .board
-            .as_deref()
-            .ok_or_else(|| anyhow::anyhow!("no board given and couldn't find Ravedude.toml in project, either pass a board as an argument or make a Ravedude.toml."))?
-            .to_str()
-            .ok_or_else(|| anyhow::anyhow!("board name isn't valid UTF-8"))?
-        )?
+    // If `CARGO_MANIFEST_DIR` isn't set, Cargo scans the current dir and all of its parents for Cargo.toml
+    // so we mirror its behavior here.
+    let current_dir = std::env::current_dir()?;
+
+    for dir_to_test in current_dir.ancestors() {
+        let path_to_test = dir_to_test.join("Ravedude.toml");
+        if path_to_test.exists() {
+            return Ok(Some(path_to_test));
+        }
+    }
+
+    Ok(None)
+}
+
+fn ravedude() -> anyhow::Result<()> {
+    let args: Args = structopt::StructOpt::from_args();
+
+    let manifest_path = find_manifest()?;
+
+    let mut ravedude_config = match (manifest_path.as_deref(), args.legacy_board_name()) {
+        (Some(_), Some(board_name)) => {
+            anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board_name);
+        }
+        (Some(path), None) => board::get_board_from_manifest(path)?,
+        (None, Some(board_name)) => {
+            warning!(
+                "Passing the board as command-line argument is deprecated; create a Ravedude.toml in the project root instead:"
+            );
+            eprintln!(
+                "\n# Ravedude.toml\n{}",
+                toml::to_string(&config::RavedudeConfig::from_args(&args)?)?
+            );
+
+            board::get_board_from_name(&board_name)?
+        }
+        (None, None) => {
+            anyhow::bail!("couldn't find Ravedude.toml in project");
+        }
     };
 
-    ravedude_config.general_options.apply_overrides(&mut args)?;
+    ravedude_config
+        .general_options
+        .apply_overrides_from(&args)?;
 
     if args.dump_config {
         println!("{}", toml::to_string(&ravedude_config)?);
