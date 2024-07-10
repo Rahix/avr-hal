@@ -47,14 +47,7 @@ impl RavedudeConfig {
                 },
                 port: args.port.clone(),
                 reset_delay: args.reset_delay,
-                board: match args.board.clone() {
-                    Some(board_osstring) => Some(
-                        board_osstring
-                            .into_string()
-                            .map_err(|_| anyhow::anyhow!("board is not valid utf-8"))?,
-                    ),
-                    None => None,
-                },
+                board: args.legacy_board_name().clone(),
             },
             board_config: Default::default(),
         })
@@ -73,8 +66,8 @@ pub struct RavedudeGeneralConfig {
 }
 
 impl RavedudeGeneralConfig {
-    pub fn apply_overrides(&mut self, args: &crate::Args) -> anyhow::Result<()> {
-        // command line args take priority over Ravedude.toml
+    /// Apply command-line overrides to this configuration. Command-line arguments take priority over Ravedude.toml
+    pub fn apply_overrides_from(&mut self, args: &crate::Args) -> anyhow::Result<()> {
         if args.open_console {
             self.open_console = true;
         }
