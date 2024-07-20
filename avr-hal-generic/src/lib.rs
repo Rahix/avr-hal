@@ -22,6 +22,7 @@ pub mod simple_pwm;
 pub mod spi;
 pub mod usart;
 pub mod wdt;
+pub mod usb;
 
 /// Prelude containing all HAL traits
 pub mod prelude {

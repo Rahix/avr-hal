@@ -26,6 +26,7 @@ embedded-storage = "0.2"
 embedded-hal = "1.0"
 embedded-hal-bus = "0.1"
 unwrap-infallible = "0.1.5"
+usb-device = "0.3.2"
 
 [dependencies.embedded-hal-v0]
 version = "0.2.3"
