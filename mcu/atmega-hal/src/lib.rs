@@ -114,7 +114,7 @@ pub use avr_hal_generic::prelude;
 
 #[cfg(feature = "device-selected")]
 pub mod adc;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", not(feature = "disable-adc")))]
 pub use adc::Adc;
 
 #[cfg(feature = "device-selected")]
