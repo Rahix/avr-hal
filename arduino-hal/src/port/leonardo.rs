@@ -1,5 +1,6 @@
 pub use atmega_hal::port::{mode, Pin, PinMode, PinOps};
 
+#[allow(non_camel_case_types)] // Mute LedRx and LedTx complaints
 avr_hal_generic::renamed_pins! {
     /// Pins of the **Arduino Leonardo**.
     ///
