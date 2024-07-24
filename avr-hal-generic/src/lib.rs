@@ -1,6 +1,7 @@
 #![no_std]
 #![cfg_attr(avr_hal_asm_macro, feature(asm_experimental_arch))]
 #![cfg_attr(not(avr_hal_asm_macro), feature(llvm_asm))]
+#![feature(decl_macro)]
 
 pub use embedded_hal as hal;
 pub use embedded_hal_v0 as hal_v0;
