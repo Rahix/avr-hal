@@ -1,82 +1,105 @@
 //! WDT Implementation
+use core::marker::PhantomData;
 
-/// Implement traits for the watchdog interface
+/// Watchdog Timeout
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Timeout {
+    /// 16 milliseconds
+    Ms16,
+    /// 32 milliseconds
+    Ms32,
+    /// 64 milliseconds
+    Ms64,
+    /// 125 milliseconds
+    Ms125,
+    /// 250 milliseconds
+    Ms250,
+    /// 500 milliseconds
+    Ms500,
+    /// 1 second
+    Ms1000,
+    /// 2 seconds
+    Ms2000,
+    /// 4 seconds
+    Ms4000,
+    /// 8 seconds
+    Ms8000,
+}
+
+/// Internal trait for low-level watchdog operations.
+///
+/// **HAL users should use the [`Wdt`] type instead.**
+pub trait WdtOps<H> {
+    type MCUSR;
+
+    /// Initialize the watchdog timer.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_init(&mut self, m: &Self::MCUSR);
+
+    /// Start the watchdog timer with the specified timeout.
+    ///
+    /// If the timeout value is not supported, `Err(())` should be returned.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_start(&mut self, timeout: Timeout) -> Result<(), ()>;
+
+    /// Feed this watchdog, to reset its period.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_feed(&mut self);
+
+    /// Disable/stop this watchdog again.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_stop(&mut self);
+}
+
+pub struct Wdt<H, WDT> {
+    p: WDT,
+    _h: PhantomData<H>,
+}
+
+impl<H, WDT: WdtOps<H>> Wdt<H, WDT> {
+    pub fn new(mut p: WDT, m: &WDT::MCUSR) -> Self {
+        p.raw_init(m);
+        Self { p, _h: PhantomData }
+    }
+
+    pub fn start(&mut self, timeout: Timeout) -> Result<(), ()> {
+        self.p.raw_start(timeout)
+    }
+
+    pub fn feed(&mut self) {
+        self.p.raw_feed()
+    }
+
+    pub fn stop(&mut self) {
+        self.p.raw_stop()
+    }
+}
+
 #[macro_export]
 macro_rules! impl_wdt {
-    // Build the match for translating time out period into wdtcsr bits
-    ($w:ident, $period:ident, $($variant:ident => {$($bits:ident()).+}),+) =>
-    {
-        (match $period.into() {
-            $(Timeout::$variant => $w.$($bits()).+),+
-        })
-        .wde()
-        .set_bit()
-        .wdce()
-        .clear_bit()
-    };
-    // Create time out periods and watchdog
     (
-        pub enum Timeout {
-            $($(#[$doc:meta])*$variant:ident $prescale:tt),+$(,)*
-        }
-
-        pub struct $Wdt:ident {
-            mcu_status_register: $MCUSR:ty,
-            peripheral: $WDT:ty,
-        }
+        hal: $HAL:ty,
+        peripheral: $WDT:ty,
+        mcusr: $MCUSR:ty,
+        wdtcsr_name: $wdtcsr:ident,
+        timeout: |$to:ident, $w:ident| $to_match:expr,
     ) => {
-        use $crate::hal::watchdog::*;
+        impl $crate::wdt::WdtOps<$HAL> for $WDT {
+            type MCUSR = $MCUSR;
 
-        /// Approximate length of the time-out period before the watchdog provides a system reset.
-        ///
-        /// After enabling the watchdog timer, call [`Watchdog::feed`] before the period ends to
-        /// prevent a reset.
-        ///
-        /// [`Watchdog::feed`]: watchdog/trait.Watchdog.html#tymethod.feed
-        #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-        pub enum Timeout {
-            $($(#[$doc])*$variant),+
-        }
-
-        /// Provides a system reset when a counter reaches a given time-out value.
-        ///
-        /// # Note
-        /// Changing the watchdog configuration requires two separate writes to WDTCSR where the
-        /// second write must occur within 4 cycles of the first or the configuration will not
-        /// change. You may need to adjust optimization settings to prevent other operations from
-        /// being emitted between these two writes.
-        ///
-        /// # Example
-        /// ```
-        /// let mut watchdog = board::wdt::Wdt::new(&dp.CPU.mcusr, dp.WDT);
-        /// watchdog.start(board::wdt::Timeout::Ms8000);
-        ///
-        /// loop {
-        ///     watchdog.feed();
-        /// }
-        /// ```
-        pub struct $Wdt {
-            peripheral: $WDT,
-        }
-
-        impl $Wdt {
-            /// Initializes a Wdt.
-            ///
-            /// If a prior reset was provided by the watchdog, the WDRF in MCUSR would be set, so
-            /// WDRF is also cleared to allow for re-enabling the watchdog.
-            pub fn new(mcu_status_register: &$MCUSR, peripheral: $WDT) -> Self {
-                mcu_status_register.modify(|_, w| w.wdrf().clear_bit());
-                $Wdt { peripheral }
+            #[inline]
+            fn raw_init(&mut self, m: &Self::MCUSR) {
+                /// If a prior reset was provided by the watchdog, the WDRF in MCUSR would be set,
+                /// so WDRF is also cleared to allow for re-enabling the watchdog.
+                m.modify(|_, w| w.wdrf().clear_bit());
             }
-        }
 
-        impl $crate::hal::watchdog::WatchdogEnable for $Wdt {
-            type Time = Timeout;
-
-            fn start<T>(&mut self, period: T)
-            where
-                T: Into<Self::Time>,
-            {
+            #[inline]
+            fn raw_start(&mut self, timeout: Timeout) -> Result<(), ()> {
                 // The sequence for changing time-out configuration is as follows:
                 //
                 //     1. In the same operation, write a logic one to the Watchdog change enable bit
@@ -86,29 +109,29 @@ macro_rules! impl_wdt {
                 //        bits (WDP) as desired, but with the WDCE bit cleared. This must be done in
                 //        one operation.
                 $crate::avr_device::interrupt::free(|_| {
-                    // Reset the watchdog timer
-                    self.feed();
-                    // Enable watchdog configuration mode
-                    self.peripheral
-                        .wdtcsr
+                    // Reset the watchdog timer.
+                    self.raw_feed();
+                    // Enable watchdog configuration mode.
+                    self.$wdtcsr
                         .modify(|_, w| w.wdce().set_bit().wde().set_bit());
-                    // Enable watchdog and set interval
-                    self.peripheral.wdtcsr.write(|w| {
-                        $crate::impl_wdt!(w, period, $($variant => $prescale),+)
+                    // Enable watchdog and set interval.
+                    self.$wdtcsr.write(|w| {
+                        let $to = timeout;
+                        let $w = w;
+                        ($to_match).wde().set_bit().wdce().clear_bit()
                     });
-                });
-            }
-        }
 
-        impl $crate::hal::watchdog::Watchdog for $Wdt {
+                    Ok(())
+                })
+            }
+
             #[inline]
-            fn feed(&mut self) {
+            fn raw_feed(&mut self) {
                 avr_device::asm::wdr();
             }
-        }
 
-        impl $crate::hal::watchdog::WatchdogDisable for $Wdt {
-            fn disable(&mut self) {
+            #[inline]
+            fn raw_stop(&mut self) {
                 // The sequence for clearing WDE is as follows:
                 //
                 //     1. In the same operation, write a logic one to the Watchdog change enable bit
@@ -117,15 +140,14 @@ macro_rules! impl_wdt {
                 //     2. Within the next four clock cycles, clear the WDE and WDCE bits.
                 //        This must be done in one operation.
                 $crate::avr_device::interrupt::free(|_| {
-                    // Reset the watchdog timer
-                    self.feed();
-                    // Enable watchdog configuration mode
-                    self.peripheral
-                        .wdtcsr
+                    // Reset the watchdog timer.
+                    self.raw_feed();
+                    // Enable watchdog configuration mode.
+                    self.$wdtcsr
                         .modify(|_, w| w.wdce().set_bit().wde().set_bit());
-                    // Disable watchdog
-                    self.peripheral.wdtcsr.reset();
-                });
+                    // Disable watchdog.
+                    self.$wdtcsr.reset();
+                })
             }
         }
     };

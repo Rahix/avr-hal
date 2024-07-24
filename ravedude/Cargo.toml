@@ -1,11 +1,11 @@
 [package]
 name = "ravedude"
-version = "0.1.2"
+version = "0.1.8"
 authors = ["Rahix <rahix@rahix.de>"]
-edition = "2018"
+edition = "2021"
 description = "Tool to easily flash code onto an AVR microcontroller with avrdude"
 readme = "README.md"
-repository = "https://github.com/Rahix/avr-hal/tree/next/ravedude"
+repository = "https://github.com/Rahix/avr-hal/tree/main/ravedude"
 license = "MIT OR Apache-2.0"
 keywords = ["avr", "arduino", "avrdude"]
 categories = ["embedded", "hardware-support", "development-tools"]
@@ -16,6 +16,7 @@ tempfile = "3.2.0"
 serialport = "4.0.0"
 anyhow = "1.0.38"
 git-version = "0.3.4"
+ctrlc = "3.2.1"
 
 [dependencies.structopt]
 version = "0.3.21"

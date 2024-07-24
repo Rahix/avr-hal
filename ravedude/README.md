@@ -1,4 +1,4 @@
-ravedude
+ravedude [![crates.io page](https://img.shields.io/crates/v/ravedude.svg)](https://crates.io/crates/ravedude)
 ========
 `ravedude` is a CLI utility to make Rust development for AVR microcontrollers
 super smooth.  It's a wrapper around `avrdude` and provides easy access to the
@@ -6,6 +6,9 @@ target's serial console, similar to the Arduino IDE.
 
 `ravedude` is meant to be used as a cargo "runner".  This allows you to just use
 `cargo run` for building, deploying, and running your AVR code!
+
+if you get an `Error: no matching serial port found, use -P or set RAVEDUDE_PORT in your environment` , 
+run `cargo run` with set environment variable or adjust `runner = "ravedude {X} -cb {X} -P /dev/ttyUSB{X}"` inside `.cargo/config.toml` (replace {X} with your respective values)
 
 ## Installation
 On Linux systems, you'll need pkg-config and libudev development files
@@ -20,6 +23,8 @@ Next, install the latest version from crates.io with the following command:
 ```bash
 cargo install ravedude
 ```
+
+Alternatively, if you're using Nix (the package manager) + Flakes, you can install `ravedude` by adding `inputs.ravedude.url = "github:Rahix/avr-hal?dir=ravedude";` and use the package `ravedude.packages."${system}".default`.
 
 Now you need to add *ravedude* to your project.  For example in a project for
 Arduino Uno, place the following into your `.cargo/config.toml` (**not in

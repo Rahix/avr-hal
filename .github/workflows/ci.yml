@@ -3,7 +3,7 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - master
+      - main
       - next
       - wip
   pull_request:
@@ -17,17 +17,55 @@ jobs:
         m:
           - type: board
             name: arduino-uno
+            examples: true
+          - type: board
+            name: arduino-diecimila
+            examples: true
           - type: board
             name: arduino-leonardo
+            examples: true
           - type: board
             name: arduino-mega2560
+            examples: true
+          - type: board
+            name: arduino-mega1280
+            examples: true
+          - type: board
+            name: sparkfun-promicro
+            examples: true
+          - type: board
+            name: sparkfun-promini-3v3
+            examples: true
+          - type: board
+            name: sparkfun-promini-5v
+            examples: true
+          - type: board
+            name: trinket-pro
+            examples: true
+          - type: board
+            name: trinket
+            examples: true
+          - type: board
+            name: arduino-nano
+            examples: true
+          - type: board
+            name: nano168
+            examples: true
+          - type: board
+            # Not really a board, but also an examples crate
+            name: atmega2560
+            examples: true
           - type: mcu
             name: atmega1280
             spec: atmega1280
             crate: atmega-hal
           - type: mcu
-            name: atmega168
-            spec: atmega168
+            name: atmega32a
+            spec: atmega32a
+            crate: atmega-hal
+          - type: mcu
+            name: atmega128a
+            spec: atmega128a
             crate: atmega-hal
           - type: mcu
             name: atmega328pb
@@ -36,6 +74,14 @@ jobs:
           - type: mcu
             name: atmega48p
             spec: atmega48p
+            crate: atmega-hal
+          - type: mcu
+            name: atmega1284p
+            spec: atmega1284p
+            crate: atmega-hal
+          - type: mcu
+            name: atmega8
+            spec: atmega8
             crate: atmega-hal
           - type: mcu
             name: attiny85
@@ -49,22 +95,31 @@ jobs:
             name: atmega8u2
             spec: atmega8u2
             crate: atmega-hal
+          - type: mcu
+            name: attiny167
+            spec: attiny167
+            crate: attiny-hal
+          - type: mcu
+            name: attiny2313
+            spec: attiny2313
+            crate: attiny-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
-          toolchain: nightly-2021-01-07
-          override: true
+          toolchain: nightly-2023-12-28
           components: rust-src
       - name: Install avr-gcc, binutils, and libc
         run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
       - name: Compile board crate and examples
-        if: "${{ matrix.m.type == 'board' }}"
+        if: "${{ matrix.m.type == 'board' && matrix.m.examples }}"
         run: cd "examples/${{ matrix.m.name }}" && cargo build --bins
+      - name: Compile board crate (without examples)
+        if: "${{ matrix.m.type == 'board' && !matrix.m.examples }}"
+        run: cd "arduino-hal/" && cargo build --features "${{ matrix.m.name }}"
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
         run: cd "mcu/${{ matrix.m.crate }}" && cargo build --features "${{ matrix.m.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"
@@ -74,17 +129,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+        uses: dtolnay/rust-toolchain@stable
       - name: Install libudev
         run: sudo apt-get update && sudo apt-get install -y libudev-dev
       - name: Check ravedude
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --manifest-path ravedude/Cargo.toml
+        run: |
+          cargo check --manifest-path ravedude/Cargo.toml

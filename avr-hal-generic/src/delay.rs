@@ -1,13 +1,26 @@
 //! Delay implementations
 
 use core::marker;
-use hal::blocking::delay;
+use embedded_hal::delay::DelayNs;
+use embedded_hal_v0::blocking::delay as delay_v0;
+
+#[cfg(all(target_arch = "avr", avr_hal_asm_macro))]
+use core::arch::asm;
 
 /// A busy-loop delay implementation
 ///
 /// # Example
 /// ```rust
-/// let mut delay = delay::Delay::<clock::MHz16>::new();
+/// // Instead of arduino_hal below you may also use a different
+/// // HAL based on avr_hal_generic like attiny_hal or atmega_hal
+/// // depending on actual hardware. For example:
+/// //
+/// // use attiny_hal as hal;
+///
+/// use arduino_hal as hal;
+/// use embedded_hal_v0::prelude::*;
+///
+/// let mut delay = embedded_hal_v0::delay::Delay::<hal::clock::MHz16>::new();
 ///
 /// // Wait 1 second
 /// delay.delay_ms(1000);
@@ -32,7 +45,19 @@ impl<SPEED> Delay<SPEED> {
 // based on https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/wiring.c
 
 cfg_if::cfg_if! {
-    if #[cfg(target_arch = "avr")] {
+    if #[cfg(all(target_arch = "avr", avr_hal_asm_macro))] {
+        #[allow(unused_assignments)]
+        fn busy_loop(mut c: u16) {
+            unsafe {
+                asm!(
+                    "1:",
+                    "sbiw {c}, 1",
+                    "brne 1b",
+                    c = inout(reg_iw) c,
+                );
+            }
+        }
+    } else if #[cfg(target_arch = "avr")] {
         #[allow(unused_assignments)]
         fn busy_loop(mut c: u16) {
             unsafe {
@@ -52,7 +77,7 @@ cfg_if::cfg_if! {
 }
 
 // Clock-Specific Delay Implementations ----------------------------------- {{{
-impl delay::DelayUs<u16> for Delay<crate::clock::MHz24> {
+impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz24> {
     fn delay_us(&mut self, mut us: u16) {
         // for the 24 crate::clock::MHz clock for the aventurous ones, trying to overclock
 
@@ -75,15 +100,21 @@ impl delay::DelayUs<u16> for Delay<crate::clock::MHz24> {
     }
 }
 
-impl delay::DelayUs<u16> for Delay<crate::clock::MHz20> {
+impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz20> {
     fn delay_us(&mut self, mut us: u16) {
         // for the 20 crate::clock::MHz clock on rare Arduino boards
 
         // for a one-microsecond delay, simply return.  the overhead
         // of the function call takes 18 (20) cycles, which is 1us
+        #[cfg(all(target_arch = "avr", avr_hal_asm_macro))]
+        unsafe {
+            asm!("nop", "nop", "nop", "nop");
+        }
+
+        #[cfg(all(target_arch = "avr", not(avr_hal_asm_macro)))]
         unsafe {
             llvm_asm!("nop\nnop\nnop\nnop" :::: "volatile");
-        } //just waiting 4 cycles
+        }
 
         if us <= 1 {
             return;
@@ -103,7 +134,7 @@ impl delay::DelayUs<u16> for Delay<crate::clock::MHz20> {
     }
 }
 
-impl delay::DelayUs<u16> for Delay<crate::clock::MHz16> {
+impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz16> {
     fn delay_us(&mut self, mut us: u16) {
         // for the 16 crate::clock::MHz clock on most Arduino boards
 
@@ -127,7 +158,7 @@ impl delay::DelayUs<u16> for Delay<crate::clock::MHz16> {
     }
 }
 
-impl delay::DelayUs<u16> for Delay<crate::clock::MHz12> {
+impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz12> {
     fn delay_us(&mut self, mut us: u16) {
         // for the 12 crate::clock::MHz clock if somebody is working with USB
 
@@ -151,7 +182,24 @@ impl delay::DelayUs<u16> for Delay<crate::clock::MHz12> {
     }
 }
 
-impl delay::DelayUs<u16> for Delay<crate::clock::MHz8> {
+impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz10> {
+    fn delay_us(&mut self, mut us: u16) {
+        // for the 10 crate::clock::MHz clock if somebody is working with USB
+
+        // for a 1 microsecond delay, simply return.  the overhead
+        // of the function call takes 14 (16) cycles, which is 1.5us
+        if us <= 1 {
+            return;
+        } // = 3 cycles, (4 when true)
+
+        // 4 cycles per busy_loop iteration = 0.4 us per busy loop, so 2.5 times to get 1 us
+        us = ((us << 2) + us) >> 1; // x2.5
+
+        busy_loop(us);
+    }
+}
+
+impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz8> {
     fn delay_us(&mut self, mut us: u16) {
         // for the 8 crate::clock::MHz internal clock
 
@@ -175,7 +223,7 @@ impl delay::DelayUs<u16> for Delay<crate::clock::MHz8> {
     }
 }
 
-impl delay::DelayUs<u16> for Delay<crate::clock::MHz1> {
+impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz1> {
     fn delay_us(&mut self, mut us: u16) {
         // for the 1 crate::clock::MHz internal clock (default settings for common Atmega microcontrollers)
 
@@ -200,18 +248,18 @@ impl delay::DelayUs<u16> for Delay<crate::clock::MHz1> {
 
 // ------------------------------------------------------------------------ }}}
 
-impl<SPEED> delay::DelayUs<u8> for Delay<SPEED>
+impl<SPEED> delay_v0::DelayUs<u8> for Delay<SPEED>
 where
-    Delay<SPEED>: delay::DelayUs<u16>,
+    Delay<SPEED>: delay_v0::DelayUs<u16>,
 {
     fn delay_us(&mut self, us: u8) {
-        delay::DelayUs::<u16>::delay_us(self, us as u16);
+        delay_v0::DelayUs::<u16>::delay_us(self, us as u16);
     }
 }
 
-impl<SPEED> delay::DelayUs<u32> for Delay<SPEED>
+impl<SPEED> delay_v0::DelayUs<u32> for Delay<SPEED>
 where
-    Delay<SPEED>: delay::DelayUs<u16>,
+    Delay<SPEED>: delay_v0::DelayUs<u16>,
 {
     fn delay_us(&mut self, us: u32) {
         // TODO: Somehow fix the overhead induced by this loop
@@ -222,27 +270,42 @@ where
         let iters = us >> 12;
         let mut i = 0;
         while i < iters {
-            delay::DelayUs::<u16>::delay_us(self, 0xfff);
+            delay_v0::DelayUs::<u16>::delay_us(self, 0xfff);
             i += 1;
         }
-        delay::DelayUs::<u16>::delay_us(self, (us & 0xfff) as u16);
+        delay_v0::DelayUs::<u16>::delay_us(self, (us & 0xfff) as u16);
     }
 }
 
-impl<SPEED> delay::DelayMs<u16> for Delay<SPEED>
+impl<SPEED> delay_v0::DelayMs<u16> for Delay<SPEED>
 where
-    Delay<SPEED>: delay::DelayUs<u32>,
+    Delay<SPEED>: delay_v0::DelayUs<u32>,
 {
     fn delay_ms(&mut self, ms: u16) {
-        delay::DelayUs::<u32>::delay_us(self, ms as u32 * 1000);
+        delay_v0::DelayUs::<u32>::delay_us(self, ms as u32 * 1000);
     }
 }
 
-impl <SPEED> delay::DelayMs<u8> for Delay<SPEED>
+impl<SPEED> delay_v0::DelayMs<u8> for Delay<SPEED>
 where
-    Delay<SPEED>: delay::DelayMs<u16>,
+    Delay<SPEED>: delay_v0::DelayMs<u16>,
 {
     fn delay_ms(&mut self, ms: u8) {
-        delay::DelayMs::<u16>::delay_ms(self, ms as u16);
+        delay_v0::DelayMs::<u16>::delay_ms(self, ms as u16);
+    }
+}
+
+impl<SPEED> DelayNs for Delay<SPEED>
+where
+    Delay<SPEED>: delay_v0::DelayUs<u16>,
+{
+    fn delay_ns(&mut self, ns: u32) {
+        // quick-win to get an initial implementation.
+        // note that the trait does not guarantee nanosecond-accuracy.
+        delay_v0::DelayUs::<u32>::delay_us(self, ns.div_ceil(1000))
+    }
+
+    fn delay_us(&mut self, us: u32) {
+        delay_v0::DelayUs::<u32>::delay_us(self, us);
     }
 }

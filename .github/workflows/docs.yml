@@ -3,7 +3,7 @@ name: Documentation
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   docs:
@@ -11,18 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
-          toolchain: nightly-2021-01-07
-          override: true
+          toolchain: nightly-2023-12-28
           components: rust-src
-      - name: Build documentation
-        run: cargo doc --all
+      - name: Build documentation (arduino-hal)
+        run: cd arduino-hal/ && cargo doc --features arduino-uno
+      - name: Build documentation (atmega-hal)
+        run: cd mcu/atmega-hal/ && cargo doc --features atmega328p
+      - name: Build documentation (attiny-hal)
+        run: cd mcu/attiny-hal/ && cargo doc --features attiny85
       - name: Deploy to GH-Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/doc

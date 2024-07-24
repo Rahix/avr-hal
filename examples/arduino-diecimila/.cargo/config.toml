@@ -1,0 +1,8 @@
+[build]
+target = "../../avr-specs/avr-atmega168.json"
+
+[target.'cfg(target_arch = "avr")']
+runner = "ravedude diecimila"
+
+[unstable]
+build-std = ["core"]

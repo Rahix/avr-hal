@@ -23,18 +23,22 @@ members = [
     "arduino-hal",
 
     # Examples
+    "examples/arduino-diecimila",
     "examples/arduino-leonardo",
     "examples/arduino-mega2560",
+    "examples/arduino-mega1280",
     "examples/arduino-nano",
     "examples/arduino-uno",
+    "examples/atmega2560",
+    "examples/nano168",
+    "examples/sparkfun-promicro",
+    "examples/sparkfun-promini-3v3",
+    "examples/sparkfun-promini-5v",
+    "examples/trinket-pro",
+    "examples/trinket",
 ]
 exclude = [
     # The RAVEDUDE! Yeah!
     "ravedude",
 ]
-
-[patch.crates-io]
-# XXX: Temporary fix for avr-rust/rust#148
-ufmt = { git = "https://github.com/Rahix/ufmt.git", rev = "12225dc1678e42fecb0e8635bf80f501e24817d9" }
-# Temporary fix until avr-device has a version bump
-avr-device = { git = "https://github.com/Rahix/avr-device", rev = "92e4d5f" }
+resolver = "2"

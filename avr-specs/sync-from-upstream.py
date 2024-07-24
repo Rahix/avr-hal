@@ -13,11 +13,23 @@ SPECS = {
     "atmega48p": {
         "cpu": "atmega48p",
     },
+    "atmega164pa": {
+        "cpu": "atmega164pa",
+    },
     "atmega168": {
         "cpu": "atmega168",
     },
+    "atmega32a": {
+        "cpu": "atmega32a"
+    },
+    "atmega328": {
+        "cpu": "atmega328",
+    },
     "atmega328p": {
         "cpu": "atmega328p",
+    },
+    "atmega128a": {
+        "cpu": "atmega128a",
     },
     "atmega1280": {
         "cpu": "atmega1280",
@@ -25,11 +37,23 @@ SPECS = {
     "atmega2560": {
         "cpu": "atmega2560",
     },
+    "atmega1284p": {
+        "cpu": "atmega1284p",
+    },
+    "atmega8": {
+        "cpu": "atmega8",
+    },
     "attiny85": {
         "cpu": "attiny85",
     },
     "attiny88": {
         "cpu": "attiny88",
+    },
+    "attiny167": {
+        "cpu": "attiny167",
+    },
+    "attiny2313": {
+        "cpu": "attiny2313",
     },
 }
 
@@ -74,7 +98,7 @@ def main():
         spec = copy.deepcopy(upstream_spec)
         spec.update(COMMON)
         spec.update(settings)
-        spec["pre-link-args"]["gcc"][0] = f"-mmcu={mcu}"
+        spec["pre-link-args"]["gcc"][0] = f"-mmcu={settings['cpu']}"
 
         with open(f"avr-specs/avr-{mcu}.json", "w") as f:
             json.dump(spec, f, sort_keys=True, indent=2)

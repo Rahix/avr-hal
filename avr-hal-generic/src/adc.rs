@@ -24,34 +24,6 @@ impl Default for ClockDivider {
     }
 }
 
-/// Select the voltage reference for the ADC peripheral
-///
-/// The internal voltage reference options may not be used if an external reference voltage is
-/// being applied to the AREF pin.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u8)]
-pub enum ReferenceVoltage {
-    /// Voltage applied to AREF pin.
-    Aref,
-    /// Default reference voltage (default).
-    AVcc,
-    /// Internal reference voltage.
-    Internal,
-}
-
-impl Default for ReferenceVoltage {
-    fn default() -> Self {
-        Self::AVcc
-    }
-}
-
-/// Configuration for the ADC peripheral.
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AdcSettings {
-    pub clock_divider: ClockDivider,
-    pub ref_voltage: ReferenceVoltage,
-}
-
 /// Internal trait for the low-level ADC peripheral.
 ///
 /// **Prefer using the [`Adc`] API instead of this trait.**
@@ -59,10 +31,13 @@ pub trait AdcOps<H> {
     /// Channel ID type for this ADC.
     type Channel: PartialEq + Copy;
 
+    /// Settings type for this ADC.
+    type Settings: PartialEq + Copy;
+
     /// Initialize the ADC peripheral with the specified settings.
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
-    fn raw_init(&mut self, settings: AdcSettings);
+    fn raw_init(&mut self, settings: Self::Settings);
 
     /// Read out the ADC data register.
     ///
@@ -92,6 +67,13 @@ pub trait AdcOps<H> {
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
     fn raw_enable_channel(&mut self, channel: Self::Channel);
+
+    /// Clear the DIDR (Digital Input Disable) for a certain channel.
+    ///
+    /// Enables digital logic on the corresponding pin after it has been used as an ADC channel.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_disable_channel(&mut self, channel: Self::Channel);
 }
 
 /// Trait marking a type as an ADC channel for a certain ADC.
@@ -150,14 +132,14 @@ impl<H, ADC: AdcOps<H>> AdcChannel<H, ADC> for Channel<H, ADC> {
 /// let pins = atmega_hal::pins!(dp);
 /// let mut adc = atmega_hal::Adc::new(dp.ADC, Default::default());
 ///
-/// let a0 = dp.pc0.into_analog_input(&mut adc);
+/// let a0 = pins.pc0.into_analog_input(&mut adc);
 ///
 /// // the following two calls are equivalent
 /// let voltage = a0.analog_read(&mut adc);
 /// let voltage = adc.read_blocking(&a0);
 ///
 /// // alternatively, a non-blocking interface exists
-/// let voltage = nb::block!(adc.read_nonblocking(&a0)).void_unwrap();
+/// let voltage = nb::block!(adc.read_nonblocking(&a0)).unwrap_infallible();
 /// ```
 pub struct Adc<H, ADC: AdcOps<H>, CLOCK> {
     p: ADC,
@@ -171,7 +153,7 @@ where
     ADC: AdcOps<H>,
     CLOCK: crate::clock::Clock,
 {
-    pub fn new(p: ADC, settings: AdcSettings) -> Self {
+    pub fn new(p: ADC, settings: ADC::Settings) -> Self {
         let mut adc = Self {
             p,
             reading_channel: None,
@@ -182,13 +164,18 @@ where
         adc
     }
 
-    pub fn initialize(&mut self, settings: AdcSettings) {
+    pub fn initialize(&mut self, settings: ADC::Settings) {
         self.p.raw_init(settings);
     }
 
     #[inline]
     pub(crate) fn enable_pin<PIN: AdcChannel<H, ADC>>(&mut self, pin: &PIN) {
         self.p.raw_enable_channel(pin.channel());
+    }
+
+    #[inline]
+    pub(crate) fn disable_pin<PIN: AdcChannel<H, ADC>>(&mut self, pin: &PIN) {
+        self.p.raw_disable_channel(pin.channel());
     }
 
     pub fn read_blocking<PIN: AdcChannel<H, ADC>>(&mut self, pin: &PIN) -> u16 {
@@ -202,14 +189,14 @@ where
     pub fn read_nonblocking<PIN: AdcChannel<H, ADC>>(
         &mut self,
         pin: &PIN,
-    ) -> nb::Result<u16, void::Void> {
+    ) -> nb::Result<u16, core::convert::Infallible> {
         match (&self.reading_channel, self.p.raw_is_converting()) {
             // Measurement on current pin is ongoing
             (Some(channel), true) if *channel == pin.channel() => Err(nb::Error::WouldBlock),
             // Measurement on current pin completed
             (Some(channel), false) if *channel == pin.channel() => {
                 self.reading_channel = None;
-                Ok(self.p.raw_read_adc().into())
+                Ok(self.p.raw_read_adc())
             }
             // Measurement on other pin is ongoing
             (Some(_), _) => {
@@ -232,12 +219,14 @@ macro_rules! impl_adc {
     (
         hal: $HAL:ty,
         peripheral: $ADC:ty,
+        settings: $Settings:ty,
+        apply_settings: |$settings_periph_var:ident, $settings_var:ident| $apply_settings:block,
         channel_id: $Channel:ty,
         set_channel: |$periph_var:ident, $chan_var:ident| $set_channel:block,
         pins: {
             $(
                 $(#[$pin_attr:meta])*
-                $pin:ty: ($pin_channel:expr, $didr:ident::$didr_method:ident),
+                $pin:ty: ($pin_channel:expr$(, $didr:ident::$didr_method:ident)?),
             )+
         },
         $(channels: {
@@ -249,26 +238,14 @@ macro_rules! impl_adc {
     ) => {
         impl $crate::adc::AdcOps<$HAL> for $ADC {
             type Channel = $Channel;
+            type Settings = $Settings;
 
             #[inline]
-            fn raw_init(&mut self, settings: $crate::adc::AdcSettings) {
-                self.adcsra.write(|w| {
-                    w.aden().set_bit();
-                    match settings.clock_divider {
-                        ClockDivider::Factor2 => w.adps().prescaler_2(),
-                        ClockDivider::Factor4 => w.adps().prescaler_4(),
-                        ClockDivider::Factor8 => w.adps().prescaler_8(),
-                        ClockDivider::Factor16 => w.adps().prescaler_16(),
-                        ClockDivider::Factor32 => w.adps().prescaler_32(),
-                        ClockDivider::Factor64 => w.adps().prescaler_64(),
-                        ClockDivider::Factor128 => w.adps().prescaler_128(),
-                    }
-                });
-                self.admux.write(|w| match settings.ref_voltage {
-                    ReferenceVoltage::Aref => w.refs().aref(),
-                    ReferenceVoltage::AVcc => w.refs().avcc(),
-                    ReferenceVoltage::Internal => w.refs().internal(),
-                });
+            fn raw_init(&mut self, settings: Self::Settings) {
+                let $settings_periph_var = self;
+                let $settings_var = settings;
+
+                $apply_settings
             }
 
             #[inline]
@@ -298,8 +275,21 @@ macro_rules! impl_adc {
             fn raw_enable_channel(&mut self, channel: Self::Channel) {
                 match channel {
                     $(
-                        $(#[$pin_attr])*
-                        x if x == $pin_channel => self.$didr.modify(|_, w| w.$didr_method().set_bit()),
+                        x if x == $pin_channel => {
+                            $(self.$didr.modify(|_, w| w.$didr_method().set_bit());)?
+                        }
+                    )+
+                    _ => unreachable!(),
+                }
+            }
+
+            #[inline]
+            fn raw_disable_channel(&mut self, channel: Self::Channel) {
+                match channel {
+                    $(
+                        x if x == $pin_channel => {
+                            $(self.$didr.modify(|_, w| w.$didr_method().clear_bit());)?
+                        }
                     )+
                     _ => unreachable!(),
                 }
@@ -333,7 +323,7 @@ macro_rules! impl_adc {
         $(#[$channel_attr])*
         impl $channel_ty {
             pub fn into_channel(self) -> $crate::adc::Channel<$HAL, $ADC> {
-                crate::adc::Channel::new(self)
+                $crate::adc::Channel::new(self)
             }
         }
         )*)?

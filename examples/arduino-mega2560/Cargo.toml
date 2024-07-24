@@ -2,15 +2,25 @@
 name = "arduino-mega2560-examples"
 version = "0.0.0"
 authors = ["Rahix <rahix@rahix.de>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [dependencies]
 panic-halt = "0.2.0"
-ufmt = "0.1.0"
-nb = "0.1.2"
-embedded-hal = "0.2.3"
+ufmt = "0.2.0"
+nb = "1.1.0"
+embedded-hal = "1.0"
+
+[dependencies.embedded-hal-v0]
+version = "0.2.3"
+package = "embedded-hal"
 
 [dependencies.arduino-hal]
 path = "../../arduino-hal/"
 features = ["arduino-mega2560"]
+
+# The latest releases of `proc-macro2` do not support the rust toolchain that
+# we use.  Thus, we must fix this dependency to an older version where our
+# toolchain is still supported.  See https://github.com/Rahix/avr-hal/issues/537
+[build-dependencies.proc-macro2]
+version = "=1.0.79"

@@ -1,3 +1,6 @@
+/*!
+ * Blink the builtin LED - the "Hello World" of embedded programming.
+ */
 #![no_std]
 #![no_main]
 

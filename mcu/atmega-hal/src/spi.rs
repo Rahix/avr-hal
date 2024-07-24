@@ -2,7 +2,13 @@
 use crate::port;
 pub use avr_hal_generic::spi::*;
 
-#[cfg(any(feature = "atmega8u2", feature = "atmega2560", feature = "atmega32u4"))]
+#[cfg(any(
+    feature = "atmega128a",
+    feature = "atmega1280",
+    feature = "atmega2560",
+    feature = "atmega8u2",
+    feature = "atmega32u4"
+))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
     crate::pac::SPI,
@@ -11,7 +17,13 @@ pub type Spi = avr_hal_generic::spi::Spi<
     port::PB3,
     port::PB0,
 >;
-#[cfg(any(feature = "atmega8u2", feature = "atmega2560", feature = "atmega32u4"))]
+#[cfg(any(
+    feature = "atmega128a",
+    feature = "atmega1280",
+    feature = "atmega2560",
+    feature = "atmega8u2",
+    feature = "atmega32u4"
+))]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
     peripheral: crate::pac::SPI,
@@ -21,7 +33,12 @@ avr_hal_generic::impl_spi! {
     cs: port::PB0,
 }
 
-#[cfg(any(feature = "atmega168", feature = "atmega328p", feature = "atmega48p",))]
+#[cfg(any(
+    feature = "atmega168",
+    feature = "atmega328p",
+    feature = "atmega48p",
+    feature = "atmega8"
+))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
     crate::pac::SPI,
@@ -30,7 +47,12 @@ pub type Spi = avr_hal_generic::spi::Spi<
     port::PB4,
     port::PB2,
 >;
-#[cfg(any(feature = "atmega168", feature = "atmega328p", feature = "atmega48p",))]
+#[cfg(any(
+    feature = "atmega168",
+    feature = "atmega328p",
+    feature = "atmega48p",
+    feature = "atmega8"
+))]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
     peripheral: crate::pac::SPI,
@@ -75,4 +97,23 @@ avr_hal_generic::impl_spi! {
     mosi: port::PE3,
     miso: port::PC0,
     cs: port::PE2,
+}
+
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
+pub type Spi = avr_hal_generic::spi::Spi<
+    crate::Atmega,
+    crate::pac::SPI,
+    port::PB7,
+    port::PB5,
+    port::PB6,
+    port::PB4,
+>;
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
+avr_hal_generic::impl_spi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::SPI,
+    sclk: port::PB7,
+    mosi: port::PB5,
+    miso: port::PB6,
+    cs: port::PB4,
 }
