@@ -6,7 +6,7 @@ pub use avr_hal_generic::usb::*;
 #[cfg(any(feature = "atmega32u4", feature = "atmega8u2"))]
 use crate::pac::{
 	usb_device::{udint, UDINT, ueintx, UEINTX},
-	USB_DEVICE
+	USB_DEVICE, PLL,
 };
 
 #[cfg(feature = "atmega32u4")]
@@ -35,6 +35,7 @@ const DPRAM_SIZE: u16 = 176;
 
 avr_hal_generic::usb::create_usb_bus! {
 	USB_DEVICE,
+	SuspendNotifier,
 	UDINT, // REVIEW: how should i be passing these down? (do we want to pass the registers too or just the type?)
 	UEINTX,
 	USBINT,
@@ -102,5 +103,35 @@ impl ClearInterrupts for USBINT {
     {
         // Bits 7:1 are reserved as do not set.
         self.write(|w| f(unsafe { w.bits(0x01) }))
+    }
+}
+
+/// Receiver for handling suspend and resume events from the USB device.
+///
+/// See [`UsbBus::with_suspend_notifier`] for more details.
+pub trait SuspendNotifier: Send + Sized + 'static {
+    /// Called by `UsbBus` when the USB peripheral has been suspended and the
+    /// PLL is safe to shut down.
+    fn suspend(&self) {}
+
+    /// Called by `UsbBus` when the USB peripheral is about to resume and is
+    /// waiting for PLL to be enabled.
+    ///
+    /// This function should block until PLL lock has been established.
+    fn resume(&self) {}
+}
+
+impl SuspendNotifier for () {}
+
+impl SuspendNotifier for PLL {
+    fn suspend(&self) {
+        self.pllcsr.modify(|_, w| w.plle().clear_bit());
+    }
+
+    fn resume(&self) {
+        self.pllcsr
+            .modify(|_, w| w.pindiv().set_bit().plle().set_bit());
+
+        while self.pllcsr.read().plock().bit_is_clear() {}
     }
 }

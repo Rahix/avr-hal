@@ -52,6 +52,7 @@ impl EndpointTableEntry {
 // Using Macro 2.0 here while not stable yet makes this code a lot more readable and easier to write
 pub macro create_usb_bus (
     $USB_DEVICE:ty,
+    $SuspendNotifier:path,
     $UDINT:ty,
     $UEINTX:ty,
     $USBINT:ty,
@@ -62,7 +63,7 @@ pub macro create_usb_bus (
 
     // MARK: - AvrUsbBus
 
-    pub struct AvrUsbBus<S: SuspendNotifier> {
+    pub struct AvrUsbBus<S: $SuspendNotifier> {
         usb: AvrDMutex<$USB_DEVICE>,
         suspend_notifier: AvrDMutex<S>,
         pending_ins: AvrDMutex<Cell<u8>>,
@@ -80,7 +81,7 @@ pub macro create_usb_bus (
         }
     }
     
-    impl<S: SuspendNotifier> AvrUsbBus<S> {
+    impl<S: $SuspendNotifier> AvrUsbBus<S> {
         /// Create a UsbBus with a suspend and resume handler.
         ///
         /// If you want the PLL to be automatically disabled when the USB peripheral
@@ -170,7 +171,7 @@ pub macro create_usb_bus (
         }
     }
 
-    impl<S: SuspendNotifier> UsbBus for AvrUsbBus<S> {
+    impl<S: $SuspendNotifier> UsbBus for AvrUsbBus<S> {
         fn alloc_ep(
             &mut self,
             ep_dir: UsbDirection,
@@ -531,20 +532,3 @@ pub macro create_usb_bus (
         }
     }
 }
-
-/// Receiver for handling suspend and resume events from the USB device.
-///
-/// See [`UsbBus::with_suspend_notifier`] for more details.
-pub trait SuspendNotifier: Send + Sized + 'static {
-    /// Called by `UsbBus` when the USB peripheral has been suspended and the
-    /// PLL is safe to shut down.
-    fn suspend(&self) {}
-
-    /// Called by `UsbBus` when the USB peripheral is about to resume and is
-    /// waiting for PLL to be enabled.
-    ///
-    /// This function should block until PLL lock has been established.
-    fn resume(&self) {}
-}
-
-impl SuspendNotifier for () {}
