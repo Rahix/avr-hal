@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["GPIOR2_SPEC","R","W"]};
