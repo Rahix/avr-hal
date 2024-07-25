@@ -145,8 +145,10 @@ pub mod eeprom;
 #[cfg(feature = "device-selected")]
 pub use eeprom::Eeprom;
 
-// REVIEW: This maybe should only be turned on for USBs
-#[cfg(feature = "device-selected")]
+#[cfg(any(
+    feature = "atmega8u2",
+    feature = "atmega32u4",
+))]
 pub mod usb;
 
 pub struct Atmega;
