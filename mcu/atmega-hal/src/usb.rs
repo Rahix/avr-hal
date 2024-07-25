@@ -12,11 +12,6 @@ use crate::pac::{
 #[cfg(feature = "atmega32u4")]
 use crate::pac::usb_device::{usbint, USBINT};
 
-#[cfg(feature = "atmega8u2")]
-type USBINT = !; // atmega8u2 does not have USBINT register
-#[cfg(feature = "atmega8u2")]
-const usbint: USBINT = !(); // atmega8u2 does not have USBINT register
-
 // MARK: - Constants by device
 
 #[cfg(feature = "atmega32u4")]
@@ -36,9 +31,6 @@ const DPRAM_SIZE: u16 = 176;
 avr_hal_generic::usb::create_usb_bus! {
 	USB_DEVICE,
 	SuspendNotifier,
-	UDINT, // REVIEW: how should i be passing these down? (do we want to pass the registers too or just the type?)
-	UEINTX,
-	USBINT,
 	MAX_ENDPOINTS,
 	ENDPOINT_MAX_BUFSIZE,
 	DPRAM_SIZE,

@@ -53,9 +53,6 @@ impl EndpointTableEntry {
 pub macro create_usb_bus (
     $USB_DEVICE:ty,
     $SuspendNotifier:path,
-    $UDINT:ty,
-    $UEINTX:ty,
-    $USBINT:ty,
     $MAX_ENDPOINTS:ident,
     $ENDPOINT_MAX_BUFSIZE:ident,
     $DPRAM_SIZE:ident,
