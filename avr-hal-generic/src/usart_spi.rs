@@ -63,8 +63,18 @@ macro_rules! add_usart_spi {
                         .[<rxcie $n>]().set_bit()
                     );
 
-                    // Set the baudrate of the UBRRn, idk what it should be set to, so for now, it'll be set to 0
-                    self.[<ubrr $n>].write(|w| unsafe{w.bits(0)});
+                    // Set the clock divider for SPI clock.
+                    self.[<ubrr $n>].write(|w| {
+                        match settings.clock {
+                            crate::spi::SerialClockRate::OscfOver2 => w.bits(0),
+                            crate::spi::SerialClockRate::OscfOver4 => w.bits(1),
+                            crate::spi::SerialClockRate::OscfOver8 => w.bits(3),
+                            crate::spi::SerialClockRate::OscfOver16 => w.bits(7),
+                            crate::spi::SerialClockRate::OscfOver32 => w.bits(15),
+                            crate::spi::SerialClockRate::OscfOver64 => w.bits(31),
+                            crate::spi::SerialClockRate::OscfOver128 => w.bits(63),
+                        }
+                    });
                 }
 
                 fn raw_release(&mut self) {
