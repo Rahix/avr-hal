@@ -7,7 +7,7 @@ use crate::{port::PinOps, spi};
 pub struct UsartSPIDummyPin;
 
 impl PinOps for UsartSPIDummyPin {
-    type Dynamic = Dynamic;
+    type Dynamic = todo!();
 
     fn into_dynamic(self) -> Self::Dynamic {
         todo!()
@@ -32,8 +32,8 @@ impl PinOps for UsartSPIDummyPin {
     unsafe fn make_input(&mut self, pull_up: bool) {}
 }
 
-pub type UsartSpi<H, USART, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> =
-    spi::Spi<H, USART, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>;
+pub type UsartSpi<H, USART, SCLKPIN, MOSIPIN, MISOPIN> =
+    spi::Spi<H, USART, SCLKPIN, MOSIPIN, MISOPIN, UsartSPIDummyPin>;
 
 // Impliment SpiOps trait for USART
 #[macro_export]
@@ -45,12 +45,11 @@ macro_rules! add_usart_spi {
         sclk: $sclkpin:ty,
         mosi: $mosipin:ty,
         miso: $misopin:ty,
-        cs: $cspin:ty,
     ) => {
         $crate::paste::paste! {
             // This is quite a messy way to get the doc string working properly... but it works!
             #[doc = concat!("**Clock:** `", stringify!($sclkpin), "`<br>**MOSI:** `", stringify!($mosipin), "`<br> **MISO:** `", stringify!($misopin), "`<br> **CS:** `", stringify!($cspin), "`")]
-            pub type [<Usart $n Spi>] = avr_hal_generic::usart_spi::UsartSpi<$HAL, $USART_SPI, $sclkpin, $mosipin, $misopin, $cspin>;
+            pub type [<Usart $n Spi>] = avr_hal_generic::usart_spi::UsartSpi<$HAL, $USART_SPI, $sclkpin, $mosipin, $misopin>;
 
             impl $crate::spi::SpiOps<$HAL, $sclkpin, $mosipin, $misopin, $cspin> for $USART_SPI {
                 fn raw_setup(&mut self, settings: &crate::spi::Settings) {
