@@ -14,7 +14,8 @@ pub type UsartReader<USART, RX, TX, CLOCK> =
     feature = "atmega328p",
     feature = "atmega328pb",
     feature = "atmega1284p",
-    feature = "atmega164pa"
+    feature = "atmega164pa",
+    feature = "atmega48p"
 ))]
 pub type Usart0<CLOCK> = Usart<
     crate::pac::USART0,
@@ -27,7 +28,8 @@ pub type Usart0<CLOCK> = Usart<
     feature = "atmega328p",
     feature = "atmega328pb",
     feature = "atmega1284p",
-    feature = "atmega164pa"
+    feature = "atmega164pa",
+    feature = "atmega48p"
 ))]
 avr_hal_generic::impl_usart_traditional! {
     hal: crate::Atmega,
