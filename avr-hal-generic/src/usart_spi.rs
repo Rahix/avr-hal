@@ -1,7 +1,36 @@
 //! MSPIM Implimentation
-use crate::spi;
+use crate::{port::PinOps, spi};
 
 // This module just impliments a macro for SpiOps, since underlyingly, the Spi type can still be used since it just needs SpiOps
+
+/// Dummy Pin for MPSPIM
+pub struct UsartSPIDummyPin;
+
+impl PinOps for UsartSPIDummyPin {
+    type Dynamic = Dynamic;
+
+    fn into_dynamic(self) -> Self::Dynamic {
+        todo!()
+    }
+
+    unsafe fn out_set(&mut self) {}
+
+    unsafe fn out_clear(&mut self) {}
+
+    unsafe fn out_toggle(&mut self) {}
+
+    unsafe fn out_get(&self) -> bool {
+        false
+    }
+
+    unsafe fn in_get(&self) -> bool {
+        true
+    }
+
+    unsafe fn make_output(&mut self) {}
+
+    unsafe fn make_input(&mut self, pull_up: bool) {}
+}
 
 pub type UsartSpi<H, USART, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> =
     spi::Spi<H, USART, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>;
@@ -60,7 +89,6 @@ macro_rules! add_usart_spi {
                     self.[<ucsr $n b>].write(|w| w
                         .[<txen $n>]().set_bit()
                         .[<rxen $n>]().set_bit()
-                        .[<rxcie $n>]().set_bit()
                     );
 
                     // Set the baudrate of the UBRRn, idk what it should be set to, so for now, it'll be set to 0
@@ -68,8 +96,8 @@ macro_rules! add_usart_spi {
                 }
 
                 fn raw_release(&mut self) {
-                    // Probably a better way to "release" the SPI interface, but from the datasheet, this is what they suggest, so ig it works
                     self.[<ucsr $n c>].write(|w| w.[<umsel $n>]().usart_async());
+                    self.[<ucsr $n b>].reset();
                 }
 
                 fn raw_check_iflag(&self) -> bool {
