@@ -175,10 +175,20 @@ pub mod usart {
     pub type UsartReader<USART, RX, TX> =
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
-
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use usart::Usart;
+
+#[cfg(feature = "arduino-leonardo")]
+pub mod usb {
+    pub use atmega_hal::usb::*;
+
+    pub type AvrUsbBus = crate::hal::usb::AvrUsbBus;
+}
+#[doc(no_inline)]
+#[cfg(feature = "arduino-leonardo")]
+pub use usb::AvrUsbBus;
+
 
 #[cfg(feature = "board-selected")]
 pub mod eeprom {
@@ -340,3 +350,4 @@ macro_rules! default_serial {
         )
     };
 }
+
