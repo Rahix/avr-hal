@@ -56,6 +56,8 @@ pub macro create_usb_bus (
     $MAX_ENDPOINTS:ident,
     $ENDPOINT_MAX_BUFSIZE:ident,
     $DPRAM_SIZE:ident,
+    $limited_inter_and_vbus:meta,
+    $not_limited_inter_and_vbus:meta
 ) {
 
     // MARK: - AvrUsbBus
@@ -125,7 +127,9 @@ pub macro create_usb_bus (
             if usb.usbcon.read().frzclk().bit_is_set() {
                 return Err(UsbError::InvalidState);
             }
-            usb.uenum.write(|w| w.bits(index as u8));
+            unsafe { // TODO: investigate unsafety here (only occurs in atmega8u2?)
+                usb.uenum.write(|w| w.bits(index as u8));
+            }
             if usb.uenum.read().bits() & 0b111 != (index as u8) {
                 return Err(UsbError::InvalidState);
             }
@@ -135,7 +139,14 @@ pub macro create_usb_bus (
         fn endpoint_byte_count(&self, cs: CriticalSection) -> u16 { // REVIEW: should this conditionally be a u8
             let usb = self.usb.borrow(cs);
             // FIXME: Potential for desync here? LUFA doesn't seem to care.
-            ((usb.uebchx.read().bits() as u16) << 8) | (usb.uebclx.read().bits() as u16)
+            #[$not_limited_inter_and_vbus]
+            {
+                return ((usb.uebchx.read().bits() as u16) << 8) | (usb.uebclx.read().bits() as u16)
+            }
+            #[$limited_inter_and_vbus]
+            { // REVIEW: is this the correct formula?
+                return (usb.uebclx.read().bits() as u16) // u16?
+            }
         }
 
         fn configure_endpoint(&self, cs: CriticalSection, index: usize) -> Result<(), UsbError> {
@@ -239,13 +250,24 @@ pub macro create_usb_bus (
         fn enable(&mut self) {
             interrupt::free(|cs| {
                 let usb = self.usb.borrow(cs);
-                usb.uhwcon.modify(|_, w| w.uvrege().set_bit());
-                usb.usbcon
-                    .modify(|_, w| w.usbe().set_bit().otgpade().set_bit());
-                // NB: FRZCLK cannot be set/cleared when USBE=0, and
-                // cannot be modified at the same time.
-                usb.usbcon
-                    .modify(|_, w| w.frzclk().clear_bit().vbuste().set_bit());
+                #[$not_limited_inter_and_vbus]
+                {
+                    usb.uhwcon.modify(|_, w| w.uvrege().set_bit()); // REVIEW: what is the uhwcon and the pad regulator?
+                    usb.usbcon
+                        .modify(|_, w| w.usbe().set_bit().otgpade().set_bit());
+                    // NB: FRZCLK cannot be set/cleared when USBE=0, and
+                    // cannot be modified at the same time.
+                    usb.usbcon
+                        .modify(|_, w| w.frzclk().clear_bit().vbuste().set_bit());
+                }
+                #[$limited_inter_and_vbus]
+                {
+                    usb.usbcon
+                        .modify(|_, w| w.usbe().set_bit());
+                    // NB: FRZCLK cannot be set/cleared when USBE=0, and
+                    // cannot be modified at the same time.
+                    usb.usbcon.modify(|_, w| w.frzclk().clear_bit());
+                }
     
                 for (index, _ep) in self.active_endpoints() {
                     self.configure_endpoint(cs, index).unwrap();
@@ -439,17 +461,22 @@ pub macro create_usb_bus (
             interrupt::free(|cs| {
                 let usb = self.usb.borrow(cs);
     
-                let usbint = usb.usbint.read();
                 let udint = usb.udint.read();
                 let udien = usb.udien.read();
-                if usbint.vbusti().bit_is_set() {
-                    usb.usbint.clear_interrupts(|w| w.vbusti().clear_bit());
-                    if usb.usbsta.read().vbus().bit_is_set() {
-                        return PollResult::Resume;
-                    } else {
-                        return PollResult::Suspend;
+
+                #[$not_limited_inter_and_vbus]
+                {
+                    let usbint = usb.usbint.read();
+                    if usbint.vbusti().bit_is_set() {
+                        usb.usbint.clear_interrupts(|w| w.vbusti().clear_bit());
+                        if usb.usbsta.read().vbus().bit_is_set() {
+                            return PollResult::Resume;
+                        } else {
+                            return PollResult::Suspend;
+                        }
                     }
                 }
+
                 if udint.suspi().bit_is_set() && udien.suspe().bit_is_set() {
                     return PollResult::Suspend;
                 }

@@ -34,6 +34,8 @@ avr_hal_generic::usb::create_usb_bus! {
 	MAX_ENDPOINTS,
 	ENDPOINT_MAX_BUFSIZE,
 	DPRAM_SIZE,
+	cfg(feature = "atmega8u2"),
+	cfg(feature = "atmega32u4")
 }
 
 /// Extension trait for conveniently clearing AVR interrupt flag registers.
@@ -121,8 +123,12 @@ impl SuspendNotifier for PLL {
     }
 
     fn resume(&self) {
+        #[cfg(feature = "atmega32u4")]
         self.pllcsr
             .modify(|_, w| w.pindiv().set_bit().plle().set_bit());
+        #[cfg(feature = "atmega8u2")]
+        self.pllcsr
+            .modify(|_, w| w.pllp().val_0x05().plle().set_bit()); // REVIEW: is val_0x05 or val_0x03 correct? or something else?
 
         while self.pllcsr.read().plock().bit_is_clear() {}
     }
