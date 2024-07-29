@@ -1,5 +1,4 @@
-
-pub use avr_hal_generic::usb::*;
+use avr_hal_generic::usb::create_usb_bus;
 
 // MARK: - Type Imports
 
@@ -28,7 +27,8 @@ const ENDPOINT_MAX_BUFSIZE: [u16; MAX_ENDPOINTS] = [64, 64, 64, 64, 64];
 #[cfg(feature = "atmega8u2")]
 const DPRAM_SIZE: u16 = 176;
 
-avr_hal_generic::usb::create_usb_bus! {
+create_usb_bus! {
+	AvrGenericUsbBus, // we have to pass the name along for visibility reasons
 	USB_DEVICE,
 	SuspendNotifier,
 	MAX_ENDPOINTS,
@@ -37,6 +37,8 @@ avr_hal_generic::usb::create_usb_bus! {
 	cfg(feature = "atmega8u2"),
 	cfg(feature = "atmega32u4")
 }
+
+pub type AvrUsbBus = AvrGenericUsbBus<PLL>;
 
 /// Extension trait for conveniently clearing AVR interrupt flag registers.
 ///

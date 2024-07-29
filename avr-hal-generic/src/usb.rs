@@ -51,6 +51,7 @@ impl EndpointTableEntry {
 
 // Using Macro 2.0 here while not stable yet makes this code a lot more readable and easier to write
 pub macro create_usb_bus (
+	$AvrGenericUsbBus:ident,
 	$USB_DEVICE:ty,
 	$SuspendNotifier:path,
 	$MAX_ENDPOINTS:ident,
@@ -58,11 +59,11 @@ pub macro create_usb_bus (
 	$DPRAM_SIZE:ident,
 	$limited_inter_and_vbus:meta,
 	$not_limited_inter_and_vbus:meta
-) {
+) { // could stand to make the above a bit more readable
 
-	// MARK: - AvrUsbBus
+	// MARK: - AvrGenericUsbBus
 
-	pub struct AvrUsbBus<S: $SuspendNotifier> {
+	pub struct $AvrGenericUsbBus<S: $SuspendNotifier> {
 		usb: AvrDMutex<$USB_DEVICE>,
 		suspend_notifier: AvrDMutex<S>,
 		pending_ins: AvrDMutex<Cell<u8>>,
@@ -70,7 +71,7 @@ pub macro create_usb_bus (
 		dpram_usage: u16, // TODO: This need to be extracted
 	}
 
-	impl AvrUsbBus<()> {
+	impl $AvrGenericUsbBus<()> {
 		/// Create a new UsbBus without power-saving functionality.
 		///
 		/// If you would like to disable the PLL when the USB peripheral is
@@ -80,7 +81,7 @@ pub macro create_usb_bus (
 		}
 	}
 	
-	impl<S: $SuspendNotifier> AvrUsbBus<S> {
+	impl<S: $SuspendNotifier> $AvrGenericUsbBus<S> {
 		/// Create a UsbBus with a suspend and resume handler.
 		///
 		/// If you want the PLL to be automatically disabled when the USB peripheral
@@ -179,7 +180,7 @@ pub macro create_usb_bus (
 		}
 	}
 
-	impl<S: $SuspendNotifier> UsbBus for AvrUsbBus<S> {
+	impl<S: $SuspendNotifier> UsbBus for $AvrGenericUsbBus<S> {
 		fn alloc_ep(
 			&mut self,
 			ep_dir: UsbDirection,
