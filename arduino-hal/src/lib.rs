@@ -1,5 +1,6 @@
 #![no_std]
 #![feature(doc_cfg)]
+#![feature(decl_macro)]
 
 //! `arduino-hal`
 //! =============
@@ -180,8 +181,10 @@ pub mod usart {
 pub use usart::Usart;
 
 #[cfg(feature = "arduino-leonardo")]
+use usb_device::bus::UsbBusAllocator;
+#[cfg(feature = "arduino-leonardo")]
 pub mod usb {
-    pub use atmega_hal::usb::*;
+    pub use crate::hal::usb::*;
 
     pub type AvrUsbBus = crate::hal::usb::AvrUsbBus;
 }
@@ -351,3 +354,16 @@ macro_rules! default_serial {
     };
 }
 
+/// Convenience macro to instantiate the [`UsbBus`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// TODO
+/// ```
+#[cfg(feature = "arduino-leonardo")]
+pub macro default_usb_bus ($usb:expr, $pll:expr) {
+    unsafe {
+        static mut USB_BUS: Option<UsbBusAllocator<AvrUsbBus>> = None;
+        $crate::AvrUsbBus::with_suspend_notifier($usb, $pll)
+    };
+}
