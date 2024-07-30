@@ -29,6 +29,8 @@ const DPRAM_SIZE: u16 = 176;
 
 create_usb_bus! {
 	AvrGenericUsbBus, // we have to pass the name along for visibility reasons
+	new,
+	with_suspend_notifier,
 	USB_DEVICE,
 	SuspendNotifier,
 	MAX_ENDPOINTS,
@@ -37,8 +39,6 @@ create_usb_bus! {
 	cfg(feature = "atmega8u2"),
 	cfg(feature = "atmega32u4")
 }
-
-pub type AvrUsbBus = AvrGenericUsbBus<PLL>;
 
 /// Extension trait for conveniently clearing AVR interrupt flag registers.
 ///
@@ -135,3 +135,5 @@ impl SuspendNotifier for PLL {
 		while self.pllcsr.read().plock().bit_is_clear() {}
 	}
 }
+
+pub type AvrUsbBus = AvrGenericUsbBus<PLL>;

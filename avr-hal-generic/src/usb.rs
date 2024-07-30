@@ -51,7 +51,9 @@ impl EndpointTableEntry {
 
 // Using Macro 2.0 here while not stable yet makes this code a lot more readable and easier to write
 pub macro create_usb_bus (
-	$AvrGenericUsbBus:ident,
+	$AvrGenericUsbBus:ident, // TODO: get rid of this when hygiene escaping is a thing (see #39412) 
+	$new:ident, // literally the keyword `new` // what cruel world do we live in
+	$with_suspend_notifier:ident,
 	$USB_DEVICE:ty,
 	$SuspendNotifier:path,
 	$MAX_ENDPOINTS:ident,
@@ -76,8 +78,8 @@ pub macro create_usb_bus (
 		///
 		/// If you would like to disable the PLL when the USB peripheral is
 		/// suspended, then construct the bus with [`UsbBus::with_suspend_notifier`].
-		pub fn new(usb: $USB_DEVICE) -> UsbBusAllocator<Self> {
-			Self::with_suspend_notifier(usb, ())
+		pub fn $new(usb: $USB_DEVICE) -> UsbBusAllocator<Self> {
+			Self::$with_suspend_notifier(usb, ())
 		}
 	}
 	
@@ -102,7 +104,7 @@ pub macro create_usb_bus (
 		/// to leave the PLL running, or implement [`SuspendNotifier`] yourself,
 		/// with some custom logic to gracefully shut down the PLL in cooperation
 		/// with your other peripherals.
-		pub fn with_suspend_notifier(usb: $USB_DEVICE, suspend_notifier: S) -> UsbBusAllocator<Self> {
+		pub fn $with_suspend_notifier(usb: $USB_DEVICE, suspend_notifier: S) -> UsbBusAllocator<Self> {
 			UsbBusAllocator::new(Self {
 				usb: AvrDMutex::new(usb),
 				suspend_notifier: AvrDMutex::new(suspend_notifier),
