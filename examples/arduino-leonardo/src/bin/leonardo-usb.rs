@@ -30,7 +30,7 @@ use arduino_hal::{pac::PLL, port::{mode::{Input, Output, PullUp}, Pin}, usb::{Av
 
 use avr_device::{asm::sleep, interrupt};
 
-use usb_device::{descriptor::lang_id::LangID, device::UsbDevice, prelude::StringDescriptors};
+use usb_device::{bus::UsbBusAllocator, descriptor::lang_id::LangID, device::UsbDevice, prelude::StringDescriptors};
 use usbd_hid::{
     descriptor::{KeyboardReport, SerializedDescriptor},
     hid_class::HIDClass,
@@ -61,13 +61,13 @@ fn main() -> ! {
     // Check PLL lock
     while pll.pllcsr.read().plock().bit_is_clear() {}
 
-    let usb_bus = arduino_hal::default_usb_bus!(usb, pll);
+    let usb_bus: &UsbBusAllocator<AvrGenericUsbBus<PLL>> = arduino_hal::default_usb_bus!(usb, pll);
 
-    let hid_class = HIDClass::new(usb_bus, KeyboardReport::desc(), 1);
+    let hid_class: HIDClass<AvrGenericUsbBus<PLL>> = HIDClass::new(usb_bus, KeyboardReport::desc(), 1);
 	let strings = StringDescriptors::new(LangID::EN)
         .manufacturer("Foo")
         .product("Bar");
-	let usb_device = arduino_hal::default_usb_device!(usb_bus, 0x1209, 0x0001, strings);
+	let usb_device: UsbDevice<AvrGenericUsbBus<PLL>> = arduino_hal::default_usb_device!(usb_bus, 0x1209, 0x0001, strings);
 	
 	unsafe {
         USB_CTX = Some(UsbContext {
@@ -86,7 +86,7 @@ fn main() -> ! {
     }
 }
 
-static mut USB_CTX: Option<UsbContext<PLL>> = None;
+static mut USB_CTX: Option<UsbContext> = None;
 
 #[interrupt(atmega32u4)]
 fn USB_GEN() {
@@ -116,16 +116,16 @@ unsafe fn poll_usb() {
     ctx.poll();
 }
 
-struct UsbContext<S: SuspendNotifier> {
-    usb_device: UsbDevice<'static, AvrGenericUsbBus<S>>,
-    hid_class: HIDClass<'static, AvrGenericUsbBus<S>>,
+struct UsbContext {
+    usb_device: UsbDevice<'static, AvrGenericUsbBus<PLL>>,
+    hid_class: HIDClass<'static, AvrGenericUsbBus<PLL>>,
     current_index: usize,
     pressed: bool,
     indicator: Pin<Output>,
     trigger: Pin<Input<PullUp>>,
 }
 
-impl<S: SuspendNotifier> UsbContext<S> {
+impl UsbContext {
     fn poll(&mut self) {
         if self.trigger.is_low() {
             let next_report = if self.pressed {

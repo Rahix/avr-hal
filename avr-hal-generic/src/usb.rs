@@ -1,5 +1,3 @@
-#![feature(negative_impls)]
-
 use core::{cell::Cell, cmp::max};
 
 use usb_device::{bus::{UsbBus, PollResult}, UsbDirection, UsbError, class_prelude::UsbBusAllocator, endpoint::{EndpointAddress, EndpointType}, Result as UsbResult};
@@ -61,16 +59,17 @@ pub macro create_usb_bus (
 	$DPRAM_SIZE:ident,
 	$limited_inter_and_vbus:meta,
 	$not_limited_inter_and_vbus:meta
+	// TODO: add a visibility restriction here so not everything is just blatantly `pub`
 ) { // could stand to make the above a bit more readable
 
 	// MARK: - AvrGenericUsbBus
 
 	pub struct $AvrGenericUsbBus<S: $SuspendNotifier> {
-		usb: AvrDMutex<$USB_DEVICE>,
-		suspend_notifier: AvrDMutex<S>,
-		pending_ins: AvrDMutex<Cell<u8>>,
-		endpoints: [EndpointTableEntry; $MAX_ENDPOINTS],
-		dpram_usage: u16, // TODO: This need to be extracted
+		pub usb: AvrDMutex<$USB_DEVICE>,
+		pub suspend_notifier: AvrDMutex<S>,
+		pub pending_ins: AvrDMutex<Cell<u8>>,
+		pub endpoints: [EndpointTableEntry; $MAX_ENDPOINTS],
+		pub dpram_usage: u16,
 	}
 
 	impl $AvrGenericUsbBus<()> {
@@ -114,14 +113,14 @@ pub macro create_usb_bus (
 			})
 		}
 
-		fn active_endpoints(&self) -> impl Iterator<Item = (usize, &EndpointTableEntry)> {
+		pub fn active_endpoints(&self) -> impl Iterator<Item = (usize, &EndpointTableEntry)> {
 			self.endpoints
 				.iter()
 				.enumerate() // why enumerate then immediately drop?
 				.filter(|&(_, ep)| ep.is_allocated)
 		}
 
-		fn set_current_endpoint(&self, cs: CriticalSection, index: usize) -> Result<(), UsbError> {
+		pub fn set_current_endpoint(&self, cs: CriticalSection, index: usize) -> Result<(), UsbError> {
 			if index >= $MAX_ENDPOINTS {
 				return Err(UsbError::InvalidEndpoint);
 			}
@@ -139,7 +138,7 @@ pub macro create_usb_bus (
 			Ok(())
 		}
 
-		fn endpoint_byte_count(&self, cs: CriticalSection) -> u16 { // REVIEW: should this conditionally be a u8
+		pub fn endpoint_byte_count(&self, cs: CriticalSection) -> u16 { // REVIEW: should this conditionally be a u8
 			let usb = self.usb.borrow(cs);
 			// FIXME: Potential for desync here? LUFA doesn't seem to care.
 			#[$not_limited_inter_and_vbus]
@@ -152,7 +151,7 @@ pub macro create_usb_bus (
 			}
 		}
 
-		fn configure_endpoint(&self, cs: CriticalSection, index: usize) -> Result<(), UsbError> {
+		pub fn configure_endpoint(&self, cs: CriticalSection, index: usize) -> Result<(), UsbError> {
 			let usb = self.usb.borrow(cs);
 			self.set_current_endpoint(cs, index)?;
 			let endpoint = &self.endpoints[index];
