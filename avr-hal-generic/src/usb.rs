@@ -129,9 +129,14 @@ pub macro create_usb_bus (
 			if usb.usbcon.read().frzclk().bit_is_set() {
 				return Err(UsbError::InvalidState);
 			}
+
+			#[$limited_inter_and_vbus]
 			unsafe { // TODO: investigate unsafety here (only occurs in atmega8u2?)
 				usb.uenum.write(|w| w.bits(index as u8));
 			}
+			#[$not_limited_inter_and_vbus]
+			usb.uenum.modify(|_, w| w.bits(index as u8));
+			
 			if usb.uenum.read().bits() & 0b111 != (index as u8) {
 				return Err(UsbError::InvalidState);
 			}
@@ -463,12 +468,14 @@ pub macro create_usb_bus (
 			interrupt::free(|cs| {
 				let usb = self.usb.borrow(cs);
 	
+				#[$not_limited_inter_and_vbus]
+				let usbint = usb.usbint.read();
+				
 				let udint = usb.udint.read();
 				let udien = usb.udien.read();
 
 				#[$not_limited_inter_and_vbus]
 				{
-					let usbint = usb.usbint.read();
 					if usbint.vbusti().bit_is_set() {
 						usb.usbint.clear_interrupts(|w| w.vbusti().clear_bit());
 						if usb.usbsta.read().vbus().bit_is_set() {

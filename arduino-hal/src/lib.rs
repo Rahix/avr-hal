@@ -378,7 +378,7 @@ pub macro default_usb_bus ($usb:expr, $pll:expr) {
 pub macro default_usb_device ($usb_bus:expr, $vid:expr, $pid:expr, $strings:expr) {
     UsbDeviceBuilder::new(
         $usb_bus,
-        UsbVidPid($vid, $pid),
+        UsbVidPid($vid, $pid)
     )
     .strings(&[$strings])
     .unwrap()
