@@ -27,10 +27,12 @@
   "no-default-libraries": false,
   "pre-link-args": {
     "gnu-cc": [
-      "-mmcu=atmega1280"
+      "-mmcu=atmega1280",
+      "-Wl,--as-needed,--print-memory-usage"
     ],
     "gnu-lld-cc": [
-      "-mmcu=atmega1280"
+      "-mmcu=atmega1280",
+      "-Wl,--as-needed,--print-memory-usage"
     ]
   },
   "relocation-model": "static",

@@ -27,10 +27,12 @@
   "no-default-libraries": false,
   "pre-link-args": {
     "gnu-cc": [
-      "-mmcu=attiny167"
+      "-mmcu=attiny167",
+      "-Wl,--as-needed,--print-memory-usage"
     ],
     "gnu-lld-cc": [
-      "-mmcu=attiny167"
+      "-mmcu=attiny167",
+      "-Wl,--as-needed,--print-memory-usage"
     ]
   },
   "relocation-model": "static",
