@@ -95,7 +95,9 @@ def main():
         spec = copy.deepcopy(upstream_spec)
         spec.update(COMMON)
         spec.update(settings)
-        spec["pre-link-args"]["gcc"][0] = f"-mmcu={settings['cpu']}"
+
+        for pre_link_args in spec["pre-link-args"].values():
+            pre_link_args[0] = f"-mmcu={settings['cpu']}"
 
         with open(f"avr-specs/avr-{mcu}.json", "w") as f:
             json.dump(spec, f, sort_keys=True, indent=2)
