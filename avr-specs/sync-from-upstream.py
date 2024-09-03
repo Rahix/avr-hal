@@ -98,6 +98,7 @@ def main():
 
         for pre_link_args in spec["pre-link-args"].values():
             pre_link_args[0] = f"-mmcu={settings['cpu']}"
+            pre_link_args.append("-Wl,--as-needed,--print-memory-usage")
 
         with open(f"avr-specs/avr-{mcu}.json", "w") as f:
             json.dump(spec, f, sort_keys=True, indent=2)
