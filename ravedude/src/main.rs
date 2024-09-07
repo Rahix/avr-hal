@@ -1,7 +1,8 @@
-use anyhow::Context as _;
+use anyhow::{bail, Context as _};
 use colored::Colorize as _;
 use structopt::clap::AppSettings;
 
+use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 
@@ -12,6 +13,72 @@ mod ui;
 
 /// This represents the minimum (Major, Minor) version raverdude requires avrdude to meet.
 const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
+
+#[derive(Debug)]
+enum OutputMode {
+    Ascii,
+    Hex,
+    Dec,
+    Bin,
+}
+
+impl FromStr for OutputMode {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ascii" => Ok(Self::Ascii),
+            "hex" => Ok(Self::Hex),
+            "dec" => Ok(Self::Dec),
+            "bin" => Ok(Self::Bin),
+            _ => Err(anyhow::anyhow!("unknown output mode")),
+        }
+    }
+}
+
+// this could have fewer nested if’s, but this produces better error messages
+fn parse_newline_on(s: &str) -> Result<char, anyhow::Error> {
+    if let Ok(c) = s.parse::<char>() {
+        Ok(c)
+
+    // if it starts with 0x then parse the hex byte
+    } else if &s[0..2] == "0x" {
+        if s.len() == 4 {
+            if let Ok(n) = u8::from_str_radix(&s[2..4], 16) {
+                Ok(n as char)
+            } else {
+                bail!("invalid hex byte")
+            }
+        } else {
+            bail!("hex byte must have 2 characters")
+        }
+    // if it starts with 0b then parse the binary byte
+    } else if &s[0..2] == "0b" {
+        if s.len() == 10 {
+            if let Ok(n) = u8::from_str_radix(&s[2..10], 2) {
+                Ok(n as char)
+            } else {
+                bail!("invalid binary byte")
+            }
+        } else {
+            bail!("binary byte must have 8 characters")
+        }
+    } else {
+        bail!("must be a single character or a byte in hex or binary notation")
+    }
+}
+
+#[test]
+fn test_parse_newline_on() {
+    assert_eq!(parse_newline_on("a").unwrap(), 'a');
+    assert_eq!(parse_newline_on("\n").unwrap(), '\n');
+    assert_eq!(parse_newline_on("0x41").unwrap(), 'A');
+    assert_eq!(parse_newline_on("0b01000001").unwrap(), 'A');
+    assert!(parse_newline_on("not a char").is_err());
+    assert!(parse_newline_on("0x").is_err());
+    assert!(parse_newline_on("0xzz").is_err());
+    assert!(parse_newline_on("0b").is_err());
+    assert!(parse_newline_on("0b0a0a0a0a").is_err());
+}
 
 /// ravedude is a rust wrapper around avrdude for providing the smoothest possible development
 /// experience with rust on AVR microcontrollers.
@@ -51,6 +118,26 @@ struct Args {
     /// Print the avrdude command that is executed for flashing the binary.
     #[structopt(long = "debug-avrdude")]
     debug_avrdude: bool,
+
+    /// Output mode.
+    /// Can be ascii, hex, dec or bin
+    #[structopt(short = "o")]
+    output_mode: Option<OutputMode>,
+
+    /// Print a newline after this byte
+    /// not used with output_mode ascii
+    /// hex (0x) and bin (0b) notations are supported.
+    /// matching chars/bytes are NOT removed
+    /// to add newlines after \n (in non-ascii mode), use \n, 0x0a or 0b00001010
+    #[structopt(long = "newline-on", parse(try_from_str = parse_newline_on), verbatim_doc_comment)]
+    newline_on: Option<char>,
+
+    /// Print a newline after n bytes
+    /// not used with output_mode ascii
+    /// defaults to 16 for hex and dec and 8 for bin
+    /// if dividable by 4, bytes will be grouped to 4
+    #[structopt(long = "newline-after", verbatim_doc_comment)]
+    newline_after: Option<u8>,
 
     /// Which board to interact with.
     ///
@@ -97,6 +184,10 @@ fn ravedude() -> anyhow::Result<()> {
 
     let board = board::get_board(&args.board).expect("board not found");
 
+    if args.newline_on.is_some() && args.newline_after.is_some() {
+        bail!("newline_on and newline_after cannot be used at the same time");
+    }
+
     task_message!("Board", "{}", board.display_name());
 
     if let Some(wait_time) = args.reset_delay {
@@ -118,7 +209,7 @@ fn ravedude() -> anyhow::Result<()> {
         }
     }
 
-    let port = match args.port {
+    let port = match args.port.clone() {
         Some(port) => Ok(Some(port)),
         None => match board.guess_port() {
             Some(Ok(port)) => Ok(Some(port)),
@@ -160,17 +251,7 @@ fn ravedude() -> anyhow::Result<()> {
     }
 
     if args.open_console {
-        let baudrate = args
-            .baudrate
-            .context("-b/--baudrate is needed for the serial console")?;
-
-        let port = port.context("console can only be opened for devices with USB-to-Serial")?;
-
-        task_message!("Console", "{} at {} baud", port.display(), baudrate);
-        task_message!("", "{}", "CTRL+C to exit.".dimmed());
-        // Empty line for visual consistency
-        eprintln!();
-        console::open(&port, baudrate)?;
+        console::open(args)?;
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
     }
