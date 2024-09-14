@@ -82,6 +82,16 @@ impl Args {
                 .and_then(|board| board.to_str().map(String::from))
         }
     }
+
+    /// Get the binary argument with fallback for the legacy menchanism.
+    ///
+    /// Returns `None` if no binary argument was passed.
+    fn bin_or_legacy_bin(&self) -> Option<&std::path::Path> {
+        self.bin_legacy
+            .as_ref()
+            .map(|p| p.as_path())
+            .or(self.bin.as_ref().map(|p| p.as_path()))
+    }
 }
 
 fn main() {
@@ -178,7 +188,7 @@ fn ravedude() -> anyhow::Result<()> {
         },
     }?;
 
-    if let Some(bin) = args.bin.as_ref() {
+    if let Some(bin) = args.bin_or_legacy_bin() {
         if let Some(wait_time) = args.reset_delay {
             if wait_time > 0 {
                 println!("Waiting {} ms before proceeding", wait_time);
