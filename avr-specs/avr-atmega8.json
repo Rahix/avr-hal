@@ -17,7 +17,7 @@
   "linker": "avr-gcc",
   "linker-flavor": "gnu-cc",
   "llvm-target": "avr-unknown-unknown",
-  "max-atomic-width": 8,
+  "max-atomic-width": 16,
   "metadata": {
     "description": null,
     "host_tools": null,

@@ -58,7 +58,9 @@ COMMON = {
     # needed because we currently rely on avr-libc
     "no-default-libraries": False,
     # 8-bit operations on AVR are atomic
-    "max-atomic-width": 8,
+    # LLVM also supports 16-bit atomics by disabling interrupts
+    # see also https://github.com/rust-lang/rust/pull/114495
+    "max-atomic-width": 16,
 }
 
 
