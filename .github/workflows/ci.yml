@@ -92,6 +92,10 @@ jobs:
             spec: attiny88
             crate: attiny-hal
           - type: mcu
+            name: atmega8u2
+            spec: atmega8u2
+            crate: atmega-hal
+          - type: mcu
             name: attiny167
             spec: attiny167
             crate: attiny-hal

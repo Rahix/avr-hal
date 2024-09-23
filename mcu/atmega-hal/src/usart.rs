@@ -54,6 +54,7 @@ avr_hal_generic::impl_usart_traditional! {
 }
 
 #[cfg(any(
+    feature = "atmega8u2",
     feature = "atmega32u4",
     feature = "atmega128a",
     feature = "atmega1280",
@@ -68,6 +69,7 @@ pub type Usart1<CLOCK> = Usart<
     CLOCK,
 >;
 #[cfg(any(
+    feature = "atmega8u2",
     feature = "atmega32u4",
     feature = "atmega1280",
     feature = "atmega2560",
