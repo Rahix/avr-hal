@@ -48,7 +48,7 @@ macro_rules! add_usart_spi {
     ) => {
         $crate::paste::paste! {
             // This is quite a messy way to get the doc string working properly... but it works!
-            #[doc = concat!("**Clock:** `", stringify!($sclkpin), "`<br>**MOSI:** `", stringify!($mosipin), "`<br> **MISO:** `", stringify!($misopin), "`<br> **CS:** `", stringify!($cspin), "`")]
+            #[doc = concat!("**Clock:** `", stringify!($sclkpin), "`<br>**MOSI:** `", stringify!($mosipin), "`<br> **MISO:** `", stringify!($misopin), "`")]
             pub type [<Usart $n Spi>] = avr_hal_generic::usart_spi::UsartSpi<$HAL, $USART_SPI, $sclkpin, $mosipin, $misopin>;
 
             impl $crate::spi::SpiOps<$HAL, $sclkpin, $mosipin, $misopin, $crate::usart_spi::UsartSPIDummyPin> for $USART_SPI {
