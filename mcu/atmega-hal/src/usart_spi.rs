@@ -17,7 +17,7 @@
 //! | `atmega1284p` | 2 | Yes |
 //! | `atmega8` | 1 | No |
 
-// Supress warning because it doesn't recognise us using it in macros properly.
+// Suppress warning because it doesn't recognise us using it in macros properly.
 #[allow(unused_imports)]
 use crate::port;
 
