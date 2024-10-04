@@ -29,7 +29,6 @@ avr_hal_generic::add_usart_spi! {
     sclk: port::PE2,
     mosi: port::PE1,
     miso: port::PE0,
-    cs: port::Dynamic,
 }
 
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
@@ -40,7 +39,6 @@ avr_hal_generic::add_usart_spi! {
     sclk: port::PD5,
     mosi: port::PD3,
     miso: port::PD2,
-    cs: port::Dynamic,
 }
 
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
@@ -51,7 +49,6 @@ avr_hal_generic::add_usart_spi! {
     sclk: port::PH2,
     mosi: port::PH1,
     miso: port::PH0,
-    cs: port::Dynamic,
 }
 
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
@@ -62,7 +59,6 @@ avr_hal_generic::add_usart_spi! {
     sclk: port::PJ2,
     mosi: port::PJ1,
     miso: port::PJ0,
-    cs: port::Dynamic,
 }
 
 #[cfg(any(
@@ -78,7 +74,6 @@ avr_hal_generic::add_usart_spi! {
     sclk: port::PD4,
     mosi: port::PD1,
     miso: port::PD0,
-    cs: port::Dynamic,
 }
 
 #[cfg(any(feature = "atmega1284p", feature = "atmega164pa",))]
@@ -89,7 +84,6 @@ avr_hal_generic::add_usart_spi! {
     sclk: port::PB0,
     mosi: port::PD1,
     miso: port::PD0,
-    cs: port::Dynamic,
 }
 
 #[cfg(any(feature = "atmega1284p", feature = "atmega164pa",))]
@@ -100,5 +94,4 @@ avr_hal_generic::add_usart_spi! {
     sclk: port::PD4,
     mosi: port::PD3,
     miso: port::PD2,
-    cs: port::Dynamic,
 }
