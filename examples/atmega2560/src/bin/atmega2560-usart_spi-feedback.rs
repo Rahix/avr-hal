@@ -35,34 +35,31 @@ fn main() -> ! {
     );
 
     // Create SPI interface.
-    let (mut spi, _) = usart_spi::Usart1Spi::new(
+    let mut spi = usart_spi::Usart1Spi::new_from_usart(
         dp.USART1,
         pins.pd5.into_output(),
         pins.pd3.into_output(),
         pins.pd2.into_pull_up_input(),
-        pins.pd4.into_output().downgrade(),
         atmega_hal::spi::Settings::default(),
     );
 
-    /* Other SPI examples for other USART's
-       let (mut spi, _) = usart_spi::Usart2Spi::new(
-           dp.USART2,
-           pins.ph2.into_output(),
-           pins.ph1.into_output(),
-           pins.ph0.into_pull_up_input(),
-           pins.pd4.into_output().downgrade(),
-           atmega_hal::spi::Settings::default(),
-       );
+    // Other SPI examples for other USART's
 
-       let (mut spi, _) = usart_spi::Usart3Spi::new(
-           dp.USART3,
-           pins.pj2.into_output(),
-           pins.pj1.into_output(),
-           pins.pj0.into_pull_up_input(),
-           pins.pd4.into_output().downgrade(),
-           atmega_hal::spi::Settings::default(),
-       );
-    */
+    // let mut spi = usart_spi::Usart2Spi::new_from_usart(
+    //     dp.USART2,
+    //     pins.ph2.into_output(),
+    //     pins.ph1.into_output(),
+    //     pins.ph0.into_pull_up_input(),
+    //     atmega_hal::spi::Settings::default(),
+    // );
+
+    // let mut spi = usart_spi::Usart3Spi::new_from_usart(
+    //     dp.USART3,
+    //     pins.pj2.into_output(),
+    //     pins.pj1.into_output(),
+    //     pins.pj0.into_pull_up_input(),
+    //     atmega_hal::spi::Settings::default(),
+    // );
 
     loop {
         // Send a byte
