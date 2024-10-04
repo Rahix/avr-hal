@@ -1,7 +1,7 @@
 //! MSPIM Implimentation
 use crate::{port::PinOps, spi};
 
-// This module just impliments a macro for SpiOps, since underlyingly, the Spi type can still be used since it just needs SpiOps
+// This module just implements a macro for SpiOps, since underlyingly, the Spi type can still be used since it just needs SpiOps
 
 /// Dummy Pin for MPSPIM
 pub struct UsartSPIDummyPin;
@@ -35,7 +35,7 @@ impl PinOps for UsartSPIDummyPin {
 pub type UsartSpi<H, USART, SCLKPIN, MOSIPIN, MISOPIN> =
     spi::Spi<H, USART, SCLKPIN, MOSIPIN, MISOPIN, UsartSPIDummyPin>;
 
-// Impliment SpiOps trait for USART
+// Implement SpiOps trait for USART
 #[macro_export]
 macro_rules! add_usart_spi {
     (
