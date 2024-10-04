@@ -68,11 +68,11 @@ macro_rules! add_usart_spi {
                         w.[<umsel $n>]().spi_master();
 
                         match settings.data_order {
-                            crate::spi::DataOrder::MostSignificantFirst => match settings.mode.phase {
+                            $crate::spi::DataOrder::MostSignificantFirst => match settings.mode.phase {
                                 spi::Phase::CaptureOnFirstTransition => w.[<ucsz $n>]().chr5(),
                                 spi::Phase::CaptureOnSecondTransition => w.[<ucsz $n>]().chr6(),
                             },
-                            crate::spi::DataOrder::LeastSignificantFirst => match settings.mode.phase {
+                            $crate::spi::DataOrder::LeastSignificantFirst => match settings.mode.phase {
                                 spi::Phase::CaptureOnFirstTransition => w.[<ucsz $n>]().chr7(),
                                 spi::Phase::CaptureOnSecondTransition => w.[<ucsz $n>]().chr8(),
                             },
@@ -93,13 +93,13 @@ macro_rules! add_usart_spi {
                     // Set the clock divider for SPI clock.
                     self.[<ubrr $n>].write(|w| {
                         match settings.clock {
-                            crate::spi::SerialClockRate::OscfOver2 => w.bits(0),
-                            crate::spi::SerialClockRate::OscfOver4 => w.bits(1),
-                            crate::spi::SerialClockRate::OscfOver8 => w.bits(3),
-                            crate::spi::SerialClockRate::OscfOver16 => w.bits(7),
-                            crate::spi::SerialClockRate::OscfOver32 => w.bits(15),
-                            crate::spi::SerialClockRate::OscfOver64 => w.bits(31),
-                            crate::spi::SerialClockRate::OscfOver128 => w.bits(63),
+                            $crate::spi::SerialClockRate::OscfOver2 => w.bits(0),
+                            $crate::spi::SerialClockRate::OscfOver4 => w.bits(1),
+                            $crate::spi::SerialClockRate::OscfOver8 => w.bits(3),
+                            $crate::spi::SerialClockRate::OscfOver16 => w.bits(7),
+                            $crate::spi::SerialClockRate::OscfOver32 => w.bits(15),
+                            $crate::spi::SerialClockRate::OscfOver64 => w.bits(31),
+                            $crate::spi::SerialClockRate::OscfOver128 => w.bits(63),
                         }
                     });
                 }
