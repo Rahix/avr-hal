@@ -55,8 +55,7 @@ macro_rules! add_usart_spi {
                 fn raw_setup(&mut self, settings: &$crate::spi::Settings) {
                     use $crate::hal::spi;
 
-                    // Setup control registers
-                    // We start by setting the UBBRn to 0
+                    // UBRRn must be zero at the time the transmitter is enabled.
                     self.[<ubrr $n>].write(|w| unsafe {w.bits(0)});
 
                     // We have to translate the character size register into the 2 bits which are the MSB/LSB and the phase
@@ -84,13 +83,14 @@ macro_rules! add_usart_spi {
                         }
                     });
 
-                    // Enable receiver and transmitter, and also the rec interrupt.
+                    // Enable receiver and transmitter.
                     self.[<ucsr $n b>].write(|w| w
                         .[<txen $n>]().set_bit()
                         .[<rxen $n>]().set_bit()
                     );
 
                     // Set the clock divider for SPI clock.
+                    // This must be done after the transmitter is enabled.
                     self.[<ubrr $n>].write(|w| {
                         match settings.clock {
                             $crate::spi::SerialClockRate::OscfOver2 => w.bits(0),
