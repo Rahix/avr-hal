@@ -91,7 +91,7 @@ macro_rules! add_usart_spi {
 
                     // Set the clock divider for SPI clock.
                     // This must be done after the transmitter is enabled.
-                    self.[<ubrr $n>].write(|w| {
+                    self.[<ubrr $n>].write(|w| unsafe {
                         match settings.clock {
                             $crate::spi::SerialClockRate::OscfOver2 => w.bits(0),
                             $crate::spi::SerialClockRate::OscfOver4 => w.bits(1),
