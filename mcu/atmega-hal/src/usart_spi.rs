@@ -16,6 +16,31 @@
 //! | `atmega1280` | 4 | Yes |
 //! | `atmega1284p` | 2 | Yes |
 //! | `atmega8` | 1 | No |
+//!
+//! # Example
+//!
+//! Complete example source code can be found in the
+//! [repository](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-usart_spi-feedback.rs).
+//!
+//! ```
+//! let dp = atmega_hal::Peripherals::take().unwrap();
+//! let pins = atmega_hal::pins!(dp);
+//!
+//! let mut spi = usart_spi::Usart1Spi::new_from_usart(
+//!     dp.USART1,
+//!     pins.pd5.into_output(),
+//!     pins.pd3.into_output(),
+//!     pins.pd2.into_pull_up_input(),
+//!     atmega_hal::spi::Settings::default(),
+//! );
+//!
+//! let data_out = b"Hello World!";
+//! let mut data_in = [0u8; 12];
+//!
+//! spi.transfer(&mut data_in, data_out).unwrap();
+//!
+//! ufmt::uwriteln!(&mut serial, "data: {:?}", data_in).unwrap();
+//! ```
 
 // Suppress warning because it doesn't recognise us using it in macros properly.
 #[allow(unused_imports)]
