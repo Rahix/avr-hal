@@ -1,3 +1,33 @@
+//! USART
+//!
+//! # Examples
+//!
+//! Complete example source code can be found in the
+//! [repository](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-usart.rs).
+//!
+//! Terminal input/output using [ufmt](https://crates.io/crates/ufmt/):
+//!
+//! ```
+//! let dp = atmega_hal::Peripherals::take().unwrap();
+//! let pins = atmega_hal::pins!(dp);
+//!
+//! let mut serial = Usart::new(
+//!     dp.USART0,
+//!     pins.pe0,
+//!     pins.pe1.into_output(),
+//!     Baudrate::<crate::CoreClock>::new(57600),
+//! );
+//!
+//! ufmt::uwriteln!(&mut serial, "Hello from ATmega!").unwrap();
+//!
+//! loop {
+//!     // Read a byte from the serial connection
+//!     let b = nb::block!(serial.read()).unwrap();
+//!     // Answer
+//!     ufmt::uwriteln!(&mut serial, "Got {}!", b).unwrap();
+//! }
+//! ```
+
 #[allow(unused_imports)]
 use crate::port;
 pub use avr_hal_generic::usart::*;
