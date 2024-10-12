@@ -1,3 +1,22 @@
+//! Port
+//!
+//! # Example
+//!
+//! Complete example source code can be found in the
+//! [repository](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-blink.rs).
+//!
+//! ```
+//! let dp = atmega_hal::Peripherals::take().unwrap();
+//! let pins = atmega_hal::pins!(dp);
+//!
+//! let mut led = pins.pb7.into_output();
+//!
+//! loop {
+//!     led.toggle();
+//!     delay_ms(1000);
+//! }
+//! ```
+
 pub use avr_hal_generic::port::{mode, PinMode, PinOps};
 
 #[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
