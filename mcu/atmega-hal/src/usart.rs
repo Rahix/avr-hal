@@ -1,11 +1,12 @@
 //! USART
 //!
-//! # Examples
+//! # Example
 //!
-//! Complete example source code can be found in the
-//! [repository](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-usart.rs).
+//! Complete example source code can be found in the repository:
+//! [`atmega2560-usart.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-usart.rs)
 //!
-//! Terminal input/output using [ufmt](https://crates.io/crates/ufmt/):
+//! *Note: [ufmt](https://crates.io/crates/ufmt/) is used instead of `core::fmt` because
+//! `core::fmt` code quickly grows too large for AVR platforms.*
 //!
 //! ```
 //! let dp = atmega_hal::Peripherals::take().unwrap();

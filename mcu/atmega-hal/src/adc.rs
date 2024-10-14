@@ -2,8 +2,8 @@
 //!
 //! # Example
 //!
-//! Complete example source code can be found in the
-//! [repository](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-adc.rs).
+//! Complete example source code can be found in the repository:
+//! [`atmega2560-adc.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-adc.rs)
 //!
 //! ```
 //! let dp = atmega_hal::Peripherals::take().unwrap();
