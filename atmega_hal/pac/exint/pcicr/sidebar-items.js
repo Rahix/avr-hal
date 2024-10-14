@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["PCICR_SPEC","R","W"],"type":["PCIE_R","PCIE_W"]};

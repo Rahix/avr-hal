@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="`μfmt`, a (6-40x) smaller, (2-9x) faster and panic-free alternative to `core::fmt`"><title>ufmt - Rust</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="ufmt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (0ad927c0c 2024-03-21)" data-channel="nightly" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-4c98445ec4002617.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../ufmt/index.html">ufmt</a><span class="version">0.2.0</span></h2></div><div class="sidebar-elems"><ul class="block">
+            <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></section></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../ufmt/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">ufmt</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/ufmt/lib.rs.html#1-433">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><code>μfmt</code>, a (6-40x) smaller, (2-9x) faster and panic-free alternative to <code>core::fmt</code></p>
+<h2 id="design-goals"><a class="doc-anchor" href="#design-goals">§</a>Design goals</h2>
+<p>From highest priority to lowest priority</p>
+<ul>
+<li>Optimized for binary size and speed (rather than for compilation time)</li>
+<li>No dynamic dispatch in generated code</li>
+<li>No panicking branches in generated code, when optimized</li>
+<li>No recursion where possible</li>
+</ul>
+<h2 id="features"><a class="doc-anchor" href="#features">§</a>Features</h2>
+<ul>
+<li><a href="trait.uDebug.html"><code>Debug</code></a> and <a href="trait.uDisplay.html"><code>Display</code></a>-like traits</li>
+<li><a href="index.html#reexports"><code>core::write!</code></a>-like macro</li>
+<li>A generic <a href="struct.Formatter.html"><code>Formatter&lt;'_, impl uWrite&gt;</code></a> instead of a single <code>core::Formatter</code>; the
+<a href="trait.uWrite.html"><code>uWrite</code></a> trait has an associated error type so each writer can choose its error type. For
+example, the implementation for <code>std::String</code> uses <a href="https://doc.rust-lang.org/core/convert/enum.Infallible.html"><code>Infallible</code></a> as its error type.</li>
+<li><a href="struct.Formatter.html#method.debug_struct"><code>core::fmt::Formatter::debug_struct</code></a>-like API</li>
+<li><a href="derive/index.html"><code>#[derive(uDebug)]</code></a></li>
+<li>Pretty formatting (<code>{:#?}</code>) for <code>uDebug</code></li>
+<li>Hexadecimal formatting (<code>{:x}</code>) of integer primitives (e.g. <code>i32</code>) – currently cannot be extended to other types</li>
+</ul>
+<h2 id="non-features"><a class="doc-anchor" href="#non-features">§</a>Non-features</h2>
+<p>These are out of scope</p>
+<ul>
+<li>Padding, alignment and other formatting options</li>
+<li>Formatting floating point numbers</li>
+</ul>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<ul>
+<li><code>uwrite!</code> / <code>uwriteln!</code></li>
+</ul>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ufmt::{derive::uDebug, uwrite};
+
+<span class="attr">#[derive(uDebug)]
+</span><span class="kw">struct </span>Pair { x: u32, y: u32 }
+
+<span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+<span class="kw">let </span>pair = Pair { x: <span class="number">1</span>, y: <span class="number">2 </span>};
+<span class="macro">uwrite!</span>(s, <span class="string">"{:?}"</span>, pair).unwrap();
+<span class="macro">assert_eq!</span>(s, <span class="string">"Pair { x: 1, y: 2 }"</span>);</code></pre></div>
+<ul>
+<li>Hexadecimal formatting</li>
+</ul>
+<p>Lowercase (<code>{:x}</code>), uppercase (<code>{:X}</code>), <code>0x</code>-prefix (<code>{:#x}</code>) and padding (<code>{:02x}</code>) are
+supported on primitive integer types.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ufmt::uwrite;
+
+<span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+<span class="macro">uwrite!</span>(s, <span class="string">"{:#06x}"</span>, <span class="number">0x42</span>);
+<span class="macro">assert_eq!</span>(s, <span class="string">"0x0042"</span>);</code></pre></div>
+<ul>
+<li>implementing <code>uWrite</code></li>
+</ul>
+<p>When implementing the <code>uWrite</code> trait you should prefer the <code>ufmt_write::uWrite</code> crate over the
+<code>ufmt::uWrite</code> crate for better forward compatibility.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::convert::Infallible;
+
+<span class="kw">use </span>ufmt_write::uWrite;
+
+<span class="kw">struct </span>MyWriter;
+
+<span class="kw">impl </span>uWrite <span class="kw">for </span>MyWriter {
+    <span class="kw">type </span>Error = Infallible;
+
+    <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="comment">// ..
+        </span><span class="prelude-val">Ok</span>(())
+    }
+}</code></pre></div>
+<ul>
+<li>writing a <code>macro_rules!</code> macro that uses <code>uwrite!</code> (or <code>uwriteln!</code>).</li>
+</ul>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// like `std::format!` it returns a `std::String` but uses `uwrite!` instead of `write!`
+</span><span class="macro">macro_rules!</span> uformat {
+    <span class="comment">// IMPORTANT use `tt` fragments instead of `expr` fragments (i.e. `$($exprs:expr),*`)
+    </span>($(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; {{
+        <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+        <span class="kw">match </span><span class="macro">ufmt::uwrite!</span>(<span class="kw-2">&amp;mut </span>s, $(<span class="macro-nonterminal">$tt</span>)<span class="kw-2">*</span>) {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(s),
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
+        }
+    }}
+}</code></pre></div>
+<h2 id="benchmarks"><a class="doc-anchor" href="#benchmarks">§</a>Benchmarks</h2>
+<p>The benchmarks ran on a ARM Cortex-M3 chip (<code>thumbv7m-none-eabi</code>).</p>
+<p>The benchmarks were compiled with <code>nightly-2019-05-01</code>, <code>-C opt-level=3</code>, <code>lto = true</code>,
+<code>codegen-units = 1</code>.</p>
+<p>In all benchmarks <code>x = i32::MIN</code> and <code>y = i32::MIN</code> plus some obfuscation was applied to
+prevent const-propagation of the <code>*write!</code> arguments.</p>
+<p>The unit of time is one core clock cycle: 125 ns (8 MHz)</p>
+<p>The <code>.text</code> and <code>.rodata</code> columns indicate the delta (in bytes) when commenting out the
+<code>*write!</code> statement.</p>
+<div><table><thead><tr><th>Code</th><th>Time</th><th>%</th><th><code>.text</code></th><th>%</th><th><code>.rodata</code></th><th>%</th></tr></thead><tbody>
+<tr><td><code>write!(&quot;Hello, world!&quot;)</code></td><td>154</td><td>~</td><td>1906</td><td>~</td><td>248</td><td>~</td></tr>
+<tr><td><code>uwrite!(&quot;Hello, world!&quot;)</code></td><td>20</td><td><strong>13.0%</strong></td><td>34</td><td><strong>1.8%</strong></td><td>16</td><td><strong>6.5%</strong></td></tr>
+<tr><td><code>write!(w, &quot;{}&quot;, 0i32)</code></td><td>256</td><td>~</td><td>1958</td><td>~</td><td>232</td><td>~</td></tr>
+<tr><td><code>uwrite!(w, &quot;{}&quot;, 0i32)</code></td><td>37</td><td><strong>14.5%</strong></td><td>288</td><td><strong>14.7%</strong></td><td>0</td><td><strong>0%</strong></td></tr>
+<tr><td><code>write!(w, &quot;{}&quot;, x)</code></td><td>381</td><td>~</td><td></td><td></td><td></td><td></td></tr>
+<tr><td><code>uwrite!(w, &quot;{}&quot;, x)</code></td><td>295</td><td>77.4%</td><td></td><td></td><td></td><td></td></tr>
+<tr><td><code>write!(w, &quot;{:?}&quot;, Pair { x: 0, y: 0 })</code></td><td>996</td><td>~</td><td>4704</td><td>~</td><td>312</td><td>~</td></tr>
+<tr><td><code>uwrite!(w, &quot;{:?}&quot;, Pair { x: 0, y: 0 })</code></td><td>254</td><td><strong>25.5%</strong></td><td>752</td><td><strong>16.0%</strong></td><td>24</td><td><strong>7.7%</strong></td></tr>
+<tr><td><code>write!(w, &quot;{:?}&quot;, Pair { x, y })</code></td><td>1264</td><td>~</td><td></td><td></td><td></td><td></td></tr>
+<tr><td><code>uwrite!(w, &quot;{:?}&quot;, Pair { x, y })</code></td><td>776</td><td>61.4%</td><td></td><td></td><td></td><td></td></tr>
+<tr><td><code>write!(w, &quot;{:#?}&quot;, Pair { x: 0, y: 0 })</code></td><td>2853</td><td>~</td><td>4710</td><td>~</td><td>348</td><td>~</td></tr>
+<tr><td><code>uwrite!(w, &quot;{:#?}&quot;, Pair { x: 0, y: 0 })</code></td><td>301</td><td><strong>10.6%</strong></td><td>754</td><td><strong>16.0%</strong></td><td>24</td><td><strong>6.9%</strong></td></tr>
+<tr><td><code>write!(w, &quot;{:#?}&quot;, Pair { x, y })</code></td><td>3693</td><td>~</td><td></td><td></td><td></td><td></td></tr>
+<tr><td><code>uwrite!(w, &quot;{:#?}&quot;, Pair { x, y })</code></td><td>823</td><td><strong>22.3%</strong></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table>
+</div>
+<p>Benchmark program:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="kw">static </span>X: AtomicI32 = AtomicI32::new(i32::MIN); <span class="comment">// or `0`
+</span><span class="kw">static </span>Y: AtomicI32 = AtomicI32::new(i32::MIN); <span class="comment">// or `0`
+
+</span><span class="attr">#[exception]
+</span><span class="kw">fn </span>PendSV() {
+   <span class="comment">// read DWT.CYCCNT here
+
+   </span><span class="kw">let </span>x = X.load(Ordering::Relaxed);
+   <span class="kw">let </span>y = Y.load(Ordering::Relaxed);
+
+   <span class="kw">let </span>p = Pair { x, y };
+
+   <span class="macro">uwrite!</span>(<span class="kw-2">&amp;mut </span>W, <span class="string">"{:#?}"</span>, p).ok();
+
+   <span class="comment">// write!(&amp;mut W, "{:#?}", p).ok();
+
+   </span>asm::bkpt(); <span class="comment">// read DWT.CYCCNT here
+</span>}</code></pre></div>
+<p>Writer used in the benchmarks:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::{convert::Infallible, fmt, ptr};
+
+<span class="kw">use </span>ufmt::uWrite;
+
+<span class="kw">struct </span>W;
+
+<span class="kw">impl </span>uWrite <span class="kw">for </span>W {
+    <span class="kw">type </span>Error = Infallible;
+
+    <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), Infallible&gt; {
+        s.as_bytes()
+            .iter()
+            .for_each(|b| <span class="kw">unsafe </span>{ drop(ptr::read_volatile(b)) });
+
+        <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="kw">impl </span>fmt::Write <span class="kw">for </span>W {
+    <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; fmt::Result {
+        s.as_bytes()
+            .iter()
+            .for_each(|b| <span class="kw">unsafe </span>{ drop(ptr::read_volatile(b)) });
+
+        <span class="prelude-val">Ok</span>(())
+    }
+}</code></pre></div>
+<h2 id="minimum-supported-rust-version-msrv"><a class="doc-anchor" href="#minimum-supported-rust-version-msrv">§</a>Minimum Supported Rust Version (MSRV)</h2>
+<p>This crate does <em>not</em> have a Minimum Supported Rust Version (MSRV) and may make use of language
+features and API in the standard library available in the latest stable Rust version.</p>
+<p>In other words, changes in the Rust version requirement of this crate are not considered semver
+breaking change and may occur in patch version release.</p>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="derive/index.html" title="mod ufmt::derive">derive</a></div><div class="desc docblock-short">Derive macros</div></li></ul><h2 id="macros" class="section-header">Macros<a href="#macros" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="macro" href="macro.uwrite.html" title="macro ufmt::uwrite">uwrite</a></div><div class="desc docblock-short">Write formatted data into a buffer</div></li><li><div class="item-name"><a class="macro" href="macro.uwriteln.html" title="macro ufmt::uwriteln">uwriteln</a></div><div class="desc docblock-short">Write formatted data into a buffer, with a newline appended</div></li></ul><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.DebugList.html" title="struct ufmt::DebugList">DebugList</a></div><div class="desc docblock-short">A struct to help with <a href="trait.uDebug.html" title="trait ufmt::uDebug"><code>uDebug</code></a> implementations.</div></li><li><div class="item-name"><a class="struct" href="struct.DebugMap.html" title="struct ufmt::DebugMap">DebugMap</a></div><div class="desc docblock-short">A struct to help with <a href="trait.uDebug.html" title="trait ufmt::uDebug"><code>uDebug</code></a> implementations.</div></li><li><div class="item-name"><a class="struct" href="struct.DebugStruct.html" title="struct ufmt::DebugStruct">DebugStruct</a></div><div class="desc docblock-short">A struct to help with <a href="trait.uDebug.html" title="trait ufmt::uDebug"><code>uDebug</code></a> implementations.</div></li><li><div class="item-name"><a class="struct" href="struct.DebugTuple.html" title="struct ufmt::DebugTuple">DebugTuple</a></div><div class="desc docblock-short">A struct to help with <a href="trait.uDebug.html" title="trait ufmt::uDebug"><code>uDebug</code></a> implementations.</div></li><li><div class="item-name"><a class="struct" href="struct.Formatter.html" title="struct ufmt::Formatter">Formatter</a></div><div class="desc docblock-short">Configuration for formatting</div></li></ul><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.uDebug.html" title="trait ufmt::uDebug">uDebug</a></div><div class="desc docblock-short">Just like <code>core::fmt::Debug</code></div></li><li><div class="item-name"><a class="trait" href="trait.uDisplay.html" title="trait ufmt::uDisplay">uDisplay</a></div><div class="desc docblock-short">Just like <code>core::fmt::Display</code></div></li><li><div class="item-name"><a class="trait" href="trait.uWrite.html" title="trait ufmt::uWrite">uWrite</a></div><div class="desc docblock-short">A collection of methods that are required / used to format a message into a stream.</div></li></ul></section></div></main></body></html>
