@@ -1,5 +1,29 @@
 #![allow(non_camel_case_types)]
 //! Analog-to-Digital Converter
+//!
+//! # Example
+//!
+//! For full source code, please refer to the ATmega ADC example:
+//! [`atmega2560-adc.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-adc.rs)
+//!
+//! ```
+//! let dp = attiny_hal::Peripherals::take().unwrap();
+//! let pins = attiny_hal::pins!(dp);
+//!
+//! let mut adc = Adc::new(dp.ADC, Default::default());
+//!
+//! let channels: [attiny_hal::adc::Channel; 4] = [
+//!     pins.pa0.into_analog_input(&mut adc).into_channel(),
+//!     pins.pa1.into_analog_input(&mut adc).into_channel(),
+//!     pins.pa2.into_analog_input(&mut adc).into_channel(),
+//!     pins.pa3.into_analog_input(&mut adc).into_channel(),
+//! ];
+//!
+//! for (index, channel) in channels.iter().enumerate() {
+//!     let value = adc.read_blocking(channel);
+//!     ufmt::uwrite!(&mut serial, "CH{}: {} ", index, value).unwrap();
+//! }
+//! ```
 
 use crate::port;
 pub use avr_hal_generic::adc::{AdcChannel, AdcOps, ClockDivider};
