@@ -129,6 +129,9 @@ pub mod port;
 #[cfg(feature = "board-selected")]
 pub use port::Pins;
 
+#[cfg(feature = "panic-halt")]
+use panic_halt as _;
+
 /// Analog to Digital converter.
 #[cfg(feature = "mcu-atmega")]
 pub mod adc {

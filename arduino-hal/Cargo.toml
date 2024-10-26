@@ -13,6 +13,7 @@ categories = ["no-std", "embedded", "hardware-support"]
 [features]
 default = ["rt"]
 rt = ["avr-device/rt"]
+panic-halt = ["dep:panic-halt"]
 
 critical-section-impl = ["avr-device/critical-section-impl"]
 
@@ -56,6 +57,10 @@ optional = true
 # this allows us to show our error instead of the one from `atmega-hal` (which
 # is much less helpful in this situation).
 features = ["disable-device-selection-error"]
+
+[dependencies.panic-halt]
+version = "0.2.0"
+optional = true
 
 [dependencies.attiny-hal]
 path = "../mcu/attiny-hal/"
