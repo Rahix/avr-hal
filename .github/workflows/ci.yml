@@ -12,7 +12,7 @@ jobs:
   ci:
     name: "${{ matrix.m.type }}: ${{ matrix.m.name }}"
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         m:
           - type: board
