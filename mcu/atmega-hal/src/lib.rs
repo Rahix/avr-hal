@@ -147,68 +147,10 @@ pub use eeprom::Eeprom;
 
 pub struct Atmega;
 
-#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
+#[cfg(feature = "device-selected")]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD)
-    };
-}
-#[cfg(any(feature = "atmega164pa"))]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
-    };
-}
-#[cfg(feature = "atmega328pb")]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE)
-    };
-}
-#[cfg(feature = "atmega32u4")]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF)
-    };
-}
-
-#[cfg(any(feature = "atmega128a"))]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new(
-            $p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF, $p.PORTG,
-        )
-    };
-}
-
-#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new(
-            $p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF, $p.PORTG, $p.PORTH,
-            $p.PORTJ, $p.PORTK, $p.PORTL,
-        )
-    };
-}
-
-#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
-    };
-}
-
-#[cfg(any(feature = "atmega8"))]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD)
+        $crate::port::pins(&$p)
     };
 }

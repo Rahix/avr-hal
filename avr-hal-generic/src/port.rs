@@ -586,7 +586,7 @@ macro_rules! impl_port_traditional {
 
             impl Pins {
                 pub fn new(
-                    $(_: $port,)+
+                    $(_: &$port,)+
                 ) -> Self {
                     Self {
                         $($([<p $name:lower $pin>]: $crate::port::Pin::new(

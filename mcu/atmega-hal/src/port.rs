@@ -27,6 +27,11 @@ avr_hal_generic::impl_port_traditional! {
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
     }
 }
+#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTB, &peripherals.PORTC, &peripherals.PORTD);
+}
+
 
 #[cfg(any(feature = "atmega164pa"))]
 avr_hal_generic::impl_port_traditional! {
@@ -37,6 +42,11 @@ avr_hal_generic::impl_port_traditional! {
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6 ,7],
     }
 }
+#[cfg(any(feature = "atmega164pa"))]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTA, &peripherals.PORTB, &peripherals.PORTC, &peripherals.PORTD);
+}
+
 
 #[cfg(feature = "atmega328pb")]
 avr_hal_generic::impl_port_traditional! {
@@ -47,6 +57,11 @@ avr_hal_generic::impl_port_traditional! {
         E: crate::pac::PORTE = [0, 1, 2, 3],
     }
 }
+#[cfg(feature = "atmega328pb")]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTB, &peripherals.PORTC, &peripherals.PORTD, &peripherals.PORTE);
+}
+
 
 #[cfg(feature = "atmega32u4")]
 avr_hal_generic::impl_port_traditional! {
@@ -58,6 +73,11 @@ avr_hal_generic::impl_port_traditional! {
         F: crate::pac::PORTF = [0, 1, 4, 5, 6, 7],
     }
 }
+#[cfg(feature = "atmega32u4")]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTB, &peripherals.PORTC, &peripherals.PORTD, &peripherals.PORTE, &peripherals.PORTF);
+}
+
 
 #[cfg(any(feature = "atmega128a"))]
 avr_hal_generic::impl_port_traditional! {
@@ -71,6 +91,11 @@ avr_hal_generic::impl_port_traditional! {
         G: crate::pac::PORTG = [0, 1, 2, 3, 4],
     }
 }
+#[cfg(any(feature = "atmega128a"))]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTA, &peripherals.PORTB, &peripherals.PORTC, &peripherals.PORTD, &peripherals.PORTE, &peripherals.PORTF, &peripherals.PORTG);
+}
+
 
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_port_traditional! {
@@ -88,6 +113,11 @@ avr_hal_generic::impl_port_traditional! {
         L: crate::pac::PORTL = [0, 1, 2, 3, 4, 5, 6, 7],
     }
 }
+#[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTA, &peripherals.PORTB, &peripherals.PORTC, &peripherals.PORTD, &peripherals.PORTE, &peripherals.PORTF, &peripherals.PORTG, &peripherals.PORTH, &peripherals.PORTJ, &peripherals.PORTK, &peripherals.PORTL);
+}
+
 
 #[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 avr_hal_generic::impl_port_traditional! {
@@ -98,6 +128,11 @@ avr_hal_generic::impl_port_traditional! {
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
     }
 }
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTA, &peripherals.PORTB, &peripherals.PORTC, &peripherals.PORTD);
+}
+
 
 #[cfg(any(feature = "atmega8"))]
 avr_hal_generic::impl_port_traditional! {
@@ -107,3 +142,8 @@ avr_hal_generic::impl_port_traditional! {
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
     }
 }
+#[cfg(any(feature = "atmega8"))]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTB, &peripherals.PORTC, &peripherals.PORTD);
+}
+

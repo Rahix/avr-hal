@@ -28,12 +28,22 @@ avr_hal_generic::impl_port_traditional! {
     }
 }
 
+#[cfg(feature = "attiny2313")]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTA, &peripherals.PORTB, &peripherals.PORTD);
+}
+
 #[cfg(feature = "attiny167")]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {
         A: crate::pac::PORTA = [0, 1, 2, 3, 4, 5, 6, 7],
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
     }
+}
+
+#[cfg(feature = "attiny167")]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTA, &peripherals.PORTB);
 }
 
 #[cfg(feature = "attiny84")]
@@ -44,11 +54,21 @@ avr_hal_generic::impl_port_traditional! {
     }
 }
 
+#[cfg(feature = "attiny84")]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTA, &peripherals.PORTB);
+}
+
 #[cfg(feature = "attiny85")]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5],
     }
+}
+
+#[cfg(feature = "attiny85")]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTB);
 }
 
 #[cfg(feature = "attiny88")]
@@ -59,4 +79,9 @@ avr_hal_generic::impl_port_traditional! {
         C: crate::pac::PORTC = [0, 1, 2, 3, 4, 5, 6, 7],
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
     }
+}
+
+#[cfg(feature = "attiny88")]
+pub fn pins(peripherals: &crate::pac::Peripherals) -> Pins {
+    return Pins::new(&peripherals.PORTA, &peripherals.PORTB, &peripherals.PORTC, &peripherals.PORTD);
 }

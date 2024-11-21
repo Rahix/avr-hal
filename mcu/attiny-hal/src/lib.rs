@@ -95,38 +95,10 @@ pub use spi::Spi;
 
 pub struct Attiny;
 
-#[cfg(feature = "attiny84")]
+#[cfg(feature = "device-selected")]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new($p.PORTA, $p.PORTB)
-    };
-}
-#[cfg(feature = "attiny85")]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new($p.PORTB)
-    };
-}
-#[cfg(feature = "attiny88")]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
-    };
-}
-#[cfg(feature = "attiny167")]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new($p.PORTA, $p.PORTB)
-    };
-}
-#[cfg(feature = "attiny2313")]
-#[macro_export]
-macro_rules! pins {
-    ($p:expr) => {
-        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTD)
+        $crate::port::pins(&$p)
     };
 }
