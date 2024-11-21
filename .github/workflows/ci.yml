@@ -119,6 +119,11 @@ jobs:
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
         run: cd "mcu/${{ matrix.m.crate }}" && cargo build --features "${{ matrix.m.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"
+      - name: Test-compile HAL crate for an MCU (no deprecated globals)
+        if: "${{ matrix.m.crate == 'attiny-hal' }}"
+        run: >-
+          cd "mcu/${{ matrix.m.crate }}" && 
+          cargo build --features "${{ matrix.m.name }}-no-deprecated-globals" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"
 
   ravedude:
     name: "ravedude"
