@@ -116,6 +116,9 @@ jobs:
       - name: Compile board crate (without examples)
         if: "${{ matrix.m.type == 'board' && !matrix.m.examples }}"
         run: cd "arduino-hal/" && cargo build --features "${{ matrix.m.name }}"
+      - name: Compile board crate (without examples) (no deprecated globals)
+        if: "${{ matrix.m.type == 'board' && !matrix.m.examples }}"
+        run: cd "arduino-hal/" && cargo build --features "${{ matrix.m.name }}-no-deprecated-globals"
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
         run: cd "mcu/${{ matrix.m.crate }}" && cargo build --features "${{ matrix.m.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"

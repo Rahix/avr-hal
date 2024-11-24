@@ -1,6 +1,6 @@
 [package]
 name = "arduino-hal"
-version = "0.1.0"
+version = "0.2.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -16,24 +16,160 @@ rt = ["avr-device/rt"]
 
 critical-section-impl = ["avr-device/critical-section-impl"]
 
-board-selected = []
-mcu-atmega = []
-mcu-attiny = []
-arduino-diecimila = ["mcu-atmega", "atmega-hal/atmega168", "board-selected"]
-arduino-leonardo = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
-arduino-mega2560 = ["mcu-atmega", "atmega-hal/atmega2560", "board-selected"]
-arduino-mega1280 = ["mcu-atmega", "atmega-hal/atmega1280", "board-selected"]
-arduino-nano = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
-arduino-uno = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
-trinket-pro = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
-sparkfun-promicro = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
-sparkfun-promini-3v3 = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
-sparkfun-promini-5v = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
-trinket = ["mcu-attiny", "attiny-hal/attiny85", "board-selected"]
-nano168 = ["mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc", "board-selected"]
+# Board-specific targets. Due to use of deprecated globals, only one board can be selected at a time
+# In arduino-hal 0.3.0 the defaults will change to no deprecated globals
+arduino-diecimila = ["arduino-diecimila-deprecated-globals"]
+arduino-leonardo = ["arduino-leonardo-deprecated-globals"]
+arduino-mega2560 = ["arduino-mega2560-deprecated-globals"]
+arduino-mega1280 = ["arduino-mega1280-deprecated-globals"]
+arduino-nano = ["arduino-nano-deprecated-globals"]
+arduino-uno = ["arduino-uno-deprecated-globals"]
+trinket-pro = ["trinket-pro-deprecated-globals"]
+sparkfun-promicro = ["sparkfun-promicro-deprecated-globals"]
+sparkfun-promini-3v3 = ["sparkfun-promini-3v3-deprecated-globals"]
+sparkfun-promini-5v = ["sparkfun-promini-5v-deprecated-globals"]
+trinket = ["trinket-deprecated-globals"]
+nano168 = ["nano168-deprecated-globals"]
 
-# We must select a board to build on docs.rs
-docsrs = ["arduino-uno"]
+# Board-specific targets with deprecated globals. This is the default in arduino-hal <0.3.0
+arduino-diecimila-deprecated-globals = [
+    "_board-arduino-diecimila",
+    "atmega-hal/deprecated-globals",
+    "deprecated-globals",
+]
+arduino-leonardo-deprecated-globals = ["_board-arduino-leonardo", "atmega-hal/deprecated-globals", "deprecated-globals"]
+arduino-mega2560-deprecated-globals = ["_board-arduino-mega2560", "atmega-hal/deprecated-globals", "deprecated-globals"]
+arduino-mega1280-deprecated-globals = ["_board-arduino-mega1280", "atmega-hal/deprecated-globals", "deprecated-globals"]
+arduino-nano-deprecated-globals = ["_board-arduino-nano", "atmega-hal/deprecated-globals", "deprecated-globals"]
+arduino-uno-deprecated-globals = ["_board-arduino-uno", "atmega-hal/deprecated-globals", "deprecated-globals"]
+trinket-pro-deprecated-globals = ["_board-trinket-pro", "atmega-hal/deprecated-globals", "deprecated-globals"]
+sparkfun-promicro-deprecated-globals = [
+    "_board-sparkfun-promicro",
+    "atmega-hal/deprecated-globals",
+    "deprecated-globals",
+]
+sparkfun-promini-3v3-deprecated-globals = [
+    "_board-sparkfun-promini-3v3",
+    "atmega-hal/deprecated-globals",
+    "deprecated-globals",
+]
+sparkfun-promini-5v-deprecated-globals = [
+    "_board-sparkfun-promini-5v",
+    "atmega-hal/deprecated-globals",
+    "deprecated-globals",
+]
+trinket-deprecated-globals = ["_board-trinket", "attiny-hal/deprecated-globals", "deprecated-globals"]
+nano168-deprecated-globals = ["_board-nano168", "atmega-hal/deprecated-globals", "deprecated-globals"]
+
+# Board-specific targets without deprecated globals. This will be the default in arduino-hal 0.3.0
+arduino-diecimila-no-deprecated-globals = ["_board-arduino-diecimila"]
+arduino-leonardo-no-deprecated-globals = ["_board-arduino-leonardo"]
+arduino-mega2560-no-deprecated-globals = ["_board-arduino-mega2560"]
+arduino-mega1280-no-deprecated-globals = ["_board-arduino-mega1280"]
+arduino-nano-no-deprecated-globals = ["_board-arduino-nano"]
+arduino-uno-no-deprecated-globals = ["_board-arduino-uno"]
+trinket-pro-no-deprecated-globals = ["_board-trinket-pro"]
+sparkfun-promicro-no-deprecated-globals = ["_board-sparkfun-promicro"]
+sparkfun-promini-3v3-no-deprecated-globals = ["_board-sparkfun-promini-3v3"]
+sparkfun-promini-5v-no-deprecated-globals = ["_board-sparkfun-promini-5v"]
+trinket-no-deprecated-globals = ["_board-trinket"]
+nano168-no-deprecated-globals = ["_board-nano168"]
+
+# Include soon-to-be-deprecated globals in the crate. Only one MCU can be selected if deprecated globals are enabled
+deprecated-globals = []
+
+# When using this crate from another lib crate, you can use this feature to suppress the chip selection error in favor of your own error
+disable-board-selection-error = ["_board-selected"]
+
+# MCU-specific implementation features
+# Do not use directly; use either an <mcu>-deprecated-globals feature or any number of <mcu>-no-deprecated-globals features
+_board-arduino-diecimila = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega168-no-deprecated-globals",
+]
+_board-arduino-leonardo = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega32u4-no-deprecated-globals",
+]
+_board-arduino-mega2560 = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega2560-no-deprecated-globals",
+]
+_board-arduino-mega1280 = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega1280-no-deprecated-globals",
+]
+_board-arduino-nano = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega328p-no-deprecated-globals",
+    "atmega-hal/enable-extra-adc",
+]
+_board-arduino-uno = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega328p-no-deprecated-globals",
+]
+_board-trinket-pro = ["_board-selected", "_mcu-atmega", "atmega-hal/atmega328p-no-deprecated-globals"]
+_board-sparkfun-promicro = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega32u4-no-deprecated-globals",
+]
+_board-sparkfun-promini-3v3 = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega328p-no-deprecated-globals",
+    "atmega-hal/enable-extra-adc",
+]
+_board-sparkfun-promini-5v = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega328p-no-deprecated-globals",
+    "atmega-hal/enable-extra-adc",
+]
+_board-trinket = ["_board-selected", "_mcu-attiny", "attiny-hal/attiny85-no-deprecated-globals"]
+_board-nano168 = [
+    "_board-selected",
+    "_mcu-atmega",
+    "_default-serial",
+    "atmega-hal/atmega168-no-deprecated-globals",
+    "atmega-hal/enable-extra-adc",
+]
+
+_mcu-atmega = []
+_mcu-attiny = []
+_default-serial = []
+
+_board-selected = []
+
+docsrs = [
+    "arduino-diecimila-no-deprecated-globals",
+    "arduino-leonardo-no-deprecated-globals",
+    "arduino-mega2560-no-deprecated-globals",
+    "arduino-mega1280-no-deprecated-globals",
+    "arduino-nano-no-deprecated-globals",
+    "arduino-uno-no-deprecated-globals",
+    "trinket-pro-no-deprecated-globals",
+    "sparkfun-promicro-no-deprecated-globals",
+    "sparkfun-promini-3v3-no-deprecated-globals",
+    "sparkfun-promini-5v-no-deprecated-globals",
+    "trinket-no-deprecated-globals",
+    "nano168-no-deprecated-globals",
+]
 
 [dependencies]
 cfg-if = "1"
@@ -50,12 +186,6 @@ path = "../avr-hal-generic/"
 [dependencies.atmega-hal]
 path = "../mcu/atmega-hal/"
 optional = true
-
-# Because this crate has its own check that at least one device is selected, we
-# can safely "circumvent" the check in `atmega-hal`.  Due to compile order,
-# this allows us to show our error instead of the one from `atmega-hal` (which
-# is much less helpful in this situation).
-features = ["disable-device-selection-error"]
 
 [dependencies.attiny-hal]
 path = "../mcu/attiny-hal/"
