@@ -240,7 +240,7 @@
     error = "Not able to guess port"
 
 [mighty-core-atmega1284p]
-    name = "Might Core Development Board for ATMEGA1284P"
+    name = "Mighty Core Development Board for ATMEGA1284P"
 
     [mighty-core-atmega1284p.reset]
     automatic = true
