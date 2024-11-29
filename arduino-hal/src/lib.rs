@@ -1,5 +1,6 @@
 #![no_std]
 #![feature(doc_cfg)]
+#![feature(decl_macro)]
 
 //! `arduino-hal`
 //! =============
@@ -175,10 +176,22 @@ pub mod usart {
     pub type UsartReader<USART, RX, TX> =
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
-
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use usart::Usart;
+
+#[cfg(feature = "arduino-leonardo")]
+use usb_device::{bus::UsbBusAllocator, device::{UsbDeviceBuilder, UsbVidPid}};
+#[cfg(feature = "arduino-leonardo")]
+pub mod usb {
+    pub use crate::hal::usb::*;
+
+    pub type AvrUsbBus = crate::hal::usb::AvrUsbBus;
+}
+#[doc(no_inline)]
+#[cfg(feature = "arduino-leonardo")]
+pub use usb::AvrUsbBus;
+
 
 #[cfg(feature = "board-selected")]
 pub mod eeprom {
@@ -339,4 +352,35 @@ macro_rules! default_serial {
             $crate::hal::usart::BaudrateExt::into_baudrate($baud),
         )
     };
+}
+
+/// Convenience macro to instantiate the [`UsbBus`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// TODO
+/// ```
+#[cfg(feature = "arduino-leonardo")]
+pub macro default_usb_bus ($usb:expr, $pll:expr) {
+    unsafe {
+        static mut USB_BUS: Option<UsbBusAllocator<AvrUsbBus>> = None;
+        &*USB_BUS.insert($crate::AvrUsbBus::with_suspend_notifier($usb, $pll))
+    };
+}
+
+/// Convenience macro to instantiate the [`UsbDevice`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// TODO
+/// ```
+#[cfg(feature = "arduino-leonardo")]
+pub macro default_usb_device ($usb_bus:expr, $vid:expr, $pid:expr, $strings:expr) {
+    UsbDeviceBuilder::new(
+        $usb_bus,
+        UsbVidPid($vid, $pid)
+    )
+    .strings(&[$strings])
+    .unwrap()
+    .build()
 }
