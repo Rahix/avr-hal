@@ -21,7 +21,7 @@ cfg-if = "1"
 nb = "1.1.0"
 ufmt = "0.2.0"
 paste = "1.0.0"
-#avr-device = "0.5.4"
+avr-device = "0.5.4"
 embedded-storage = "0.2"
 embedded-hal = "1.0"
 embedded-hal-bus = "0.1"
@@ -31,9 +31,6 @@ unwrap-infallible = "0.1.5"
 version = "0.2.3"
 package = "embedded-hal"
 features = ["unproven"]
-
-[dependencies.avr-device]
-path = "../../avr-device"
 
 [build-dependencies]
 rustversion = "1.0"

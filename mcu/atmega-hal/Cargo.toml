@@ -37,10 +37,10 @@ disable-device-selection-error = []
 docsrs = ["atmega328p"]
 
 [dependencies]
-avr-hal-generic = { path = "../../avr-hal-generic" }
+avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-path = "../../../avr-device"
+version = "0.5.4"
 
 # Because this crate has its own check that at least one device is selected, we
 # can safely "circumvent" the check in `avr-device`.
