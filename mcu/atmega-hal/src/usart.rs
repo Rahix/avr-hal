@@ -43,7 +43,6 @@ pub type UsartReader<USART, RX, TX, CLOCK> =
 #[cfg(any(
     feature = "atmega88p",
     feature = "atmega168",
-    feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega328pb",
     feature = "atmega1284p",
