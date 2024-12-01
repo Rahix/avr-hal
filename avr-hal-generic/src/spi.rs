@@ -25,13 +25,19 @@ use embedded_hal::spi::{self, SpiBus};
 /// | `OscfOver128` | 125 kHz | 62.5 kHz |
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SerialClockRate {
-    OscfOver2,
-    OscfOver4,
-    OscfOver8,
-    OscfOver16,
-    OscfOver32,
-    OscfOver64,
-    OscfOver128,
+    OscfOver2 = 1,
+    OscfOver4 = 2,
+    OscfOver8 = 3,
+    OscfOver16 = 4,
+    OscfOver32 = 5,
+    OscfOver64 = 6,
+    OscfOver128 = 7,
+}
+
+impl SerialClockRate {
+    pub fn into_divider(self) -> u8 {
+        2u8.pow(self as u32)
+    }
 }
 
 /// Order of data transmission, either MSB first or LSB first

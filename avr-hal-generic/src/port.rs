@@ -781,13 +781,18 @@ macro_rules! renamed_pins {
             type McuPins = $mcu_pins:ty;
         }
     ) => {
-        $(#[$pins_attr])*
-        pub struct Pins {
-            $($(#[$pin_attr])*
-            pub $pin_name: $pin_wrapper<
-                $crate::port::mode::Input<$crate::port::mode::Floating>,
-                $pin_type,
-            >,)+
+        $crate::paste::paste! {
+            $(#[$pins_attr])*
+            pub struct Pins {
+                    $(pub $pin_name: $pin_wrapper<
+                        $crate::port::mode::Input<$crate::port::mode::Floating>,
+                        [<$pin_name:upper>],
+                    >,)+
+            }
+        }
+
+        $crate::paste::paste! {
+            $($(#[$pin_attr])* pub type [<$pin_name:upper>] = $pin_type;)+
         }
 
         impl Pins {
