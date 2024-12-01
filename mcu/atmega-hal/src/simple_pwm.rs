@@ -5,6 +5,7 @@ use crate::port::*;
 
 #[cfg(any(
     feature = "atmega48p",
+    feature = "atmega88p",
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega328pb"
@@ -58,6 +59,7 @@ avr_hal_generic::impl_simple_pwm! {
 
 #[cfg(any(
     feature = "atmega48p",
+    feature = "atmega88p",
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega328pb"
@@ -115,6 +117,7 @@ avr_hal_generic::impl_simple_pwm! {
 
 #[cfg(any(
     feature = "atmega48p",
+    feature = "atmega88p",
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega328pb"

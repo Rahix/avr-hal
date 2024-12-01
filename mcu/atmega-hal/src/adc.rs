@@ -80,6 +80,7 @@ pub mod channel {
             feature = "atmega128a",
             feature = "atmega1284p",
             feature = "atmega8",
+            feature = "atmega88p"
         ),
         feature = "enable-extra-adc",
     ))]
@@ -94,6 +95,7 @@ pub mod channel {
             feature = "atmega128a",
             feature = "atmega1284p",
             feature = "atmega8",
+            feature = "atmega88p"
         ),
         feature = "enable-extra-adc",
     ))]
@@ -111,6 +113,7 @@ pub mod channel {
         feature = "atmega1284p",
         feature = "atmega8",
         feature = "atmega164pa",
+        feature = "atmega88p"
     ))]
     pub struct Vbg;
     #[cfg(any(
@@ -126,6 +129,7 @@ pub mod channel {
         feature = "atmega1284p",
         feature = "atmega8",
         feature = "atmega164pa",
+        feature = "atmega88p"
     ))]
     pub struct Gnd;
     #[cfg(any(
@@ -133,6 +137,7 @@ pub mod channel {
         feature = "atmega328pb",
         feature = "atmega32u4",
         feature = "atmega48p",
+        feature = "atmega88p"
     ))]
     pub struct Temperature;
 }
@@ -142,6 +147,7 @@ pub mod channel {
     feature = "atmega328p",
     feature = "atmega328pb",
     feature = "atmega48p",
+    feature = "atmega88p"
 ))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,

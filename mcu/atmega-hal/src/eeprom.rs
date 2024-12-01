@@ -14,6 +14,17 @@ avr_hal_generic::impl_eeprom_atmega! {
     },
 }
 
+#[cfg(feature = "atmega88p")]
+avr_hal_generic::impl_eeprom_atmega! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::EEPROM,
+    capacity: 512,
+    addr_width: u16,
+    set_address: |peripheral, address| {
+        peripheral.eear.write(|w| w.bits(address));
+    },
+}
+
 #[cfg(any(feature = "atmega168", feature = "atmega164pa"))]
 avr_hal_generic::impl_eeprom_atmega! {
     hal: crate::Atmega,
