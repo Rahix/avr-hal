@@ -4,8 +4,6 @@
 //! =============
 //! Common HAL (hardware abstraction layer) for ATtiny* microcontrollers.
 
-// This crate can be configured in one of two ways: either you specify deprecated-globals and exactly one MCU
-// Or you don't specify deprecated globals and at least one MCU
 #[cfg(all(
     not(feature = "_mcu-selected"),
     not(feature = "disable-device-selection-error")
@@ -44,7 +42,3 @@ pub mod attiny85;
 #[cfg(feature = "_mcu-attiny88")]
 pub mod attiny88;
 
-#[cfg(feature = "deprecated-globals")]
-mod globals;
-#[cfg(feature = "deprecated-globals")]
-pub use globals::*;

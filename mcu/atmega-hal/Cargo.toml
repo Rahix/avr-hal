@@ -1,6 +1,6 @@
 [package]
 name = "atmega-hal"
-version = "0.3.0"
+version = "0.4.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -15,74 +15,42 @@ rt = ["avr-device/rt"]
 enable-extra-adc = []
 
 # MCU-specific targets. 
-atmega48p = ["atmega48p-no-deprecated-globals"]
-atmega164pa = ["atmega164pa-no-deprecated-globals"]
-atmega168 = ["atmega168-no-deprecated-globals"]
-atmega328p = ["atmega328p-no-deprecated-globals"]
-atmega328pb = ["atmega328pb-no-deprecated-globals"]
-atmega32a = ["atmega32a-no-deprecated-globals"]
-atmega32u4 = ["atmega32u4-no-deprecated-globals"]
-atmega2560 = ["atmega2560-no-deprecated-globals"]
-atmega128a = ["atmega128a-no-deprecated-globals"]
-atmega1280 = ["atmega1280-no-deprecated-globals"]
-atmega1284p = ["atmega1284p-no-deprecated-globals"]
-atmega8 = ["atmega8-no-deprecated-globals"]
-
-# MCU-specific targets with deprecated globals. This was the default in atmega-hal <0.3.0
-atmega48p-deprecated-globals = ["_mcu-atmega48p", "deprecated-globals"]
-atmega164pa-deprecated-globals = ["_mcu-atmega164pa", "deprecated-globals"]
-atmega168-deprecated-globals = ["_mcu-atmega168", "deprecated-globals"]
-atmega328p-deprecated-globals = ["_mcu-atmega328p", "deprecated-globals"]
-atmega328pb-deprecated-globals = ["_mcu-atmega328pb", "deprecated-globals"]
-atmega32a-deprecated-globals = ["_mcu-atmega32a", "deprecated-globals"]
-atmega32u4-deprecated-globals = ["_mcu-atmega32u4", "deprecated-globals"]
-atmega2560-deprecated-globals = ["_mcu-atmega2560", "deprecated-globals"]
-atmega128a-deprecated-globals = ["_mcu-atmega128a", "deprecated-globals"]
-atmega1280-deprecated-globals = ["_mcu-atmega1280", "deprecated-globals"]
-atmega1284p-deprecated-globals = ["_mcu-atmega1284p", "deprecated-globals"]
-atmega8-deprecated-globals = ["_mcu-atmega8", "deprecated-globals"]
-
-# MCU-specific targets without deprecated globals. This is the default in atmega-hal 0.3.0
-atmega48p-no-deprecated-globals = ["_mcu-atmega48p"]
-atmega164pa-no-deprecated-globals = ["_mcu-atmega164pa"]
-atmega168-no-deprecated-globals = ["_mcu-atmega168"]
-atmega328p-no-deprecated-globals = ["_mcu-atmega328p"]
-atmega328pb-no-deprecated-globals = ["_mcu-atmega328pb"]
-atmega32a-no-deprecated-globals = ["_mcu-atmega32a"]
-atmega32u4-no-deprecated-globals = ["_mcu-atmega32u4"]
-atmega2560-no-deprecated-globals = ["_mcu-atmega2560"]
-atmega128a-no-deprecated-globals = ["_mcu-atmega128a"]
-atmega1280-no-deprecated-globals = ["_mcu-atmega1280"]
-atmega1284p-no-deprecated-globals = ["_mcu-atmega1284p"]
-atmega8-no-deprecated-globals = ["_mcu-atmega8"]
+atmega48p = ["_mcu-atmega48p"]
+atmega164pa = ["_mcu-atmega164pa"]
+atmega168 = ["_mcu-atmega168"]
+atmega328p = ["_mcu-atmega328p"]
+atmega328pb = ["_mcu-atmega328pb"]
+atmega32a = ["_mcu-atmega32a"]
+atmega32u4 = ["_mcu-atmega32u4"]
+atmega2560 = ["_mcu-atmega2560"]
+atmega128a = ["_mcu-atmega128a"]
+atmega1280 = ["_mcu-atmega1280"]
+atmega1284p = ["_mcu-atmega1284p"]
+atmega8 = ["_mcu-atmega8"]
 
 critical-section-impl = ["avr-device/critical-section-impl"]
 
 default = []
 
 docsrs = [
-    "atmega48p-no-deprecated-globals",
-    "atmega164pa-no-deprecated-globals",
-    "atmega168-no-deprecated-globals",
-    "atmega328p-no-deprecated-globals",
-    "atmega328pb-no-deprecated-globals",
-    "atmega32a-no-deprecated-globals",
-    "atmega32u4-no-deprecated-globals",
-    "atmega2560-no-deprecated-globals",
-    "atmega128a-no-deprecated-globals",
-    "atmega1280-no-deprecated-globals",
-    "atmega1284p-no-deprecated-globals",
-    "atmega8-no-deprecated-globals",
+    "atmega48p",
+    "atmega164pa",
+    "atmega168",
+    "atmega328p",
+    "atmega328pb",
+    "atmega32a",
+    "atmega32u4",
+    "atmega2560",
+    "atmega128a",
+    "atmega1280",
+    "atmega1284p",
+    "atmega8",
 ]
-
-# Include soon-to-be-deprecated globals in the crate. Only one MCU can be selected if deprecated globals are enabled
-deprecated-globals = []
 
 # If using this crate from another library crate you may want to suppress this error and provide your own
 disable-device-selection-error = []
 
 # MCU-specific implementation features
-# Do not use directly; use either an <mcu>-deprecated-globals feature or any number of <mcu>-no-deprecated-globals features
 _mcu-atmega48p = ["_mcu-selected", "_peripheral-spi", "_peripheral-simple-pwm", "avr-device/atmega48p"]
 _mcu-atmega164pa = ["_mcu-selected", "_peripheral-usart", "_peripheral-simple-pwm", "avr-device/atmega164pa"]
 _mcu-atmega168 = [

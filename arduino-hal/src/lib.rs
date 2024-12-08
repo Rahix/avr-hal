@@ -72,8 +72,3 @@ pub mod sparkfun;
 #[doc(cfg(feature = "rt"))]
 pub use avr_device::entry;
 
-#[cfg(feature = "deprecated-globals")]
-mod globals;
-
-#[cfg(feature = "deprecated-globals")]
-pub use globals::*;

@@ -5,9 +5,6 @@
 //! Common HAL (hardware abstraction layer) for ATmega* microcontrollers.
 //!
 
-// This crate can be configured in one of two ways: either you specify deprecated-globals and exactly one MCU
-// Or you don't specify deprecated globals and at least one MCU
-
 #[cfg(all(
     not(feature = "_mcu-selected"),
     not(feature = "disable-device-selection-error")
@@ -76,10 +73,6 @@ pub mod atmega1284p;
 #[cfg(feature = "_mcu-atmega8")]
 pub mod atmega8;
 
-#[cfg(feature = "deprecated-globals")]
-mod globals;
 
 pub(crate) mod r#impl;
 
-#[cfg(feature = "deprecated-globals")]
-pub use globals::*;

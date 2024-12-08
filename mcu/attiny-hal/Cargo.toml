@@ -1,6 +1,6 @@
 [package]
 name = "attiny-hal"
-version = "0.3.0"
+version = "0.4.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -14,46 +14,22 @@ categories = ["no-std", "embedded", "hardware-support"]
 rt = ["avr-device/rt"]
 
 # MCU-specific targets. 
-attiny84 = ["attiny84-no-deprecated-globals"]
-attiny85 = ["attiny85-no-deprecated-globals"]
-attiny88 = ["attiny88-no-deprecated-globals"]
-attiny167 = ["attiny167-no-deprecated-globals"]
-attiny2313 = ["attiny2313-no-deprecated-globals"]
-
-# MCU-specific targets with deprecated globals. This was the default in attiny-hal <0.3.0
-attiny84-deprecated-globals = ["_mcu-attiny84", "deprecated-globals"]
-attiny85-deprecated-globals = ["_mcu-attiny85", "deprecated-globals"]
-attiny88-deprecated-globals = ["_mcu-attiny88", "deprecated-globals"]
-attiny167-deprecated-globals = ["_mcu-attiny167", "deprecated-globals"]
-attiny2313-deprecated-globals = ["_mcu-attiny2313", "deprecated-globals"]
-
-# MCU-specific targets without deprecated globals. This is the default in attiny-hal 0.3.0
-attiny84-no-deprecated-globals = ["_mcu-attiny84"]
-attiny85-no-deprecated-globals = ["_mcu-attiny85"]
-attiny88-no-deprecated-globals = ["_mcu-attiny88"]
-attiny167-no-deprecated-globals = ["_mcu-attiny167"]
-attiny2313-no-deprecated-globals = ["_mcu-attiny2313"]
+attiny84 = ["_mcu-attiny84"]
+attiny85 = ["_mcu-attiny85"]
+attiny88 = ["_mcu-attiny88"]
+attiny167 = ["_mcu-attiny167"]
+attiny2313 = ["_mcu-attiny2313"]
 
 critical-section-impl = ["avr-device/critical-section-impl"]
 
 default = []
 
-docsrs = [
-    "attiny84-no-deprecated-globals",
-    "attiny85-no-deprecated-globals",
-    "attiny88-no-deprecated-globals",
-    "attiny167-no-deprecated-globals",
-    "attiny2313-no-deprecated-globals",
-]
-
-# Include soon-to-be-deprecated globals in the crate. Only one MCU can be selected if deprecated globals are enabled
-deprecated-globals = []
+docsrs = ["attiny84", "attiny85", "attiny88", "attiny167", "attiny2313"]
 
 # When using this crate from another lib crate, you can use this feature to turn suppress the chip selection error in favor of your own error
 disable-device-selection-error = ["_mcu-selected"]
 
 # MCU-specific implementation features
-# Do not use directly; use either an <mcu>-deprecated-globals feature or any number of <mcu>-no-deprecated-globals features
 _mcu-attiny84 = ["_mcu-selected", "_peripheral-simple-pwm", "avr-device/attiny84"]
 _mcu-attiny85 = ["_mcu-selected", "_peripheral-adc", "_peripheral-simple-pwm", "avr-device/attiny85"]
 _mcu-attiny88 = ["_mcu-selected", "_peripheral-adc", "_peripheral-spi", "_peripheral-simple-pwm", "avr-device/attiny88"]
