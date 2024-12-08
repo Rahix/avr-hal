@@ -14,21 +14,22 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
-use arduino_hal::spi;
+use arduino_hal::arduino::uno as board;
+use board::prelude::*;
+use board::spi;
 use embedded_hal_v0::spi::FullDuplex;
 use panic_halt as _;
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
     // set up serial interface for text output
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let mut serial = board::default_serial!(dp, pins, 57600);
 
     // Create SPI interface.
-    let (mut spi, _) = arduino_hal::Spi::new(
+    let (mut spi, _) = board::Spi::new(
         dp.SPI,
         pins.d13.into_output(),
         pins.d11.into_output(),
@@ -44,6 +45,6 @@ fn main() -> ! {
         let data = nb::block!(spi.read()).unwrap_infallible();
 
         ufmt::uwriteln!(&mut serial, "data: {}\r", data).unwrap_infallible();
-        arduino_hal::delay_ms(1000);
+        board::delay_ms(1000);
     }
 }

@@ -1,21 +1,22 @@
 #![no_std]
 #![no_main]
 
-use atmega_hal::adc::channel;
+use atmega_hal::atmega2560 as hal;
+use hal::adc::channel;
 use atmega_hal::delay::Delay;
-use atmega_hal::usart::{Baudrate, Usart};
+use hal::usart::{Baudrate, Usart};
 use embedded_hal::delay::DelayNs;
 use panic_halt as _;
 
 // Define core clock in the root crate
 type CoreClock = atmega_hal::clock::MHz16;
 // Use it as follows in the rest of the project
-type Adc = atmega_hal::adc::Adc<crate::CoreClock>;
+type Adc = hal::adc::Adc<crate::CoreClock>;
 
 #[avr_device::entry]
 fn main() -> ! {
-    let dp = atmega_hal::Peripherals::take().unwrap();
-    let pins = atmega_hal::pins!(dp);
+    let dp = hal::Peripherals::take().unwrap();
+    let pins = hal::pins!(dp);
 
     let mut delay = Delay::<crate::CoreClock>::new();
 
@@ -37,7 +38,7 @@ fn main() -> ! {
     ufmt::uwriteln!(&mut serial, "Ground: {}", gnd).unwrap();
 
     // To store multiple channels in an array, we use the `into_channel()` method.
-    let channels: [atmega_hal::adc::Channel; 16] = [
+    let channels: [hal::adc::Channel; 16] = [
         pins.pf0.into_analog_input(&mut adc).into_channel(),
         pins.pf1.into_analog_input(&mut adc).into_channel(),
         pins.pf2.into_analog_input(&mut adc).into_channel(),

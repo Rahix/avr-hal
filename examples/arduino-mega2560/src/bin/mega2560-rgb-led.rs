@@ -12,15 +12,16 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::arduino::mega2560 as board;
 use panic_halt as _;
-use arduino_hal::simple_pwm::IntoPwmPin;
-use arduino_hal::simple_pwm::Prescaler;
-use arduino_hal::simple_pwm::{Timer3Pwm, Timer4Pwm};
+use board::simple_pwm::IntoPwmPin;
+use board::simple_pwm::Prescaler;
+use board::simple_pwm::{Timer3Pwm, Timer4Pwm};
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
     let timer0 = Timer4Pwm::new(dp.TC4, Prescaler::Prescale64);
     let timer1 = Timer3Pwm::new(dp.TC3, Prescaler::Prescale64);
@@ -43,19 +44,19 @@ fn main() -> ! {
         // Fade in/out red
         for i in (0..=max_duty_d6).chain((0..=max_duty_d6 - 1).rev()) {
             d6.set_duty(i);
-            arduino_hal::delay_ms(delay_time);
+            board::delay_ms(delay_time);
         }
 
         // Fade in/out green
         for i in (0..=max_duty_d5).chain((0..=max_duty_d5 - 1).rev()) {
             d5.set_duty(i);
-            arduino_hal::delay_ms(delay_time);
+            board::delay_ms(delay_time);
         }
 
         // Fade in/out blue
         for i in (0..=max_duty_d3).chain((0..=max_duty_d3 - 1).rev()) {
             d3.set_duty(i);
-            arduino_hal::delay_ms(delay_time);
+            board::delay_ms(delay_time);
         }
     }
 }

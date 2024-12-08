@@ -77,4 +77,3 @@ mod globals;
 
 #[cfg(feature = "deprecated-globals")]
 pub use globals::*;
-

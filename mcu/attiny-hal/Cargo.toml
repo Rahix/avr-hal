@@ -1,6 +1,6 @@
 [package]
 name = "attiny-hal"
-version = "0.2.0"
+version = "0.3.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -13,22 +13,21 @@ categories = ["no-std", "embedded", "hardware-support"]
 [features]
 rt = ["avr-device/rt"]
 
-# MCU-specific targets. Due to use of deprecated globals, only one MCU can be selected at a time
-# In attiny-hal 0.30 the defaults will change to no deprecated globals
-attiny84 = ["attiny84-deprecated-globals"]
-attiny85 = ["attiny85-deprecated-globals"]
-attiny88 = ["attiny88-deprecated-globals"]
-attiny167 = ["attiny167-deprecated-globals"]
-attiny2313 = ["attiny2313-deprecated-globals"]
+# MCU-specific targets. 
+attiny84 = ["attiny84-no-deprecated-globals"]
+attiny85 = ["attiny85-no-deprecated-globals"]
+attiny88 = ["attiny88-no-deprecated-globals"]
+attiny167 = ["attiny167-no-deprecated-globals"]
+attiny2313 = ["attiny2313-no-deprecated-globals"]
 
-# MCU-specific targets with deprecated globals. This is the default in attiny-hal <0.3.0
+# MCU-specific targets with deprecated globals. This was the default in attiny-hal <0.3.0
 attiny84-deprecated-globals = ["_mcu-attiny84", "deprecated-globals"]
 attiny85-deprecated-globals = ["_mcu-attiny85", "deprecated-globals"]
 attiny88-deprecated-globals = ["_mcu-attiny88", "deprecated-globals"]
 attiny167-deprecated-globals = ["_mcu-attiny167", "deprecated-globals"]
 attiny2313-deprecated-globals = ["_mcu-attiny2313", "deprecated-globals"]
 
-# MCU-specific targets without deprecated globals. This will be the default in attiny-hal 0.3.0
+# MCU-specific targets without deprecated globals. This is the default in attiny-hal 0.3.0
 attiny84-no-deprecated-globals = ["_mcu-attiny84"]
 attiny85-no-deprecated-globals = ["_mcu-attiny85"]
 attiny88-no-deprecated-globals = ["_mcu-attiny88"]

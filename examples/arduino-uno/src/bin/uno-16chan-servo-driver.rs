@@ -16,18 +16,19 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::arduino::uno as board;
 use panic_halt as _;
 use pwm_pca9685::{Address, Channel, Pca9685};
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
     // Digital pin 13 is also connected to an onboard LED marked "L"
     let mut led = pins.d13.into_output();
 
-    let i2c = arduino_hal::I2c::new(
+    let i2c = board::I2c::new(
         dp.TWI,
         pins.a4.into_pull_up_input(),
         pins.a5.into_pull_up_input(),
@@ -52,9 +53,9 @@ fn main() -> ! {
     loop {
         // Blink the LED to indicate that everything is working properly.
         led.toggle();
-        arduino_hal::delay_ms(500);
+        board::delay_ms(500);
         led.toggle();
-        arduino_hal::delay_ms(500);
+        board::delay_ms(500);
 
         pwm.set_channel_off(Channel::C0, current).unwrap();
         pwm.set_channel_off(Channel::C1, servo_min + (servo_max - current))

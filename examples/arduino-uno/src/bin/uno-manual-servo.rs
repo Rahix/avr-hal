@@ -16,12 +16,13 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::arduino::uno as board;
 use panic_halt as _;
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
     // Important because this sets the bit in the DDR register!
     pins.d9.into_output();
@@ -41,7 +42,7 @@ fn main() -> ! {
         // 700 counts => 2.8ms
         for duty in 100..=700 {
             tc1.ocr1a.write(|w| w.bits(duty));
-            arduino_hal::delay_ms(20);
+            board::delay_ms(20);
         }
     }
 }

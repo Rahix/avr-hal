@@ -9,6 +9,7 @@
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
+use arduino_hal::arduino::uno as board;
 use panic_halt as _;
 
 use core::sync::atomic::{AtomicBool, Ordering};
@@ -35,8 +36,8 @@ fn rotate(flag: &AtomicBool) -> bool {
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
     //Pins used to drive the stepper motor
     let mut dir_pin = pins.d4.into_output();
@@ -69,9 +70,9 @@ fn main() -> ! {
             //Move the stepper motor
             for _ in 0..=50 {
                 step_pin.set_high();
-                arduino_hal::delay_us(2000);
+                board::delay_us(2000);
                 step_pin.set_low();
-                arduino_hal::delay_us(2000);
+                board::delay_us(2000);
             }
         }
     }

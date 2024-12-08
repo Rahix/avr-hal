@@ -16,3 +16,4 @@ macro_rules! impl_usart_atmega {
 
 #[cfg(feature = "_mcu-atmega")]
 pub(crate) use impl_usart_atmega;
+

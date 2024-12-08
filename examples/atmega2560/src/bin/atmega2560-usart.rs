@@ -1,8 +1,9 @@
 #![no_std]
 #![no_main]
 
+use atmega_hal::atmega2560 as hal;
 use atmega_hal::prelude::*;
-use atmega_hal::usart::{Baudrate, Usart};
+use hal::usart::{Baudrate, Usart};
 use panic_halt as _;
 
 // Define core clock. This can be used in the rest of the project.
@@ -10,8 +11,8 @@ type CoreClock = atmega_hal::clock::MHz16;
 
 #[avr_device::entry]
 fn main() -> ! {
-    let dp = atmega_hal::Peripherals::take().unwrap();
-    let pins = atmega_hal::pins!(dp);
+    let dp = hal::Peripherals::take().unwrap();
+    let pins = hal::pins!(dp);
     let mut serial = Usart::new(
         dp.USART0,
         pins.pe0,

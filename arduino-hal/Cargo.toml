@@ -1,6 +1,6 @@
 [package]
 name = "arduino-hal"
-version = "0.2.0"
+version = "0.3.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -16,22 +16,21 @@ rt = ["avr-device/rt"]
 
 critical-section-impl = ["avr-device/critical-section-impl"]
 
-# Board-specific targets. Due to use of deprecated globals, only one board can be selected at a time
-# In arduino-hal 0.3.0 the defaults will change to no deprecated globals
-arduino-diecimila = ["arduino-diecimila-deprecated-globals"]
-arduino-leonardo = ["arduino-leonardo-deprecated-globals"]
-arduino-mega2560 = ["arduino-mega2560-deprecated-globals"]
-arduino-mega1280 = ["arduino-mega1280-deprecated-globals"]
-arduino-nano = ["arduino-nano-deprecated-globals"]
-arduino-uno = ["arduino-uno-deprecated-globals"]
-trinket-pro = ["trinket-pro-deprecated-globals"]
-sparkfun-promicro = ["sparkfun-promicro-deprecated-globals"]
-sparkfun-promini-3v3 = ["sparkfun-promini-3v3-deprecated-globals"]
-sparkfun-promini-5v = ["sparkfun-promini-5v-deprecated-globals"]
-trinket = ["trinket-deprecated-globals"]
-nano168 = ["nano168-deprecated-globals"]
+# Board-specific targets. 
+arduino-diecimila = ["arduino-diecimila-no-deprecated-globals"]
+arduino-leonardo = ["arduino-leonardo-no-deprecated-globals"]
+arduino-mega2560 = ["arduino-mega2560-no-deprecated-globals"]
+arduino-mega1280 = ["arduino-mega1280-no-deprecated-globals"]
+arduino-nano = ["arduino-nano-no-deprecated-globals"]
+arduino-uno = ["arduino-uno-no-deprecated-globals"]
+trinket-pro = ["trinket-pro-no-deprecated-globals"]
+sparkfun-promicro = ["sparkfun-promicro-no-deprecated-globals"]
+sparkfun-promini-3v3 = ["sparkfun-promini-3v3-no-deprecated-globals"]
+sparkfun-promini-5v = ["sparkfun-promini-5v-no-deprecated-globals"]
+trinket = ["trinket-no-deprecated-globals"]
+nano168 = ["nano168-no-deprecated-globals"]
 
-# Board-specific targets with deprecated globals. This is the default in arduino-hal <0.3.0
+# Board-specific targets with deprecated globals. This was the default in arduino-hal <0.3.0
 arduino-diecimila-deprecated-globals = [
     "_board-arduino-diecimila",
     "atmega-hal/deprecated-globals",
@@ -61,7 +60,7 @@ sparkfun-promini-5v-deprecated-globals = [
 trinket-deprecated-globals = ["_board-trinket", "attiny-hal/deprecated-globals", "deprecated-globals"]
 nano168-deprecated-globals = ["_board-nano168", "atmega-hal/deprecated-globals", "deprecated-globals"]
 
-# Board-specific targets without deprecated globals. This will be the default in arduino-hal 0.3.0
+# Board-specific targets without deprecated globals. This is the default in arduino-hal 0.3.0
 arduino-diecimila-no-deprecated-globals = ["_board-arduino-diecimila"]
 arduino-leonardo-no-deprecated-globals = ["_board-arduino-leonardo"]
 arduino-mega2560-no-deprecated-globals = ["_board-arduino-mega2560"]

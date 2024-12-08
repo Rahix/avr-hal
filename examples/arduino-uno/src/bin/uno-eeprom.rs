@@ -4,16 +4,17 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
+use arduino_hal::arduino::uno as board;
+use board::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
+    let mut serial = board::default_serial!(dp, pins, 57600);
 
-    let mut ep = arduino_hal::Eeprom::new(dp.EEPROM);
+    let mut ep = board::Eeprom::new(dp.EEPROM);
     let ep_capacity = ep.capacity();
     ufmt::uwriteln!(&mut serial, "eeprom capacity is:{}\r", ep_capacity).unwrap_infallible();
 
@@ -33,7 +34,7 @@ fn main() -> ! {
         ufmt::uwriteln!(&mut serial, "{}", i).unwrap_infallible();
     }
 
-    let _ = ep.erase(0, arduino_hal::Eeprom::CAPACITY);
+    let _ = ep.erase(0, board::Eeprom::CAPACITY);
 
     loop {}
 }

@@ -241,10 +241,10 @@ pub use crate::sparkfun::pro_mini_3v3 as board;
 #[cfg(feature = "_board-sparkfun-promini-5v")]
 pub use crate::sparkfun::pro_mini_5v as board;
 
-#[cfg(feature = "_mcu-attiny")]
-pub use attiny_hal as hal;
 #[cfg(feature = "_mcu-atmega")]
 pub use atmega_hal as hal;
+#[cfg(feature = "_mcu-attiny")]
+pub use attiny_hal as hal;
 
 pub use board::{
     clock,

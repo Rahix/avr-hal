@@ -8,12 +8,13 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::arduino::uno as board;
 use panic_halt as _;
 
 use avr_device::interrupt;
 use core::cell::RefCell;
 
-type Console = arduino_hal::hal::usart::Usart0<arduino_hal::DefaultClock>;
+type Console = board::hal::usart::Usart0<board::DefaultClock>;
 static CONSOLE: interrupt::Mutex<RefCell<Option<Console>>> =
     interrupt::Mutex::new(RefCell::new(None));
 
@@ -60,9 +61,9 @@ fn demo_print_without_ln() {
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-    let serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
+    let serial = board::default_serial!(dp, pins, 57600);
     put_console(serial);
 
     println!("Hello from main!");

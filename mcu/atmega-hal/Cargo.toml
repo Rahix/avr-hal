@@ -1,6 +1,6 @@
 [package]
 name = "atmega-hal"
-version = "0.2.0"
+version = "0.3.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -14,22 +14,21 @@ categories = ["no-std", "embedded", "hardware-support"]
 rt = ["avr-device/rt"]
 enable-extra-adc = []
 
-# MCU-specific targets. Due to use of deprecated globals, only one MCU can be selected at a time
-# In atmega-hal 0.3.0 the defaults will change to no deprecated globals
-atmega48p = ["atmega48p-deprecated-globals"]
-atmega164pa = ["atmega164pa-deprecated-globals"]
-atmega168 = ["atmega168-deprecated-globals"]
-atmega328p = ["atmega328p-deprecated-globals"]
-atmega328pb = ["atmega328pb-deprecated-globals"]
-atmega32a = ["atmega32a-deprecated-globals"]
-atmega32u4 = ["atmega32u4-deprecated-globals"]
-atmega2560 = ["atmega2560-deprecated-globals"]
-atmega128a = ["atmega128a-deprecated-globals"]
-atmega1280 = ["atmega1280-deprecated-globals"]
-atmega1284p = ["atmega1284p-deprecated-globals"]
-atmega8 = ["atmega8-deprecated-globals"]
+# MCU-specific targets. 
+atmega48p = ["atmega48p-no-deprecated-globals"]
+atmega164pa = ["atmega164pa-no-deprecated-globals"]
+atmega168 = ["atmega168-no-deprecated-globals"]
+atmega328p = ["atmega328p-no-deprecated-globals"]
+atmega328pb = ["atmega328pb-no-deprecated-globals"]
+atmega32a = ["atmega32a-no-deprecated-globals"]
+atmega32u4 = ["atmega32u4-no-deprecated-globals"]
+atmega2560 = ["atmega2560-no-deprecated-globals"]
+atmega128a = ["atmega128a-no-deprecated-globals"]
+atmega1280 = ["atmega1280-no-deprecated-globals"]
+atmega1284p = ["atmega1284p-no-deprecated-globals"]
+atmega8 = ["atmega8-no-deprecated-globals"]
 
-# MCU-specific targets with deprecated globals. This is the default in atmega-hal <0.3.0
+# MCU-specific targets with deprecated globals. This was the default in atmega-hal <0.3.0
 atmega48p-deprecated-globals = ["_mcu-atmega48p", "deprecated-globals"]
 atmega164pa-deprecated-globals = ["_mcu-atmega164pa", "deprecated-globals"]
 atmega168-deprecated-globals = ["_mcu-atmega168", "deprecated-globals"]
@@ -43,7 +42,7 @@ atmega1280-deprecated-globals = ["_mcu-atmega1280", "deprecated-globals"]
 atmega1284p-deprecated-globals = ["_mcu-atmega1284p", "deprecated-globals"]
 atmega8-deprecated-globals = ["_mcu-atmega8", "deprecated-globals"]
 
-# MCU-specific targets without deprecated globals. This will be the default in atmega-hal 0.3.0
+# MCU-specific targets without deprecated globals. This is the default in atmega-hal 0.3.0
 atmega48p-no-deprecated-globals = ["_mcu-atmega48p"]
 atmega164pa-no-deprecated-globals = ["_mcu-atmega164pa"]
 atmega168-no-deprecated-globals = ["_mcu-atmega168"]
