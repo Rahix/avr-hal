@@ -1,4 +1,28 @@
 //! Analog-to-Digital Converter
+//!
+//! # Example
+//!
+//! Complete example source code can be found in the repository:
+//! [`atmega2560-adc.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-adc.rs)
+//!
+//! ```
+//! let dp = atmega_hal::Peripherals::take().unwrap();
+//! let pins = atmega_hal::pins!(dp);
+//!
+//! let mut adc = Adc::new(dp.ADC, Default::default());
+//!
+//! let channels: [atmega_hal::adc::Channel; 4] = [
+//!     pins.pf0.into_analog_input(&mut adc).into_channel(),
+//!     pins.pf1.into_analog_input(&mut adc).into_channel(),
+//!     pins.pf2.into_analog_input(&mut adc).into_channel(),
+//!     pins.pf3.into_analog_input(&mut adc).into_channel(),
+//! ];
+//!
+//! for (index, channel) in channels.iter().enumerate() {
+//!     let value = adc.read_blocking(channel);
+//!     ufmt::uwrite!(&mut serial, "CH{}: {} ", index, value).unwrap();
+//! }
+//! ```
 
 use crate::port;
 pub use avr_hal_generic::adc::{AdcChannel, AdcOps, ClockDivider};
@@ -73,6 +97,7 @@ pub mod channel {
     #[cfg(all(
         any(
             feature = "atmega168",
+            feature = "atmega32a",
             feature = "atmega328p",
             feature = "atmega328pb",
             feature = "atmega48p",
@@ -86,6 +111,7 @@ pub mod channel {
     #[cfg(all(
         any(
             feature = "atmega168",
+            feature = "atmega32a",
             feature = "atmega328p",
             feature = "atmega328pb",
             feature = "atmega48p",
@@ -100,6 +126,7 @@ pub mod channel {
         feature = "atmega1280",
         feature = "atmega168",
         feature = "atmega2560",
+        feature = "atmega32a",
         feature = "atmega328p",
         feature = "atmega328pb",
         feature = "atmega32u4",
@@ -107,12 +134,14 @@ pub mod channel {
         feature = "atmega128a",
         feature = "atmega1284p",
         feature = "atmega8",
+        feature = "atmega164pa",
     ))]
     pub struct Vbg;
     #[cfg(any(
         feature = "atmega1280",
         feature = "atmega168",
         feature = "atmega2560",
+        feature = "atmega32a",
         feature = "atmega328p",
         feature = "atmega328pb",
         feature = "atmega32u4",
@@ -120,6 +149,7 @@ pub mod channel {
         feature = "atmega128a",
         feature = "atmega1284p",
         feature = "atmega8",
+        feature = "atmega164pa",
     ))]
     pub struct Gnd;
     #[cfg(any(
@@ -163,6 +193,32 @@ avr_hal_generic::impl_adc! {
         channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
         #[cfg(any(feature = "atmega328p", feature = "atmega328pb", feature = "atmega48p"))]
         channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
+    },
+}
+
+#[cfg(any(feature = "atmega32a"))]
+avr_hal_generic::impl_adc! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
+    channel_id: crate::pac::adc::admux::MUX_A,
+    set_channel: |peripheral, id| {
+        peripheral.admux.modify(|_, w| w.mux().variant(id));
+    },
+    pins: {
+        port::PA0: (crate::pac::adc::admux::MUX_A::ADC0),
+        port::PA1: (crate::pac::adc::admux::MUX_A::ADC1),
+        port::PA2: (crate::pac::adc::admux::MUX_A::ADC2),
+        port::PA3: (crate::pac::adc::admux::MUX_A::ADC3),
+        port::PA4: (crate::pac::adc::admux::MUX_A::ADC4),
+        port::PA5: (crate::pac::adc::admux::MUX_A::ADC5),
+        port::PA6: (crate::pac::adc::admux::MUX_A::ADC6),
+        port::PA7: (crate::pac::adc::admux::MUX_A::ADC7),
+    },
+    channels: {
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }
 
@@ -223,7 +279,6 @@ avr_hal_generic::impl_adc! {
         channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }
-
 
 #[cfg(any(feature = "atmega2560", feature = "atmega1280"))]
 avr_hal_generic::impl_adc! {
@@ -311,6 +366,32 @@ avr_hal_generic::impl_adc! {
         channel::ADC6: crate::pac::adc::admux::MUX_A::ADC6,
         #[cfg(feature = "enable-extra-adc")]
         channel::ADC7: crate::pac::adc::admux::MUX_A::ADC7,
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
+    },
+}
+
+#[cfg(any(feature = "atmega164pa"))]
+avr_hal_generic::impl_adc! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
+    channel_id: crate::pac::adc::admux::MUX_A,
+    set_channel: |peripheral, id| {
+        peripheral.admux.modify(|_, w| w.mux().variant(id));
+    },
+    pins: {
+        port::PA0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
+        port::PA1: (crate::pac::adc::admux::MUX_A::ADC1, didr0::adc1d),
+        port::PA2: (crate::pac::adc::admux::MUX_A::ADC2, didr0::adc2d),
+        port::PA3: (crate::pac::adc::admux::MUX_A::ADC3, didr0::adc3d),
+        port::PA4: (crate::pac::adc::admux::MUX_A::ADC4, didr0::adc4d),
+        port::PA5: (crate::pac::adc::admux::MUX_A::ADC5, didr0::adc5d),
+        port::PA6: (crate::pac::adc::admux::MUX_A::ADC6, didr0::adc6d),
+        port::PA7: (crate::pac::adc::admux::MUX_A::ADC7, didr0::adc7d),
+    },
+    channels: {
         channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
         channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },

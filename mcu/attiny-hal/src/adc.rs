@@ -1,5 +1,29 @@
 #![allow(non_camel_case_types)]
 //! Analog-to-Digital Converter
+//!
+//! # Example
+//!
+//! For full source code, please refer to the ATmega ADC example:
+//! [`atmega2560-adc.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-adc.rs)
+//!
+//! ```
+//! let dp = attiny_hal::Peripherals::take().unwrap();
+//! let pins = attiny_hal::pins!(dp);
+//!
+//! let mut adc = Adc::new(dp.ADC, Default::default());
+//!
+//! let channels: [attiny_hal::adc::Channel; 4] = [
+//!     pins.pa0.into_analog_input(&mut adc).into_channel(),
+//!     pins.pa1.into_analog_input(&mut adc).into_channel(),
+//!     pins.pa2.into_analog_input(&mut adc).into_channel(),
+//!     pins.pa3.into_analog_input(&mut adc).into_channel(),
+//! ];
+//!
+//! for (index, channel) in channels.iter().enumerate() {
+//!     let value = adc.read_blocking(channel);
+//!     ufmt::uwrite!(&mut serial, "CH{}: {} ", index, value).unwrap();
+//! }
+//! ```
 
 use crate::port;
 pub use avr_hal_generic::adc::{AdcChannel, AdcOps, ClockDivider};
@@ -12,20 +36,14 @@ pub use avr_hal_generic::adc::{AdcChannel, AdcOps, ClockDivider};
 #[repr(u8)]
 pub enum ReferenceVoltage {
     /// Voltage applied to AREF pin.
-    #[cfg(any(
-        feature = "attiny85",
-        feature = "attiny167",
-    ))]
+    #[cfg(any(feature = "attiny85", feature = "attiny167",))]
     Aref,
     /// Default reference voltage (default).
     AVcc,
     /// Internal 1.1V reference.
     Internal1_1,
     /// Internal 2.56V reference.
-    #[cfg(any(
-        feature = "attiny85",
-        feature = "attiny167",
-    ))]
+    #[cfg(any(feature = "attiny85", feature = "attiny167",))]
     Internal2_56,
 }
 
@@ -55,8 +73,8 @@ pub type Channel = avr_hal_generic::adc::Channel<crate::Attiny, crate::pac::ADC>
 ///
 /// # Example
 /// ```
-/// let dp = atmega_hal::Peripherals::take().unwrap();
-/// let mut adc = atmega_hal::Adc::new(dp.ADC, Default::default());
+/// let dp = attiny_hal::Peripherals::take().unwrap();
+/// let mut adc = attiny_hal::Adc::new(dp.ADC, Default::default());
 ///
 /// let value = adc.read_blocking(&channel::Vbg);
 /// ```
@@ -82,7 +100,6 @@ fn apply_clock(peripheral: &crate::pac::ADC, settings: AdcSettings) {
         }
     });
 }
-
 
 #[cfg(feature = "attiny85")]
 avr_hal_generic::impl_adc! {
@@ -114,7 +131,6 @@ avr_hal_generic::impl_adc! {
         channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
     },
 }
-
 
 #[cfg(feature = "attiny88")]
 avr_hal_generic::impl_adc! {
@@ -148,7 +164,6 @@ avr_hal_generic::impl_adc! {
         channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
     },
 }
-
 
 #[cfg(feature = "attiny167")]
 avr_hal_generic::impl_adc! {

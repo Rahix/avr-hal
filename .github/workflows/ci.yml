@@ -34,6 +34,12 @@ jobs:
             name: sparkfun-promicro
             examples: true
           - type: board
+            name: sparkfun-promini-3v3
+            examples: true
+          - type: board
+            name: sparkfun-promini-5v
+            examples: true
+          - type: board
             name: trinket-pro
             examples: true
           - type: board
@@ -45,9 +51,17 @@ jobs:
           - type: board
             name: nano168
             examples: true
+          - type: board
+            # Not really a board, but also an examples crate
+            name: atmega2560
+            examples: true
           - type: mcu
             name: atmega1280
             spec: atmega1280
+            crate: atmega-hal
+          - type: mcu
+            name: atmega32a
+            spec: atmega32a
             crate: atmega-hal
           - type: mcu
             name: atmega128a
@@ -88,11 +102,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2022-06-13
+          toolchain: nightly-2023-12-28
           components: rust-src
       - name: Install avr-gcc, binutils, and libc
         run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
@@ -111,14 +125,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          components: check
+        uses: dtolnay/rust-toolchain@stable
       - name: Install libudev
         run: sudo apt-get update && sudo apt-get install -y libudev-dev
       - name: Check ravedude
         run: |
           cargo check --manifest-path ravedude/Cargo.toml
+      - name: Test ravedude
+        run: |
+          cargo test --manifest-path ravedude/Cargo.toml

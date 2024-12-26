@@ -18,8 +18,8 @@ fn main() -> ! {
         adc.read_blocking(&adc::channel::Vbg),
         adc.read_blocking(&adc::channel::Gnd),
     );
-    ufmt::uwriteln!(&mut serial, "Vbandgap: {}", vbg).void_unwrap();
-    ufmt::uwriteln!(&mut serial, "Ground: {}", gnd).void_unwrap();
+    ufmt::uwriteln!(&mut serial, "Vbandgap: {}", vbg).unwrap_infallible();
+    ufmt::uwriteln!(&mut serial, "Ground: {}", gnd).unwrap_infallible();
 
     // To store multiple channels in an array, we use the `into_channel()` method.
     let channels: [adc::Channel; 6] = [
@@ -34,10 +34,10 @@ fn main() -> ! {
     loop {
         for (i, ch) in channels.iter().enumerate() {
             let v = adc.read_blocking(ch);
-            ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).void_unwrap();
+            ufmt::uwrite!(&mut serial, "A{}: {} ", i, v).unwrap_infallible();
         }
 
-        ufmt::uwriteln!(&mut serial, "").void_unwrap();
+        ufmt::uwriteln!(&mut serial, "").unwrap_infallible();
         arduino_hal::delay_ms(1000);
     }
 }

@@ -2,7 +2,7 @@
 target = "../../avr-specs/avr-atmega328p.json"
 
 [target.'cfg(target_arch = "avr")']
-runner = "ravedude nano-every -cb 115200 -r "
+runner = "../../ravedude/target/debug/ravedude"
 
 [unstable]
 build-std = ["core"]

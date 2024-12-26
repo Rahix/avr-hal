@@ -1,6 +1,8 @@
 //! PWM Implementation
 
 use core::marker::PhantomData;
+use embedded_hal::pwm;
+use embedded_hal::pwm::{ErrorKind, ErrorType, SetDutyCycle};
 
 use crate::port::mode;
 use crate::port::Pin;
@@ -79,6 +81,37 @@ impl<TC, PIN: PwmPinOps<TC>> Pin<mode::PwmOutput<TC>, PIN> {
 
     pub fn set_duty(&mut self, duty: u8) {
         self.pin.set_duty(duty);
+    }
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum PwmError {
+    /// `embedded-hal` supports duty cycles up to `u16`, however `avr` devices only support up to `u8`.
+    /// Passing a duty cycle larger than [`u8::MAX`] will result in this error.
+    DutyCycleTooLarge,
+}
+
+impl pwm::Error for PwmError {
+    fn kind(&self) -> ErrorKind {
+        ErrorKind::Other
+    }
+}
+
+impl<TC, PIN: PwmPinOps<TC>> ErrorType for Pin<mode::PwmOutput<TC>, PIN> {
+    type Error = PwmError;
+}
+
+impl<TC, PIN: PwmPinOps<TC, Duty = u8>> SetDutyCycle for Pin<mode::PwmOutput<TC>, PIN> {
+    fn max_duty_cycle(&self) -> u16 {
+        self.get_max_duty() as u16
+    }
+
+    fn set_duty_cycle(&mut self, duty: u16) -> Result<(), Self::Error> {
+        if duty > u8::MAX as u16 {
+            return Err(PwmError::DutyCycleTooLarge);
+        }
+        self.set_duty(duty as u8);
+        Ok(())
     }
 }
 

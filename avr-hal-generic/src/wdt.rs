@@ -112,7 +112,8 @@ macro_rules! impl_wdt {
                     // Reset the watchdog timer.
                     self.raw_feed();
                     // Enable watchdog configuration mode.
-                    self.$wdtcsr.modify(|_, w| w.wdce().set_bit().wde().set_bit());
+                    self.$wdtcsr
+                        .modify(|_, w| w.wdce().set_bit().wde().set_bit());
                     // Enable watchdog and set interval.
                     self.$wdtcsr.write(|w| {
                         let $to = timeout;
@@ -142,11 +143,12 @@ macro_rules! impl_wdt {
                     // Reset the watchdog timer.
                     self.raw_feed();
                     // Enable watchdog configuration mode.
-                    self.$wdtcsr.modify(|_, w| w.wdce().set_bit().wde().set_bit());
+                    self.$wdtcsr
+                        .modify(|_, w| w.wdce().set_bit().wde().set_bit());
                     // Disable watchdog.
                     self.$wdtcsr.reset();
                 })
             }
         }
-    }
+    };
 }

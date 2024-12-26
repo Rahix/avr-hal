@@ -1,24 +1,36 @@
 [package]
 name = "avr-hal-generic"
 version = "0.1.0"
+
 authors = ["Rahix <rahix@rahix.de>"]
-edition = "2018"
+edition = "2021"
+description = "MCU-generic meta-HAL crate for AVR microcontrollers"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rahix/avr-hal"
+keywords = ["avr", "arduino"]
+categories = ["no-std", "embedded", "hardware-support"]
+
+[package.metadata.docs.rs]
+features = ["docsrs"]
+
+[features]
+docsrs = ["avr-device/docsrs"]
 
 [dependencies]
-cfg-if = "0.1.7"
-nb = "0.1.2"
-ufmt = "0.1.0"
+cfg-if = "1"
+nb = "1.1.0"
+ufmt = "0.2.0"
 paste = "1.0.0"
-avr-device = "0.5.1"
+avr-device = "0.5.4"
 embedded-storage = "0.2"
+embedded-hal = "1.0"
+embedded-hal-bus = "0.1"
+unwrap-infallible = "0.1.5"
 
-[dependencies.embedded-hal]
+[dependencies.embedded-hal-v0]
 version = "0.2.3"
+package = "embedded-hal"
 features = ["unproven"]
-
-[dependencies.void]
-version = "1.0.2"
-default-features = false
 
 [build-dependencies]
 rustversion = "1.0"

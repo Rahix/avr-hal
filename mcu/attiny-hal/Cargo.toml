@@ -1,8 +1,14 @@
 [package]
 name = "attiny-hal"
 version = "0.1.0"
+
 authors = ["Rahix <rahix@rahix.de>"]
-edition = "2018"
+edition = "2021"
+description = "HAL crate for ATtiny-series AVR microcontrollers"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rahix/avr-hal"
+keywords = ["avr", "arduino"]
+categories = ["no-std", "embedded", "hardware-support"]
 
 [features]
 rt = ["avr-device/rt"]
@@ -18,11 +24,14 @@ critical-section-impl = ["avr-device/critical-section-impl"]
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
 
+# We must select a microcontroller to build on docs.rs
+docsrs = ["attiny85"]
+
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-version = "0.5.1"
+version = "0.5.4"
 
 # Because this crate has its own check that at least one device is selected, we
 # can safely "circumvent" the check in `avr-device`.
@@ -31,3 +40,6 @@ version = "0.5.1"
 # error will be shown and ours won't which leads to a degraded user experience
 # as the displayed error message does not really tell what needs to be done...
 features = ["device-selected"]
+
+[package.metadata.docs.rs]
+features = ["docsrs"]

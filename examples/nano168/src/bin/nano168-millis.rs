@@ -14,7 +14,7 @@ use arduino_hal::prelude::*;
 use core::cell;
 use panic_halt as _;
 
-use embedded_hal::serial::Read;
+use embedded_hal_v0::serial::Read;
 
 // Possible Values:
 //
@@ -83,10 +83,9 @@ fn main() -> ! {
 
     // Wait for a character and print current time once it is received
     loop {
-        let b = nb::block!(serial.read()).void_unwrap();
+        let b = nb::block!(serial.read()).unwrap_infallible();
 
         let time = millis();
-        ufmt::uwriteln!(&mut serial, "Got {} after {} ms!\r", b, time).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "Got {} after {} ms!\r", b, time).unwrap_infallible();
     }
 }
-

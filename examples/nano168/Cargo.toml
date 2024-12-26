@@ -3,18 +3,28 @@ name = "nano168-examples"
 description = "Examples for the arduino clones with Atmega168 chip"
 version = "0.0.0"
 authors = ["David R. Morrison <drmorr@evokewonder.com>", "Franz Dietrich <dietrich@teilgedanken.de>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [dependencies]
 panic-halt = "0.2.0"
-ufmt = "0.1.0"
-nb = "0.1.2"
-embedded-hal = "0.2.3"
+ufmt = "0.2.0"
+nb = "1.1.0"
+embedded-hal = "1.0"
+
+[dependencies.embedded-hal-v0]
+version = "0.2.3"
+package = "embedded-hal"
 
 [dependencies.arduino-hal]
 path = "../../arduino-hal/"
 features = ["nano168"]
 
 [dependencies.avr-device]
-version = "0.5.1"
+version = "0.5.4"
+
+# The latest releases of `proc-macro2` do not support the rust toolchain that
+# we use.  Thus, we must fix this dependency to an older version where our
+# toolchain is still supported.  See https://github.com/Rahix/avr-hal/issues/537
+[build-dependencies.proc-macro2]
+version = "=1.0.79"

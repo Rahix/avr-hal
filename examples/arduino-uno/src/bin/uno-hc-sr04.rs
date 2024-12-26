@@ -50,7 +50,7 @@ fn main() -> ! {
                     &mut serial,
                     "Nothing was detected and jump to outer loop.\r"
                 )
-                .void_unwrap();
+                .unwrap_infallible();
                 continue 'outer;
             }
         }
@@ -73,7 +73,7 @@ fn main() -> ! {
                     &mut serial,
                     "Nothing was detected and jump to outer loop.\r"
                 )
-                .void_unwrap();
+                .unwrap_infallible();
                 continue 'outer;
             }
             _ => temp_timer / 58,
@@ -88,6 +88,6 @@ fn main() -> ! {
             "Hello, we are {} cms away from target!\r",
             value
         )
-        .void_unwrap();
+        .unwrap_infallible();
     }
 }

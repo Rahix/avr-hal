@@ -32,24 +32,26 @@ compile_error!(
     "
 );
 
-#[cfg(feature = "attiny84")]
-pub use avr_device::attiny84 as pac;
-
-/// Reexport of `attiny85` from `avr-device`
-#[cfg(feature = "attiny85")]
-pub use avr_device::attiny85 as pac;
-
-/// Reexport of `attiny88` from `avr-device`
-#[cfg(feature = "attiny88")]
-pub use avr_device::attiny88 as pac;
-
 /// Reexport of `attiny167` from `avr-device`
+///
 #[cfg(feature = "attiny167")]
 pub use avr_device::attiny167 as pac;
-
 /// Reexport of `attiny2313` from `avr-device`
+///
 #[cfg(feature = "attiny2313")]
 pub use avr_device::attiny2313 as pac;
+/// Reexport of `attiny84` from `avr-device`
+///
+#[cfg(feature = "attiny84")]
+pub use avr_device::attiny84 as pac;
+/// Reexport of `attiny85` from `avr-device`
+///
+#[cfg(feature = "attiny85")]
+pub use avr_device::attiny85 as pac;
+/// Reexport of `attiny88` from `avr-device`
+///
+#[cfg(feature = "attiny88")]
+pub use avr_device::attiny88 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -77,10 +79,19 @@ pub use port::Pins;
 pub mod simple_pwm;
 
 #[cfg(feature = "device-selected")]
+pub mod wdt;
+#[cfg(feature = "device-selected")]
+pub use wdt::Wdt;
+
+#[cfg(feature = "device-selected")]
 pub mod eeprom;
 #[cfg(feature = "device-selected")]
 pub use eeprom::Eeprom;
 
+#[cfg(feature = "device-selected")]
+pub mod spi;
+#[cfg(feature = "device-selected")]
+pub use spi::Spi;
 
 pub struct Attiny;
 

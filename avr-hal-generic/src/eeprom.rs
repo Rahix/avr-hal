@@ -40,7 +40,7 @@ where
     pub fn new(p: EEPROM) -> Self {
         Self {
             p,
-            _h: ::core::marker::PhantomData,
+            _h: marker::PhantomData,
         }
     }
     #[inline]
@@ -190,14 +190,14 @@ macro_rules! impl_eeprom_common {
                                 let $periph_ewmode_var = &self;
                                 $set_erasewrite_mode
                             }
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase+Write operation.
+                            self.eecr.modify(|_, w| w.eepe().set_bit()); // Start Erase+Write operation.
                         } else {
                             // Now we know that all bits should be erased.
                             {
                                 let $periph_emode_var = &self;
                                 $set_erase_mode
                             }
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Erase-only operation.
+                            self.eecr.modify(|_, w| w.eepe().set_bit()); // Start Erase-only operation.
                         }
                     }
                     //Now we know that _no_ bits need to be erased to '1'.
@@ -210,7 +210,7 @@ macro_rules! impl_eeprom_common {
                                 let $periph_wmode_var = &self;
                                 $set_write_mode
                             }
-                            self.eecr.write(|w| w.eepe().set_bit()); // Start Write-only operation.
+                            self.eecr.modify(|_, w| w.eepe().set_bit()); // Start Write-only operation.
                         }
                     }
                 }
@@ -229,7 +229,7 @@ macro_rules! impl_eeprom_common {
                         $set_erase_mode
                     }
                     // Start Erase-only operation.
-                    self.eecr.write(|w| w.eepe().set_bit());
+                    self.eecr.modify(|_, w| w.eepe().set_bit());
                 }
             }
         }
@@ -264,7 +264,6 @@ macro_rules! impl_eeprom_atmega_old {
         impl $crate::eeprom::EepromOps<$HAL> for $EEPROM {
             const CAPACITY: u16 = $capacity;
 
-
             fn raw_read_byte(&self, address: u16) -> u8 {
                 unsafe {
                     atmega_helper::set_address(&self, address);
@@ -279,14 +278,9 @@ macro_rules! impl_eeprom_atmega_old {
                 }
 
                 //Start EEPROM read operation
-                self.eedr.write(|w| unsafe {
-                    w.bits(data)
-                });
+                self.eedr.write(|w| unsafe { w.bits(data) });
 
-                self.eecr.write(|w|
-                    w
-                        .eemwe().set_bit()
-                        .eewe().clear_bit());
+                self.eecr.write(|w| w.eemwe().set_bit().eewe().clear_bit());
 
                 self.eecr.write(|w| w.eewe().set_bit());
             }

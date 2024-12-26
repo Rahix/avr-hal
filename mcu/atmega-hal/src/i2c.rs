@@ -1,8 +1,34 @@
+//! I2C
+//!
+//! # Example
+//!
+//! Complete example source code can be found in the repository:
+//! [`atmega2560-i2cdetect.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-i2cdetect.rs)
+//!
+//! ```
+//! let dp = atmega_hal::Peripherals::take().unwrap();
+//! let pins = atmega_hal::pins!(dp);
+//!
+//! let mut i2c = I2c::new(
+//!     dp.TWI,
+//!     pins.pd1.into_pull_up_input(),
+//!     pins.pd0.into_pull_up_input(),
+//!     50_000,
+//! );
+//!
+//! i2c.i2cdetect(&mut serial, atmega_hal::i2c::Direction::Read).unwrap();
+//! ```
+
 #[allow(unused_imports)]
 use crate::port;
 pub use avr_hal_generic::i2c::*;
 
-#[cfg(any(feature = "atmega128a", feature = "atmega1280", feature = "atmega2560", feature = "atmega32u4"))]
+#[cfg(any(
+    feature = "atmega128a",
+    feature = "atmega1280",
+    feature = "atmega2560",
+    feature = "atmega32u4"
+))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
     crate::pac::TWI,
@@ -10,7 +36,12 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     port::Pin<port::mode::Input, port::PD0>,
     CLOCK,
 >;
-#[cfg(any(feature = "atmega128a", feature = "atmega1280", feature = "atmega2560", feature = "atmega32u4"))]
+#[cfg(any(
+    feature = "atmega128a",
+    feature = "atmega1280",
+    feature = "atmega2560",
+    feature = "atmega32u4"
+))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
     peripheral: crate::pac::TWI,
@@ -18,7 +49,28 @@ avr_hal_generic::impl_i2c_twi! {
     scl: port::PD0,
 }
 
-#[cfg(any(feature = "atmega328p", feature = "atmega168", feature = "atmega48p", feature = "atmega8"))]
+#[cfg(any(feature = "atmega164pa"))]
+pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
+    crate::Atmega,
+    crate::pac::TWI,
+    port::Pin<port::mode::Input, port::PC1>,
+    port::Pin<port::mode::Input, port::PC0>,
+    CLOCK,
+>;
+#[cfg(any(feature = "atmega164pa"))]
+avr_hal_generic::impl_i2c_twi! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::TWI,
+    sda: port::PC1,
+    scl: port::PC0,
+}
+
+#[cfg(any(
+    feature = "atmega328p",
+    feature = "atmega168",
+    feature = "atmega48p",
+    feature = "atmega8"
+))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
     crate::pac::TWI,
@@ -26,7 +78,12 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     port::Pin<port::mode::Input, port::PC5>,
     CLOCK,
 >;
-#[cfg(any(feature = "atmega328p", feature = "atmega168", feature = "atmega48p", feature = "atmega8"))]
+#[cfg(any(
+    feature = "atmega328p",
+    feature = "atmega168",
+    feature = "atmega48p",
+    feature = "atmega8"
+))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
     peripheral: crate::pac::TWI,
@@ -65,7 +122,7 @@ avr_hal_generic::impl_i2c_twi! {
     scl: port::PE1,
 }
 
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
     crate::pac::TWI,
@@ -73,7 +130,7 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     port::Pin<port::mode::Input, port::PC0>,
     CLOCK,
 >;
-#[cfg(any(feature = "atmega1284p"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
     peripheral: crate::pac::TWI,

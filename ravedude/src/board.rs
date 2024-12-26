@@ -1,486 +1,113 @@
-use crate::avrdude;
+use std::{collections::HashMap, path::Path};
 
-pub trait Board {
-    fn display_name(&self) -> &str;
-    fn needs_reset(&self) -> Option<&str>;
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions;
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>>;
-}
+use crate::config;
 
-pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
-    Some(match board {
-        "uno" => Box::new(ArduinoUno),
-        "nano" => Box::new(ArduinoNano),
-        "nano-new" => Box::new(ArduinoNanoNew),
-        "nano-every" => Box::new(ArduinoNanoEvery),
-        "leonardo" => Box::new(ArduinoLeonardo),
-        "micro" => Box::new(ArduinoMicro),
-        "mega2560" => Box::new(ArduinoMega2560),
-        "mega1280" => Box::new(ArduinoMega1280),
-        "diecimila" => Box::new(ArduinoDiecimila),
-        "promicro" => Box::new(SparkFunProMicro),
-        "trinket-pro" => Box::new(TrinketPro),
-        "trinket" => Box::new(Trinket),
-        "nano168" => Box::new(Nano168),
-        "duemilanove" => Box::new(ArduinoDuemilanove),
-        _ => return None,
+fn get_all_boards() -> anyhow::Result<HashMap<String, config::BoardConfig>> {
+    toml::from_str(include_str!("boards.toml")).map_err(|err| {
+        if cfg!(test) {
+            anyhow::anyhow!(
+                "boards.toml in ravedude source is invalid.\n{}",
+                err.message()
+            )
+        } else {
+            anyhow::anyhow!(
+                "boards.toml in ravedude source is invalid. This is a bug, please report it!\n{}",
+                err.message()
+            )
+        }
     })
 }
 
-// ----------------------------------------------------------------------------
+pub fn get_board_from_name(board_name: &str) -> anyhow::Result<config::RavedudeConfig> {
+    let mut all_boards = get_all_boards()?;
 
-fn find_port_from_vid_pid_list(list: &[(u16, u16)]) -> anyhow::Result<std::path::PathBuf> {
-    for serialport::SerialPortInfo {
-        port_name,
-        port_type,
-    } in serialport::available_ports().unwrap()
-    {
-        if let serialport::SerialPortType::UsbPort(usb_info) = port_type {
-            for (vid, pid) in list.iter() {
-                if usb_info.vid == *vid && usb_info.pid == *pid {
-                    return Ok(port_name.into());
-                }
+    Ok(config::RavedudeConfig {
+        board_config: Some(all_boards.remove(board_name).ok_or_else(|| {
+            let mut msg = format!("invalid board: {board_name}\n");
+
+            msg.push_str("valid boards:");
+
+            for board in all_boards.keys() {
+                msg.push('\n');
+                msg.push_str(&board);
             }
-        }
-    }
-    Err(anyhow::anyhow!("Serial port not found."))
+            anyhow::anyhow!(msg)
+        })?),
+        ..Default::default()
+    })
 }
 
-// ----------------------------------------------------------------------------
+pub fn get_board_from_manifest(manifest_path: &Path) -> anyhow::Result<config::RavedudeConfig> {
+    Ok({
+        let file_contents = std::fs::read_to_string(manifest_path)
+            .map_err(|err| anyhow::anyhow!("Ravedude.toml read error:\n{}", err))?;
 
-struct ArduinoUno;
+        let mut board: config::RavedudeConfig = toml::from_str(&file_contents)
+            .map_err(|err| anyhow::anyhow!("invalid Ravedude.toml:\n{}", err))?;
 
-impl Board for ArduinoUno {
-    fn display_name(&self) -> &str {
-        "Arduino Uno"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        None
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "arduino",
-            partno: "atmega328p",
-            baudrate: None,
-            do_chip_erase: true,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
+        if let Some(board_config) = board.board_config.as_ref() {
+            if let Some(board_name) = board.general_options.board.as_deref() {
+                anyhow::bail!(
+                    "can't both have board in [general] and [board] section; set inherit = \"{}\" under [board] to inherit its options",
+                    board_name
+                )
+            }
+            if let Some(inherit) = board_config.inherit.as_deref() {
+                let base_board = get_board_from_name(inherit)?.board_config.unwrap();
+                board.board_config = Some(board.board_config.take().unwrap().merge(base_board));
+            }
+        } else if let Some(board_name) = board.general_options.board.as_deref() {
+            let base_board = get_board_from_name(board_name)?.board_config.unwrap();
+            board.board_config = Some(base_board);
         }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(find_port_from_vid_pid_list(&[
-            (0x2341, 0x0043),
-            (0x2341, 0x0001),
-            (0x2A03, 0x0043),
-            (0x2341, 0x0243),
-        ]))
-    }
+        board
+    })
 }
 
-struct ArduinoMicro;
+#[cfg(test)]
+mod tests {
+    use super::get_all_boards;
 
-impl Board for ArduinoMicro {
-    fn display_name(&self) -> &str {
-        "Arduino Micro"
-    }
+    #[test]
+    fn validate_board_list() -> anyhow::Result<()> {
+        let all_boards = get_all_boards()?;
 
-    fn needs_reset(&self) -> Option<&str> {
-        Some("Reset the board by pressing the reset button once.")
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "avr109",
-            partno: "atmega32u4",
-            baudrate: Some(115200),
-            do_chip_erase: true,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
+        for (name, board) in all_boards.iter() {
+            assert!(
+                board.name.is_some(),
+                "Board {name:?} doesn't have a `name` key"
+            );
+            assert!(
+                board.inherit.is_none(),
+                "Board {name:?} has illegal `inherit` key"
+            );
+            assert!(
+                board.reset.is_some(),
+                "Board {name:?} doesn't have a `reset` key"
+            );
+            assert!(
+                board.avrdude.is_some(),
+                "Board {name:?} doesn't have an `avrdude` key"
+            );
+            let avrdude = board.avrdude.as_ref().unwrap();
+            assert!(
+                avrdude.programmer.is_some(),
+                "Board {name:?}'s avrdude options doesn't have a `programmer` key"
+            );
+            assert!(
+                avrdude.partno.is_some(),
+                "Board {name:?}'s avrdude options doesn't have a `partno` key"
+            );
+            assert!(
+                avrdude.baudrate.is_some(),
+                "Board {name:?}'s avrdude options doesn't have a `baudrate` key"
+            );
+            assert!(
+                avrdude.do_chip_erase.is_some(),
+                "Board {name:?}'s avrdude options doesn't have a `do_chip_erase` key"
+            );
         }
-    }
 
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(find_port_from_vid_pid_list(&[
-            (0x2341, 0x0037),
-            (0x2341, 0x8037),
-            (0x2A03, 0x0037),
-            (0x2A03, 0x8037),
-            (0x2341, 0x0237),
-            (0x2341, 0x8237),
-        ]))
-    }
-}
-
-struct ArduinoNano;
-
-impl Board for ArduinoNano {
-    fn display_name(&self) -> &str {
-        "Arduino Nano"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        None
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "arduino",
-            partno: "atmega328p",
-            baudrate: Some(57600),
-            do_chip_erase: true,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(Err(anyhow::anyhow!("Not able to guess port")))
-    }
-}
-
-struct ArduinoNanoNew;
-
-impl Board for ArduinoNanoNew {
-    fn display_name(&self) -> &str {
-        "Arduino Nano (New Bootloader)"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        None
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "arduino",
-            partno: "atmega328p",
-            baudrate: Some(115200),
-            do_chip_erase: true,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(Err(anyhow::anyhow!("Not able to guess port")))
-    }
-}
-
-struct ArduinoNanoEvery;
-
-impl Board for ArduinoNanoEvery {
-    fn display_name(&self) -> &str {
-        "Arduino Nano Every"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        None
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "jtag2updi",
-            partno: "atmega4809",
-            baudrate: Some(115200),
-            do_chip_erase: true,
-            fuse2:Some(0x01),
-            fuse5:Some(0x69),
-            fuse8:Some(0x00),
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(Err(anyhow::anyhow!("Not able to guess port")))
-    }
-}
-
-struct ArduinoLeonardo;
-
-impl Board for ArduinoLeonardo {
-    fn display_name(&self) -> &str {
-        "Arduino Leonardo"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        let a = self.guess_port();
-        match a {
-            Some(Ok(name)) => {
-                match serialport::new(name.to_str().unwrap(), 1200).open() {
-                    Ok(_) => {
-                        std::thread::sleep(core::time::Duration::from_secs(1));
-                        None
-                    },
-                    Err(_) => Some("Reset the board by pressing the reset button once.")
-                }
-            },
-            _ => Some("Reset the board by pressing the reset button once.")
-        }
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "avr109",
-            partno: "atmega32u4",
-            baudrate: None,
-            do_chip_erase: true,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(find_port_from_vid_pid_list(&[
-            (0x2341, 0x0036),
-            (0x2341, 0x8036),
-            (0x2A03, 0x0036),
-            (0x2A03, 0x8036),
-        ]))
-    }
-}
-
-
-struct ArduinoMega1280;
-
-impl Board for ArduinoMega1280 {
-    fn display_name(&self) -> &str {
-        "Arduino Mega 1280"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        None
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "arduino",
-            partno: "atmega1280",
-            baudrate: Some(57600),
-            do_chip_erase: false,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-       // This board uses a generic serial interface id 0403:6001 which is too common for auto detection.
-       Some(Err(anyhow::anyhow!("Unable to guess port.")))
-    }
-}
-
-
-struct ArduinoMega2560;
-
-impl Board for ArduinoMega2560 {
-    fn display_name(&self) -> &str {
-        "Arduino Mega 2560"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        None
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "wiring",
-            partno: "atmega2560",
-            baudrate: Some(115200),
-            do_chip_erase: false,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(find_port_from_vid_pid_list(&[
-            (0x2341, 0x0010),
-            (0x2341, 0x0042),
-            (0x2A03, 0x0010),
-            (0x2A03, 0x0042),
-            (0x2341, 0x0210),
-            (0x2341, 0x0242),
-        ]))
-    }
-}
-
-struct ArduinoDiecimila;
-
-impl Board for ArduinoDiecimila {
-    fn display_name(&self) -> &str {
-        "Arduino Diecimila"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        None
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "arduino",
-            partno: "atmega168",
-            baudrate: Some(19200),
-            do_chip_erase: false,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(Err(anyhow::anyhow!("Not able to guess port")))
-    }
-}
-
-struct SparkFunProMicro;
-
-impl Board for SparkFunProMicro {
-    fn display_name(&self) -> &str {
-        "SparkFun Pro Micro"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        Some("Reset the board by quickly pressing the reset button **twice**.")
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "avr109",
-            partno: "atmega32u4",
-            baudrate: None,
-            do_chip_erase: true,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(find_port_from_vid_pid_list(&[
-            (0x1B4F, 0x9205), //5V
-            (0x1B4F, 0x9206), //5V
-            (0x1B4F, 0x9203), //3.3V
-            (0x1B4F, 0x9204), //3.3V
-        ]))
-    }
-}
-
-struct TrinketPro;
-
-impl Board for TrinketPro {
-    fn display_name(&self) -> &str {
-        "Trinket Pro"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        Some("Reset the board by pressing the reset button once.")
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "usbtiny",
-            partno: "atmega328p",
-            baudrate: None,
-            do_chip_erase: false,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        None // The TrinketPro does not have USB-to-Serial.
-    }
-}
-
-struct Trinket;
-
-impl Board for Trinket {
-    fn display_name(&self) -> &str {
-        "Trinket"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        Some("Reset the board by pressing the reset button once.")
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "usbtiny",
-            partno: "attiny85",
-            baudrate: None,
-            do_chip_erase: true,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        None // The Trinket does not have USB-to-Serial.
-    }
-}
-
-struct Nano168;
-
-impl Board for Nano168 {
-    fn display_name(&self) -> &str {
-        "Nano Clone (ATmega168)"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        None
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "arduino",
-            partno: "atmega168",
-            baudrate: Some(19200),
-            do_chip_erase: false,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(Err(anyhow::anyhow!("Not able to guess port")))
-    }
-}
-
-
-struct ArduinoDuemilanove;
-
-impl Board for ArduinoDuemilanove {
-    fn display_name(&self) -> &str {
-        "Arduino Duemilanove"
-    }
-
-    fn needs_reset(&self) -> Option<&str> {
-        None
-    }
-
-    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
-        avrdude::AvrdudeOptions {
-            programmer: "arduino",
-            partno: "atmega328p",
-            baudrate: Some(57600),
-            do_chip_erase: true,
-            fuse2:None,
-            fuse5:None,
-            fuse8:None,
-        }
-    }
-
-    fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
-        Some(Err(anyhow::anyhow!("Not able to guess port")))
+        Ok(())
     }
 }

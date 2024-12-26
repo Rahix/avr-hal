@@ -67,6 +67,13 @@ pub trait AdcOps<H> {
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
     fn raw_enable_channel(&mut self, channel: Self::Channel);
+
+    /// Clear the DIDR (Digital Input Disable) for a certain channel.
+    ///
+    /// Enables digital logic on the corresponding pin after it has been used as an ADC channel.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_disable_channel(&mut self, channel: Self::Channel);
 }
 
 /// Trait marking a type as an ADC channel for a certain ADC.
@@ -125,14 +132,14 @@ impl<H, ADC: AdcOps<H>> AdcChannel<H, ADC> for Channel<H, ADC> {
 /// let pins = atmega_hal::pins!(dp);
 /// let mut adc = atmega_hal::Adc::new(dp.ADC, Default::default());
 ///
-/// let a0 = dp.pc0.into_analog_input(&mut adc);
+/// let a0 = pins.pc0.into_analog_input(&mut adc);
 ///
 /// // the following two calls are equivalent
 /// let voltage = a0.analog_read(&mut adc);
 /// let voltage = adc.read_blocking(&a0);
 ///
 /// // alternatively, a non-blocking interface exists
-/// let voltage = nb::block!(adc.read_nonblocking(&a0)).void_unwrap();
+/// let voltage = nb::block!(adc.read_nonblocking(&a0)).unwrap_infallible();
 /// ```
 pub struct Adc<H, ADC: AdcOps<H>, CLOCK> {
     p: ADC,
@@ -166,6 +173,11 @@ where
         self.p.raw_enable_channel(pin.channel());
     }
 
+    #[inline]
+    pub(crate) fn disable_pin<PIN: AdcChannel<H, ADC>>(&mut self, pin: &PIN) {
+        self.p.raw_disable_channel(pin.channel());
+    }
+
     pub fn read_blocking<PIN: AdcChannel<H, ADC>>(&mut self, pin: &PIN) -> u16 {
         // assert!(self.reading_channel.is_none());
         self.p.raw_set_channel(pin.channel());
@@ -177,7 +189,7 @@ where
     pub fn read_nonblocking<PIN: AdcChannel<H, ADC>>(
         &mut self,
         pin: &PIN,
-    ) -> nb::Result<u16, void::Void> {
+    ) -> nb::Result<u16, core::convert::Infallible> {
         match (&self.reading_channel, self.p.raw_is_converting()) {
             // Measurement on current pin is ongoing
             (Some(channel), true) if *channel == pin.channel() => Err(nb::Error::WouldBlock),
@@ -270,6 +282,18 @@ macro_rules! impl_adc {
                     _ => unreachable!(),
                 }
             }
+
+            #[inline]
+            fn raw_disable_channel(&mut self, channel: Self::Channel) {
+                match channel {
+                    $(
+                        x if x == $pin_channel => {
+                            $(self.$didr.modify(|_, w| w.$didr_method().clear_bit());)?
+                        }
+                    )+
+                    _ => unreachable!(),
+                }
+            }
         }
 
         $(
@@ -305,4 +329,3 @@ macro_rules! impl_adc {
         )*)?
     };
 }
-

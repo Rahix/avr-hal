@@ -1,4 +1,4 @@
-use embedded_hal::blocking::delay::{DelayMs, DelayUs};
+use embedded_hal_v0::blocking::delay::{DelayMs, DelayUs};
 
 /// Delay type for `embedded-hal` compatibility.
 ///

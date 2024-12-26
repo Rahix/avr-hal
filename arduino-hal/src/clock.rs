@@ -23,10 +23,11 @@ pub(crate) mod default {
         feature = "arduino-uno",
         feature = "nano-every",
         feature = "sparkfun-promicro",
+        feature = "sparkfun-promini-5v",
         feature = "trinket-pro",
         feature = "nano168",
     ))]
     pub type DefaultClock = avr_hal_generic::clock::MHz16;
-    #[cfg(feature = "trinket")]
+    #[cfg(any(feature = "trinket", feature = "sparkfun-promini-3v3"))]
     pub type DefaultClock = avr_hal_generic::clock::MHz8;
 }
