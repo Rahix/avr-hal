@@ -1,5 +1,5 @@
 [build]
-target = "../../avr-specs/avr-atmega328p.json"
+target = "../../avr-specs/avr-atmega328pb.json"
 
 [target.'cfg(target_arch = "avr")']
 runner = "../../ravedude/target/debug/ravedude"

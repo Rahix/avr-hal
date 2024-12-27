@@ -48,6 +48,27 @@ do-chip-erase = true
 [nano-new.usb-info]
 error = "Not able to guess port"
 
+
+[nano-328pb]
+name = "Nano Atmega328pb"
+
+[nano-328pb.reset]
+automatic = true
+
+[nano-328pb.avrdude]
+programmer = "arduino"
+partno = "atmega328pb"
+baudrate = 115200
+do-chip-erase = true
+curclock = true
+no-metadata = true
+avrdude-path = "~/.arduino15/packages/MiniCore/tools/avrdude/8.0-arduino.1/bin/avrdude"
+avrdude-conf = "~/.arduino15/packages/MiniCore/tools/avrdude/8.0-arduino.1/etc/avrdude.conf"
+
+[nano-328pb.usb-info]
+error = "Not able to guess port"
+
+
 [nano-every]
 name = "Nano Every"
 

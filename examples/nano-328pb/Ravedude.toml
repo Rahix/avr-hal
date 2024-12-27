@@ -1,0 +1,6 @@
+# Ravedude.toml
+[general]
+open-console = true
+serial-baudrate = 115200
+board = "nano-328pb"
+port = "/dev/ttyUSB0"

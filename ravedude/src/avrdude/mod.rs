@@ -87,8 +87,8 @@ impl Avrdude {
         };
 
         let mut command = command
-            //            .arg("-v")
-            //            .arg("-V")
+            .arg("-v")
+            .arg("-V")
             .arg("-c")
             .arg(
                 options
@@ -141,7 +141,27 @@ impl Avrdude {
             command = command.arg("-e");
         }
 
-        command = command.arg("-D").arg("-U").arg(flash_instruction);
+        match options.curclock {
+            Some(curclock) => {
+                if curclock == true {
+                    command = command.arg("-curclock");
+                }
+            }
+            None => {}
+        }
+
+        command = command.arg("-D");
+        command = command.arg("-U").arg(flash_instruction);
+
+        // Add x nometadata if no_metadata is true
+        match options.no_metadata {
+            Some(no_metadata) => {
+                if no_metadata == true {
+                    command = command.arg("-x").arg("nometadata");
+                }
+            }
+            None => {}
+        }
 
         if debug {
             crate::task_message!(
