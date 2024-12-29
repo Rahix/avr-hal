@@ -17,28 +17,49 @@ macro_rules! impl_mod_adc {
         pub mod adc {
             //! Analog-to-Digital Converter
             //!
-            //! # Example
-            //!
             //! For full source code, please refer to the ATmega ADC example:
             //! [`atmega2560-adc.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-adc.rs)
             //!
+            //! # Example: Read pins using `analog_read()`
+            //!
+            //! ```no_run
+            #![doc = concat!("use attiny_hal::", stringify!($hal), " as hal;")]
+            //!
+            //! let dp = hal::Peripherals::take().unwrap();
+            //! let pins = hal::pins!(dp);
+            //!
+            //! type Clock = avr_hal_generic::clock::MHz16;
+            //! let mut adc = hal::Adc::<Clock>::new(dp.ADC, Default::default());
+            //! 
+            $(
+                #![doc = paste!{ concat!(
+                    "let ", stringify!([< input_ $pin_name:lower >]), " = pins.", stringify!([< $pin_name:lower >]), ".into_analog_input(&mut adc);\n",
+                    "let ", stringify!([< value_ $pin_name:lower >]), " = ", stringify!([< input_ $pin_name:lower >]), ".analog_read(&mut adc);\n\n"
+                )}]
+            )*
             //! ```
-            //! let dp = attiny_hal::Peripherals::take().unwrap();
-            //! let pins = attiny_hal::pins!(dp);
             //!
-            //! let mut adc = Adc::new(dp.ADC, Default::default());
+            //! # Example: Read channels (including pins) using `read_blocking()`
             //!
-            //! let channels: [attiny_hal::adc::Channel; 4] = [
-            //!     pins.pa0.into_analog_input(&mut adc).into_channel(),
-            //!     pins.pa1.into_analog_input(&mut adc).into_channel(),
-            //!     pins.pa2.into_analog_input(&mut adc).into_channel(),
-            //!     pins.pa3.into_analog_input(&mut adc).into_channel(),
-            //! ];
+            //! ```no_run
+            #![doc = concat!("use attiny_hal::", stringify!($hal), " as hal;")]
             //!
-            //! for (index, channel) in channels.iter().enumerate() {
-            //!     let value = adc.read_blocking(channel);
-            //!     ufmt::uwrite!(&mut serial, "CH{}: {} ", index, value).unwrap();
-            //! }
+            //! let dp = hal::Peripherals::take().unwrap();
+            //! let pins = hal::pins!(dp);
+            //!
+            //! type Clock = avr_hal_generic::clock::MHz16;
+            //! let mut adc = hal::Adc::<Clock>::new(dp.ADC, Default::default());
+            $(
+                #![doc = paste!{ concat!(
+                    "let ", stringify!([< channel_ $pin_name:lower >]), " = pins.", stringify!([< $pin_name:lower >]), ".into_analog_input(&mut adc).into_channel();\n",
+                    "let ", stringify!([< value_ $pin_name:lower >]), " = adc.read_blocking(&", stringify!([< channel_ $pin_name:lower >]), ");\n\n"
+                ) }]
+            )*
+            $(
+                #![doc = paste!{ concat!(
+                    "let ", stringify!([< value_ $channel_name:lower >]), " = adc.read_blocking(&hal::adc::channel::", stringify!([< $channel_name >]), ");\n\n"
+                ) }]
+            )*
             //! ```
 
             use avr_hal_generic::paste::paste;
@@ -61,14 +82,6 @@ macro_rules! impl_mod_adc {
             ///
             /// Some channels are not directly connected to pins.  This module provides types which can be used
             /// to access them.
-            /// 
-            /// # Example
-            /// ```
-            /// let dp = attiny_hal::Peripherals::take().unwrap();
-            /// let mut adc = attiny_hal::Adc::new(dp.ADC, Default::default());
-            ///
-            /// let value = adc.read_blocking(&channel::Vbg);
-            /// ```
             #[allow(non_camel_case_types)]
             pub mod channel {
                 $(
