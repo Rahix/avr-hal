@@ -34,6 +34,10 @@ _peripheral-simple-pwm = []
 no-globals = []
 
 
+[dev-dependencies]
+ufmt = "0.2.0"
+embedded-hal = "1.0"
+
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
