@@ -20,14 +20,19 @@ avr_hal! {
                 /// Use `TC0` for PWM (pins `PB0`, `PB1`)
                 ///
                 /// # Example
-                /// ```
+                /// ```no_run
+                /// use attiny_hal::attiny85 as hal;
+                /// use hal::simple_pwm::{IntoPwmPin,Timer0Pwm,Prescaler};
+                ///
+                /// let dp = hal::Peripherals::take().unwrap();
+                /// let pins = hal::pins!(dp);
                 /// let mut timer0 = Timer0Pwm::new(dp.TC0, Prescaler::Prescale64);
                 ///
-                /// let mut d0 = pins.d0.into_output().into_pwm(&mut timer0);
-                /// let mut d1 = pins.d1.into_output().into_pwm(&mut timer0);
+                /// let mut pb0 = pins.pb0.into_output().into_pwm(&mut timer0);
+                /// let mut pb1 = pins.pb1.into_output().into_pwm(&mut timer0);
                 ///
-                /// d0.set_duty(128);
-                /// d0.enable();
+                /// pb0.set_duty(128);
+                /// pb0.enable();
                 /// ```
                 pub struct Timer0Pwm {
                     timer: crate::attiny85::pac::TC0,
@@ -67,13 +72,18 @@ avr_hal! {
                 /// Use `TC1` for PWM (pins `PB4`)
                 ///
                 /// # Example
-                /// ```
+                /// ```no_run
+                /// use attiny_hal::attiny85 as hal;
+                /// use hal::simple_pwm::{IntoPwmPin,Timer1Pwm,Prescaler};
+                ///
+                /// let dp = hal::Peripherals::take().unwrap();
+                /// let pins = hal::pins!(dp);
                 /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
                 ///
-                /// let mut d4 = pins.d4.into_output().into_pwm(&mut timer1);
+                /// let mut pb4 = pins.pb4.into_output().into_pwm(&mut timer1);
                 ///
-                /// d4.set_duty(128);
-                /// d4.enable();
+                /// pb4.set_duty(128);
+                /// pb4.enable();
                 /// ```
                 pub struct Timer1Pwm {
                     timer: crate::attiny85::pac::TC1,

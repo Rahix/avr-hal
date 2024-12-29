@@ -24,14 +24,19 @@ avr_hal! {
                 /// Use `TC1` for PWM (pins `PB1`, 'PB2')
                 ///
                 /// # Example
-                /// ```
+                /// ```no_run
+                /// use attiny_hal::attiny88 as hal;
+                /// use hal::simple_pwm::{Timer1Pwm,Prescaler,IntoPwmPin};
+                ///
+                /// let dp = hal::Peripherals::take().unwrap();
+                /// let pins = hal::pins!(dp);
                 /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
                 ///
-                /// let mut d9 = pins.d9.into_output().into_pwm(&mut timer1);
-                /// let mut d10 = pins.d10.into_output().into_pwm(&mut timer1);
+                /// let mut pb1 = pins.pb1.into_output().into_pwm(&mut timer1);
+                /// let mut pb2 = pins.pb2.into_output().into_pwm(&mut timer1);
                 ///
-                /// d9.set_duty(128);
-                /// d9.enable();
+                /// pb1.set_duty(128);
+                /// pb1.enable();
                 /// ```
                 pub struct Timer1Pwm {
                     timer: crate::attiny88::pac::TC1,
