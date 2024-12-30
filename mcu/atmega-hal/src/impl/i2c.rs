@@ -17,21 +17,29 @@ macro_rules! impl_mod_i2c {
             //! Complete example source code can be found in the repository:
             //! [`atmega2560-i2cdetect.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-i2cdetect.rs)
             //!
-            //! ```
-            //! let dp = atmega_hal::Peripherals::take().unwrap();
-            //! let pins = atmega_hal::pins!(dp);
+            //! ```no_run
+            #![doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
             //!
-            //! let mut i2c = I2c::new(
-            //!     dp.TWI,
-            //!     pins.pd1.into_pull_up_input(),
-            //!     pins.pd0.into_pull_up_input(),
-            //!     50_000,
-            //! );
+            //! let dp = hal::Peripherals::take().unwrap();
+            //! let pins = hal::pins!(dp);
             //!
-            //! i2c.i2cdetect(&mut serial, atmega_hal::i2c::Direction::Read).unwrap();
+            //! type Clock = avr_hal_generic::clock::MHz16;
+            $(
+                #![doc = paste!{ concat!(
+                    "let mut i2c = hal::i2c::", stringify!($interface), "::<Clock>::new(\n",
+                    "    dp.", stringify!($peripheral), ",\n",
+                    "    pins.", stringify!([< $sda:lower >]), ".into_pull_up_input(),\n",
+                    "    pins.", stringify!([< $scl:lower >]), ".into_pull_up_input(),\n",
+                    "    50_000,\n",
+                    ");\n",
+                ) }]
+            )+
+            //!
+            //! // i2c.i2cdetect(&mut serial, hal::i2c::Direction::Read).unwrap();
             //! ```
 
             pub use avr_hal_generic::i2c::*;
+            use avr_hal_generic::paste::paste;
             use crate::$hal as hal;
 
             $(

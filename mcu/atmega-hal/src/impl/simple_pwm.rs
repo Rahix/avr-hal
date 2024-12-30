@@ -40,14 +40,19 @@ macro_rules! impl_simple_pwm_48p_168_328p_328pb {
             /// Use `TC0` for PWM (pins `PD5`, `PD6`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+            /// use hal::simple_pwm::{IntoPwmPin,Timer0Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer0 = Timer0Pwm::new(dp.TC0, Prescaler::Prescale64);
             ///
-            /// let mut d5 = pins.d5.into_output().into_pwm(&mut timer0);
-            /// let mut d6 = pins.d6.into_output().into_pwm(&mut timer0);
+            /// let mut pd5 = pins.pd5.into_output().into_pwm(&mut timer0);
+            /// let mut pd6 = pins.pd6.into_output().into_pwm(&mut timer0);
             ///
-            /// d5.set_duty(128);
-            /// d5.enable();
+            /// pd5.set_duty(128);
+            /// pd5.enable();
             /// ```
             pub struct Timer0Pwm {
                 timer: hal::pac::TC0,
@@ -87,14 +92,19 @@ macro_rules! impl_simple_pwm_48p_168_328p_328pb {
             /// Use `TC1` for PWM (pins `PB1`, `PB2`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+            /// use hal::simple_pwm::{IntoPwmPin,Timer1Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
             ///
-            /// let mut d9 = pins.d9.into_output().into_pwm(&mut timer1);
-            /// let mut d10 = pins.d10.into_output().into_pwm(&mut timer1);
+            /// let mut pb1 = pins.pb1.into_output().into_pwm(&mut timer1);
+            /// let mut pb2 = pins.pb2.into_output().into_pwm(&mut timer1);
             ///
-            /// d9.set_duty(128);
-            /// d9.enable();
+            /// pb1.set_duty(128);
+            /// pb1.enable();
             /// ```
             pub struct Timer1Pwm {
                 timer: hal::pac::TC1,
@@ -138,14 +148,19 @@ macro_rules! impl_simple_pwm_48p_168_328p_328pb {
             /// Use `TC2` for PWM (pins `PB3`, `PD3`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+            /// use hal::simple_pwm::{IntoPwmPin,Timer2Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer2 = Timer2Pwm::new(dp.TC2, Prescaler::Prescale64);
             ///
-            /// let mut d11 = pins.d11.into_output().into_pwm(&mut timer2);
-            /// let mut d3 = pins.d3.into_output().into_pwm(&mut timer2);
+            /// let mut pb3 = pins.pb3.into_output().into_pwm(&mut timer2);
+            /// let mut pd3 = pins.pd3.into_output().into_pwm(&mut timer2);
             ///
-            /// d11.set_duty(128);
-            /// d11.enable();
+            /// pb3.set_duty(128);
+            /// pb3.enable();
             /// ```
             pub struct Timer2Pwm {
                 timer: hal::pac::TC2,
@@ -192,14 +207,19 @@ macro_rules! impl_simple_pwm_1280_2560 {
             /// Use `TC0` for PWM (pins `PB7`, `PG5`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+            /// use hal::simple_pwm::{IntoPwmPin,Timer0Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer0 = Timer0Pwm::new(dp.TC0, Prescaler::Prescale64);
             ///
-            /// let mut d13 = pins.d13.into_output().into_pwm(&mut timer0);
-            /// let mut d4 = pins.d4.into_output().into_pwm(&mut timer0);
+            /// let mut pb7 = pins.pb7.into_output().into_pwm(&mut timer0);
+            /// let mut pg5 = pins.pg5.into_output().into_pwm(&mut timer0);
             ///
-            /// d13.set_duty(128);
-            /// d13.enable();
+            /// pb7.set_duty(128);
+            /// pb7.enable();
             /// ```
             pub struct Timer0Pwm {
                 timer: hal::pac::TC0,
@@ -239,15 +259,20 @@ macro_rules! impl_simple_pwm_1280_2560 {
             /// Use `TC1` for PWM (pins `PB5`, `PB6`, `PB7`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+            /// use hal::simple_pwm::{IntoPwmPin,Timer1Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
             ///
-            /// let mut d11 = pins.d11.into_output().into_pwm(&mut timer1);
-            /// let mut d12 = pins.d12.into_output().into_pwm(&mut timer1);
-            /// let mut d13 = pins.d13.into_output().into_pwm(&mut timer1);
+            /// let mut pb5 = pins.pb5.into_output().into_pwm(&mut timer1);
+            /// let mut pb6 = pins.pb6.into_output().into_pwm(&mut timer1);
+            /// let mut pb7 = pins.pb7.into_output().into_pwm(&mut timer1);
             ///
-            /// d11.set_duty(128);
-            /// d11.enable();
+            /// pb5.set_duty(128);
+            /// pb5.enable();
             /// ```
             pub struct Timer1Pwm {
                 timer: hal::pac::TC1,
@@ -296,14 +321,19 @@ macro_rules! impl_simple_pwm_1280_2560 {
             /// Use `TC2` for PWM (pins `PB4`, `PH6`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+            /// use hal::simple_pwm::{IntoPwmPin,Timer2Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer2 = Timer2Pwm::new(dp.TC2, Prescaler::Prescale64);
             ///
-            /// let mut d10 = pins.d10.into_output().into_pwm(&mut timer2);
-            /// let mut d9 = pins.d9.into_output().into_pwm(&mut timer2);
+            /// let mut pb4 = pins.pb4.into_output().into_pwm(&mut timer2);
+            /// let mut ph6 = pins.ph6.into_output().into_pwm(&mut timer2);
             ///
-            /// d10.set_duty(128);
-            /// d10.enable();
+            /// pb4.set_duty(128);
+            /// pb4.enable();
             /// ```
 
             pub struct Timer2Pwm {
@@ -348,15 +378,20 @@ macro_rules! impl_simple_pwm_1280_2560 {
             /// Use `TC3` for PWM (pins `PE3`, `PE4`, `PE5`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+            /// use hal::simple_pwm::{IntoPwmPin,Timer3Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer3 = Timer3Pwm::new(dp.TC3, Prescaler::Prescale64);
             ///
-            /// let mut d5 = pins.d5.into_output().into_pwm(&mut timer3);
-            /// let mut d2 = pins.d2.into_output().into_pwm(&mut timer3);
-            /// let mut d3 = pins.d3.into_output().into_pwm(&mut timer3);
+            /// let mut pe3 = pins.pe3.into_output().into_pwm(&mut timer3);
+            /// let mut pe4 = pins.pe4.into_output().into_pwm(&mut timer3);
+            /// let mut pe5 = pins.pe5.into_output().into_pwm(&mut timer3);
             ///
-            /// d5.set_duty(128);
-            /// d5.enable();
+            /// pe3.set_duty(128);
+            /// pe3.enable();
             /// ```
             pub struct Timer3Pwm {
                 timer: hal::pac::TC3,
@@ -410,15 +445,20 @@ macro_rules! impl_simple_pwm_1280_2560 {
             /// Use `TC4` for PWM (pins `PH3`, `PH4`, `PH5`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+            /// use hal::simple_pwm::{IntoPwmPin,Timer4Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer4 = Timer4Pwm::new(dp.TC4, Prescaler::Prescale64);
             ///
-            /// let mut d6 = pins.d6.into_output().into_pwm(&mut timer4);
-            /// let mut d7 = pins.d7.into_output().into_pwm(&mut timer4);
-            /// let mut d8 = pins.d8.into_output().into_pwm(&mut timer4);
+            /// let mut ph3 = pins.ph3.into_output().into_pwm(&mut timer4);
+            /// let mut ph4 = pins.ph4.into_output().into_pwm(&mut timer4);
+            /// let mut ph5 = pins.ph5.into_output().into_pwm(&mut timer4);
             ///
-            /// d6.set_duty(128);
-            /// d6.enable();
+            /// ph3.set_duty(128);
+            /// ph3.enable();
             /// ```
             pub struct Timer4Pwm {
                 timer: hal::pac::TC4,
@@ -472,15 +512,20 @@ macro_rules! impl_simple_pwm_1280_2560 {
             /// Use `TC5` for PWM (pins `PL3`, `PL4`, `PL5`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+            /// use hal::simple_pwm::{IntoPwmPin,Timer5Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer5 = Timer5Pwm::new(dp.TC5, Prescaler::Prescale64);
             ///
-            /// let mut d46 = pins.d46.into_output().into_pwm(&mut timer5);
-            /// let mut d45 = pins.d45.into_output().into_pwm(&mut timer5);
-            /// let mut d44 = pins.d44.into_output().into_pwm(&mut timer5);
+            /// let mut pl3 = pins.pl3.into_output().into_pwm(&mut timer5);
+            /// let mut pl4 = pins.pl4.into_output().into_pwm(&mut timer5);
+            /// let mut pl5 = pins.pl5.into_output().into_pwm(&mut timer5);
             ///
-            /// d46.set_duty(128);
-            /// d46.enable();
+            /// pl3.set_duty(128);
+            /// pl3.enable();
             /// ```
             pub struct Timer5Pwm {
                 timer: hal::pac::TC5,
