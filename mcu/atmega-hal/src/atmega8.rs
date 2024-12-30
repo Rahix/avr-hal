@@ -67,14 +67,19 @@ impl_mod_simple_pwm! {
             /// Use `TC1` for PWM (pins `PB1`, `PB2`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            /// use atmega_hal::atmega8 as hal;
+            /// use hal::simple_pwm::{IntoPwmPin,Timer1Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
             ///
-            /// let mut b1 = pins.b1.into_output().into_pwm(&mut timer1);
-            /// let mut b2 = pins.b2.into_output().into_pwm(&mut timer1);
+            /// let mut pb1 = pins.pb1.into_output().into_pwm(&mut timer1);
+            /// let mut pb2 = pins.pb2.into_output().into_pwm(&mut timer1);
             ///
-            /// d9.set_duty(128);
-            /// d9.enable();
+            /// pb1.set_duty(128);
+            /// pb1.enable();
             /// ```
             pub struct Timer1Pwm {
                 timer: hal::pac::TC1,
@@ -118,14 +123,17 @@ impl_mod_simple_pwm! {
             /// Use `TC2` for PWM (pin `PB3`)
             ///
             /// # Example
-            /// ```
+            /// ```no_run
+            /// use atmega_hal::atmega8 as hal;
+            /// use hal::simple_pwm::{IntoPwmPin,Timer2Pwm,Prescaler};
+            /// 
+            /// let dp = hal::Peripherals::take().unwrap();
+            /// let pins = hal::pins!(dp);
             /// let mut timer2 = Timer2Pwm::new(dp.TC2, Prescaler::Prescale64);
             ///
-            /// let mut d11 = pins.d11.into_output().into_pwm(&mut timer2);
-            /// let mut d3 = pins.d3.into_output().into_pwm(&mut timer2);
+            /// let mut pb3 = pins.pb3.into_output().into_pwm(&mut timer2);
             ///
-            /// d11.set_duty(128);
-            /// d11.enable();
+            /// pb3.set_duty(128);
             /// ```
             pub struct Timer2Pwm {
                 timer: hal::pac::TC2,

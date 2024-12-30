@@ -7,18 +7,24 @@ macro_rules! impl_mod_port {
             //!
             //! # Example
             //!
-            //! Complete example source code can be found in the repository:
+            //! For full source code, please refer to the ATmega port example:
             //! [`atmega2560-blink.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-blink.rs)
             //!
-            //! ```
-            //! let dp = atmega_hal::Peripherals::take().unwrap();
-            //! let pins = atmega_hal::pins!(dp);
+            //! ```no_run
+            //! use atmega_hal::prelude::*;
+            #![doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
             //!
-            //! let mut led = pins.pb7.into_output();
+            //! type Clock = atmega_hal::clock::MHz8;
+            //! let mut delay = atmega_hal::delay::Delay::<Clock>::new();
+            //! 
+            //! let dp = hal::Peripherals::take().unwrap();
+            //! let pins = hal::pins!(dp);
+            //!
+            //! let mut led = pins.pb2.into_output();
             //!
             //! loop {
             //!     led.toggle();
-            //!     delay_ms(1000);
+            //!     delay.delay_ms(1000u16);
             //! }
             //! ```
             pub use avr_hal_generic::port::{mode, PinMode, PinOps};

@@ -129,6 +129,11 @@ jobs:
         run: >-
           cd "mcu/${{ matrix.m.crate }}" && 
           cargo test --doc --features "${{ matrix.m.name }}-no-deprecated-globals" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"
+      - name: Compile doctests for an MCU (no deprecated globals)
+        if: "${{ matrix.m.crate == 'atmega-hal' }}"
+        run: >-
+          cd "mcu/${{ matrix.m.crate }}" && 
+          cargo test --doc --features "${{ matrix.m.name }}-no-deprecated-globals,enable-extra-adc" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"
 
   ravedude:
     name: "ravedude"
