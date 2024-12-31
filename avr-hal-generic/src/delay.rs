@@ -57,11 +57,6 @@ fn busy_loop(mut c: u16) {
     }
 }
 
-#[cfg(not(target_arch = "avr"))]
-fn busy_loop(_c: u16) {
-    unimplemented!("Implementation is only available for avr targets!")
-}
-
 // Clock-Specific Delay Implementations ----------------------------------- {{{
 impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz24> {
     fn delay_us(&mut self, mut us: u16) {
