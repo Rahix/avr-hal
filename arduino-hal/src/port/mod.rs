@@ -43,9 +43,9 @@ mod uno;
     feature = "sparkfun-promini-5v"
 ))]
 pub use uno::*;
-#[cfg(feature = "sparkfun-promicro")]
+#[cfg(any(feature = "sparkfun-promicro-3v3", feature = "sparkfun-promicro-5v"))]
 mod promicro;
-#[cfg(feature = "sparkfun-promicro")]
+#[cfg(any(feature = "sparkfun-promicro-3v3", feature = "sparkfun-promicro-5v"))]
 pub use promicro::*;
 #[cfg(feature = "trinket-pro")]
 mod trinket_pro;

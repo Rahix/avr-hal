@@ -31,7 +31,10 @@ jobs:
             name: arduino-mega1280
             examples: true
           - type: board
-            name: sparkfun-promicro
+            name: sparkfun-promicro-3v3
+            examples: true
+          - type: board
+            name: sparkfun-promicro-5v
             examples: true
           - type: board
             name: sparkfun-promini-3v3

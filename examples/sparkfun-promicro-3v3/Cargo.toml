@@ -17,7 +17,7 @@ package = "embedded-hal"
 
 [dependencies.arduino-hal]
 path = "../../arduino-hal/"
-features = ["sparkfun-promicro"]
+features = ["sparkfun-promicro-3v3"]
 
 # The latest releases of `proc-macro2` do not support the rust toolchain that
 # we use.  Thus, we must fix this dependency to an older version where our

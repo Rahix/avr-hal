@@ -12,7 +12,14 @@
 #![cfg_attr(feature = "arduino-mega1280", doc = "**Arduino Mega 1280**.")]
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
-#![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
+#![cfg_attr(
+    feature = "sparkfun-promicro-3v3",
+    doc = "**SparkFun ProMicro 3.3V (8MHz)**."
+)]
+#![cfg_attr(
+    feature = "sparkfun-promicro-5v",
+    doc = "**SparkFun ProMicro 5V (16MHz)**."
+)]
 #![cfg_attr(
     feature = "sparkfun-promini-3v3",
     doc = "**SparkFun ProMini 3.3V (8MHz)**."
@@ -66,7 +73,8 @@ compile_error!(
     * arduino-mega1280
     * arduino-nano
     * arduino-uno
-    * sparkfun-promicro
+    * sparkfun-promicro-3v3
+    * sparkfun-promicro-5v
     * sparkfun-promini-3v3
     * sparkfun-promini-5v
     * trinket-pro
@@ -259,7 +267,7 @@ macro_rules! default_serial {
 /// let pins = arduino_hal::pins!(dp);
 /// let serial = arduino_hal::default_serial!(dp, pins, 57600);
 /// ```
-#[cfg(any(feature = "sparkfun-promicro"))]
+#[cfg(any(feature = "sparkfun-promicro-3v3", features = "sparkfun-promicro-5v"))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
