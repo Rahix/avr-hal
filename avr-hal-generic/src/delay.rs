@@ -4,7 +4,7 @@ use core::marker;
 use embedded_hal::delay::DelayNs;
 use embedded_hal_v0::blocking::delay as delay_v0;
 
-#[cfg(all(target_arch = "avr", avr_hal_asm_macro))]
+#[cfg(target_arch = "avr")]
 use core::arch::asm;
 
 /// A busy-loop delay implementation
@@ -44,36 +44,22 @@ impl<SPEED> Delay<SPEED> {
 
 // based on https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/wiring.c
 
-cfg_if::cfg_if! {
-    if #[cfg(all(target_arch = "avr", avr_hal_asm_macro))] {
-        #[allow(unused_assignments)]
-        fn busy_loop(mut c: u16) {
-            unsafe {
-                asm!(
-                    "1:",
-                    "sbiw {c}, 1",
-                    "brne 1b",
-                    c = inout(reg_iw) c,
-                );
-            }
-        }
-    } else if #[cfg(target_arch = "avr")] {
-        #[allow(unused_assignments)]
-        fn busy_loop(mut c: u16) {
-            unsafe {
-                llvm_asm!("1: sbiw $0,1\n\tbrne 1b"
-                     : "=w"(c)
-                     : "0"(c)
-                     :
-                     : "volatile"
-                 );
-            }
-        }
-    } else {
-        fn busy_loop(_c: u16) {
-            unimplemented!("Implementation is only available for avr targets!")
-        }
+#[cfg(target_arch = "avr")]
+#[allow(unused_assignments)]
+fn busy_loop(mut c: u16) {
+    unsafe {
+        asm!(
+            "1:",
+            "sbiw {c}, 1",
+            "brne 1b",
+            c = inout(reg_iw) c,
+        );
     }
+}
+
+#[cfg(not(target_arch = "avr"))]
+fn busy_loop(_c: u16) {
+    unimplemented!("Implementation is only available for avr targets!")
 }
 
 // Clock-Specific Delay Implementations ----------------------------------- {{{
@@ -106,14 +92,9 @@ impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz20> {
 
         // for a one-microsecond delay, simply return.  the overhead
         // of the function call takes 18 (20) cycles, which is 1us
-        #[cfg(all(target_arch = "avr", avr_hal_asm_macro))]
+        #[cfg(target_arch = "avr")]
         unsafe {
             asm!("nop", "nop", "nop", "nop");
-        }
-
-        #[cfg(all(target_arch = "avr", not(avr_hal_asm_macro)))]
-        unsafe {
-            llvm_asm!("nop\nnop\nnop\nnop" :::: "volatile");
         }
 
         if us <= 1 {
