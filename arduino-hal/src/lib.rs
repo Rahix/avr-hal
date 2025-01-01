@@ -120,7 +120,7 @@ pub use clock::default::DefaultClock;
 #[cfg(feature = "board-selected")]
 mod delay;
 #[cfg(feature = "board-selected")]
-pub use delay::{delay_ms, delay_us, Delay};
+pub use delay::{delay_ms, delay_ns, delay_us, Delay};
 
 #[cfg(feature = "board-selected")]
 pub mod port;
