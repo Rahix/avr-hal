@@ -14,9 +14,10 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::arduino::uno as board;
 use panic_halt as _;
 
-use arduino_hal::{
+use board::{
     hal::port::{PD4, PD5, PD6},
     port::{mode::Output, Pin},
 };
@@ -51,8 +52,8 @@ fn update_shift_register(
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
     let mut data_pin = pins.d4.into_output();
     let mut latch_pin = pins.d5.into_output();
@@ -62,13 +63,13 @@ fn main() -> ! {
         let mut data: u8 = 0;
 
         update_shift_register(&mut data_pin, &mut latch_pin, &mut clock_pin, &data);
-        arduino_hal::delay_ms(500);
+        board::delay_ms(500);
 
         for i in 0..8 {
             data |= 1 << i;
 
             update_shift_register(&mut data_pin, &mut latch_pin, &mut clock_pin, &data);
-            arduino_hal::delay_ms(500);
+            board::delay_ms(500);
         }
     }
 }

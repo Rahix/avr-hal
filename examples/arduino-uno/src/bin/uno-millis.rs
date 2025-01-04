@@ -12,7 +12,8 @@
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
-use arduino_hal::prelude::*;
+use arduino_hal::arduino::uno as board;
+use board::prelude::*;
 use core::cell;
 use panic_halt as _;
 
@@ -37,7 +38,7 @@ const MILLIS_INCREMENT: u32 = PRESCALER * TIMER_COUNTS / 16000;
 static MILLIS_COUNTER: avr_device::interrupt::Mutex<cell::Cell<u32>> =
     avr_device::interrupt::Mutex::new(cell::Cell::new(0));
 
-fn millis_init(tc0: arduino_hal::pac::TC0) {
+fn millis_init(tc0: board::pac::TC0) {
     // Configure the timer for the above interval (in CTC mode)
     // and enable its interrupt.
     tc0.tccr0a.write(|w| w.wgm0().ctc());
@@ -74,9 +75,9 @@ fn millis() -> u32 {
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
+    let mut serial = board::default_serial!(dp, pins, 57600);
 
     millis_init(dp.TC0);
 

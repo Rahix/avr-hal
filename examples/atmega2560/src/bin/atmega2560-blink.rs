@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 
+use atmega_hal::atmega2560 as hal;
 use embedded_hal::delay::DelayNs;
 use panic_halt as _;
 
@@ -20,8 +21,8 @@ fn delay_us(us: u32) {
 
 #[avr_device::entry]
 fn main() -> ! {
-    let dp = atmega_hal::Peripherals::take().unwrap();
-    let pins = atmega_hal::pins!(dp);
+    let dp = hal::Peripherals::take().unwrap();
+    let pins = hal::pins!(dp);
 
     let mut led = pins.pb7.into_output();
 

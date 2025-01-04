@@ -5,6 +5,7 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::arduino::uno as board;
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::StatefulOutputPin;
 
@@ -25,14 +26,14 @@ fn blink(led: &mut impl StatefulOutputPin, delay: &mut impl DelayNs) -> ! {
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
     // Digital pin 13 is also connected to an onboard LED marked "L"
     let mut led = pins.d13.into_output();
     led.set_high();
 
-    let mut delay = arduino_hal::Delay::new();
+    let mut delay = board::Delay::new();
 
     blink(&mut led, &mut delay);
 }
