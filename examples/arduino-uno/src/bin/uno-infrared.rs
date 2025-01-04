@@ -19,10 +19,11 @@
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
+use arduino_hal::arduino::uno as board;
 use core::cell::Cell;
 use panic_halt as _;
 
-use arduino_hal::{
+use board::{
     hal::port::{PD2, PD6, PD7},
     pac::tc0::tccr0b::CS0_A,
     port::mode::{Floating, Input, Output},
@@ -46,9 +47,9 @@ static CMD: Mutex<Cell<Option<IrCmd>>> = Mutex::new(Cell::new(None));
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
+    let mut serial = board::default_serial!(dp, pins, 57600);
 
     // Monotonic clock to keep track of the time
     CLOCK.start(dp.TC0);
@@ -92,7 +93,7 @@ fn main() -> ! {
             .unwrap_infallible();
         }
 
-        arduino_hal::delay_ms(100);
+        board::delay_ms(100);
     }
 }
 
@@ -139,7 +140,7 @@ impl Clock {
         }
     }
 
-    pub fn start(&self, tc0: arduino_hal::pac::TC0) {
+    pub fn start(&self, tc0: board::pac::TC0) {
         // Configure the timer for the above interval (in CTC mode)
         tc0.tccr0a.write(|w| w.wgm0().ctc());
         tc0.ocr0a.write(|w| w.bits(Self::TOP));

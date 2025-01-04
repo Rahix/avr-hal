@@ -1,18 +1,19 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
+use arduino_hal::arduino::mega2560 as board;
+use board::prelude::*;
 use panic_halt as _;
 
-use arduino_hal::adc;
+use board::adc;
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
+    let mut serial = board::default_serial!(dp, pins, 57600);
 
-    let mut adc = arduino_hal::Adc::new(dp.ADC, Default::default());
+    let mut adc = board::Adc::new(dp.ADC, Default::default());
 
     let (vbg, gnd) = (
         adc.read_blocking(&adc::channel::Vbg),
@@ -48,6 +49,6 @@ fn main() -> ! {
         }
 
         ufmt::uwriteln!(&mut serial, "").unwrap_infallible();
-        arduino_hal::delay_ms(1000);
+        board::delay_ms(1000);
     }
 }

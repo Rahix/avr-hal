@@ -5,13 +5,15 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::simple_pwm::*;
 use panic_halt as _;
+
+use arduino_hal::adafruit::trinket as board;
+use board::simple_pwm::*;
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
     let timer0 = Timer0Pwm::new(dp.TC0, Prescaler::Prescale64);
 
@@ -22,7 +24,7 @@ fn main() -> ! {
     loop {
         for x in (0..=255).chain((0..=254).rev()) {
             pwm_led.set_duty(x);
-            arduino_hal::delay_ms(10);
+            board::delay_ms(10);
         }
     }
 }

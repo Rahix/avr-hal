@@ -25,18 +25,19 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
+use arduino_hal::arduino::nano_v2 as board;
+use board::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
+    let dp = board::Peripherals::take().unwrap();
     // setup the pins
-    let pins = arduino_hal::pins!(dp);
+    let pins = board::pins!(dp);
     // setup the serial connection for the output.
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let mut serial = board::default_serial!(dp, pins, 57600);
     // setup the analog digital converter
-    let mut adc = arduino_hal::Adc::new(dp.ADC, Default::default());
+    let mut adc = board::Adc::new(dp.ADC, Default::default());
     // in this example we only need pin a5
     let a5 = pins.a5.into_analog_input(&mut adc);
 
@@ -61,6 +62,6 @@ fn main() -> ! {
         ufmt::uwriteln!(&mut serial, "").unwrap_infallible();
 
         // wait for half a second then measure again
-        arduino_hal::delay_ms(500);
+        board::delay_ms(500);
     }
 }

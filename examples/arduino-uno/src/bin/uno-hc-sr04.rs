@@ -13,14 +13,15 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
+use arduino_hal::arduino::uno as board;
+use board::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
+    let mut serial = board::default_serial!(dp, pins, 57600);
 
     let mut trig = pins.d2.into_output();
     let echo = pins.d3; // pin is input by default
@@ -38,7 +39,7 @@ fn main() -> ! {
 
         // the trigger must be set to high under 10 µs as per the HC-SR04 datasheet
         trig.set_high();
-        arduino_hal::delay_us(10);
+        board::delay_us(10);
         trig.set_low();
 
         while echo.is_low() {

@@ -17,16 +17,17 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
+use arduino_hal::arduino::uno as board;
+use board::prelude::*;
 use panic_halt as _;
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
+    let mut serial = board::default_serial!(dp, pins, 57600);
 
-    let mut i2c = arduino_hal::I2c::new(
+    let mut i2c = board::I2c::new(
         dp.TWI,
         pins.a4.into_pull_up_input(),
         pins.a5.into_pull_up_input(),
@@ -34,13 +35,13 @@ fn main() -> ! {
     );
 
     ufmt::uwriteln!(&mut serial, "Write direction test:\r").unwrap_infallible();
-    i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Write)
+    i2c.i2cdetect(&mut serial, board::i2c::Direction::Write)
         .unwrap_infallible();
     ufmt::uwriteln!(&mut serial, "\r\nRead direction test:\r").unwrap_infallible();
-    i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Read)
+    i2c.i2cdetect(&mut serial, board::i2c::Direction::Read)
         .unwrap_infallible();
 
     loop {
-        arduino_hal::delay_ms(1000);
+        board::delay_ms(1000);
     }
 }

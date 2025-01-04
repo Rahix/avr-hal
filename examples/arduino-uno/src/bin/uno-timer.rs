@@ -9,9 +9,10 @@ and then modernized to account for API drift since 2020
 
 */
 
-use arduino_hal::port::mode::Output;
-use arduino_hal::port::Pin;
-use arduino_hal::prelude::*;
+use arduino_hal::arduino::uno as board;
+use board::port::mode::Output;
+use board::port::Pin;
+use board::prelude::*;
 use avr_device::atmega328p::tc1::tccr1b::CS1_A;
 use avr_device::atmega328p::TC1;
 use core::mem;
@@ -26,10 +27,10 @@ static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState> = mem::MaybeUninit:
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let mut serial = board::default_serial!(dp, pins, 57600);
     ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap_infallible();
 
     let led = pins.d13.into_output();
@@ -82,9 +83,9 @@ pub fn rig_timer<W: uWrite<Error = ::core::convert::Infallible>>(tmr1: &TC1, ser
      https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
      section 15.11
     */
-    use arduino_hal::clock::Clock;
+    use board::clock::Clock;
 
-    const ARDUINO_UNO_CLOCK_FREQUENCY_HZ: u32 = arduino_hal::DefaultClock::FREQ;
+    const ARDUINO_UNO_CLOCK_FREQUENCY_HZ: u32 = board::DefaultClock::FREQ;
     const CLOCK_SOURCE: CS1_A = CS1_A::PRESCALE_256;
     let clock_divisor: u32 = match CLOCK_SOURCE {
         CS1_A::DIRECT => 1,

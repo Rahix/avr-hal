@@ -1,18 +1,19 @@
 #![no_std]
 #![no_main]
 
-use atmega_hal::usart::{Baudrate, Usart};
+use atmega_hal::atmega2560 as hal;
+use hal::usart::{Baudrate, Usart};
 use panic_halt as _;
 
 // Define core clock in the root crate
 type CoreClock = atmega_hal::clock::MHz16;
 // Use it as follows in the rest of the project
-type I2c = atmega_hal::i2c::I2c<crate::CoreClock>;
+type I2c = hal::i2c::I2c<crate::CoreClock>;
 
 #[avr_device::entry]
 fn main() -> ! {
-    let dp = atmega_hal::Peripherals::take().unwrap();
-    let pins = atmega_hal::pins!(dp);
+    let dp = hal::Peripherals::take().unwrap();
+    let pins = hal::pins!(dp);
 
     // set up serial interface for text output
     let mut serial = Usart::new(
@@ -30,10 +31,10 @@ fn main() -> ! {
     );
 
     ufmt::uwriteln!(&mut serial, "Write direction test:\r").unwrap();
-    i2c.i2cdetect(&mut serial, atmega_hal::i2c::Direction::Write)
+    i2c.i2cdetect(&mut serial, hal::i2c::Direction::Write)
         .unwrap();
     ufmt::uwriteln!(&mut serial, "\r\nRead direction test:\r").unwrap();
-    i2c.i2cdetect(&mut serial, atmega_hal::i2c::Direction::Read)
+    i2c.i2cdetect(&mut serial, hal::i2c::Direction::Read)
         .unwrap();
 
     loop {}

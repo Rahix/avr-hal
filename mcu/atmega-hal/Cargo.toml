@@ -1,6 +1,6 @@
 [package]
 name = "atmega-hal"
-version = "0.1.0"
+version = "0.4.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -12,28 +12,104 @@ categories = ["no-std", "embedded", "hardware-support"]
 
 [features]
 rt = ["avr-device/rt"]
-device-selected = []
 enable-extra-adc = []
-atmega48p = ["avr-device/atmega48p", "device-selected"]
-atmega164pa = ["avr-device/atmega164pa", "device-selected"]
-atmega168 = ["avr-device/atmega168", "device-selected"]
-atmega328p = ["avr-device/atmega328p", "device-selected"]
-atmega328pb = ["avr-device/atmega328pb", "device-selected"]
-atmega32a = ["avr-device/atmega32a", "device-selected"]
-atmega32u4 = ["avr-device/atmega32u4", "device-selected"]
-atmega2560 = ["avr-device/atmega2560", "device-selected"]
-atmega128a = ["avr-device/atmega128a", "device-selected"]
-atmega1280 = ["avr-device/atmega1280", "device-selected"]
-atmega1284p = ["avr-device/atmega1284p", "device-selected"]
-atmega8 = ["avr-device/atmega8", "device-selected"]
+
+# MCU-specific targets. 
+atmega48p = ["_mcu-atmega48p"]
+atmega164pa = ["_mcu-atmega164pa"]
+atmega168 = ["_mcu-atmega168"]
+atmega328p = ["_mcu-atmega328p"]
+atmega328pb = ["_mcu-atmega328pb"]
+atmega32a = ["_mcu-atmega32a"]
+atmega32u4 = ["_mcu-atmega32u4"]
+atmega2560 = ["_mcu-atmega2560"]
+atmega128a = ["_mcu-atmega128a"]
+atmega1280 = ["_mcu-atmega1280"]
+atmega1284p = ["_mcu-atmega1284p"]
+atmega8 = ["_mcu-atmega8"]
 
 critical-section-impl = ["avr-device/critical-section-impl"]
 
-# Allow certain downstream crates to overwrite the device selection error by themselves.
+default = []
+
+docsrs = [
+    "atmega48p",
+    "atmega164pa",
+    "atmega168",
+    "atmega328p",
+    "atmega328pb",
+    "atmega32a",
+    "atmega32u4",
+    "atmega2560",
+    "atmega128a",
+    "atmega1280",
+    "atmega1284p",
+    "atmega8",
+]
+
+# If using this crate from another library crate you may want to suppress this error and provide your own
 disable-device-selection-error = []
 
-# We must select a microcontroller to build on docs.rs
-docsrs = ["atmega328p"]
+# MCU-specific implementation features
+_mcu-atmega48p = ["_mcu-selected", "_peripheral-spi", "_peripheral-simple-pwm", "avr-device/atmega48p"]
+_mcu-atmega164pa = ["_mcu-selected", "_peripheral-usart", "_peripheral-simple-pwm", "avr-device/atmega164pa"]
+_mcu-atmega168 = [
+    "_mcu-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+    "avr-device/atmega168",
+]
+_mcu-atmega328p = [
+    "_mcu-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+    "avr-device/atmega328p",
+]
+_mcu-atmega328pb = [
+    "_mcu-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+    "avr-device/atmega328pb",
+]
+_mcu-atmega32a = ["_mcu-selected", "_peripheral-usart", "_peripheral-spi", "avr-device/atmega32a"]
+_mcu-atmega32u4 = [
+    "_mcu-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+    "avr-device/atmega32u4",
+]
+_mcu-atmega2560 = [
+    "_mcu-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+    "avr-device/atmega2560",
+]
+_mcu-atmega128a = ["_mcu-selected", "_peripheral-usart", "_peripheral-spi", "avr-device/atmega128a"]
+_mcu-atmega1280 = [
+    "_mcu-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+    "avr-device/atmega1280",
+]
+_mcu-atmega1284p = [
+    "_mcu-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+    "avr-device/atmega1284p",
+]
+_mcu-atmega8 = ["_mcu-selected", "_peripheral-usart", "_peripheral-spi", "_peripheral-simple-pwm", "avr-device/atmega8"]
+
+_mcu-selected = []
+_peripheral-simple-pwm = []
+_peripheral-spi = []
+_peripheral-usart = []
 
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }

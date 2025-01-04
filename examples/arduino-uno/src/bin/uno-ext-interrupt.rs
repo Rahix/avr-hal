@@ -9,7 +9,8 @@
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
-use arduino_hal::port::{mode, Pin};
+use arduino_hal::arduino::uno as board;
+use board::port::{mode, Pin};
 use core::sync::atomic::{AtomicBool, Ordering};
 use either::*;
 use panic_halt as _;
@@ -35,15 +36,15 @@ fn blink_for_range(range: impl Iterator<Item = u16>, leds: &mut [Pin<mode::Outpu
         };
         iter.for_each(|led| {
             led.toggle();
-            arduino_hal::delay_ms(ms as u16);
+            board::delay_ms(ms as u16);
         })
     });
 }
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
 
     // thanks to tsemczyszyn and Rahix: https://github.com/Rahix/avr-hal/issues/240
     // Configure INT0 for falling edge. 0x03 would be rising edge.

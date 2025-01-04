@@ -1,6 +1,6 @@
 [package]
 name = "arduino-hal"
-version = "0.1.0"
+version = "0.4.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -16,24 +16,57 @@ rt = ["avr-device/rt"]
 
 critical-section-impl = ["avr-device/critical-section-impl"]
 
-board-selected = []
-mcu-atmega = []
-mcu-attiny = []
-arduino-diecimila = ["mcu-atmega", "atmega-hal/atmega168", "board-selected"]
-arduino-leonardo = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
-arduino-mega2560 = ["mcu-atmega", "atmega-hal/atmega2560", "board-selected"]
-arduino-mega1280 = ["mcu-atmega", "atmega-hal/atmega1280", "board-selected"]
-arduino-nano = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
-arduino-uno = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
-trinket-pro = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
-sparkfun-promicro = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
-sparkfun-promini-3v3 = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
-sparkfun-promini-5v = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
-trinket = ["mcu-attiny", "attiny-hal/attiny85", "board-selected"]
-nano168 = ["mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc", "board-selected"]
+# Board-specific targets. 
+arduino-diecimila = ["_board-arduino-diecimila"]
+arduino-leonardo = ["_board-arduino-leonardo"]
+arduino-mega2560 = ["_board-arduino-mega2560"]
+arduino-mega1280 = ["_board-arduino-mega1280"]
+arduino-nano = ["_board-arduino-nano"]
+arduino-uno = ["_board-arduino-uno"]
+trinket-pro = ["_board-trinket-pro"]
+sparkfun-promicro = ["_board-sparkfun-promicro"]
+sparkfun-promini-3v3 = ["_board-sparkfun-promini-3v3"]
+sparkfun-promini-5v = ["_board-sparkfun-promini-5v"]
+trinket = ["_board-trinket"]
+nano168 = ["_board-nano168"]
 
-# We must select a board to build on docs.rs
-docsrs = ["arduino-uno"]
+# When using this crate from another lib crate, you can use this feature to suppress the chip selection error in favor of your own error
+disable-board-selection-error = ["_board-selected"]
+
+# MCU-specific implementation features
+_board-arduino-diecimila = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega168"]
+_board-arduino-leonardo = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega32u4"]
+_board-arduino-mega2560 = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega2560"]
+_board-arduino-mega1280 = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega1280"]
+_board-arduino-nano = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc"]
+_board-arduino-uno = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega328p"]
+_board-trinket-pro = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega328p"]
+_board-sparkfun-promicro = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega32u4"]
+_board-sparkfun-promini-3v3 = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc"]
+_board-sparkfun-promini-5v = ["_mcu-atmega", "_default-serial", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc"]
+_board-trinket = ["_mcu-attiny", "attiny-hal/attiny85"]
+_board-nano168 = ["_mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc"]
+
+_mcu-atmega = ["_board-selected"]
+_mcu-attiny = ["_board-selected"]
+_default-serial = []
+
+_board-selected = []
+
+docsrs = [
+    "arduino-diecimila",
+    "arduino-leonardo",
+    "arduino-mega2560",
+    "arduino-mega1280",
+    "arduino-nano",
+    "arduino-uno",
+    "trinket-pro",
+    "sparkfun-promicro",
+    "sparkfun-promini-3v3",
+    "sparkfun-promini-5v",
+    "trinket",
+    "nano168",
+]
 
 [dependencies]
 cfg-if = "1"
@@ -50,12 +83,6 @@ path = "../avr-hal-generic/"
 [dependencies.atmega-hal]
 path = "../mcu/atmega-hal/"
 optional = true
-
-# Because this crate has its own check that at least one device is selected, we
-# can safely "circumvent" the check in `atmega-hal`.  Due to compile order,
-# this allows us to show our error instead of the one from `atmega-hal` (which
-# is much less helpful in this situation).
-features = ["disable-device-selection-error"]
 
 [dependencies.attiny-hal]
 path = "../mcu/attiny-hal/"

@@ -7,7 +7,8 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
+use arduino_hal::arduino::nano_v3 as board;
+use board::prelude::*;
 
 // Documentation build does not like this and fails with the following error, even though
 // everything is fine when compiling the binary.
@@ -27,9 +28,9 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     // SAFETY: Because main() already has references to the peripherals this is an unsafe
     // operation - but because no other code can run after the panic handler was called,
     // we know it is okay.
-    let dp = unsafe { arduino_hal::Peripherals::steal() };
-    let pins = arduino_hal::pins!(dp);
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let dp = unsafe { board::Peripherals::steal() };
+    let pins = board::pins!(dp);
+    let mut serial = board::default_serial!(dp, pins, 57600);
 
     // Print out panic location
     ufmt::uwriteln!(&mut serial, "Firmware panic!\r").unwrap_infallible();
@@ -48,20 +49,20 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     let mut led = pins.d13.into_output();
     loop {
         led.toggle();
-        arduino_hal::delay_ms(100);
+        board::delay_ms(100);
     }
 }
 
 #[arduino_hal::entry]
 fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-    let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
+    let dp = board::Peripherals::take().unwrap();
+    let pins = board::pins!(dp);
+    let mut serial = board::default_serial!(dp, pins, 57600);
 
     ufmt::uwriteln!(&mut serial, "Hello from Arduino!\r").unwrap_infallible();
     ufmt::uwriteln!(&mut serial, "Panic in 5 seconds!\r").unwrap_infallible();
 
-    arduino_hal::delay_ms(5000);
+    board::delay_ms(5000);
 
     // Panic messages cannot yet be captured because they rely on core::fmt
     // which is way too big for AVR
