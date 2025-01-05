@@ -1,0 +1,17 @@
+[general]
+open-console = true
+serial-baudrate = 115200
+port = "/dev/ttyACM0"
+board = "nano-every"
+debug-avrdude = true
+reset-delay = 500
+
+[avrdude]
+programmer = "jtag2updi"
+partno = "atmega4809"
+delay-serial = true
+fuse2 = 0x40
+fuse5 = 0x69
+fuse8 = 0x00
+avrdude-conf = "~/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf"
+avrdude-path = "~/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"

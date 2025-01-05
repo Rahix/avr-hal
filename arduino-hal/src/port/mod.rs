@@ -30,6 +30,7 @@ pub use mega::*;
 #[cfg(any(
     feature = "arduino-nano",
     feature = "arduino-uno",
+    feature = "nano-every",
     feature = "nano168",
     feature = "sparkfun-promini-3v3",
     feature = "sparkfun-promini-5v"
@@ -38,6 +39,7 @@ mod uno;
 #[cfg(any(
     feature = "arduino-nano",
     feature = "arduino-uno",
+    feature = "nano-every",
     feature = "nano168",
     feature = "sparkfun-promini-3v3",
     feature = "sparkfun-promini-5v"

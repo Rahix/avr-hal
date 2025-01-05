@@ -1,3 +1,7 @@
+use resolve_path::PathResolveExt;
+use std::thread;
+use std::time::Duration;
+
 use anyhow::Context as _;
 use std::path;
 use std::process;
@@ -51,7 +55,18 @@ impl Avrdude {
     ) -> anyhow::Result<Self> {
         let avrdude_version = Self::get_avrdude_version()?;
 
-        let mut command = &mut process::Command::new("avrdude");
+        println!("{:?}", options);
+
+        let mut command = match options.avrdude_path.as_ref() {
+            Some(avrdude_path) => {
+                let avrdude_path = avrdude_path.resolve();
+                // let avrdude_path = path::absolute(avrdude_path).unwrap();
+                &mut process::Command::new(avrdude_path.as_os_str())
+            }
+            None => &mut process::Command::new("avrdude"), //     let avrdude_path = path::absolute(options.avrdude_path);
+                                                           //     &mut process::Command::new(avrdude_path)
+                                                           // } else {
+        };
 
         let config = if avrdude_version <= (7, 0) {
             let config = tempfile::Builder::new()
@@ -72,6 +87,8 @@ impl Avrdude {
         };
 
         let mut command = command
+            .arg("-v")
+            .arg("-V")
             .arg("-c")
             .arg(
                 options
@@ -87,8 +104,25 @@ impl Avrdude {
                     .ok_or_else(|| anyhow::anyhow!("board has no part number"))?,
             );
 
-        if let Some(port) = port {
+        if let Some(fuse2) = options.fuse2 {
+            command = command.arg("-U").arg(format!("fuse2:w:{:#02X}:m", fuse2));
+        }
+
+        if let Some(fuse5) = options.fuse5 {
+            command = command.arg("-U").arg(format!("fuse2:w:{:#02X}:m", fuse5));
+        }
+
+        if let Some(fuse8) = options.fuse8 {
+            command = command.arg("-U").arg(format!("fuse2:w:{:#02X}:m", fuse8));
+        }
+
+        if let Some(port) = port.as_ref() {
             command = command.arg("-P").arg(port.as_ref());
+        }
+
+        if let Some(avrdude_conf) = options.avrdude_conf.as_ref() {
+            let avrdude_conf = avrdude_conf.resolve();
+            command = command.arg("-C").arg(avrdude_conf.as_os_str());
         }
 
         if let Some(baudrate) = options.baudrate.flatten() {
@@ -107,7 +141,27 @@ impl Avrdude {
             command = command.arg("-e");
         }
 
-        command = command.arg("-D").arg("-U").arg(flash_instruction);
+        match options.curclock {
+            Some(curclock) => {
+                if curclock == true {
+                    command = command.arg("-curclock");
+                }
+            }
+            None => {}
+        }
+
+        command = command.arg("-D");
+        command = command.arg("-U").arg(flash_instruction);
+
+        // Add x nometadata if no_metadata is true
+        match options.no_metadata {
+            Some(no_metadata) => {
+                if no_metadata == true {
+                    command = command.arg("-x").arg("nometadata");
+                }
+            }
+            None => {}
+        }
 
         if debug {
             crate::task_message!(
@@ -121,6 +175,26 @@ impl Avrdude {
                     .join(" ")
             );
         }
+
+        // Reset if this is nanao-every
+        match options.delay_serial {
+            Some(delay_serial) => {
+                if delay_serial == true {
+                    if let Some(port) = port.as_ref() {
+                        // Open the port
+                        let serial_port = serialport::new(port.as_ref().to_str().unwrap(), 1200);
+                        serial_port.open().expect("Failed to open port");
+
+                        // Wait for half a second
+                        let half_second = Duration::from_millis(500);
+                        thread::sleep(half_second);
+                    }
+                }
+            }
+            None => {}
+        }
+
+        println!("{:?}", command);
 
         let process = command.spawn().context("failed starting avrdude")?;
 

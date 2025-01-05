@@ -131,6 +131,14 @@ pub struct BoardAvrdudeOptions {
     // Option<if baudrate == -1 { None } else { NonZeroU32(baudrate) }>
     pub baudrate: Option<Option<NonZeroU32>>,
     pub do_chip_erase: Option<bool>,
+    pub delay_serial: Option<bool>,
+    pub curclock: Option<bool>,
+    pub no_metadata: Option<bool>,
+    pub fuse2: Option<u8>,
+    pub fuse5: Option<u8>,
+    pub fuse8: Option<u8>,
+    pub avrdude_conf: Option<std::path::PathBuf>,
+    pub avrdude_path: Option<std::path::PathBuf>,
 }
 impl BoardAvrdudeOptions {
     pub fn merge(self, base: Self) -> Self {
@@ -139,6 +147,14 @@ impl BoardAvrdudeOptions {
             partno: self.partno.or(base.partno),
             baudrate: self.baudrate.or(base.baudrate),
             do_chip_erase: self.do_chip_erase.or(base.do_chip_erase),
+            delay_serial: self.delay_serial.or(base.delay_serial),
+            curclock: self.curclock.or(base.curclock),
+            no_metadata: self.no_metadata.or(base.no_metadata),
+            fuse2: self.fuse2.or(base.fuse2),
+            fuse5: self.fuse5.or(base.fuse5),
+            fuse8: self.fuse8.or(base.fuse8),
+            avrdude_conf: self.avrdude_conf.or(base.avrdude_conf),
+            avrdude_path: self.avrdude_path.or(base.avrdude_path),
         }
     }
 }
