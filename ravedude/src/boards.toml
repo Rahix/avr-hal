@@ -201,9 +201,9 @@
     
     [trinket.avrdude]
     programmer = "usbtiny"
-    partno = "atmega328p"
+    partno = "attiny85"
     baudrate = -1
-    do-chip-erase = true
+    do-chip-erase = false
 
     # The Trinket does not have USB-Serial, thus no port is known or needed.
 
