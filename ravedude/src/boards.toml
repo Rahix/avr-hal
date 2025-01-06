@@ -238,3 +238,18 @@
     [duemilanove.usb-info]
     # No IDs here because the Nano 168 uses a generic USB-Serial chip.
     error = "Not able to guess port"
+
+[mighty-core-atmega1284p]
+    name = "Mighty Core DIP40 Dev Board for ATMEGA1284P"
+
+    [mighty-core-atmega1284p.reset]
+    automatic = true
+
+    [mighty-core-atmega1284p.avrdude]
+    programmer = "arduino"
+    partno = "atmega1284p"
+    baudrate = -1
+    do-chip-erase = true
+
+    [mighty-core-atmega1284p.usb-info]
+    error = "Not able to guess port"
