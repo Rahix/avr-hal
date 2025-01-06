@@ -55,6 +55,7 @@ pub struct AdcSettings {
     pub ref_voltage: ReferenceVoltage,
 }
 
+#[cfg(not(feature = "disable-adc"))]
 fn apply_settings(peripheral: &crate::pac::ADC, settings: AdcSettings) {
     peripheral.adcsra.write(|w| {
         w.aden().set_bit();
@@ -76,9 +77,11 @@ fn apply_settings(peripheral: &crate::pac::ADC, settings: AdcSettings) {
 }
 
 /// Check the [`avr_hal_generic::adc::Adc`] documentation.
+#[cfg(not(feature = "disable-adc"))]
 pub type Adc<CLOCK> = avr_hal_generic::adc::Adc<crate::Atmega, crate::pac::ADC, CLOCK>;
 
 /// Check the [`avr_hal_generic::adc::Channel`] documentation.
+#[cfg(not(feature = "disable-adc"))]
 pub type Channel = avr_hal_generic::adc::Channel<crate::Atmega, crate::pac::ADC>;
 
 /// Additional channels

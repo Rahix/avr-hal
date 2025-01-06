@@ -36,6 +36,7 @@ pub use avr_hal_generic::spi::*;
     feature = "atmega128a",
     feature = "atmega1280",
     feature = "atmega2560",
+    feature = "atmega8u2",
     feature = "atmega32u4"
 ))]
 pub type Spi = avr_hal_generic::spi::Spi<
@@ -50,6 +51,7 @@ pub type Spi = avr_hal_generic::spi::Spi<
     feature = "atmega128a",
     feature = "atmega1280",
     feature = "atmega2560",
+    feature = "atmega8u2",
     feature = "atmega32u4"
 ))]
 avr_hal_generic::impl_spi! {

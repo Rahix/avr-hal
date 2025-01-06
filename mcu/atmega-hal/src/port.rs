@@ -19,7 +19,7 @@
 
 pub use avr_hal_generic::port::{mode, PinMode, PinOps};
 
-#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
+#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p", feature="atmega8"))]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
@@ -35,6 +35,15 @@ avr_hal_generic::impl_port_traditional! {
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6 ,7],
         C: crate::pac::PORTC = [0, 1, 2, 3, 4, 5, 6 ,7],
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6 ,7],
+    }
+}
+
+#[cfg(feature = "atmega8u2")]
+avr_hal_generic::impl_port_traditional! {
+    enum Ports {
+        B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
+        C: crate::pac::PORTC = [0, 1, 2, 3, 4, 5, 6, 7],
+        D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
     }
 }
 
@@ -95,15 +104,6 @@ avr_hal_generic::impl_port_traditional! {
         A: crate::pac::PORTA = [0, 1, 2, 3, 4, 5, 6, 7],
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
         C: crate::pac::PORTC = [0, 1, 2, 3, 4, 5, 6, 7],
-        D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
-    }
-}
-
-#[cfg(any(feature = "atmega8"))]
-avr_hal_generic::impl_port_traditional! {
-    enum Ports {
-        B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
-        C: crate::pac::PORTC = [0, 1, 2, 3, 4, 5, 6],
         D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
     }
 }

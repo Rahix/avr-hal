@@ -33,6 +33,7 @@ compile_error!(
 
     Please select one of the following
 
+    * atmega8u2
     * atmega48p
     * atmega164pa
     * atmega168
@@ -95,6 +96,10 @@ pub use avr_device::atmega48p as pac;
 ///
 #[cfg(feature = "atmega8")]
 pub use avr_device::atmega8 as pac;
+/// Reexport of `atmega8u2` from `avr-device`
+/// 
+#[cfg(feature = "atmega8u2")]
+pub use avr_device::atmega8u2 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -109,7 +114,7 @@ pub use avr_hal_generic::prelude;
 
 #[cfg(feature = "device-selected")]
 pub mod adc;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", not(feature = "disable-adc")))]
 pub use adc::Adc;
 
 #[cfg(feature = "device-selected")]
@@ -147,7 +152,12 @@ pub use eeprom::Eeprom;
 
 pub struct Atmega;
 
-#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
+#[cfg(any(
+    feature = "atmega8u2",
+    feature = "atmega48p",
+    feature = "atmega168",
+    feature = "atmega328p"
+))]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
