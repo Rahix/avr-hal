@@ -21,4 +21,4 @@ path = "../../mcu/atxmega-hal"
 
 
 [dependencies.avr-device]
-path = "../../../avr-device"
+version = "0.7"

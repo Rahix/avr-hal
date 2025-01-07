@@ -1,6 +1,3 @@
-use avr_device::atmega4809::clkctrl;
-use avr_hal_generic::port;
-
 fn init(portmux: &crate::pac::PORTMUX, clkctrl: &crate::pac::CLKCTRL, cpu: &crate::pac::CPU) {
     portmux.usartroutea.write(|w| w.usart1().alt1().usart3().alt1());
       // PORTMUX setting for TCA -> all outputs [0:2] point to PORTB pins [0:2] timer
