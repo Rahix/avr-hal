@@ -65,7 +65,8 @@ avr_hal_generic::impl_spi! {
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega48p",
-    feature = "atmega8"
+    feature = "atmega8",
+    feature = "atmega88p"
 ))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
@@ -79,7 +80,8 @@ pub type Spi = avr_hal_generic::spi::Spi<
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega48p",
-    feature = "atmega8"
+    feature = "atmega8",
+    feature = "atmega88p"
 ))]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,

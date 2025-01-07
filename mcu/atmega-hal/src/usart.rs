@@ -41,6 +41,7 @@ pub type UsartReader<USART, RX, TX, CLOCK> =
     avr_hal_generic::usart::UsartReader<crate::Atmega, USART, RX, TX, CLOCK>;
 
 #[cfg(any(
+    feature = "atmega88p",
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega328pb",
@@ -54,6 +55,7 @@ pub type Usart0<CLOCK> = Usart<
     CLOCK,
 >;
 #[cfg(any(
+    feature = "atmega88p",
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega328pb",

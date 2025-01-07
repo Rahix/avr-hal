@@ -69,7 +69,8 @@ avr_hal_generic::impl_i2c_twi! {
     feature = "atmega328p",
     feature = "atmega168",
     feature = "atmega48p",
-    feature = "atmega8"
+    feature = "atmega8",
+    feature = "atmega88p"
 ))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
@@ -82,7 +83,8 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     feature = "atmega328p",
     feature = "atmega168",
     feature = "atmega48p",
-    feature = "atmega8"
+    feature = "atmega8",
+    feature = "atmega88p"
 ))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,

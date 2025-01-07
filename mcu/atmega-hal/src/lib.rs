@@ -17,6 +17,7 @@
 #![cfg_attr(feature = "atmega1280", doc = "**ATmega1280**.")]
 #![cfg_attr(feature = "atmega1284p", doc = "**ATmega1284P**.")]
 #![cfg_attr(feature = "atmega8", doc = "**ATmega8**.")]
+#![cfg_attr(feature = "atmega88p", doc = "**ATmega88P**.")]
 //! This means that only items which are available for this MCU are visible.  If you are using
 //! a different chip, try building the documentation locally with:
 //!
@@ -44,6 +45,7 @@ compile_error!(
     * atmega2560
     * atmega1284p
     * atmega8
+    * atmega88p
     "
 );
 
@@ -95,6 +97,10 @@ pub use avr_device::atmega48p as pac;
 ///
 #[cfg(feature = "atmega8")]
 pub use avr_device::atmega8 as pac;
+/// Reexport of `atmega88p` from `avr-device`
+///
+#[cfg(feature = "atmega88p")]
+pub use avr_device::atmega88p as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -147,7 +153,12 @@ pub use eeprom::Eeprom;
 
 pub struct Atmega;
 
-#[cfg(any(feature = "atmega48p", feature = "atmega168", feature = "atmega328p"))]
+#[cfg(any(
+    feature = "atmega48p",
+    feature = "atmega88p",
+    feature = "atmega168",
+    feature = "atmega328p"
+))]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
