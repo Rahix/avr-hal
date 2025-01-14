@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"attr":["entry"],"fn":["delay_ms","delay_us"],"macro":["default_serial","pins"],"mod":["adc","clock","eeprom","i2c","port","prelude","simple_pwm","spi","usart"],"type":["DefaultClock","Delay"]};

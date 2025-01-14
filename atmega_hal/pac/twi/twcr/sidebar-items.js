@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["R","TWCR_SPEC","W"],"type":["TWEA_R","TWEA_W","TWEN_R","TWEN_W","TWIE_R","TWIE_W","TWINT_R","TWINT_W","TWSTA_R","TWSTA_W","TWSTO_R","TWSTO_W","TWWC_R"]};

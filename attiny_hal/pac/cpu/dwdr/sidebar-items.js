@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["DWDR_SPEC","R","W"]};
