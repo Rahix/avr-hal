@@ -14,7 +14,6 @@
 
 use panic_halt as _;
 use arduino_hal::port::{mode::Output, Pin};
-use core::ptr::addr_of_mut;
 
 const MAX_SERVOS: usize = 12; // Digital pins 2 to 13
 const REFRESH_INTERVAL: u16 = 20000; // 20ms
