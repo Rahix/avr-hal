@@ -16,7 +16,7 @@ use panic_halt as _;
 use arduino_hal::port::{mode::Output, Pin};
 use core::ptr::addr_of_mut;
 
-const MAX_SERVOS: usize = 8;
+const MAX_SERVOS: usize = 12; // Digital pins 2 to 13
 const REFRESH_INTERVAL: u16 = 20000; // 20ms
 const DEFAULT_PULSE_WIDTH: u16 = 1500; // 1.5ms
 const INTERRUPT_OVERHEAD: u16 = 4;
@@ -153,66 +153,53 @@ fn main() -> ! {
 #[avr_device::interrupt(atmega328p)]
 fn TIMER1_COMPA() {
     let dp = unsafe { arduino_hal::Peripherals::steal() };
-    let t1 = dp.TC1; // Get the timer 1
+    let t1 = dp.TC1; // Timer 1
+    let refresh_ticks = us_to_ticks(REFRESH_INTERVAL);
 
-    // Get the current servo index
-    let index = unsafe {addr_of_mut!(CURRENT_SERVO_INDEX)};
-
-    // Check current servo
-    // If it is the last one, reset the counter
-    match unsafe { *index  >= CURRENT_OPERATIVE_SERVOS } {
-        true => {
-            // Reset the counter TCNT1
-            t1.tcnt1.write(|w| w.bits(0b0));
-
-            // Set the index to 0
-            // To check the first servo in the array
-            unsafe { *index = 0 } ;
-        }
-        false => {
-            unsafe {
-                if let Some(servo_ptr) = SERVO_ARRAY[*index] { // Get the servo pointer
-                    let servo = &mut *servo_ptr;
-                    servo.pin.set_low();
-                }
-
-                // Increment the index to check
-                // The next servo in the array
-                *index += 1;
+    unsafe {
+        // Get index of the current servo and check if it is the last one
+        if CURRENT_SERVO_INDEX >= CURRENT_OPERATIVE_SERVOS { // No more servos, refresh
+            t1.tcnt1.write(|w| w.bits(0)); // Reset timer
+            CURRENT_SERVO_INDEX = 0; // Reset index
+        } else { // There is a servo from last interrupt
+            // Pull down the pin of the current servo
+            if let Some(servo_ptr) = SERVO_ARRAY[CURRENT_SERVO_INDEX] {
+                let servo = &mut *servo_ptr;
+                servo.pin.set_low();
             }
-        }
-    }
 
-    // Check if we are at the end of the array
-    match unsafe { *index < CURRENT_OPERATIVE_SERVOS } {
-        true => {
+            // Move to the next servo
+            CURRENT_SERVO_INDEX += 1;
+        }
+
+        // Config next interrupt
+        if CURRENT_SERVO_INDEX < CURRENT_OPERATIVE_SERVOS { // There are more servos
             // Set next interrupt to current counter value
-            // Plus the pulse width of the next servo
-            // OCR1A = TCNT1 + SERVO_ARRAY[*index].pulse_width_ticks
-            // And set the pin to high
-            // SERVO_ARRAY[*index].pin.set_high();
-            unsafe {
-                if let Some(servo_ptr) = SERVO_ARRAY[*index] { // Get the servo pointer
-                    let servo = &mut *servo_ptr;
-                    let next_interrupt = t1.tcnt1.read().bits() + servo.pulse_width_ticks;
-                    t1.ocr1a.write(|w| w.bits(next_interrupt));
-                    servo.pin.set_high();
-                }
+            // Plus the pulse width of the next servo to complete
+            // a duty cycle.
+            // OCR1A = TCNT1 + SERVO_ARRAY[CURRENT_SERVO_INDEX].pulse_width_ticks
+            // And set the pin to high to start the pulse for the duty cycle
+            // SERVO_ARRAY[CURRENT_SERVO_INDEX].pin.set_high();
+            if let Some(servo_ptr) = SERVO_ARRAY[CURRENT_SERVO_INDEX] {
+                let servo = &mut *servo_ptr;
+                let next_interrupt = t1.tcnt1.read().bits() + servo.pulse_width_ticks;
+                t1.ocr1a.write(|w| w.bits(next_interrupt));
+                servo.pin.set_high();
             }
-        }
-        false => {
+        } else { // No more servos
             // Check value of the current counter TCNT1 + interrupt overhead
             // If it is less than the value of the REFRESH_INTERVAL
             // Set next interrupt to REFRESH_INTERVAL
             // Else set next interrupt to TCNT1 + interrupt overhead
-            // And set index >= CURRENT_OPERATIVE_SERVOS
-            let mut next_interrupt = t1.tcnt1.read().bits() + INTERRUPT_OVERHEAD;
-            if next_interrupt < us_to_ticks(REFRESH_INTERVAL) {
-                next_interrupt = us_to_ticks(REFRESH_INTERVAL);
-            } 
+            // And set CURRENT_SERVO_INDEX >= CURRENT_OPERATIVE_SERVOS
+            let current_ticks = t1.tcnt1.read().bits();
+            let next_interrupt = if current_ticks + INTERRUPT_OVERHEAD < refresh_ticks {
+                refresh_ticks
+            } else {
+                current_ticks + INTERRUPT_OVERHEAD
+            };
 
             t1.ocr1a.write(|w| w.bits(next_interrupt));
-            unsafe { *index = CURRENT_OPERATIVE_SERVOS };
         }
     }
 }
