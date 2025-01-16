@@ -40,10 +40,6 @@ cfg-if = "1"
 embedded-hal = "1.0"
 ufmt = "0.2.0"
 
-[dependencies.embedded-hal-v0]
-version = "0.2.3"
-package = "embedded-hal"
-
 [dependencies.avr-hal-generic]
 path = "../avr-hal-generic/"
 

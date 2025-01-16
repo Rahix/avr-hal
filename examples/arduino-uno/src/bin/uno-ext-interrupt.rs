@@ -26,7 +26,7 @@ fn INT0() {
     REVERSED.store(!current, Ordering::SeqCst);
 }
 
-fn blink_for_range(range: impl Iterator<Item = u16>, leds: &mut [Pin<mode::Output>]) {
+fn blink_for_range(range: impl Iterator<Item = u32>, leds: &mut [Pin<mode::Output>]) {
     range.map(|i| i * 100).for_each(|ms| {
         let iter = if is_reversed() {
             Left(leds.iter_mut().rev())
@@ -35,7 +35,7 @@ fn blink_for_range(range: impl Iterator<Item = u16>, leds: &mut [Pin<mode::Outpu
         };
         iter.for_each(|led| {
             led.toggle();
-            arduino_hal::delay_ms(ms as u16);
+            arduino_hal::delay_ms(ms);
         })
     });
 }

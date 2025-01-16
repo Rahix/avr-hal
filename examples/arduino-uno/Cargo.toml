@@ -14,10 +14,6 @@ pwm-pca9685 = "1.0.0"
 infrared = "0.14.1"
 embedded-storage = "0.2"
 
-[dependencies.embedded-hal-v0]
-version = "0.2.3"
-package = "embedded-hal"
-
 [dependencies.arduino-hal]
 path = "../../arduino-hal/"
 features = ["arduino-uno"]
