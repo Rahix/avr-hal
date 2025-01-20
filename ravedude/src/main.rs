@@ -92,7 +92,6 @@
 //!
 //! For reference, take a look at [`boards.toml`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml).
 use anyhow::Context as _;
-use clap::AppSettings;
 use colored::Colorize as _;
 
 use std::path::Path;
@@ -114,8 +113,6 @@ const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
 /// ravedude is primarily intended to be used as a "runner" in the cargo configuration.
 #[derive(clap::Parser, Debug)]
 #[clap(name = "ravedude",
-    setting = AppSettings::ColoredHelp,
-    setting = AppSettings::DeriveDisplayOrder,
     version = git_version::git_version!(
         args = ["--always", "--dirty", "--abbrev=12"],
         cargo_prefix = "v",
@@ -138,7 +135,7 @@ struct Args {
 
     /// Overwrite which port to use. By default ravedude will try to find a connected board by
     /// itself.
-    #[clap(short = 'P', long = "port", parse(from_os_str), env = "RAVEDUDE_PORT")]
+    #[clap(short = 'P', long = "port", value_parser, env = "RAVEDUDE_PORT")]
     port: Option<std::path::PathBuf>,
 
     /// This assumes the board is already resetting.
@@ -151,7 +148,7 @@ struct Args {
     #[clap(long = "debug-avrdude")]
     debug_avrdude: bool,
 
-    #[clap(name = "BINARY", parse(from_os_str))]
+    #[clap(name = "BINARY", value_parser)]
     /// The binary to be flashed.
     ///
     /// If no binary is given, flashing will be skipped.
@@ -160,7 +157,7 @@ struct Args {
 
     /// Deprecated binary for old configurations of ravedude without `Ravedude.toml`.
     /// Should not be used in newer configurations.
-    #[clap(name = "LEGACY BINARY", parse(from_os_str))]
+    #[clap(name = "LEGACY BINARY", value_parser)]
     bin_legacy: Option<std::path::PathBuf>,
 }
 impl Args {
@@ -219,7 +216,7 @@ fn find_manifest() -> anyhow::Result<Option<std::path::PathBuf>> {
 }
 
 fn ravedude() -> anyhow::Result<()> {
-    let args: Args = clap::Parser::from_args();
+    let args: Args = clap::Parser::parse();
 
     let manifest_path = find_manifest()?;
 
