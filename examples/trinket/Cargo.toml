@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-panic-halt = "0.2.0"
+panic-halt = "1.0.0"
 embedded-hal = "1.0"
 
 [dependencies.embedded-hal-v0]

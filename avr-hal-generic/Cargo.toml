@@ -17,11 +17,10 @@ features = ["docsrs"]
 docsrs = ["avr-device/docsrs"]
 
 [dependencies]
-cfg-if = "0.1.7"
 nb = "1.1.0"
 ufmt = "0.2.0"
 paste = "1.0.0"
-avr-device = "0.5.4"
+avr-device = "0.7"
 embedded-storage = "0.2"
 embedded-hal = "1.0"
 embedded-hal-bus = "0.1"
@@ -32,6 +31,3 @@ usb-device = "0.3.2"
 version = "0.2.3"
 package = "embedded-hal"
 features = ["unproven"]
-
-[build-dependencies]
-rustversion = "1.0"

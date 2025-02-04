@@ -58,7 +58,9 @@ COMMON = {
     # needed because we currently rely on avr-libc
     "no-default-libraries": False,
     # 8-bit operations on AVR are atomic
-    "max-atomic-width": 8,
+    # LLVM also supports 16-bit atomics by disabling interrupts
+    # see also https://github.com/rust-lang/rust/pull/114495
+    "max-atomic-width": 16,
 }
 
 
@@ -95,7 +97,10 @@ def main():
         spec = copy.deepcopy(upstream_spec)
         spec.update(COMMON)
         spec.update(settings)
-        spec["pre-link-args"]["gcc"][0] = f"-mmcu={settings['cpu']}"
+
+        for pre_link_args in spec["pre-link-args"].values():
+            pre_link_args[0] = f"-mmcu={settings['cpu']}"
+            pre_link_args.append("-Wl,--as-needed,--print-memory-usage")
 
         with open(f"avr-specs/avr-{mcu}.json", "w") as f:
             json.dump(spec, f, sort_keys=True, indent=2)

@@ -76,6 +76,10 @@ jobs:
             spec: atmega48p
             crate: atmega-hal
           - type: mcu
+            name: atmega88p
+            spec: atmega88p
+            crate: atmega-hal
+          - type: mcu
             name: atmega1284p
             spec: atmega1284p
             crate: atmega-hal
@@ -133,3 +137,6 @@ jobs:
       - name: Check ravedude
         run: |
           cargo check --manifest-path ravedude/Cargo.toml
+      - name: Test ravedude
+        run: |
+          cargo test --manifest-path ravedude/Cargo.toml

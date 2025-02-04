@@ -4,13 +4,7 @@ use std::process;
 
 use std::io::Write;
 
-#[derive(Debug)]
-pub struct AvrdudeOptions<'a> {
-    pub programmer: &'a str,
-    pub partno: &'a str,
-    pub baudrate: Option<u32>,
-    pub do_chip_erase: bool,
-}
+use crate::config::BoardAvrdudeOptions;
 
 #[derive(Debug)]
 pub struct Avrdude {
@@ -50,7 +44,7 @@ impl Avrdude {
     }
 
     pub fn run(
-        options: &AvrdudeOptions,
+        options: &BoardAvrdudeOptions,
         port: Option<impl AsRef<path::Path>>,
         bin: &path::Path,
         debug: bool,
@@ -79,15 +73,25 @@ impl Avrdude {
 
         let mut command = command
             .arg("-c")
-            .arg(options.programmer)
+            .arg(
+                options
+                    .programmer
+                    .as_ref()
+                    .ok_or_else(|| anyhow::anyhow!("board has no programmer"))?,
+            )
             .arg("-p")
-            .arg(options.partno);
+            .arg(
+                options
+                    .partno
+                    .as_ref()
+                    .ok_or_else(|| anyhow::anyhow!("board has no part number"))?,
+            );
 
         if let Some(port) = port {
             command = command.arg("-P").arg(port.as_ref());
         }
 
-        if let Some(baudrate) = options.baudrate {
+        if let Some(baudrate) = options.baudrate.flatten() {
             command = command.arg("-b").arg(baudrate.to_string());
         }
 
@@ -96,7 +100,10 @@ impl Avrdude {
         flash_instruction.push(bin);
         flash_instruction.push(":e");
 
-        if options.do_chip_erase {
+        if options
+            .do_chip_erase
+            .ok_or_else(|| anyhow::anyhow!("board doesn't specify whether to erase the chip"))?
+        {
             command = command.arg("-e");
         }
 

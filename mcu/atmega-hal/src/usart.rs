@@ -1,3 +1,34 @@
+//! USART
+//!
+//! # Example
+//!
+//! Complete example source code can be found in the repository:
+//! [`atmega2560-usart.rs`](https://github.com/Rahix/avr-hal/blob/main/examples/atmega2560/src/bin/atmega2560-usart.rs)
+//!
+//! *Note: [ufmt](https://crates.io/crates/ufmt/) is used instead of `core::fmt` because
+//! `core::fmt` code quickly grows too large for AVR platforms.*
+//!
+//! ```
+//! let dp = atmega_hal::Peripherals::take().unwrap();
+//! let pins = atmega_hal::pins!(dp);
+//!
+//! let mut serial = Usart::new(
+//!     dp.USART0,
+//!     pins.pe0,
+//!     pins.pe1.into_output(),
+//!     Baudrate::<crate::CoreClock>::new(57600),
+//! );
+//!
+//! ufmt::uwriteln!(&mut serial, "Hello from ATmega!").unwrap();
+//!
+//! loop {
+//!     // Read a byte from the serial connection
+//!     let b = nb::block!(serial.read()).unwrap();
+//!     // Answer
+//!     ufmt::uwriteln!(&mut serial, "Got {}!", b).unwrap();
+//! }
+//! ```
+
 #[allow(unused_imports)]
 use crate::port;
 pub use avr_hal_generic::usart::*;
@@ -10,6 +41,7 @@ pub type UsartReader<USART, RX, TX, CLOCK> =
     avr_hal_generic::usart::UsartReader<crate::Atmega, USART, RX, TX, CLOCK>;
 
 #[cfg(any(
+    feature = "atmega88p",
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega328pb",
@@ -23,6 +55,7 @@ pub type Usart0<CLOCK> = Usart<
     CLOCK,
 >;
 #[cfg(any(
+    feature = "atmega88p",
     feature = "atmega168",
     feature = "atmega328p",
     feature = "atmega328pb",
