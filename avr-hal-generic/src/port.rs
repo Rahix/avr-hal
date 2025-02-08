@@ -769,6 +769,237 @@ macro_rules! impl_port_traditional {
 }
 
 #[macro_export]
+macro_rules! impl_port_xmega {
+    (
+        enum Ports {
+            $($PortName:ident: ($Port:ty),)+
+        }
+
+        $(#[$pins_attr:meta])*
+        pub struct Pins {
+            $($pin:ident: $Pin:ident = ($PinPort:ty, $PinPortName:ident, $pin_num:expr, $pin_pinctrl_reg:ident),)+
+        }
+    ) => {
+        /// Type-alias for a pin type which can represent any concrete pin.
+        ///
+        /// Sometimes it is easier to handle pins if they are all of the same type.  By default,
+        /// each pin gets its own distinct type in `avr-hal`, but by
+        /// [downgrading][avr_hal_generic::port::Pin#downgrading], you can cast them into this
+        /// "dynamic" type.  Do note, however, that using this dynamic type has a runtime cost.
+        pub type Pin<MODE, PIN = Dynamic> = $crate::port::Pin<MODE, PIN>;
+
+        $(#[$pins_attr])*
+        pub struct Pins {
+            $(pub $pin: Pin<
+                mode::Input<mode::Floating>,
+                $Pin,
+            >,)+
+        }
+
+        impl Pins {
+            pub fn new(
+                $(_: $Port,)+
+            ) -> Self {
+                Self {
+                    $($pin: $crate::port::Pin::new(
+                        $Pin { _private: (), }
+                    ),)+
+                }
+            }
+        }
+
+        #[repr(u8)]
+        pub enum DynamicPort {
+            $($PortName,)+
+        }
+
+        pub struct Dynamic {
+            port: DynamicPort,
+            // We'll store the mask instead of the pin number because this allows much less code to
+            // be generated for the trait method implementations.
+            //
+            // (TODO verify this statement quantitatively? This implementation detail was
+            // copied from impl_port_traditional, but it makes some things more complicated,
+            // like accessing PINxCTRL to configure pull-up.
+            mask: u8,
+        }
+
+        impl Dynamic {
+            fn new(port: DynamicPort, pin_num: u8) -> Self {
+                Self {
+                    port,
+                    mask: 1 << pin_num,
+                }
+            }
+        }
+
+        impl $crate::port::PinOps for Dynamic {
+            type Dynamic = Self;
+
+            #[inline]
+            fn into_dynamic(self) -> Self::Dynamic {
+                self
+            }
+
+            #[inline]
+            unsafe fn out_set(&mut self) {
+                match self.port {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).outset.write(|w| {
+                        w.bits(self.mask)
+                    }),)+
+                }
+            }
+
+            #[inline]
+            unsafe fn out_clear(&mut self) {
+                match self.port {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).outclr.write(|w| {
+                        w.bits(self.mask)
+                    }),)+
+                }
+            }
+
+            #[inline]
+            unsafe fn out_toggle(&mut self) {
+                match self.port {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).outtgl.write(|w| {
+                        w.bits(self.mask)
+                    }),)+
+                }
+            }
+
+            #[inline]
+            unsafe fn out_get(&self) -> bool {
+                match self.port {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).out.read().bits()
+                        & self.mask != 0,)+
+                }
+            }
+
+            #[inline]
+            unsafe fn in_get(&self) -> bool {
+                match self.port {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).in_.read().bits()
+                        & self.mask != 0,)+
+                }
+            }
+
+            #[inline]
+            unsafe fn make_output(&mut self) {
+                match self.port {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).dirset.write(|w| {
+                        w.bits(self.mask)
+                    }),)+
+                }
+            }
+
+            #[inline]
+            unsafe fn make_input(&mut self, pull_up: bool) {
+                match self.port {
+                    $(DynamicPort::$PortName => {
+                        if pull_up {
+                            match self.mask {
+                                0x01 => (*<$Port>::ptr()).pin0ctrl.modify(|_, w| w.pullupen().set_bit()),
+                                0x02 => (*<$Port>::ptr()).pin1ctrl.modify(|_, w| w.pullupen().set_bit()),
+                                0x04 => (*<$Port>::ptr()).pin2ctrl.modify(|_, w| w.pullupen().set_bit()),
+                                0x08 => (*<$Port>::ptr()).pin3ctrl.modify(|_, w| w.pullupen().set_bit()),
+                                0x10 => (*<$Port>::ptr()).pin4ctrl.modify(|_, w| w.pullupen().set_bit()),
+                                0x20 => (*<$Port>::ptr()).pin5ctrl.modify(|_, w| w.pullupen().set_bit()),
+                                0x40 => (*<$Port>::ptr()).pin6ctrl.modify(|_, w| w.pullupen().set_bit()),
+                                0x80 => (*<$Port>::ptr()).pin7ctrl.modify(|_, w| w.pullupen().set_bit()),
+                                // TODO exhaustive match with an enum?
+                                //_ => unreachable!()
+                                _ => {}
+                            }
+                        } else {
+                            match self.mask {
+                                0x01 => (*<$Port>::ptr()).pin0ctrl.modify(|_, w| w.pullupen().clear_bit()),
+                                0x02 => (*<$Port>::ptr()).pin1ctrl.modify(|_, w| w.pullupen().clear_bit()),
+                                0x04 => (*<$Port>::ptr()).pin2ctrl.modify(|_, w| w.pullupen().clear_bit()),
+                                0x08 => (*<$Port>::ptr()).pin3ctrl.modify(|_, w| w.pullupen().clear_bit()),
+                                0x10 => (*<$Port>::ptr()).pin4ctrl.modify(|_, w| w.pullupen().clear_bit()),
+                                0x20 => (*<$Port>::ptr()).pin5ctrl.modify(|_, w| w.pullupen().clear_bit()),
+                                0x40 => (*<$Port>::ptr()).pin6ctrl.modify(|_, w| w.pullupen().clear_bit()),
+                                0x80 => (*<$Port>::ptr()).pin7ctrl.modify(|_, w| w.pullupen().clear_bit()),
+                                // TODO exhaustive match with an enum?
+                                //_ => unreachable!()
+                                _ => {}
+                            }
+                        }
+                        (*<$Port>::ptr()).dirclr.write(|w| {
+                            w.bits(self.mask)
+                        });
+                    })+
+                }
+            }
+        }
+
+        $(
+            pub struct $Pin {
+                _private: ()
+            }
+
+            impl $crate::port::PinOps for $Pin {
+                type Dynamic = Dynamic;
+
+                #[inline]
+                fn into_dynamic(self) -> Self::Dynamic {
+                    Dynamic::new(DynamicPort::$PinPortName, $pin_num)
+                }
+
+                #[inline]
+                unsafe fn out_set(&mut self) {
+                    (*<$PinPort>::ptr()).outset.write(|w| {
+                        w.bits(1 << $pin_num)
+                    });
+                }
+
+                #[inline]
+                unsafe fn out_clear(&mut self) {
+                    (*<$PinPort>::ptr()).outclr.write(|w| {
+                        w.bits(1 << $pin_num)
+                    });
+                }
+
+                #[inline]
+                unsafe fn out_toggle(&mut self) {
+                    (*<$PinPort>::ptr()).outtgl.write(|w| w.bits(1 << $pin_num));
+                }
+
+                #[inline]
+                unsafe fn out_get(&self) -> bool {
+                    (*<$PinPort>::ptr()).out.read().bits() & (1 << $pin_num) != 0
+                }
+
+                #[inline]
+                unsafe fn in_get(&self) -> bool {
+                    (*<$PinPort>::ptr()).in_.read().bits() & (1 << $pin_num) != 0
+                }
+
+                #[inline]
+                unsafe fn make_output(&mut self) {
+                    (*<$PinPort>::ptr()).dirset.write(|w| {
+                        w.bits(1 << $pin_num)
+                    });
+                }
+
+                #[inline]
+                unsafe fn make_input(&mut self, pull_up: bool) {
+                    if pull_up {
+                        (*<$PinPort>::ptr()).$pin_pinctrl_reg.modify(|_, w| w.pullupen().set_bit());
+                    } else {
+                        (*<$PinPort>::ptr()).$pin_pinctrl_reg.modify(|_, w| w.pullupen().clear_bit());
+                    }
+                    (*<$PinPort>::ptr()).dirclr.write(|w| {
+                        w.bits(1 << $pin_num)
+                    });
+                }
+            }
+        )+
+    };
+}
+
+#[macro_export]
 macro_rules! renamed_pins {
     (
         $(#[$pins_attr:meta])*
