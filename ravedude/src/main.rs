@@ -1,6 +1,6 @@
 use anyhow::Context as _;
+use clap::AppSettings;
 use colored::Colorize as _;
-use structopt::clap::AppSettings;
 
 use std::path::Path;
 use std::thread;
@@ -19,8 +19,8 @@ const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
 /// experience with rust on AVR microcontrollers.
 ///
 /// ravedude is primarily intended to be used as a "runner" in the cargo configuration.
-#[derive(structopt::StructOpt, Debug)]
-#[structopt(name = "ravedude",
+#[derive(clap::Parser, Debug)]
+#[clap(name = "ravedude",
     setting = AppSettings::ColoredHelp,
     setting = AppSettings::DeriveDisplayOrder,
     version = git_version::git_version!(
@@ -31,34 +31,34 @@ const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
     ))]
 struct Args {
     /// Utility flag for dumping a config of a named board to TOML.
-    #[structopt(long = "dump-config")]
+    #[clap(long = "dump-config")]
     dump_config: bool,
 
     /// After successfully flashing the program, open a serial console to see output sent by the
     /// board and possibly interact with it.
-    #[structopt(short = "c", long = "open-console")]
+    #[clap(short = 'c', long = "open-console")]
     open_console: bool,
 
     /// Baudrate which should be used for the serial console.
-    #[structopt(short = "b", long = "baudrate")]
+    #[clap(short = 'b', long = "baudrate")]
     baudrate: Option<u32>,
 
     /// Overwrite which port to use. By default ravedude will try to find a connected board by
     /// itself.
-    #[structopt(short = "P", long = "port", parse(from_os_str), env = "RAVEDUDE_PORT")]
+    #[clap(short = 'P', long = "port", parse(from_os_str), env = "RAVEDUDE_PORT")]
     port: Option<std::path::PathBuf>,
 
     /// This assumes the board is already resetting.
     /// Instead of giving the reset instructions and waiting for user confirmation, we wait the amount in milliseconds before proceeding.
     /// Set this value to 0 to skip the board reset question instantly.
-    #[structopt(short = "d", long = "reset-delay")]
+    #[clap(short = 'd', long = "reset-delay")]
     reset_delay: Option<u64>,
 
     /// Print the avrdude command that is executed for flashing the binary.
-    #[structopt(long = "debug-avrdude")]
+    #[clap(long = "debug-avrdude")]
     debug_avrdude: bool,
 
-    #[structopt(name = "BINARY", parse(from_os_str))]
+    #[clap(name = "BINARY", parse(from_os_str))]
     /// The binary to be flashed.
     ///
     /// If no binary is given, flashing will be skipped.
@@ -67,7 +67,7 @@ struct Args {
 
     /// Deprecated binary for old configurations of ravedude without `Ravedude.toml`.
     /// Should not be used in newer configurations.
-    #[structopt(name = "LEGACY BINARY", parse(from_os_str))]
+    #[clap(name = "LEGACY BINARY", parse(from_os_str))]
     bin_legacy: Option<std::path::PathBuf>,
 }
 impl Args {
@@ -126,7 +126,7 @@ fn find_manifest() -> anyhow::Result<Option<std::path::PathBuf>> {
 }
 
 fn ravedude() -> anyhow::Result<()> {
-    let args: Args = structopt::StructOpt::from_args();
+    let args: Args = clap::Parser::from_args();
 
     let manifest_path = find_manifest()?;
 
