@@ -10,6 +10,9 @@ panic-halt = "1.0.0"
 ufmt = "0.2.0"
 nb = "1.1.0"
 embedded-hal = "1.0"
+avr-device = "0.5.4"
+usb-device = "0.3"
+usbd-hid = "0.8"
 
 [dependencies.arduino-hal]
 path = "../../arduino-hal/"
