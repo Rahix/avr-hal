@@ -24,16 +24,34 @@ Next, install the latest version from crates.io with the following command:
 cargo +stable install --locked ravedude
 ```
 
-Alternatively, if you're using Nix (the package manager) + Flakes, you can install `ravedude` by adding `inputs.ravedude.url = "github:Rahix/avr-hal?dir=ravedude";` and use the package `ravedude.packages."${system}".default`.
+Alternatively, if you're using Nix (the package manager) + Flakes, you can
+install `ravedude` by adding `inputs.ravedude.url =
+"github:Rahix/avr-hal?dir=ravedude";` and use the package
+`ravedude.packages."${system}".default`.
 
+## Usage
 Now you need to add *ravedude* to your project.  For example in a project for
 Arduino Uno, place the following into your `.cargo/config.toml` (**not in
 `Cargo.toml`**):
 
 ```toml
 [target.'cfg(target_arch = "avr")']
-runner = "ravedude uno --open-console --baudrate 57600"
+runner = "ravedude"
 ```
+
+Then, create a `Ravedude.toml` file next to your `Cargo.toml`:
+
+```toml
+[general]
+board = "uno"
+
+# ravedude should open a serial console after flashing
+open-console = true
+serial-baudrate = 57600
+```
+
+(For more info about the `Ravedude.toml` format, please check
+[`main.rs`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/main.rs)).
 
 And that's all, now just call `cargo run` and watch it do its magic:
 

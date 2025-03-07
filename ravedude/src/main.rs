@@ -1,3 +1,96 @@
+//! # ravedude
+//! `ravedude` is a CLI utility to make Rust development for AVR microcontrollers
+//! super smooth.  It's a wrapper around `avrdude` and provides easy access to the
+//! target's serial console, similar to the Arduino IDE.
+//!
+//! `ravedude` is meant to be used as a cargo "runner".  This allows you to just use
+//! `cargo run` for building, deploying, and running your AVR code!
+//!
+//! # Installation
+//! On Linux systems, you'll need pkg-config and libudev development files
+//! installed:
+//!
+//! - *Archlinux*: `pacman -S systemd pkgconf`
+//! - *Ubuntu/Debian*: `apt install libudev-dev pkg-config`
+//! - *Fedora*: `dnf install systemd-devel pkgconf-pkg-config`
+//!
+//! Next, install the latest version from crates.io with the following command:
+//!
+//! ```text
+//! cargo +stable install --locked ravedude
+//! ```
+//!
+//! # Usage
+//! To use ravedude in your project, add the following to your project's `.cargo/config.toml`:
+//!
+//! ```text
+//! [target.'cfg(target_arch = "avr")']
+//! runner = "ravedude"
+//! ```
+//!
+//! Then, create a `Ravedude.toml` file next to your `Cargo.toml`.  This is the configuration file
+//! for ravedude.  For a simple Arduino Uno, you can use the following config:
+//!
+//! ```text
+//! [general]
+//! board = "uno"
+//! serial-baudrate = 57600
+//! open-console = true
+//! ```
+//!
+//! # Configuration
+//! For off-the-shelf AVR boards that are already supported by ravedude, configuration is very
+//! simple.  Just two lines in `Ravedude.toml` are all that is necessary:
+//!
+//! ```text
+//! [general]
+//! board = "<board-name-here>"
+//! ```
+//!
+//! Depending on your project, you may want to add any of the following additional options:
+//!
+//! ```text
+//! [general]
+//! # if auto-detection is not working, you can hard-code a specific port here
+//! # (the port can also be passed via the RAVEDUDE_PORT environment variable)
+//! port = "/dev/ttyACM0"
+//!
+//! # ravedude should open a serial console after flashing
+//! open-console = true
+//!
+//! # baudrate for the serial console (this is **not** the avrdude flashing baudrate)
+//! serial-baudrate = 57600
+//!
+//! # time to wait for the board to be reset (in milliseconds).  this skips the manual prompt for resetting the board.
+//! reset-delay = 2000
+//! ```
+//!
+//! # Custom Boards
+//! For boards that are not yet part of _ravedude_, you can specify all relevant options yourself
+//! in `Ravedude.toml`.  It works like this:
+//!
+//! ```text
+//! [general]
+//! # port = ...
+//! # open-console = true
+//! # serial-baudrate = 57600
+//!
+//! [board]
+//! name = "Custom Arduino Uno"
+//!
+//! [board.reset]
+//! # The board automatically resets when attempting to flash
+//! automatic = true
+//!
+//! [board.avrdude]
+//! # avrdude configuration
+//! programmer = "arduino"
+//! partno = "atmega328p"
+//! baudrate = -1
+//! do-chip-erase = true
+//! ```
+//!
+//! For reference, take a look at [`boards.toml`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml).
 use anyhow::Context as _;
 use clap::AppSettings;
 use colored::Colorize as _;
