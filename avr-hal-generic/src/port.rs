@@ -632,7 +632,7 @@ macro_rules! impl_port_traditional {
                 #[inline]
                 unsafe fn out_set(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>]().modify(|r, w| {
                             w.bits(r.bits() | self.mask)
                         }),)+
                     }
@@ -641,7 +641,7 @@ macro_rules! impl_port_traditional {
                 #[inline]
                 unsafe fn out_clear(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>]().modify(|r, w| {
                             w.bits(r.bits() & !self.mask)
                         }),)+
                     }
@@ -650,7 +650,7 @@ macro_rules! impl_port_traditional {
                 #[inline]
                 unsafe fn out_toggle(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<pin $name:lower>].write(|w| {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<pin $name:lower>]().write(|w| {
                             w.bits(self.mask)
                         }),)+
                     }
@@ -660,7 +660,7 @@ macro_rules! impl_port_traditional {
                 unsafe fn out_get(&self) -> bool {
                     match self.port {
                         $(DynamicPort::[<PORT $name>] => {
-                            (*<$port>::ptr()).[<port $name:lower>].read().bits() & self.mask != 0
+                            (*<$port>::ptr()).[<port $name:lower>]().read().bits() & self.mask != 0
                         })+
                     }
                 }
@@ -669,7 +669,7 @@ macro_rules! impl_port_traditional {
                 unsafe fn in_get(&self) -> bool {
                     match self.port {
                         $(DynamicPort::[<PORT $name>] => {
-                            (*<$port>::ptr()).[<pin $name:lower>].read().bits() & self.mask != 0
+                            (*<$port>::ptr()).[<pin $name:lower>]().read().bits() & self.mask != 0
                         })+
                     }
                 }
@@ -677,7 +677,7 @@ macro_rules! impl_port_traditional {
                 #[inline]
                 unsafe fn make_output(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<ddr $name:lower>].modify(|r, w| {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<ddr $name:lower>]().modify(|r, w| {
                             w.bits(r.bits() | self.mask)
                         }),)+
                     }
@@ -686,7 +686,7 @@ macro_rules! impl_port_traditional {
                 #[inline]
                 unsafe fn make_input(&mut self, pull_up: bool) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<ddr $name:lower>].modify(|r, w| {
+                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<ddr $name:lower>]().modify(|r, w| {
                             w.bits(r.bits() & !self.mask)
                         }),)+
                     }
@@ -715,45 +715,45 @@ macro_rules! impl_port_traditional {
 
                     #[inline]
                     unsafe fn out_set(&mut self) {
-                        (*<$port>::ptr()).[<port $name:lower>].modify(|_, w| {
+                        (*<$port>::ptr()).[<port $name:lower>]().modify(|_, w| {
                             w.[<p $name:lower $pin>]().set_bit()
                         })
                     }
 
                     #[inline]
                     unsafe fn out_clear(&mut self) {
-                        (*<$port>::ptr()).[<port $name:lower>].modify(|_, w| {
+                        (*<$port>::ptr()).[<port $name:lower>]().modify(|_, w| {
                             w.[<p $name:lower $pin>]().clear_bit()
                         })
                     }
 
                     #[inline]
                     unsafe fn out_toggle(&mut self) {
-                        (*<$port>::ptr()).[<pin $name:lower>].write(|w| {
+                        (*<$port>::ptr()).[<pin $name:lower>]().write(|w| {
                             w.[<p $name:lower $pin>]().set_bit()
                         })
                     }
 
                     #[inline]
                     unsafe fn out_get(&self) -> bool {
-                        (*<$port>::ptr()).[<port $name:lower>].read().[<p $name:lower $pin>]().bit()
+                        (*<$port>::ptr()).[<port $name:lower>]().read().[<p $name:lower $pin>]().bit()
                     }
 
                     #[inline]
                     unsafe fn in_get(&self) -> bool {
-                        (*<$port>::ptr()).[<pin $name:lower>].read().[<p $name:lower $pin>]().bit()
+                        (*<$port>::ptr()).[<pin $name:lower>]().read().[<p $name:lower $pin>]().bit()
                     }
 
                     #[inline]
                     unsafe fn make_output(&mut self) {
-                        (*<$port>::ptr()).[<ddr $name:lower>].modify(|_, w| {
+                        (*<$port>::ptr()).[<ddr $name:lower>]().modify(|_, w| {
                             w.[<p $name:lower $pin>]().set_bit()
                         })
                     }
 
                     #[inline]
                     unsafe fn make_input(&mut self, pull_up: bool) {
-                        (*<$port>::ptr()).[<ddr $name:lower>].modify(|_, w| {
+                        (*<$port>::ptr()).[<ddr $name:lower>]().modify(|_, w| {
                             w.[<p $name:lower $pin>]().clear_bit()
                         });
                         if pull_up {
