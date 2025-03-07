@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ADTS_A"],"struct":["ADCSRB_SPEC","R","W"],"type":["ADTS_R","ADTS_W","BIN_R","BIN_W","IPR_R","IPR_W"]};
