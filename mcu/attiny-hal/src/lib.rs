@@ -44,5 +44,7 @@ pub mod attiny85;
 #[cfg(feature = "attiny88")]
 pub mod attiny88;
 
+#[cfg(not(feature = "no-globals"))]
 mod globals;
+#[cfg(not(feature = "no-globals"))]
 pub use globals::*;
