@@ -24,12 +24,15 @@ critical-section-impl = ["avr-device/critical-section-impl"]
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
 
-# We must select a microcontroller to build on docs.rs
-docsrs = ["attiny85"]
+default = []
+all = ["attiny84", "attiny85", "attiny88", "attiny167", "attiny2313", "no-globals"]
+docsrs = ["all"]
 
 _peripheral-adc = []
 _peripheral-spi = []
 _peripheral-simple-pwm = []
+no-globals = []
+
 
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
