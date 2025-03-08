@@ -81,12 +81,29 @@ critical-section-impl = ["avr-device/critical-section-impl"]
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
 
-# We must select a microcontroller to build on docs.rs
-docsrs = ["atmega328p"]
+default = []
+all = [
+    "atmega48p",
+    "atmega164pa",
+    "atmega168",
+    "atmega328p",
+    "atmega328pb",
+    "atmega32a",
+    "atmega32u4",
+    "atmega2560",
+    "atmega128a",
+    "atmega1280",
+    "atmega1284p",
+    "atmega8",
+    "atmega88p",
+    "no-globals",
+]
+docsrs = ["all"]
 
 _peripheral-simple-pwm = []
 _peripheral-spi = []
 _peripheral-usart = []
+no-globals = []
 
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
