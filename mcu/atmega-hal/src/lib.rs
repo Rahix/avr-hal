@@ -80,8 +80,10 @@ pub mod atmega8;
 #[cfg(feature = "atmega88p")]
 pub mod atmega88p;
 
+#[cfg(not(feature = "no-globals"))]
 mod globals;
 
 pub(crate) mod r#impl;
 
+#[cfg(not(feature = "no-globals"))]
 pub use globals::*;
