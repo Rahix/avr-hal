@@ -1,6 +1,6 @@
 [package]
 name = "atmega-hal"
-version = "0.1.0"
+version = "0.2.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -14,19 +14,67 @@ categories = ["no-std", "embedded", "hardware-support"]
 rt = ["avr-device/rt"]
 device-selected = []
 enable-extra-adc = []
-atmega48p = ["avr-device/atmega48p", "device-selected"]
-atmega164pa = ["avr-device/atmega164pa", "device-selected"]
-atmega168 = ["avr-device/atmega168", "device-selected"]
-atmega328p = ["avr-device/atmega328p", "device-selected"]
-atmega328pb = ["avr-device/atmega328pb", "device-selected"]
-atmega32a = ["avr-device/atmega32a", "device-selected"]
-atmega32u4 = ["avr-device/atmega32u4", "device-selected"]
-atmega2560 = ["avr-device/atmega2560", "device-selected"]
-atmega128a = ["avr-device/atmega128a", "device-selected"]
-atmega1280 = ["avr-device/atmega1280", "device-selected"]
-atmega1284p = ["avr-device/atmega1284p", "device-selected"]
-atmega8 = ["avr-device/atmega8", "device-selected"]
-atmega88p = ["avr-device/atmega88p", "device-selected"]
+atmega48p = ["avr-device/atmega48p", "device-selected", "_peripheral-spi", "_peripheral-simple-pwm"]
+atmega164pa = ["avr-device/atmega164pa", "device-selected", "_peripheral-usart", "_peripheral-simple-pwm"]
+atmega168 = [
+    "avr-device/atmega168",
+    "device-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+]
+atmega328p = [
+    "avr-device/atmega328p",
+    "device-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+]
+atmega328pb = [
+    "avr-device/atmega328pb",
+    "device-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+]
+atmega32a = ["avr-device/atmega32a", "device-selected", "_peripheral-usart", "_peripheral-spi"]
+atmega32u4 = [
+    "avr-device/atmega32u4",
+    "device-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+]
+atmega2560 = [
+    "avr-device/atmega2560",
+    "device-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+]
+atmega128a = ["avr-device/atmega128a", "device-selected", "_peripheral-usart", "_peripheral-spi"]
+atmega1280 = [
+    "avr-device/atmega1280",
+    "device-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+]
+atmega1284p = [
+    "avr-device/atmega1284p",
+    "device-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+]
+atmega8 = ["avr-device/atmega8", "device-selected", "_peripheral-usart", "_peripheral-spi", "_peripheral-simple-pwm"]
+atmega88p = [
+    "avr-device/atmega88p",
+    "device-selected",
+    "_peripheral-usart",
+    "_peripheral-spi",
+    "_peripheral-simple-pwm",
+]
 
 critical-section-impl = ["avr-device/critical-section-impl"]
 
@@ -35,6 +83,10 @@ disable-device-selection-error = []
 
 # We must select a microcontroller to build on docs.rs
 docsrs = ["atmega328p"]
+
+_peripheral-simple-pwm = []
+_peripheral-spi = []
+_peripheral-usart = []
 
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
