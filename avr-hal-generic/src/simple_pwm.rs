@@ -123,7 +123,7 @@ macro_rules! impl_simple_pwm {
             timer: $TIMER:ty,
             init: |$init_timer:ident, $prescaler:ident| $init_block:block,
             pins: {$(
-                $PXi:ident: {
+                $PXi:ty: {
                     ocr: $ocr:ident,
                     $into_pwm:ident: |$pin_timer:ident| if enable
                         $pin_enable_block:block else $pin_disable_block:block,
