@@ -123,6 +123,11 @@ jobs:
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
         run: cd "mcu/${{ matrix.m.crate }}" && cargo build --features "${{ matrix.m.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"
+      - name: Compile doctests for an ATtiny MCU
+        if: "${{ matrix.m.crate == 'attiny-hal' }}"
+        run: >-
+          cd "mcu/${{ matrix.m.crate }}" && 
+          cargo test --doc --features "${{ matrix.m.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"
 
   ravedude:
     name: "ravedude"
