@@ -126,6 +126,7 @@ pub mod channel {
     pub struct ADC7;
     #[cfg(any(
         feature = "atmega1280",
+        feature = "atmega16",
         feature = "atmega168",
         feature = "atmega2560",
         feature = "atmega32a",
@@ -136,6 +137,7 @@ pub mod channel {
         feature = "atmega128a",
         feature = "atmega1284p",
         feature = "atmega8",
+        feature = "atmega16",
         feature = "atmega164pa",
         feature = "atmega88p"
     ))]
@@ -152,6 +154,7 @@ pub mod channel {
         feature = "atmega128a",
         feature = "atmega1284p",
         feature = "atmega8",
+        feature = "atmega16",
         feature = "atmega164pa",
         feature = "atmega88p"
     ))]
@@ -202,7 +205,7 @@ avr_hal_generic::impl_adc! {
     },
 }
 
-#[cfg(any(feature = "atmega32a"))]
+#[cfg(any(feature = "atmega16", feature = "atmega32a"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
     peripheral: crate::pac::ADC,
