@@ -58,17 +58,25 @@ macro_rules! timer0_8bit_impl {
     ) => {
         paste! {
             avr_hal_generic::impl_simple_pwm! {
-                /// Use `$peripheral` for PWM (pins `$pin`,)
+                #[doc = concat!("Use `", stringify!($peripheral), "` for PWM.")]
                 ///
                 /// # Example
-                /// ```
-                /// let mut timer0 = Timer0Pwm::new(dp.$peripheral, Prescaler::Prescale64);
+                /// ```no_run
+                #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+                #[doc = concat!("use hal::simple_pwm::{IntoPwmPin,", stringify!($timer), ",Prescaler};")]
                 ///
-                /// let mut d0 = pins.d0.into_output().into_pwm(&mut timer0);
-                /// let mut d1 = pins.d1.into_output().into_pwm(&mut timer0);
+                /// let dp = hal::Peripherals::take().unwrap();
+                /// let pins = hal::pins!(dp);
+                #[doc = concat!("let mut timer = ", stringify!($timer), "::new(dp.", stringify!($peripheral), ", Prescaler::Prescale64);")]
                 ///
-                /// d0.set_duty(128);
-                /// d0.enable();
+                $(
+                    #[doc = paste!{ concat!(
+                        "let mut ", stringify!([< $pin:lower >]), " = pins.", stringify!([< $pin:lower >]), ".into_output().into_pwm(&mut timer);\n",
+                        stringify!([< $pin:lower >]), ".set_duty(128);\n",
+                        stringify!([< $pin:lower >]), ".enable();\n",
+                        "\n",
+                    ) }]
+                )+
                 /// ```
                 pub struct $timer {
                     timer: crate::$hal::pac::$peripheral,
@@ -120,17 +128,25 @@ macro_rules! timer1_8bit_separate_prescale {
     ) => {
         paste! {
             avr_hal_generic::impl_simple_pwm! {
-                /// Use `$peripheral` for PWM (pins `$pin`,)
+                #[doc = concat!("Use `", stringify!($peripheral), "` for PWM.")]
                 ///
                 /// # Example
-                /// ```
-                /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
+                /// ```no_run
+                #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+                #[doc = concat!("use hal::simple_pwm::{IntoPwmPin,", stringify!($timer), ",Prescaler};")]
                 ///
-                /// let mut d4 = pins.d4.into_output().into_pwm(&mut timer1);
+                /// let dp = hal::Peripherals::take().unwrap();
+                /// let pins = hal::pins!(dp);
+                #[doc = concat!("let mut timer1 = ", stringify!($timer), "::new(dp.", stringify!($peripheral), ", Prescaler::Prescale64);")]
                 ///
-                /// d4.set_duty(128);
-                /// d4.enable();
-                /// ```
+                $(
+                    #[doc = paste!{ concat!(
+                        "let mut ", stringify!([< $pin:lower >]), " = pins.", stringify!([< $pin:lower >]), ".into_output().into_pwm(&mut timer1);\n",
+                        stringify!([< $pin:lower >]), ".set_duty(128);\n",
+                        stringify!([< $pin:lower >]), ".enable();\n",
+                        "\n",
+                    ) }]
+                )+
                 pub struct $timer {
                     timer: crate::$hal::pac::$peripheral,
                     init: |tim, prescaler| {
@@ -185,17 +201,25 @@ macro_rules! timer_10bit_impl {
     ) => {
         paste! {
             avr_hal_generic::impl_simple_pwm! {
-                /// Use `$peripheral` for PWM (pins `$pin`,)
+                #[doc = concat!("Use `", stringify!($peripheral), "` for PWM.")]
                 ///
                 /// # Example
-                /// ```
-                /// let mut timer0 = Timer0Pwm::new(dp.$peripheral, Prescaler::Prescale64);
+                /// ```no_run
+                #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+                #[doc = concat!("use hal::simple_pwm::{IntoPwmPin,", stringify!($timer), ",Prescaler};")]
                 ///
-                /// let mut d0 = pins.d0.into_output().into_pwm(&mut timer0);
-                /// let mut d1 = pins.d1.into_output().into_pwm(&mut timer0);
+                /// let dp = hal::Peripherals::take().unwrap();
+                /// let pins = hal::pins!(dp);
+                #[doc = concat!("let mut timer = ", stringify!($timer), "::new(dp.", stringify!($peripheral), ", Prescaler::Prescale64);")]
                 ///
-                /// d0.set_duty(128);
-                /// d0.enable();
+                $(
+                    #[doc = paste!{ concat!(
+                        "let mut ", stringify!([< $pin:lower >]), " = pins.", stringify!([< $pin:lower >]), ".into_output().into_pwm(&mut timer);\n",
+                        stringify!([< $pin:lower >]), ".set_duty(128);\n",
+                        stringify!([< $pin:lower >]), ".enable();\n",
+                        "\n",
+                    ) }]
+                )+
                 /// ```
                 pub struct $timer {
                     timer: crate::$hal::pac::$peripheral,
@@ -252,16 +276,25 @@ macro_rules! timer_16bit_impl {
     ) => {
         paste! {
             avr_hal_generic::impl_simple_pwm! {
-                /// Use `$peripheral` for PWM (pins `$pin`,)
+                #[doc = concat!("Use `", stringify!($peripheral), "` for PWM.")]
                 ///
                 /// # Example
-                /// ```
-                /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
+                /// ```no_run
+                #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+                #[doc = concat!("use hal::simple_pwm::{IntoPwmPin,", stringify!($timer), ",Prescaler};")]
                 ///
-                /// let mut d4 = pins.d4.into_output().into_pwm(&mut timer1);
+                /// let dp = hal::Peripherals::take().unwrap();
+                /// let pins = hal::pins!(dp);
+                #[doc = concat!("let mut timer = ", stringify!($timer), "::new(dp.", stringify!($peripheral), ", Prescaler::Prescale64);")]
                 ///
-                /// d4.set_duty(128);
-                /// d4.enable();
+                $(
+                    #[doc = paste!{ concat!(
+                        "let mut ", stringify!([< $pin:lower >]), " = pins.", stringify!([< $pin:lower >]), ".into_output().into_pwm(&mut timer);\n",
+                        stringify!([< $pin:lower >]), ".set_duty(128);\n",
+                        stringify!([< $pin:lower >]), ".enable();\n",
+                        "\n",
+                    ) }]
+                )+
                 /// ```
                 pub struct $timer {
                     timer: crate::$hal::pac::$peripheral,
@@ -315,16 +348,25 @@ macro_rules! timer_8bit_1wf_with_async {
     ) => {
         paste! {
             avr_hal_generic::impl_simple_pwm! {
-                /// Use `$peripheral` for PWM (pins `$pin`,)
+                #[doc = concat!("Use `", stringify!($peripheral), "` for PWM.")]
                 ///
                 /// # Example
-                /// ```
-                /// let mut timer2 = Timer2Pwm::new(dp.TC2, Prescaler::Prescale64);
+                /// ```no_run
+                #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+                #[doc = concat!("use hal::simple_pwm::{IntoPwmPin,", stringify!($timer), ",Prescaler};")]
                 ///
-                /// let mut d4 = pins.d4.into_output().into_pwm(&mut timer1);
+                /// let dp = hal::Peripherals::take().unwrap();
+                /// let pins = hal::pins!(dp);
+                #[doc = concat!("let mut timer = ", stringify!($timer), "::new(dp.", stringify!($peripheral), ", Prescaler::Prescale64);")]
                 ///
-                /// d4.set_duty(128);
-                /// d4.enable();
+                $(
+                    #[doc = paste!{ concat!(
+                        "let mut ", stringify!([< $pin:lower >]), " = pins.", stringify!([< $pin:lower >]), ".into_output().into_pwm(&mut timer);\n",
+                        stringify!([< $pin:lower >]), ".set_duty(128);\n",
+                        stringify!([< $pin:lower >]), ".enable();\n",
+                        "\n",
+                    ) }]
+                )+
                 /// ```
                 pub struct $timer {
                     timer: crate::$hal::pac::$peripheral,
@@ -376,16 +418,25 @@ macro_rules! timer_8bit_2wf_with_async {
     ) => {
         paste! {
             avr_hal_generic::impl_simple_pwm! {
-                /// Use `$peripheral` for PWM (pins `$pin`,)
+                #[doc = concat!("Use `", stringify!($peripheral), "` for PWM.")]
                 ///
                 /// # Example
-                /// ```
-                /// let mut timer2 = Timer2Pwm::new(dp.TC2, Prescaler::Prescale64);
+                /// ```no_run
+                #[doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
+                #[doc = concat!("use hal::simple_pwm::{IntoPwmPin,", stringify!($timer), ",Prescaler};")]
                 ///
-                /// let mut d4 = pins.d4.into_output().into_pwm(&mut timer1);
+                /// let dp = hal::Peripherals::take().unwrap();
+                /// let pins = hal::pins!(dp);
+                #[doc = concat!("let mut timer = ", stringify!($timer), "::new(dp.", stringify!($peripheral), ", Prescaler::Prescale64);")]
                 ///
-                /// d4.set_duty(128);
-                /// d4.enable();
+                $(
+                    #[doc = paste!{ concat!(
+                        "let mut ", stringify!([< $pin:lower >]), " = pins.", stringify!([< $pin:lower >]), ".into_output().into_pwm(&mut timer);\n",
+                        stringify!([< $pin:lower >]), ".set_duty(128);\n",
+                        stringify!([< $pin:lower >]), ".enable();\n",
+                        "\n",
+                    ) }]
+                )+
                 /// ```
                 pub struct $timer {
                     timer: crate::$hal::pac::$peripheral,

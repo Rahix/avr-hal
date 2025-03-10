@@ -25,16 +25,25 @@ macro_rules! impl_mod_usart {
             //! *Note: [ufmt](https://crates.io/crates/ufmt/) is used instead of `core::fmt` because
             //! `core::fmt` code quickly grows too large for AVR platforms.*
             //!
-            //! ```
-            //! let dp = atmega_hal::Peripherals::take().unwrap();
-            //! let pins = atmega_hal::pins!(dp);
+             //! ```no_run
+            //! use atmega_hal::prelude::*;
+            #![doc = concat!("use atmega_hal::", stringify!($hal), " as hal;")]
             //!
-            //! let mut serial = Usart::new(
-            //!     dp.USART0,
-            //!     pins.pe0,
-            //!     pins.pe1.into_output(),
-            //!     Baudrate::<crate::CoreClock>::new(57600),
-            //! );
+            //! let dp = hal::Peripherals::take().unwrap();
+            //! let pins = hal::pins!(dp);
+            //!
+            //!
+            //! type Clock = avr_hal_generic::clock::MHz16;
+            $(
+                #![doc = paste!{ concat!(
+                    "let mut serial = hal::usart::", stringify!($interface), "::new(\n",
+                    "    dp.", stringify!($peripheral), ",\n",
+                    "    pins.", stringify!([< $rx:lower >]), ",\n",
+                    "    pins.", stringify!([< $tx:lower >]), ".into_output(),\n",
+                    "    hal::usart::Baudrate::<Clock>::new(57600),\n",
+                    ");\n",
+                ) }]
+            )+
             //!
             //! ufmt::uwriteln!(&mut serial, "Hello from ATmega!").unwrap();
             //!

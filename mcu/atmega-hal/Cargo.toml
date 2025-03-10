@@ -105,6 +105,11 @@ _peripheral-spi = []
 _peripheral-usart = []
 no-globals = []
 
+[dev-dependencies]
+embedded-hal = "1.0"
+ufmt = "0.2.0"
+nb = "1.1.0"
+
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
