@@ -729,8 +729,8 @@ macro_rules! impl_port_traditional {
 
                     #[inline]
                     unsafe fn out_toggle(&mut self) {
-                        (*<$port>::ptr()).[<pin $name:lower>].write(|w| {
-                            w.[<p $name:lower $pin>]().set_bit()
+                        (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
+                            w.[<p $name:lower $pin>]().bit(!r.[<p $name:lower $pin>]().bit())
                         })
                     }
 
