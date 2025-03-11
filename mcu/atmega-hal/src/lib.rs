@@ -6,6 +6,7 @@
 //!
 //! **Note**: This version of the documentation was built for
 #![cfg_attr(feature = "atmega48p", doc = "**ATmega48P**.")]
+#![cfg_attr(feature = "atmega16", doc = "**ATmega16**.")]
 #![cfg_attr(feature = "atmega164pa", doc = "**ATmega164PA**.")]
 #![cfg_attr(feature = "atmega168", doc = "**ATmega168**.")]
 #![cfg_attr(feature = "atmega328p", doc = "**ATmega328P**.")]
@@ -35,6 +36,7 @@ compile_error!(
     Please select one of the following
 
     * atmega48p
+    * atmega16
     * atmega164pa
     * atmega168
     * atmega328p
@@ -61,6 +63,10 @@ pub use avr_device::atmega1284p as pac;
 ///
 #[cfg(feature = "atmega128a")]
 pub use avr_device::atmega128a as pac;
+/// Reexport of `atmega16` from `avr-device`
+///
+#[cfg(feature = "atmega16")]
+pub use avr_device::atmega16 as pac;
 /// Reexport of `atmega164pa` from `avr-device`
 ///
 #[cfg(feature = "atmega164pa")]
@@ -165,7 +171,7 @@ macro_rules! pins {
         $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD)
     };
 }
-#[cfg(any(feature = "atmega164pa"))]
+#[cfg(any(feature = "atmega16", feature = "atmega164pa"))]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {

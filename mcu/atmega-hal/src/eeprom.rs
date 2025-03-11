@@ -86,7 +86,7 @@ avr_hal_generic::impl_eeprom_atmega! {
     },
 }
 
-#[cfg(any(feature = "atmega8"))]
+#[cfg(any(feature = "atmega8", feature = "atmega8"))]
 avr_hal_generic::impl_eeprom_atmega_old! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
