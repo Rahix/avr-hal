@@ -20,4 +20,4 @@ ctrlc = "3.2.1"
 serde = { version = "1.0.197", features = ["serde_derive"] }
 toml = "0.8.11"
 either = "1.10.0"
-clap = { version = "3.0.0", features = ["derive", "env"] }
+clap = { version = "4.0.0", features = ["derive", "env"] }
