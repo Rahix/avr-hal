@@ -1,5 +1,6 @@
 [build]
-target = "../../avr-specs/avr-attiny85.json"
+target = "avr-none"
+rustflags = ["-C", "target-cpu=attiny85"]
 
 [target.'cfg(target_arch = "avr")']
 runner = "ravedude trinket"
