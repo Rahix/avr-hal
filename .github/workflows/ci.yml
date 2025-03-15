@@ -103,6 +103,10 @@ jobs:
             name: attiny2313
             spec: attiny2313
             crate: attiny-hal
+          - type: mcu
+            name: attiny404
+            spec: attiny404
+            crate: avrxmega-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

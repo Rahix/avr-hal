@@ -49,6 +49,9 @@ SPECS = {
     "attiny167": {
         "cpu": "attiny167",
     },
+    "attiny404": {
+        "cpu": "attiny404",
+    },
     "attiny2313": {
         "cpu": "attiny2313",
     },
