@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["DDRD_SPEC","R","W"],"type":["PD0_R","PD0_W","PD1_R","PD1_W","PD2_R","PD2_W","PD3_R","PD3_W","PD4_R","PD4_W","PD5_R","PD5_W","PD6_R","PD6_W","PD7_R","PD7_W"]};
