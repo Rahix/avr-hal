@@ -151,6 +151,17 @@ pub mod eeprom;
 #[cfg(feature = "device-selected")]
 pub use eeprom::Eeprom;
 
+#[cfg(any(
+    feature = "atmega8u2",
+    feature = "atmega32u4",
+))]
+pub mod usb;
+#[cfg(any(
+    feature = "atmega8u2",
+    feature = "atmega32u4",
+))]
+pub use usb::AvrUsbBus;
+
 pub struct Atmega;
 
 #[cfg(any(
