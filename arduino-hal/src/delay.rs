@@ -1,4 +1,4 @@
-use embedded_hal_v0::blocking::delay::{DelayMs, DelayUs};
+use embedded_hal::delay::DelayNs;
 
 /// Delay type for `embedded-hal` compatibility.
 ///
@@ -10,7 +10,7 @@ pub type Delay = avr_hal_generic::delay::Delay<crate::DefaultClock>;
 ///
 /// Busy-loop for the given time.  This function assumes the default clock speed defined by
 /// [`arduino_hal::DefaultClock`][crate::DefaultClock].
-pub fn delay_ms(ms: u16) {
+pub fn delay_ms(ms: u32) {
     Delay::new().delay_ms(ms)
 }
 
@@ -20,4 +20,12 @@ pub fn delay_ms(ms: u16) {
 /// [`arduino_hal::DefaultClock`][crate::DefaultClock].
 pub fn delay_us(us: u32) {
     Delay::new().delay_us(us)
+}
+
+/// Delay execution for a number of nanoseconds.
+///
+/// Busy-loop for the given time.  This function assumes the default clock speed defined by
+/// [`arduino_hal::DefaultClock`][crate::DefaultClock].
+pub fn delay_ns(ns: u32) {
+    Delay::new().delay_ns(ns)
 }

@@ -1,6 +1,98 @@
+//! # ravedude
+//! `ravedude` is a CLI utility to make Rust development for AVR microcontrollers
+//! super smooth.  It's a wrapper around `avrdude` and provides easy access to the
+//! target's serial console, similar to the Arduino IDE.
+//!
+//! `ravedude` is meant to be used as a cargo "runner".  This allows you to just use
+//! `cargo run` for building, deploying, and running your AVR code!
+//!
+//! # Installation
+//! On Linux systems, you'll need pkg-config and libudev development files
+//! installed:
+//!
+//! - *Archlinux*: `pacman -S systemd pkgconf`
+//! - *Ubuntu/Debian*: `apt install libudev-dev pkg-config`
+//! - *Fedora*: `dnf install systemd-devel pkgconf-pkg-config`
+//!
+//! Next, install the latest version from crates.io with the following command:
+//!
+//! ```text
+//! cargo +stable install --locked ravedude
+//! ```
+//!
+//! # Usage
+//! To use ravedude in your project, add the following to your project's `.cargo/config.toml`:
+//!
+//! ```text
+//! [target.'cfg(target_arch = "avr")']
+//! runner = "ravedude"
+//! ```
+//!
+//! Then, create a `Ravedude.toml` file next to your `Cargo.toml`.  This is the configuration file
+//! for ravedude.  For a simple Arduino Uno, you can use the following config:
+//!
+//! ```text
+//! [general]
+//! board = "uno"
+//! serial-baudrate = 57600
+//! open-console = true
+//! ```
+//!
+//! # Configuration
+//! For off-the-shelf AVR boards that are already supported by ravedude, configuration is very
+//! simple.  Just two lines in `Ravedude.toml` are all that is necessary:
+//!
+//! ```text
+//! [general]
+//! board = "<board-name-here>"
+//! ```
+//!
+//! Depending on your project, you may want to add any of the following additional options:
+//!
+//! ```text
+//! [general]
+//! # if auto-detection is not working, you can hard-code a specific port here
+//! # (the port can also be passed via the RAVEDUDE_PORT environment variable)
+//! port = "/dev/ttyACM0"
+//!
+//! # ravedude should open a serial console after flashing
+//! open-console = true
+//!
+//! # baudrate for the serial console (this is **not** the avrdude flashing baudrate)
+//! serial-baudrate = 57600
+//!
+//! # time to wait for the board to be reset (in milliseconds).  this skips the manual prompt for resetting the board.
+//! reset-delay = 2000
+//! ```
+//!
+//! # Custom Boards
+//! For boards that are not yet part of _ravedude_, you can specify all relevant options yourself
+//! in `Ravedude.toml`.  It works like this:
+//!
+//! ```text
+//! [general]
+//! # port = ...
+//! # open-console = true
+//! # serial-baudrate = 57600
+//!
+//! [board]
+//! name = "Custom Arduino Uno"
+//!
+//! [board.reset]
+//! # The board automatically resets when attempting to flash
+//! automatic = true
+//!
+//! [board.avrdude]
+//! # avrdude configuration
+//! programmer = "arduino"
+//! partno = "atmega328p"
+//! baudrate = -1
+//! do-chip-erase = true
+//! ```
+//!
+//! For reference, take a look at [`boards.toml`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml).
 use anyhow::Context as _;
 use colored::Colorize as _;
-use structopt::clap::AppSettings;
 
 use std::path::Path;
 use std::thread;
@@ -19,10 +111,8 @@ const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
 /// experience with rust on AVR microcontrollers.
 ///
 /// ravedude is primarily intended to be used as a "runner" in the cargo configuration.
-#[derive(structopt::StructOpt, Debug)]
-#[structopt(name = "ravedude",
-    setting = AppSettings::ColoredHelp,
-    setting = AppSettings::DeriveDisplayOrder,
+#[derive(clap::Parser, Debug)]
+#[clap(name = "ravedude",
     version = git_version::git_version!(
         args = ["--always", "--dirty", "--abbrev=12"],
         cargo_prefix = "v",
@@ -31,34 +121,34 @@ const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
     ))]
 struct Args {
     /// Utility flag for dumping a config of a named board to TOML.
-    #[structopt(long = "dump-config")]
+    #[clap(long = "dump-config")]
     dump_config: bool,
 
     /// After successfully flashing the program, open a serial console to see output sent by the
     /// board and possibly interact with it.
-    #[structopt(short = "c", long = "open-console")]
+    #[clap(short = 'c', long = "open-console")]
     open_console: bool,
 
     /// Baudrate which should be used for the serial console.
-    #[structopt(short = "b", long = "baudrate")]
+    #[clap(short = 'b', long = "baudrate")]
     baudrate: Option<u32>,
 
     /// Overwrite which port to use. By default ravedude will try to find a connected board by
     /// itself.
-    #[structopt(short = "P", long = "port", parse(from_os_str), env = "RAVEDUDE_PORT")]
+    #[clap(short = 'P', long = "port", value_parser, env = "RAVEDUDE_PORT")]
     port: Option<std::path::PathBuf>,
 
     /// This assumes the board is already resetting.
     /// Instead of giving the reset instructions and waiting for user confirmation, we wait the amount in milliseconds before proceeding.
     /// Set this value to 0 to skip the board reset question instantly.
-    #[structopt(short = "d", long = "reset-delay")]
+    #[clap(short = 'd', long = "reset-delay")]
     reset_delay: Option<u64>,
 
     /// Print the avrdude command that is executed for flashing the binary.
-    #[structopt(long = "debug-avrdude")]
+    #[clap(long = "debug-avrdude")]
     debug_avrdude: bool,
 
-    #[structopt(name = "BINARY", parse(from_os_str))]
+    #[clap(name = "BINARY", value_parser)]
     /// The binary to be flashed.
     ///
     /// If no binary is given, flashing will be skipped.
@@ -67,7 +157,7 @@ struct Args {
 
     /// Deprecated binary for old configurations of ravedude without `Ravedude.toml`.
     /// Should not be used in newer configurations.
-    #[structopt(name = "LEGACY BINARY", parse(from_os_str))]
+    #[clap(name = "LEGACY BINARY", value_parser)]
     bin_legacy: Option<std::path::PathBuf>,
 }
 impl Args {
@@ -126,7 +216,7 @@ fn find_manifest() -> anyhow::Result<Option<std::path::PathBuf>> {
 }
 
 fn ravedude() -> anyhow::Result<()> {
-    let args: Args = structopt::StructOpt::from_args();
+    let args: Args = clap::Parser::parse();
 
     let manifest_path = find_manifest()?;
 
