@@ -14,6 +14,28 @@ pub struct Avrdude {
 }
 
 impl Avrdude {
+    fn avrdude_installed((req_major, req_minor): (u8, u8)) -> anyhow::Result<()> {
+        let output = process::Command::new("avrdude").arg("-?").output()?;
+        let status = output.status;
+        if !status.success() {
+            // Response should specify wrong version,
+            // but then platform specific advice on
+            // what to use instead.
+            let default_error = format!(
+                "Avrdude is not installed. Please install v{}.{}, in accordance with the below instructions.",
+                req_major, req_minor
+            );
+            #[cfg(target_os = "windows")]
+            {
+                anyhow::bail!(
+                    "{} \n\
+                    Use winget(https://learn.microsoft.com/en-us/windows/package-manager/winget/) on Windows 10 and 11.\n \
+                    \"winget install AVRDudes.AVRDUDE\"\n\
+                    On older systems, use scoop.", );
+            }
+        }
+    }
+    
     fn get_avrdude_version() -> anyhow::Result<(u8, u8)> {
         let output = process::Command::new("avrdude").arg("-?").output()?;
         let stderr: &str = std::str::from_utf8(&output.stderr)?;
@@ -30,6 +52,7 @@ impl Avrdude {
     }
 
     pub fn require_min_ver((req_major, req_minor): (u8, u8)) -> anyhow::Result<()> {
+        Self::avrdude_installed()?;
         let (major, minor) =
             Self::get_avrdude_version().context("Failed reading avrdude version information.")?;
         if (major, minor) < (req_major, req_minor) {
