@@ -460,7 +460,7 @@ macro_rules! impl_spi {
                 use $crate::hal::spi;
 
                 // set up control register
-                self.spcr.write(|w| {
+                self.spcr().write(|w| {
                     // enable SPI
                     w.spe().set_bit();
                     // Set to primary mode
@@ -492,7 +492,7 @@ macro_rules! impl_spi {
                     }
                 });
                 // set up 2x clock rate status bit
-                self.spsr.write(|w| match settings.clock {
+                self.spsr().write(|w| match settings.clock {
                     SerialClockRate::OscfOver2 => w.spi2x().set_bit(),
                     SerialClockRate::OscfOver4 => w.spi2x().clear_bit(),
                     SerialClockRate::OscfOver8 => w.spi2x().set_bit(),
@@ -504,19 +504,19 @@ macro_rules! impl_spi {
             }
 
             fn raw_release(&mut self) {
-                self.spcr.write(|w| w.spe().clear_bit());
+                self.spcr().write(|w| w.spe().clear_bit());
             }
 
             fn raw_check_iflag(&self) -> bool {
-                self.spsr.read().spif().bit_is_set()
+                self.spsr().read().spif().bit_is_set()
             }
 
             fn raw_read(&self) -> u8 {
-                self.spdr.read().bits()
+                self.spdr().read().bits()
             }
 
             fn raw_write(&mut self, byte: u8) {
-                self.spdr.write(|w| unsafe { w.bits(byte) });
+                self.spdr().write(|w| unsafe { w.bits(byte) });
             }
 
             fn raw_transaction(&mut self, byte: u8) -> u8 {
