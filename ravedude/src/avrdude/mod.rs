@@ -1,10 +1,9 @@
+use crate::config::BoardAvrdudeOptions;
 use anyhow::Context as _;
+use colored::Colorize;
+use std::io::Write;
 use std::path;
 use std::process;
-
-use std::io::Write;
-
-use crate::config::BoardAvrdudeOptions;
 
 #[derive(Debug)]
 pub struct Avrdude {
@@ -14,28 +13,61 @@ pub struct Avrdude {
 }
 
 impl Avrdude {
-    fn avrdude_installed((req_major, req_minor): (u8, u8)) -> anyhow::Result<()> {
-        let output = process::Command::new("avrdude").arg("-?").output()?;
-        let status = output.status;
-        if !status.success() {
+    pub fn avrdude_installed() -> anyhow::Result<()> {
+        let dude_output = process::Command::new("avrdude")
+            .arg("-?")
+            .stderr(std::process::Stdio::null())
+            .status();
+        let gcc_output = process::Command::new("avr-gcc")
+            .arg("-v")
+            .stderr(std::process::Stdio::null())
+            .status();
+        if dude_output.is_err() || gcc_output.is_err() {
             // Response should specify wrong version,
             // but then platform specific advice on
             // what to use instead.
-            let default_error = format!(
-                "Avrdude is not installed. Please install v{}.{}, in accordance with the below instructions.",
-                req_major, req_minor
-            );
+            let default_error = format!("{} and/or {} is not installed.\nPlease install the latest version, in accordance with the below instructions.\nFor more help, visit {}. \n", "Avrdude".bright_black(), "avr-gcc".bright_black(), terminal_link::Link::new("here", "https://github.com/Rahix/avr-hal/wiki/Setting-up-environment"));
             #[cfg(target_os = "windows")]
+            {
+                let winget = terminal_link::Link::new(
+                    "winget",
+                    "https://learn.microsoft.com/en-us/windows/package-manager/winget/",
+                );
+                let scoop = terminal_link::Link::new("scoop", "https://scoop.sh/");
+                anyhow::bail!(
+                    "{} \n\
+                    Use {} on Windows 10 and 11: {}\n\
+                    On older systems, install and use {}: {}",
+                    default_error,
+                    winget,
+                    "winget install AVRDudes.AVRDUDE ZakKemble.avr-gcc".bright_black(),
+                    scoop,
+                    "scoop install avrdude avr-gcc".bright_black(),
+                );
+            }
+            #[cfg(target_os = "macos")]
             {
                 anyhow::bail!(
                     "{} \n\
-                    Use winget(https://learn.microsoft.com/en-us/windows/package-manager/winget/) on Windows 10 and 11.\n \
-                    \"winget install AVRDudes.AVRDUDE\"\n\
-                    On older systems, use scoop.", );
+                    Use the following commands:\n\
+                    {}",
+                    default_error,
+                    " xcode-select --install\n \
+                    brew tap osx-cross/avr\n \
+                    brew install avr-gcc avrdude"
+                        .bright_black()
+                );
+            }
+            #[cfg(target_os = "linux")]
+            {
+                anyhow::bail!("{} \n\
+                Use the following command: {}", default_error, "sudo apt install avr-libc gcc-avr pkg-config avrdude libudev-dev build-essential".bright_black());
             }
         }
+
+        Ok(())
     }
-    
+
     fn get_avrdude_version() -> anyhow::Result<(u8, u8)> {
         let output = process::Command::new("avrdude").arg("-?").output()?;
         let stderr: &str = std::str::from_utf8(&output.stderr)?;
@@ -52,7 +84,6 @@ impl Avrdude {
     }
 
     pub fn require_min_ver((req_major, req_minor): (u8, u8)) -> anyhow::Result<()> {
-        Self::avrdude_installed()?;
         let (major, minor) =
             Self::get_avrdude_version().context("Failed reading avrdude version information.")?;
         if (major, minor) < (req_major, req_minor) {
