@@ -107,13 +107,13 @@ jobs:
         run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
       - name: Compile board crate and examples
         if: "${{ matrix.m.type == 'board' && matrix.m.examples }}"
-        run: cd "examples/${{ matrix.m.name }}" && cargo build --release --bins
+        run: cd "examples/${{ matrix.m.name }}" && cargo build --bins
       - name: Compile board crate (without examples)
         if: "${{ matrix.m.type == 'board' && !matrix.m.examples }}"
-        run: cd "arduino-hal/" && cargo build --release --features "${{ matrix.m.name }}"
+        run: cd "arduino-hal/" && cargo build --features "${{ matrix.m.name }}"
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
-        run: cd "mcu/${{ matrix.m.crate }}" && RUSTFLAGS="-C target-cpu=${{ matrix.m.name }}" cargo build --release --target=avr-none --features "${{ matrix.m.name }}" -Z build-std=core
+        run: cd "mcu/${{ matrix.m.crate }}" && RUSTFLAGS="-C target-cpu=${{ matrix.m.name }}" cargo build --target=avr-none --features "${{ matrix.m.name }}" -Z build-std=core
 
   ravedude:
     name: "ravedude"

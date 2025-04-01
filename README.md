@@ -47,7 +47,7 @@ Go into `./examples/arduino-uno` (or the directory for whatever board you want),
 cd examples/arduino-uno
 
 # Build and run it on a connected board
-cargo run --release --bin uno-blink
+cargo run --bin uno-blink
 ```
 
 ## Starting your own project
