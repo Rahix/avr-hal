@@ -47,7 +47,7 @@ Go into `./examples/arduino-uno` (or the directory for whatever board you want),
 cd examples/arduino-uno
 
 # Build and run it on a connected board
-cargo run --bin uno-blink
+cargo run --release --bin uno-blink
 ```
 
 ## Starting your own project
@@ -72,9 +72,6 @@ HAL crates for AVR microcontroller families.  If you have a custom board, you'll
 
 ### `avr-hal-generic` [![avr-hal-generic docs](https://img.shields.io/badge/docs-git-4d76ae)][avr-hal-generic docs]
 This is a generic crate containing most of the HAL implementations in the form of macros which are instanciated in each HAL crate for the specific MCUs.  If you intend to write drivers that work with any AVR chip, targeting `avr-hal-generic` is probably the best route.
-
-### `avr-specs/`
-The `avr-specs/` directory contains rustc target definitions for all supported microcontrollers.  You will need these for compiling rust code for AVR.  The [`avr-hal-template`](https://github.com/Rahix/avr-hal-template) already includes them for convenience.
 
 ### [`ravedude`](./ravedude) [![crates.io page](https://img.shields.io/crates/v/ravedude.svg)](https://crates.io/crates/ravedude)
 `ravedude` is a utility for seamlessly integrating avrdude and a serial console into the cargo workflow.  With a bit of configuration (check its [README](./ravedude/README.md)!) you can then upload your code to your board and view its output over the serial console by just using `cargo run` as you would normally.
