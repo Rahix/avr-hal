@@ -23,4 +23,4 @@ features = ["sparkfun-promini-3v3"]
 # we use.  Thus, we must fix this dependency to an older version where our
 # toolchain is still supported.  See https://github.com/Rahix/avr-hal/issues/537
 [build-dependencies.proc-macro2]
-version = "=1.0.79"
+version = "=1.0.94"
