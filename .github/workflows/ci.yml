@@ -131,3 +131,13 @@ jobs:
       - name: Test ravedude
         run: |
           cargo test --manifest-path ravedude/Cargo.toml
+
+  crates_io_release:
+     name: "release-plz"
+     runs-on: ubuntu-latest
+     steps:
+       - name: Run release-plz
+         uses: MarcoIeni/release-plz-action@main
+         env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
