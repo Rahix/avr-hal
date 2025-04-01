@@ -21,3 +21,4 @@ serde = { version = "1.0.197", features = ["serde_derive"] }
 toml = "0.8.11"
 either = "1.10.0"
 clap = { version = "4.0.0", features = ["derive", "env"] }
+goblin = "0.9.3"
