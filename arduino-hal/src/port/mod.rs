@@ -43,6 +43,12 @@ mod uno;
     feature = "sparkfun-promini-5v"
 ))]
 pub use uno::*;
+#[cfg(feature = "nano-every")]
+mod every;
+
+#[cfg(feature = "nano-every")]
+pub use every::*;
+
 #[cfg(feature = "sparkfun-promicro")]
 mod promicro;
 #[cfg(feature = "sparkfun-promicro")]
