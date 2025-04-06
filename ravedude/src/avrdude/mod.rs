@@ -26,7 +26,13 @@ impl Avrdude {
             // Response should specify wrong version,
             // but then platform specific advice on
             // what to use instead.
-            let default_error = format!("{} and/or {} is not installed.\nPlease install the latest version, in accordance with the below instructions.\nFor more help, visit {}. \n", "Avrdude".bright_black(), "avr-gcc".bright_black(), terminal_link::Link::new("here", "https://github.com/Rahix/avr-hal/wiki/Setting-up-environment"));
+            let default_error = format!(
+                "{} and/or {} is not installed.\n\
+                Please install the latest version, in accordance with the below instructions.\n\
+                For more help, visit https://github.com/Rahix/avr-hal/wiki/Setting-up-environment. \n",
+                "Avrdude".bright_black(),
+                "avr-gcc".bright_black()
+            );
             #[cfg(target_os = "windows")]
             {
                 let winget = terminal_link::Link::new(
