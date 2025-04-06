@@ -21,4 +21,6 @@ serde = { version = "1.0.197", features = ["serde_derive"] }
 toml = "0.8.11"
 either = "1.10.0"
 clap = { version = "4.0.0", features = ["derive", "env"] }
+
+[target.'cfg(windows)'.dependencies]
 terminal-link = "0.1.0"
