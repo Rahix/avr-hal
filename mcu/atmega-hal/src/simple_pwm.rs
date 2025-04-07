@@ -1128,7 +1128,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(any(feature = "atmega164pa"))]
+#[cfg(any(feature = "atmega16", feature = "atmega164pa"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC1` for PWM (pins `PD4`, `PD5`)
     ///
@@ -1150,12 +1150,21 @@ avr_hal_generic::impl_simple_pwm! {
             tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
             tim.tccr1a.modify(|_r, w| w.com1a().bits(0b00));
             tim.tccr1a.modify(|_r, w| w.com1b().bits(0b00));
+            #[cfg(any(feature = "atmega164pa"))]
             tim.tccr1b.modify(|_r, w| match prescaler {
                 Prescaler::Direct => w.cs1().running_no_prescaling(),
                 Prescaler::Prescale8 => w.cs1().running_clk_8(),
                 Prescaler::Prescale64 => w.cs1().running_clk_64(),
                 Prescaler::Prescale256 => w.cs1().running_clk_256(),
                 Prescaler::Prescale1024 => w.cs1().running_clk_1024(),
+            });
+            #[cfg(any(feature = "atmega16"))]
+            tim.tccr1b.modify(|_r, w| match prescaler {
+                Prescaler::Direct => w.cs1().val_0x01(),
+                Prescaler::Prescale8 => w.cs1().val_0x02(),
+                Prescaler::Prescale64 => w.cs1().val_0x03(),
+                Prescaler::Prescale256 => w.cs1().val_0x04(),
+                Prescaler::Prescale1024 => w.cs1().val_0x05(),
             });
         },
         pins: {
