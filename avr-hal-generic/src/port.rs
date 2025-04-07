@@ -560,8 +560,9 @@ impl<PIN: PinOps> Pin<mode::Analog, PIN> {
 }
 
 #[macro_export]
-macro_rules! impl_port_traditional {
+macro_rules! impl_port_traditional_base {
     (
+        $chip_supports_atomic_toggle:literal,
         $(#[$pins_attr:meta])*
         enum Ports {
             $($name:ident: $port:ty = [$($pin:literal),+],)+
@@ -650,9 +651,21 @@ macro_rules! impl_port_traditional {
                 #[inline]
                 unsafe fn out_toggle(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<pin $name:lower>].write(|w| {
-                            w.bits(self.mask)
-                        }),)+
+                        $(DynamicPort::[<PORT $name>] => {
+                            if $chip_supports_atomic_toggle {
+                                (*<$port>::ptr()).[<pin $name:lower>].write(|w| {
+                                    w.bits(self.mask)
+                                })
+                            } else {
+                                // This read-modify-write sequence cannot be optimized into a single sbi/cbi instruction,
+                                // so it is wrapped in a critical section which ensures we will never hit a race-condition here.
+                                $crate::avr_device::interrupt::free(|_| {
+                                    (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
+                                        w.bits(r.bits() ^ self.mask)
+                                    })
+                                })
+                            }
+                        },)+
                     }
                 }
 
@@ -729,9 +742,19 @@ macro_rules! impl_port_traditional {
 
                     #[inline]
                     unsafe fn out_toggle(&mut self) {
-                        (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
-                            w.[<p $name:lower $pin>]().bit(!r.[<p $name:lower $pin>]().bit())
-                        })
+                        if $chip_supports_atomic_toggle {
+                            (*<$port>::ptr()).[<pin $name:lower>].write(|w| {
+                                w.[<p $name:lower $pin>]().set_bit()
+                            })
+                        } else {
+                            // This read-modify-write sequence cannot be optimized into a single sbi/cbi instruction,
+                            // so it is wrapped in a critical section which ensures we will never hit a race-condition here.
+                            $crate::avr_device::interrupt::free(|_| {
+                                (*<$port>::ptr()).[<port $name:lower>].modify(|r, w| {
+                                    w.[<p $name:lower $pin>]().bit(!r.[<p $name:lower $pin>]().bit())
+                                })
+                            })
+                        }
                     }
 
                     #[inline]
@@ -765,6 +788,23 @@ macro_rules! impl_port_traditional {
                 }
             )+)+
         }
+    };
+}
+
+/// A macro that implements port handling for a microcontroller.
+#[macro_export]
+macro_rules! impl_port_traditional {
+    ($($tts:tt)*)  => {
+        $crate::impl_port_traditional_base!(true, $($tts)*);
+    };
+}
+
+/// A macro that implements port handling for an old microcontroller,
+/// that does not support toggling the output via the PIN register.
+#[macro_export]
+macro_rules! impl_port_traditional_old {
+    ($($tts:tt)*)  => {
+        $crate::impl_port_traditional_base!(false, $($tts)*);
     };
 }
 

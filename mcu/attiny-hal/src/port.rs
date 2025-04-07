@@ -52,7 +52,7 @@ avr_hal_generic::impl_port_traditional! {
 }
 
 #[cfg(feature = "attiny88")]
-avr_hal_generic::impl_port_traditional! {
+avr_hal_generic::impl_port_traditional_old! {
     enum Ports {
         A: crate::pac::PORTA = [0, 1, 2, 3],
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
