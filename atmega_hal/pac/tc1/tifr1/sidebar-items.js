@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["R","TIFR1_SPEC","W"],"type":["ICF1_R","ICF1_W","OCF1A_R","OCF1A_W","OCF1B_R","OCF1B_W","TOV1_R","TOV1_W"]};
