@@ -33,8 +33,8 @@ avr_hal_generic::impl_port_traditional! {
     }
 }
 
-#[cfg(any(feature = "atmega164pa"))]
-avr_hal_generic::impl_port_traditional! {
+#[cfg(any(feature = "atmega16", feature = "atmega32a"))]
+avr_hal_generic::impl_port_traditional_old! {
     enum Ports {
         A: crate::pac::PORTA = [0, 1, 2, 3, 4, 5, 6 ,7],
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6 ,7],
@@ -65,7 +65,7 @@ avr_hal_generic::impl_port_traditional! {
 }
 
 #[cfg(any(feature = "atmega128a"))]
-avr_hal_generic::impl_port_traditional! {
+avr_hal_generic::impl_port_traditional_old! {
     enum Ports {
         A: crate::pac::PORTA = [0, 1, 2, 3, 4, 5, 6, 7],
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
@@ -94,7 +94,7 @@ avr_hal_generic::impl_port_traditional! {
     }
 }
 
-#[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
+#[cfg(any(feature = "atmega1284p", feature = "atmega164pa"))]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {
         A: crate::pac::PORTA = [0, 1, 2, 3, 4, 5, 6, 7],
@@ -105,7 +105,7 @@ avr_hal_generic::impl_port_traditional! {
 }
 
 #[cfg(any(feature = "atmega8"))]
-avr_hal_generic::impl_port_traditional! {
+avr_hal_generic::impl_port_traditional_old! {
     enum Ports {
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
         C: crate::pac::PORTC = [0, 1, 2, 3, 4, 5, 6],

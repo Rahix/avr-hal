@@ -31,18 +31,47 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     let pins = arduino_hal::pins!(dp);
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    // Print out panic location
     ufmt::uwriteln!(&mut serial, "Firmware panic!\r").unwrap_infallible();
-    if let Some(loc) = info.location() {
-        ufmt::uwriteln!(
-            &mut serial,
-            "  At {}:{}:{}\r",
-            loc.file(),
-            loc.line(),
-            loc.column(),
-        )
-        .unwrap_infallible();
-    }
+
+    // Accessing the panic info unfortunately means that the optimizer can no longer remove panic
+    // messages from the resulting binary.  This leads to an explosion of SRAM usage, quickly
+    // surpassing available space.
+    //
+    // If you need precise panic info, currently your best bet is disabling `overflow-checks` and
+    // `debug-assertions` in the build profile and structuring your code such that panics never
+    // include a message payload.  For example, instead of calling `.unwrap()`, use these macros:
+    //
+    // #[macro_export]
+    // macro_rules! unwrap_result {
+    //     ($v:expr) => {
+    //         match $v {
+    //             Ok(v) => v,
+    //             Err(_) => panic!(),
+    //         }
+    //     };
+    // }
+    //
+    // #[macro_export]
+    // macro_rules! unwrap_option {
+    //     ($v:expr) => {
+    //         match $v {
+    //             Some(v) => v,
+    //             None => panic!(),
+    //         }
+    //     };
+    // }
+
+    // Print panic location:
+    // if let Some(loc) = info.location() {
+    //     ufmt::uwriteln!(
+    //         &mut serial,
+    //         "  At {}:{}:{}\r",
+    //         loc.file(),
+    //         loc.line(),
+    //         loc.column(),
+    //     )
+    //     .unwrap_infallible();
+    // }
 
     // Blink LED rapidly
     let mut led = pins.d13.into_output();

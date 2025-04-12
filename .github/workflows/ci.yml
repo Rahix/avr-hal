@@ -57,51 +57,42 @@ jobs:
             examples: true
           - type: mcu
             name: atmega1280
-            spec: atmega1280
             crate: atmega-hal
           - type: mcu
             name: atmega32a
-            spec: atmega32a
             crate: atmega-hal
           - type: mcu
             name: atmega128a
-            spec: atmega128a
+            crate: atmega-hal
+          - type: mcu
+            name: atmega328p
             crate: atmega-hal
           - type: mcu
             name: atmega328pb
-            spec: atmega328p
             crate: atmega-hal
           - type: mcu
             name: atmega48p
-            spec: atmega48p
             crate: atmega-hal
           - type: mcu
             name: atmega88p
-            spec: atmega88p
             crate: atmega-hal
           - type: mcu
             name: atmega1284p
-            spec: atmega1284p
             crate: atmega-hal
           - type: mcu
             name: atmega8
-            spec: atmega8
             crate: atmega-hal
           - type: mcu
             name: attiny85
-            spec: attiny85
             crate: attiny-hal
           - type: mcu
             name: attiny88
-            spec: attiny88
             crate: attiny-hal
           - type: mcu
             name: attiny167
-            spec: attiny167
             crate: attiny-hal
           - type: mcu
             name: attiny2313
-            spec: attiny2313
             crate: attiny-hal
     runs-on: ubuntu-latest
     steps:
@@ -110,7 +101,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2023-12-28
+          toolchain: nightly-2025-03-03
           components: rust-src
       - name: Install avr-gcc, binutils, and libc
         run: sudo apt-get install -y avr-libc binutils-avr gcc-avr
@@ -122,7 +113,7 @@ jobs:
         run: cd "arduino-hal/" && cargo build --features "${{ matrix.m.name }}"
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
-        run: cd "mcu/${{ matrix.m.crate }}" && cargo build --features "${{ matrix.m.name }}" -Z build-std=core --target "../../avr-specs/avr-${{ matrix.m.spec }}.json"
+        run: cd "mcu/${{ matrix.m.crate }}" && RUSTFLAGS="-C target-cpu=${{ matrix.m.name }}" cargo build --target=avr-none --features "${{ matrix.m.name }}" -Z build-std=core
 
   ravedude:
     name: "ravedude"
