@@ -66,8 +66,22 @@ impl Avrdude {
             }
             #[cfg(target_os = "linux")]
             {
-                anyhow::bail!("{} \n\
-                Use the following command: {}", default_error, "sudo apt install avr-libc gcc-avr pkg-config avrdude libudev-dev build-essential".bright_black());
+                anyhow::bail!(
+                    "{} \n\
+                    Use the following command: {}", 
+                    default_error, 
+                    "sudo apt install avr-libc gcc-avr pkg-config avrdude libudev-dev build-essential".bright_black()
+            );
+            }
+            #[allow(unreachable_code)]
+            {
+                anyhow::bail!(
+                    "{} \n\
+                    You don't seem to be on a (directly) supported platform.\n\
+                    Please confirm you are using one of the following platforms: Windows, Linux, or macOS.\n\
+                    For more help, visit https://github.com/Rahix/avr-hal/wiki/Setting-up-environment.",
+                    default_error,
+                )
             }
         }
 
