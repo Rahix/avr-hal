@@ -250,6 +250,7 @@ fn ravedude() -> anyhow::Result<()> {
         return Ok(());
     }
 
+    avrdude::Avrdude::avrdude_installed()?;
     avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
 
     let Some(mut board) = ravedude_config.board_config else {
