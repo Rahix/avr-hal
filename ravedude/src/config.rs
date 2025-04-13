@@ -34,7 +34,7 @@ where
 }
 
 impl RavedudeConfig {
-    pub fn from_args(args: &crate::Args) -> anyhow::Result<Self> {
+    pub fn from_args(args: &crate::BoardArgs) -> anyhow::Result<Self> {
         Ok(Self {
             general_options: RavedudeGeneralConfig {
                 open_console: args.open_console,
@@ -67,7 +67,7 @@ pub struct RavedudeGeneralConfig {
 
 impl RavedudeGeneralConfig {
     /// Apply command-line overrides to this configuration. Command-line arguments take priority over Ravedude.toml
-    pub fn apply_overrides_from(&mut self, args: &crate::Args) -> anyhow::Result<()> {
+    pub fn apply_overrides_from(&mut self, args: &crate::BoardArgs) -> anyhow::Result<()> {
         if args.open_console {
             self.open_console = true;
         }
