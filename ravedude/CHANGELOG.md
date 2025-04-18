@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added support for the Mighty Core ATMEGA1284P board ([#607]).
+- Ravedude now gives descriptive errors when one of the dependency tools is not
+  installed ([#649]).
 
 ### Fixed
 - Fixed trinked board definition ([#626]).
@@ -27,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#607]: https://github.com/Rahix/avr-hal/pull/607
 [#626]: https://github.com/Rahix/avr-hal/pull/626
 [#631]: https://github.com/Rahix/avr-hal/pull/631
+[#649]: https://github.com/Rahix/avr-hal/pull/649
 
 
 ## [0.1.8] - 2024-03-15
