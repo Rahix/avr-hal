@@ -15,7 +15,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2025-03-03
+          toolchain: nightly-2025-04-27
           components: rust-src
       - name: Build documentation (arduino-hal)
         run: cd arduino-hal/ && cargo doc --features arduino-uno
