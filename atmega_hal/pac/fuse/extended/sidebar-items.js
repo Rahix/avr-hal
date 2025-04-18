@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["BODLEVEL_A"],"struct":["EXTENDED_SPEC","R","W"],"type":["BODLEVEL_R","BODLEVEL_W"]};
