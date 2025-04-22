@@ -70,3 +70,9 @@ pub mod port {
         }
     }
 }
+
+pub mod simple_pwm {
+    pub use crate::periphals::simple_pwm::*;
+
+    // Fixme: Implement PWM for ATtiny167.
+}

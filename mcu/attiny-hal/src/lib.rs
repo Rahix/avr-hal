@@ -95,9 +95,6 @@ pub use adc::Adc;
 pub use port::Pins;
 
 #[cfg(feature = "device-selected")]
-pub mod simple_pwm;
-
-#[cfg(feature = "device-selected")]
 pub mod wdt;
 #[cfg(feature = "device-selected")]
 pub use wdt::Wdt;
