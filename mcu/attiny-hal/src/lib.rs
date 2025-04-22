@@ -44,6 +44,10 @@ pub use crate::attiny167::*;
 ///
 #[cfg(feature = "attiny2313")]
 pub use avr_device::attiny2313 as pac;
+#[cfg(feature = "attiny2313")]
+pub mod attiny2313;
+#[cfg(feature = "attiny2313")]
+pub use crate::attiny2313::*;
 /// Reexport of `attiny84` from `avr-device`
 ///
 #[cfg(feature = "attiny84")]
@@ -100,8 +104,6 @@ pub mod wdt;
 #[cfg(feature = "device-selected")]
 pub use wdt::Wdt;
 
-#[cfg(feature = "device-selected")]
-pub mod eeprom;
 #[cfg(feature = "device-selected")]
 pub use eeprom::Eeprom;
 

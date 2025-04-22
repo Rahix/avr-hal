@@ -32,3 +32,17 @@ pub mod adc {
         },
     }
 }
+
+pub mod eeprom {
+    pub use crate::periphals::eeprom::*;
+
+    avr_hal_generic::impl_eeprom_attiny! {
+        hal: crate::Attiny,
+        peripheral: crate::pac::EEPROM,
+        capacity: 512,
+        addr_width: u16,
+        set_address: |peripheral, address| {
+            peripheral.eear.write(|w| w.bits(address));
+        },
+    }
+}
