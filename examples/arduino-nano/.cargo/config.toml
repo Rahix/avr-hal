@@ -3,7 +3,7 @@ target = "avr-none"
 rustflags = ["-C", "target-cpu=atmega328p"]
 
 [target.'cfg(target_arch = "avr")']
-runner = "ravedude nano -cb 57600"
+runner = "ravedude"
 
 [unstable]
 build-std = ["core"]

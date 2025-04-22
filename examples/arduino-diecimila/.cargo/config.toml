@@ -3,7 +3,7 @@ target = "avr-none"
 rustflags = ["-C", "target-cpu=atmega168"]
 
 [target.'cfg(target_arch = "avr")']
-runner = "ravedude diecimila"
+runner = "ravedude"
 
 [unstable]
 build-std = ["core"]
