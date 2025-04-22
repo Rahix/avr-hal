@@ -1,0 +1,7 @@
+[general]
+board = "mega2560"
+serial-baudrate = 57600
+open-console = true
+
+# For documentation about this file, check here:
+# https://github.com/Rahix/avr-hal/blob/main/ravedude/README.md#ravedudetoml-format

@@ -1,0 +1,34 @@
+[general]
+# We're not using a predefined board here, but instead define a custom one.
+# board = "???"
+
+serial-baudrate = 57600
+open-console = true
+
+# Custom Board Definition Below.  Check
+# https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml for some
+# example board definitions.
+[board]
+name = "Custom ATmega2560 Board"
+
+[board.reset]
+automatic = true
+
+[board.avrdude]
+programmer = "wiring"
+partno = "atmega2560"
+baudrate = 115200
+do-chip-erase = false
+
+[board.usb-info]
+port-ids = [
+    { vid = 0x2341, pid = 0x0010 },
+    { vid = 0x2341, pid = 0x0042 },
+    { vid = 0x2A03, pid = 0x0010 },
+    { vid = 0x2A03, pid = 0x0042 },
+    { vid = 0x2341, pid = 0x0210 },
+    { vid = 0x2341, pid = 0x0242 },
+]
+
+# For documentation about this file, check here:
+# https://github.com/Rahix/avr-hal/blob/main/ravedude/README.md#ravedudetoml-format
