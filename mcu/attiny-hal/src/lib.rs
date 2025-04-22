@@ -103,8 +103,6 @@ pub use wdt::Wdt;
 pub use eeprom::Eeprom;
 
 #[cfg(feature = "device-selected")]
-pub mod spi;
-#[cfg(feature = "device-selected")]
 pub use spi::Spi;
 
 pub struct Attiny;

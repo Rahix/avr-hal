@@ -4,3 +4,4 @@ pub mod adc;
 pub mod eeprom;
 pub mod port;
 pub mod simple_pwm;
+pub mod spi;

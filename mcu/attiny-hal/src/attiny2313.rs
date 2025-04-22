@@ -29,3 +29,9 @@ pub mod simple_pwm {
 
     // Fixme: Implement PWM for ATtiny2313.
 }
+
+pub mod spi {
+    pub use crate::periphals::spi::*;
+
+    // Fixme: Implement SPI for ATtiny2313.
+}

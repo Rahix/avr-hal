@@ -117,3 +117,27 @@ pub mod simple_pwm {
         }
     }
 }
+
+pub mod spi {
+    pub use crate::periphals::spi::*;
+
+    use crate::port;
+
+    pub type Spi = avr_hal_generic::spi::Spi<
+        crate::Attiny,
+        crate::pac::SPI,
+        port::PB5,
+        port::PB3,
+        port::PB4,
+        port::PB2,
+    >;
+
+    avr_hal_generic::impl_spi! {
+        hal: crate::Attiny,
+        peripheral: crate::pac::SPI,
+        sclk: port::PB5,
+        mosi: port::PB3,
+        miso: port::PB4,
+        cs: port::PB2,
+    }
+}

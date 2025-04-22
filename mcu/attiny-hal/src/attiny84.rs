@@ -100,3 +100,9 @@ pub mod simple_pwm {
         }
     }
 }
+
+pub mod spi {
+    pub use crate::periphals::spi::*;
+
+    // Fixme: Implement SPI for ATtiny84.
+}
