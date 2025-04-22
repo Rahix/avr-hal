@@ -7,9 +7,6 @@ target's serial console, similar to the Arduino IDE.
 `ravedude` is meant to be used as a cargo "runner".  This allows you to just use
 `cargo run` for building, deploying, and running your AVR code!
 
-if you get an `Error: no matching serial port found, use -P or set RAVEDUDE_PORT in your environment` , 
-run `cargo run` with set environment variable or adjust `runner = "ravedude {X} -cb {X} -P /dev/ttyUSB{X}"` inside `.cargo/config.toml` (replace {X} with your respective values)
-
 ## Installation
 On Linux systems, you'll need pkg-config and libudev development files
 installed:
@@ -50,8 +47,8 @@ open-console = true
 serial-baudrate = 57600
 ```
 
-(For more info about the `Ravedude.toml` format, please check
-[`main.rs`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/main.rs)).
+For more info about the configuratiom, please check [`Ravedude.toml`
+Format](#ravedudetoml-format) below.
 
 And that's all, now just call `cargo run` and watch it do its magic:
 
@@ -114,6 +111,60 @@ Read direction test:
 60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 70: -- -- -- -- -- -- -- --
 </pre>
+
+## `Ravedude.toml` Format
+For off-the-shelf AVR boards that are already supported by ravedude, configuration is very
+simple.  Just two lines in `Ravedude.toml` are all that is necessary:
+
+```toml
+[general]
+board = "<board-name-here>"
+```
+
+Depending on your project, you may want to add any of the following additional options:
+
+```toml
+[general]
+# if auto-detection is not working, you can hard-code a specific port here
+# (the port can also be passed via the RAVEDUDE_PORT environment variable)
+port = "/dev/ttyACM0"
+
+# ravedude should open a serial console after flashing
+open-console = true
+
+# baudrate for the serial console (this is **not** the avrdude flashing baudrate)
+serial-baudrate = 57600
+
+# time to wait for the board to be reset (in milliseconds).  this skips the manual prompt for resetting the board.
+reset-delay = 2000
+```
+
+#### Custom Boards
+For boards that are not yet part of _ravedude_, you can specify all relevant options yourself
+in `Ravedude.toml`.  It works like this:
+
+```toml
+[general]
+# port = ...
+# open-console = true
+# serial-baudrate = 57600
+
+[board]
+name = "Custom Arduino Uno"
+
+[board.reset]
+# The board automatically resets when attempting to flash
+automatic = true
+
+[board.avrdude]
+# avrdude configuration
+programmer = "arduino"
+partno = "atmega328p"
+baudrate = -1
+do-chip-erase = true
+```
+
+For reference, take a look at [`boards.toml`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml).
 
 ## License
 *ravedude* is licensed under either of
