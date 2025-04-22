@@ -2,3 +2,4 @@
 #[cfg(not(feature = "attiny2313"))]
 pub mod adc;
 pub mod eeprom;
+pub mod port;

@@ -46,3 +46,13 @@ pub mod eeprom {
         },
     }
 }
+
+pub mod port {
+    pub use crate::periphals::port::*;
+
+    avr_hal_generic::impl_port_traditional! {
+        enum Ports {
+            B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5],
+        }
+    }
+}

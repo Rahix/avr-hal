@@ -92,8 +92,6 @@ pub mod periphals;
 pub use adc::Adc;
 
 #[cfg(feature = "device-selected")]
-pub mod port;
-#[cfg(feature = "device-selected")]
 pub use port::Pins;
 
 #[cfg(feature = "device-selected")]
