@@ -36,6 +36,10 @@ compile_error!(
 ///
 #[cfg(feature = "attiny167")]
 pub use avr_device::attiny167 as pac;
+#[cfg(feature = "attiny167")]
+pub mod attiny167;
+#[cfg(feature = "attiny167")]
+pub use crate::attiny167::*;
 /// Reexport of `attiny2313` from `avr-device`
 ///
 #[cfg(feature = "attiny2313")]
@@ -44,14 +48,26 @@ pub use avr_device::attiny2313 as pac;
 ///
 #[cfg(feature = "attiny84")]
 pub use avr_device::attiny84 as pac;
+#[cfg(feature = "attiny84")]
+pub mod attiny84;
+#[cfg(feature = "attiny84")]
+pub use crate::attiny84::*;
 /// Reexport of `attiny85` from `avr-device`
 ///
 #[cfg(feature = "attiny85")]
 pub use avr_device::attiny85 as pac;
+#[cfg(feature = "attiny85")]
+pub mod attiny85;
+#[cfg(feature = "attiny85")]
+pub use crate::attiny85::*;
 /// Reexport of `attiny88` from `avr-device`
 ///
 #[cfg(feature = "attiny88")]
 pub use avr_device::attiny88 as pac;
+#[cfg(feature = "attiny88")]
+pub mod attiny88;
+#[cfg(feature = "attiny88")]
+pub use crate::attiny88::*;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -64,9 +80,10 @@ pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
 pub use avr_hal_generic::prelude;
 
+#[cfg(feature = "device-selected")]
+pub mod periphals;
+
 // ATtiny2313 does not have ADC and will not compile with this module
-#[cfg(all(feature = "device-selected", not(feature = "attiny2313")))]
-pub mod adc;
 #[cfg(all(feature = "device-selected", not(feature = "attiny2313")))]
 pub use adc::Adc;
 
