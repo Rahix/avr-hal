@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   installed ([#649]).
 
 ### Fixed
-- Fixed trinked board definition ([#626]).
+- Fixed trinket board definition ([#626]).
 
 [#522]: https://github.com/Rahix/avr-hal/pull/522
 [#607]: https://github.com/Rahix/avr-hal/pull/607
