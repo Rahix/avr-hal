@@ -14,8 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   internals of the tool.  Custom boards can now be defined and settings for
   off-the-shelf boards can be adjusted.
 
-  For documentation, please check [`main.rs`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/main.rs)
-  for the time being.
+  For documentation, please see [`Ravedude.toml` Format](https://github.com/Rahix/avr-hal/blob/main/ravedude/README.md#ravedudetoml-format).
 
   This redesign was implemented in [#522].
 - Updated to clap 3.0 ([#631]).
