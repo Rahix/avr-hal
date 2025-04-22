@@ -100,3 +100,26 @@ pub mod spi {
         cs: port::PA6,
     }
 }
+
+pub mod wdt {
+    pub use crate::periphals::wdt::*;
+
+    avr_hal_generic::impl_wdt! {
+        hal: crate::Attiny,
+        peripheral: crate::pac::WDT,
+        mcusr: crate::pac::cpu::MCUSR,
+        wdtcsr_name: wdtcr,
+        timeout: |to, w| match to {
+            Timeout::Ms16 => w.wdpl().cycles_2k_512k(),
+            Timeout::Ms32 => w.wdpl().cycles_4k_1024k(),
+            Timeout::Ms64 => w.wdpl().cycles_8k(),
+            Timeout::Ms125 => w.wdpl().cycles_16k(),
+            Timeout::Ms250 => w.wdpl().cycles_32k(),
+            Timeout::Ms500 => w.wdpl().cycles_64k(),
+            Timeout::Ms1000 => w.wdpl().cycles_128k(),
+            Timeout::Ms2000 => w.wdpl().cycles_256k(),
+            Timeout::Ms4000 => w.wdph().set_bit().wdpl().cycles_2k_512k(),
+            Timeout::Ms8000 => w.wdph().set_bit().wdpl().cycles_4k_1024k(),
+        },
+    }
+}
