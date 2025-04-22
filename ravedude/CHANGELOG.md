@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
+## [0.2.0] - 2025-04-22
 ### Changed
 - **BREAKING** ravedude is now configured using a `Ravedude.toml` configuration
   file.  This is more flexible because boards are no longer hard-coded into the
@@ -136,7 +139,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial, miminal version.
 
 
-[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.8...HEAD
+[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.2.0...HEAD
+[0.2.0]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.8...ravedude-0.2.0
 [0.1.8]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.7...ravedude-0.1.8
 [0.1.7]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.6...ravedude-0.1.7
 [0.1.6]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.5...ravedude-0.1.6
