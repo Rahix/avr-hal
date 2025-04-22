@@ -50,6 +50,13 @@ pub mod eeprom {
     }
 }
 
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
+    };
+}
+
 pub mod port {
     pub use crate::periphals::port::*;
 

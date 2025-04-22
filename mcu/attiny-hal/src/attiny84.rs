@@ -10,6 +10,13 @@ pub mod eeprom {
     // Fixme: Implement EEPROM for ATtiny84.
 }
 
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB)
+    };
+}
+
 pub mod port {
     pub use crate::periphals::port::*;
 
