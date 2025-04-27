@@ -91,7 +91,7 @@
 //! ```
 //!
 //! For reference, take a look at [`boards.toml`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml).
-use anyhow::{bail, Context as _};
+use anyhow::Context as _;
 use colored::Colorize as _;
 use config::OutputMode;
 
@@ -130,7 +130,7 @@ fn parse_newline_on(s: &str) -> Result<u8, anyhow::Error> {
     // if it starts with 0x then parse the hex byte
     if &s[0..2] == "0x" {
         if s.len() != 4 {
-            bail!("hex byte must have 2 digits");
+            anyhow::bail!("hex byte must have 2 digits");
         }
         return u8::from_str_radix(&s[2..4], 16).context("invalid hex byte");
     }
@@ -138,12 +138,12 @@ fn parse_newline_on(s: &str) -> Result<u8, anyhow::Error> {
     // if it starts with 0b then parse the binary byte
     if &s[0..2] == "0b" {
         if s.len() != 10 {
-            bail!("binary byte must have 8 digits");
+            anyhow::bail!("binary byte must have 8 digits");
         }
         return u8::from_str_radix(&s[2..10], 2).context("invalid binary byte");
     }
 
-    bail!("must be a single character or a byte in hex or binary notation");
+    anyhow::bail!("must be a single character or a byte in hex or binary notation");
 }
 
 #[test]
@@ -280,7 +280,7 @@ fn ravedude() -> anyhow::Result<()> {
 
     let mut ravedude_config = match (manifest_path.as_deref(), args.legacy_board_name()) {
         (Some(_), Some(board_name)) => {
-            bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board_name);
+            anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board_name);
         }
         (Some(path), None) => board::get_board_from_manifest(path)?,
         (None, Some(board_name)) => {
@@ -295,7 +295,7 @@ fn ravedude() -> anyhow::Result<()> {
             board::get_board_from_name(&board_name)?
         }
         (None, None) => {
-            bail!("couldn't find Ravedude.toml in project");
+            anyhow::bail!("couldn't find Ravedude.toml in project");
         }
     };
 
@@ -312,13 +312,13 @@ fn ravedude() -> anyhow::Result<()> {
     avrdude::Avrdude::require_min_ver(MIN_VERSION_AVRDUDE)?;
 
     let Some(mut board) = ravedude_config.board_config else {
-        bail!("no named board given and no board options provided");
+        anyhow::bail!("no named board given and no board options provided");
     };
 
     if ravedude_config.general_options.newline_on.is_some()
         && ravedude_config.general_options.newline_after.is_some()
     {
-        bail!("newline_on and newline_after cannot be used at the same time");
+        anyhow::bail!("newline_on and newline_after cannot be used at the same time");
     }
 
     let board_avrdude_options = board
