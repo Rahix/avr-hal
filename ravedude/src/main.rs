@@ -96,7 +96,6 @@ use colored::Colorize as _;
 use config::OutputMode;
 
 use std::path::Path;
-use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 
@@ -108,56 +107,6 @@ mod ui;
 
 /// This represents the minimum (Major, Minor) version raverdude requires avrdude to meet.
 const MIN_VERSION_AVRDUDE: (u8, u8) = (6, 3);
-
-impl FromStr for OutputMode {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "ascii" => Ok(Self::Ascii),
-            "hex" => Ok(Self::Hex),
-            "dec" => Ok(Self::Dec),
-            "bin" => Ok(Self::Bin),
-            _ => Err(anyhow::anyhow!("unknown output mode")),
-        }
-    }
-}
-
-fn parse_newline_on(s: &str) -> Result<u8, anyhow::Error> {
-    if let Ok(c) = s.parse::<char>() {
-        return u8::try_from(c).context("non-byte character in `newline-on`");
-    }
-
-    // if it starts with 0x then parse the hex byte
-    if &s[0..2] == "0x" {
-        if s.len() != 4 {
-            anyhow::bail!("hex byte must have 2 digits");
-        }
-        return u8::from_str_radix(&s[2..4], 16).context("invalid hex byte");
-    }
-
-    // if it starts with 0b then parse the binary byte
-    if &s[0..2] == "0b" {
-        if s.len() != 10 {
-            anyhow::bail!("binary byte must have 8 digits");
-        }
-        return u8::from_str_radix(&s[2..10], 2).context("invalid binary byte");
-    }
-
-    anyhow::bail!("must be a single character or a byte in hex or binary notation");
-}
-
-#[test]
-fn test_parse_newline_on() {
-    assert_eq!(parse_newline_on("a").unwrap(), 'a' as u8);
-    assert_eq!(parse_newline_on("\n").unwrap(), '\n' as u8);
-    assert_eq!(parse_newline_on("0x41").unwrap(), 0x41);
-    assert_eq!(parse_newline_on("0b01000001").unwrap(), 0b01000001);
-    assert!(parse_newline_on("not a char").is_err());
-    assert!(parse_newline_on("0x").is_err());
-    assert!(parse_newline_on("0xzz").is_err());
-    assert!(parse_newline_on("0b").is_err());
-    assert!(parse_newline_on("0b0a0a0a0a").is_err());
-}
 
 /// ravedude is a rust wrapper around avrdude for providing the smoothest possible development
 /// experience with rust on AVR microcontrollers.
@@ -333,7 +282,7 @@ fn ravedude() -> anyhow::Result<()> {
     );
 
     let port = match ravedude_config.general_options.port {
-        Some(port) => Ok(Some(port)),
+        Some(ref port) => Ok(Some(port.clone())),
         None => match board.guess_port() {
             Some(Ok(port)) => Ok(Some(port)),
             p @ Some(Err(_)) => p.transpose().context(
@@ -399,14 +348,8 @@ fn ravedude() -> anyhow::Result<()> {
             })?;
 
         let port = port.context("console can only be opened for devices with USB-to-Serial")?;
+		let newline_mode = ravedude_config.general_options.newline_mode()?;
 
-        let output_mode = ravedude_config.general_options.output_mode;
-        let newline_on = if let Some(newline_on) = ravedude_config.general_options.newline_on {
-            Some(parse_newline_on(newline_on.as_str()))
-        } else {
-            None
-        };
-        let newline_after = ravedude_config.general_options.newline_after;
 
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
         task_message!("", "{}", "CTRL+C to exit.".dimmed());
@@ -415,9 +358,9 @@ fn ravedude() -> anyhow::Result<()> {
         console::open(
             &port,
             baudrate.get(),
-            output_mode,
-            parse_newline_on(newline_on),
-            newline_after,
+			ravedude_config.general_options.output_mode,
+			newline_mode,
+			newline_mode.space_after()
         )?;
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");

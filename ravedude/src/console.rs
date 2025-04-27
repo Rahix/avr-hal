@@ -4,6 +4,7 @@ use std::io::Write as _;
 use anyhow::Context as _;
 use colored::Colorize as _;
 
+use crate::config::NewlineMode;
 use crate::config::OutputMode;
 use crate::config::OutputMode::*;
 use crate::task_message;
@@ -11,21 +12,11 @@ use crate::task_message;
 pub fn open(
     port: &std::path::PathBuf,
     baudrate: u32,
-    output_mode: Option<OutputMode>,
-    newline_on: Option<char>,
-    newline_after: Option<u8>,
+    output_mode: OutputMode,
+    newline_mode: NewlineMode,
+    space_after: Option<u8>,
 ) -> anyhow::Result<()> {
     task_message!("Console", "{} at {} baud", port.display(), baudrate);
-    task_message!(
-        "Output",
-        "{}",
-        match output_mode {
-            Some(Ascii) | None => "ascii",
-            Some(Hex) => "hexadecimal",
-            Some(Dec) => "decimal",
-            Some(Bin) => "binary",
-        }
-    );
     task_message!("", "{}", "CTRL+C to exit.".dimmed());
     // Empty line for visual consistency
     eprintln!();
@@ -46,21 +37,6 @@ pub fn open(
         std::process::exit(0);
     })
     .context("failed setting a CTRL+C handler")?;
-
-    let newline_after = match newline_after {
-        Some(n) => n,
-        None => match output_mode {
-            Some(Hex) | Some(Dec) => 16,
-            Some(Bin) => 8,
-            _ => 0,
-        },
-    };
-
-    let (spaces, space_after) = if newline_on.is_none() && newline_after % 4 == 0 {
-        (true, 4)
-    } else {
-        (false, 0)
-    };
 
     let mut byte_count = 0;
 
@@ -85,35 +61,35 @@ pub fn open(
                         }
                     }
                 }
-                match output_mode {
-                    Some(Ascii) | None => {
-                        stdout.write_all(&buf).unwrap();
-                    }
-                    _ => {
-                        for byte in &buf[..count] {
-                            byte_count += 1;
-                            match output_mode {
-                                Some(Ascii) | None => unreachable!(),
-                                Some(Hex) => {
-                                    write!(stdout, "{:02x} ", byte).unwrap();
-                                }
-                                Some(Dec) => {
-                                    write!(stdout, "{:03} ", byte).unwrap();
-                                }
-                                Some(Bin) => {
-                                    write!(stdout, "{:08b} ", byte).unwrap();
-                                }
-                            }
-                            // don’t execute in ascii mode, ascii is unreachable here
-                            if spaces && byte_count % space_after == 0 {
+                if output_mode == Ascii {
+                    stdout.write(&buf[..count]).unwrap();
+                } else {
+                    for byte in &buf[..count] {
+                        byte_count += 1;
+                        match output_mode {
+                            Ascii => unreachable!(),
+                            Hex => write!(stdout, "{:02x} ", byte).unwrap(),
+                            Dec => write!(stdout, "{:03} ", byte).unwrap(),
+                            Bin => write!(stdout, "{:08b} ", byte).unwrap(),
+                        }
+
+                        if let Some(space_after) = space_after {
+                            if byte_count % space_after == 0 {
                                 write!(stdout, " ").unwrap();
                             }
-                            if newline_on.is_none() && byte_count % newline_after == 0 {
-                                writeln!(stdout).unwrap();
+                        }
+                        match newline_mode {
+                            NewlineMode::On(newline_on) => {
+                                if *byte == newline_on {
+                                    writeln!(stdout).unwrap()
+                                }
                             }
-                            if newline_on.is_some() && *byte as char == newline_on.unwrap() {
-                                writeln!(stdout).unwrap();
+                            NewlineMode::After(newline_after) => {
+                                if byte_count % newline_after == 0 {
+                                    writeln!(stdout).unwrap();
+                                }
                             }
+                            NewlineMode::Off => {}
                         }
                     }
                 }
