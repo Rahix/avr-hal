@@ -122,44 +122,36 @@ impl FromStr for OutputMode {
     }
 }
 
-// this could have fewer nested if’s, but this produces better error messages
-fn parse_newline_on(s: &str) -> Result<char, anyhow::Error> {
+fn parse_newline_on(s: &str) -> Result<u8, anyhow::Error> {
     if let Ok(c) = s.parse::<char>() {
-        Ok(c)
+        return u8::try_from(c).context("non-byte character in `newline-on`");
+    }
 
     // if it starts with 0x then parse the hex byte
-    } else if &s[0..2] == "0x" {
-        if s.len() == 4 {
-            if let Ok(n) = u8::from_str_radix(&s[2..4], 16) {
-                Ok(n as char)
-            } else {
-                bail!("invalid hex byte")
-            }
-        } else {
-            bail!("hex byte must have 2 characters")
+    if &s[0..2] == "0x" {
+        if s.len() != 4 {
+            bail!("hex byte must have 2 digits");
         }
-    // if it starts with 0b then parse the binary byte
-    } else if &s[0..2] == "0b" {
-        if s.len() == 10 {
-            if let Ok(n) = u8::from_str_radix(&s[2..10], 2) {
-                Ok(n as char)
-            } else {
-                bail!("invalid binary byte")
-            }
-        } else {
-            bail!("binary byte must have 8 characters")
-        }
-    } else {
-        bail!("must be a single character or a byte in hex or binary notation")
+        return u8::from_str_radix(&s[2..4], 16).context("invalid hex byte");
     }
+
+    // if it starts with 0b then parse the binary byte
+    if &s[0..2] == "0b" {
+        if s.len() != 10 {
+            bail!("binary byte must have 8 digits");
+        }
+        return u8::from_str_radix(&s[2..10], 2).context("invalid binary byte");
+    }
+
+    bail!("must be a single character or a byte in hex or binary notation");
 }
 
 #[test]
 fn test_parse_newline_on() {
-    assert_eq!(parse_newline_on("a").unwrap(), 'a');
-    assert_eq!(parse_newline_on("\n").unwrap(), '\n');
-    assert_eq!(parse_newline_on("0x41").unwrap(), 'A');
-    assert_eq!(parse_newline_on("0b01000001").unwrap(), 'A');
+    assert_eq!(parse_newline_on("a").unwrap(), 'a' as u8);
+    assert_eq!(parse_newline_on("\n").unwrap(), '\n' as u8);
+    assert_eq!(parse_newline_on("0x41").unwrap(), 0x41);
+    assert_eq!(parse_newline_on("0b01000001").unwrap(), 0b01000001);
     assert!(parse_newline_on("not a char").is_err());
     assert!(parse_newline_on("0x").is_err());
     assert!(parse_newline_on("0xzz").is_err());
