@@ -535,12 +535,15 @@ macro_rules! impl_usart_traditional {
 
                 fn raw_interrupt(&mut self, event: $crate::usart::Event, state: bool) {
                     match event {
-                        $crate::usart::Event::RxComplete =>
-                            self.[<ucsr $n b>]().modify(|_, w| w.[<rxcie $n>]().bit(state)),
-                        $crate::usart::Event::TxComplete =>
-                            self.[<ucsr $n b>]().modify(|_, w| w.[<txcie $n>]().bit(state)),
-                        $crate::usart::Event::DataRegisterEmpty =>
-                            self.[<ucsr $n b>]().modify(|_, w| w.[<udrie $n>]().bit(state)),
+                        $crate::usart::Event::RxComplete => {
+                            self.[<ucsr $n b>]().modify(|_, w| w.[<rxcie $n>]().bit(state));
+                        }
+                        $crate::usart::Event::TxComplete => {
+                            self.[<ucsr $n b>]().modify(|_, w| w.[<txcie $n>]().bit(state));
+                        }
+                        $crate::usart::Event::DataRegisterEmpty => {
+                            self.[<ucsr $n b>]().modify(|_, w| w.[<udrie $n>]().bit(state));
+                        }
                     }
                 }
             }
