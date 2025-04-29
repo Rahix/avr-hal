@@ -28,7 +28,7 @@ fn main() -> ! {
     let mut led = pins.d13.into_output();
 
     let i2c = arduino_hal::I2c::new(
-        dp.TWI,
+        dp.twi,
         pins.a4.into_pull_up_input(),
         pins.a5.into_pull_up_input(),
         100_000,

@@ -28,7 +28,7 @@ fn main() -> ! {
 
     // Create SPI interface.
     let (mut spi, _) = arduino_hal::Spi::new(
-        dp.SPI,
+        dp.spi,
         pins.d13.into_output(),
         pins.d11.into_output(),
         pins.d12.into_pull_up_input(),

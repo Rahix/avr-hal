@@ -49,10 +49,10 @@ fn main() -> ! {
     ];
 
     // Enable the PCINT2 pin change interrupt
-    dp.EXINT.pcicr().write(|w| unsafe { w.bits(0b100) });
+    dp.exint.pcicr().write(|w| unsafe { w.bits(0b100) });
 
     // Enable pin change interrupts on PCINT18 which is pin PD2 (= d2)
-    dp.EXINT.pcmsk2().write(|w| w.set(0b100));
+    dp.exint.pcmsk2().write(|w| w.set(0b100));
 
     //From this point on an interrupt can happen
     unsafe { avr_device::interrupt::enable() };

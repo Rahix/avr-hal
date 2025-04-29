@@ -24,7 +24,7 @@ use panic_halt as _;
 
 use arduino_hal::{
     hal::port::{PD2, PD6, PD7},
-    pac::tc0::tccr0b::CS0_A,
+    pac::tc0::tccr0b::Cs0,
     port::mode::{Floating, Input, Output},
     port::Pin,
     prelude::*,
@@ -51,7 +51,7 @@ fn main() -> ! {
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
     // Monotonic clock to keep track of the time
-    CLOCK.start(dp.TC0);
+    CLOCK.start(dp.tc0);
 
     let mut uno_led = pins.d13.into_output();
     let mut irdroino_led1 = pins.d7.into_output();
@@ -62,10 +62,10 @@ fn main() -> ! {
     irdroino_led2.set_low();
 
     // Enable group 2 (PORTD)
-    dp.EXINT.pcicr().write(|w| unsafe { w.bits(0b100) });
+    dp.exint.pcicr().write(|w| unsafe { w.bits(0b100) });
 
     // Enable pin change interrupts on PCINT18 which is pin PD2 (= d2)
-    dp.EXINT.pcmsk2().write(|w| w.set(0b100));
+    dp.exint.pcmsk2().write(|w| w.set(0b100));
 
     let ir = Receiver::with_pin(Clock::FREQ, pins.d2);
 
@@ -130,7 +130,7 @@ struct Clock {
 
 impl Clock {
     const FREQ: u32 = 20_000;
-    const PRESCALER: CS0_A = CS0_A::PRESCALE_8;
+    const PRESCALER: Cs0 = Cs0::Prescale8;
     const TOP: u8 = 99;
 
     pub const fn new() -> Clock {
@@ -139,7 +139,7 @@ impl Clock {
         }
     }
 
-    pub fn start(&self, tc0: arduino_hal::pac::TC0) {
+    pub fn start(&self, tc0: arduino_hal::pac::Tc0) {
         // Configure the timer for the above interval (in CTC mode)
         tc0.tccr0a().write(|w| w.wgm0().ctc());
         tc0.ocr0a().write(|w| w.set(Self::TOP));

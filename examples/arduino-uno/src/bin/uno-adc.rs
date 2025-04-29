@@ -23,7 +23,7 @@ fn main() -> ! {
     let pins = arduino_hal::pins!(dp);
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    let mut adc = arduino_hal::Adc::new(dp.ADC, Default::default());
+    let mut adc = arduino_hal::Adc::new(dp.adc, Default::default());
 
     let (vbg, gnd, tmp) = (
         adc.read_blocking(&adc::channel::Vbg),

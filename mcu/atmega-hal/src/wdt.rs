@@ -1,13 +1,13 @@
 #[allow(unused_imports)]
 pub use avr_hal_generic::wdt::{Timeout, WdtOps};
 
-pub type Wdt = avr_hal_generic::wdt::Wdt<crate::Atmega, crate::pac::WDT>;
+pub type Wdt = avr_hal_generic::wdt::Wdt<crate::Atmega, crate::pac::Wdt>;
 
 #[cfg(not(any(feature = "atmega8", feature = "atmega16", feature = "atmega32a", feature = "atmega128a")))]
 avr_hal_generic::impl_wdt! {
     hal: crate::Atmega,
-    peripheral: crate::pac::WDT,
-    mcusr: crate::pac::cpu::MCUSR,
+    peripheral: crate::pac::Wdt,
+    mcusr: crate::pac::cpu::Mcusr,
     wdtcsr_name: wdtcsr,
     timeout: |to, w| match to {
         Timeout::Ms16 => w.wdpl().cycles_2k_512k(),
@@ -26,7 +26,7 @@ avr_hal_generic::impl_wdt! {
 #[cfg(any(feature = "atmega8", feature = "atmega32a", feature = "atmega128a"))]
 avr_hal_generic::impl_wdt! {
     hal: crate::Atmega,
-    peripheral: crate::pac::WDT,
+    peripheral: crate::pac::Wdt,
     mcusr: crate::pac::cpu::MCUCSR,
     wdtcsr_name: wdtcr,
     timeout: |to, w| match to {

@@ -12,8 +12,8 @@ and then modernized to account for API drift since 2020
 use arduino_hal::port::mode::Output;
 use arduino_hal::port::Pin;
 use arduino_hal::prelude::*;
-use avr_device::atmega328p::tc1::tccr1b::CS1_A;
-use avr_device::atmega328p::TC1;
+use avr_device::atmega328p::tc1::tccr1b::Cs1;
+use avr_device::atmega328p::Tc1;
 use core::mem;
 use panic_halt as _;
 use ufmt::{uWrite, uwriteln};
@@ -46,7 +46,7 @@ fn main() -> ! {
 
     //
 
-    let tmr1: TC1 = dp.TC1;
+    let tmr1: Tc1 = dp.tc1;
 
     rig_timer(&tmr1, &mut serial);
 
@@ -77,7 +77,7 @@ pub const fn calc_overflow(clock_hz: u32, target_hz: u32, prescale: u32) -> u32 
     clock_hz / target_hz / prescale - 1
 }
 
-pub fn rig_timer<W: uWrite<Error = ::core::convert::Infallible>>(tmr1: &TC1, serial: &mut W) {
+pub fn rig_timer<W: uWrite<Error = ::core::convert::Infallible>>(tmr1: &Tc1, serial: &mut W) {
     /*
      https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
      section 15.11
@@ -85,14 +85,14 @@ pub fn rig_timer<W: uWrite<Error = ::core::convert::Infallible>>(tmr1: &TC1, ser
     use arduino_hal::clock::Clock;
 
     const ARDUINO_UNO_CLOCK_FREQUENCY_HZ: u32 = arduino_hal::DefaultClock::FREQ;
-    const CLOCK_SOURCE: CS1_A = CS1_A::PRESCALE_256;
+    const CLOCK_SOURCE: Cs1 = Cs1::Prescale256;
     let clock_divisor: u32 = match CLOCK_SOURCE {
-        CS1_A::DIRECT => 1,
-        CS1_A::PRESCALE_8 => 8,
-        CS1_A::PRESCALE_64 => 64,
-        CS1_A::PRESCALE_256 => 256,
-        CS1_A::PRESCALE_1024 => 1024,
-        CS1_A::NO_CLOCK | CS1_A::EXT_FALLING | CS1_A::EXT_RISING => {
+        Cs1::Direct => 1,
+        Cs1::Prescale8 => 8,
+        Cs1::Prescale64 => 64,
+        Cs1::Prescale256 => 256,
+        Cs1::Prescale1024 => 1024,
+        Cs1::NoClock | Cs1::ExtFalling | Cs1::ExtRising => {
             uwriteln!(serial, "uhoh, code tried to set the clock source to something other than a static prescaler {}", CLOCK_SOURCE as usize)
                 .unwrap_infallible();
             1

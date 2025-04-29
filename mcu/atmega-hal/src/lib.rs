@@ -168,28 +168,28 @@ pub struct Atmega;
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD)
+        $crate::Pins::new($p.port_b, $p.port_c, $p.port_d)
     };
 }
 #[cfg(any(feature = "atmega16", feature = "atmega164pa"))]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
+        $crate::Pins::new($p.port_a, $p.port_b, $p.port_c, $p.port_d)
     };
 }
 #[cfg(feature = "atmega328pb")]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE)
+        $crate::Pins::new($p.port_b, $p.port_c, $p.port_d, $p.port_e)
     };
 }
 #[cfg(feature = "atmega32u4")]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF)
+        $crate::Pins::new($p.port_b, $p.port_c, $p.port_d, $p.port_e, $p.port_f)
     };
 }
 
@@ -198,7 +198,7 @@ macro_rules! pins {
 macro_rules! pins {
     ($p:expr) => {
         $crate::Pins::new(
-            $p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF, $p.PORTG,
+            $p.port_a, $p.port_b, $p.port_c, $p.port_d, $p.port_e, $p.port_f, $p.port_g,
         )
     };
 }
@@ -208,8 +208,8 @@ macro_rules! pins {
 macro_rules! pins {
     ($p:expr) => {
         $crate::Pins::new(
-            $p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF, $p.PORTG, $p.PORTH,
-            $p.PORTJ, $p.PORTK, $p.PORTL,
+            $p.port_a, $p.port_b, $p.port_c, $p.port_d, $p.port_e, $p.port_f, $p.port_g, $p.port_h,
+            $p.port_j, $p.port_k, $p.port_l,
         )
     };
 }
@@ -218,7 +218,7 @@ macro_rules! pins {
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD)
+        $crate::Pins::new($p.port_a, $p.port_b, $p.port_c, $p.port_d)
     };
 }
 
@@ -226,6 +226,6 @@ macro_rules! pins {
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
-        $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD)
+        $crate::Pins::new($p.port_b, $p.port_c, $p.port_d)
     };
 }

@@ -31,7 +31,7 @@ pub use avr_hal_generic::i2c::*;
 ))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
-    crate::pac::TWI,
+    crate::pac::Twi,
     port::Pin<port::mode::Input, port::PD1>,
     port::Pin<port::mode::Input, port::PD0>,
     CLOCK,
@@ -44,7 +44,7 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
 ))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::TWI,
+    peripheral: crate::pac::Twi,
     sda: port::PD1,
     scl: port::PD0,
 }
@@ -52,7 +52,7 @@ avr_hal_generic::impl_i2c_twi! {
 #[cfg(any(feature = "atmega16", feature = "atmega164pa"))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
-    crate::pac::TWI,
+    crate::pac::Twi,
     port::Pin<port::mode::Input, port::PC1>,
     port::Pin<port::mode::Input, port::PC0>,
     CLOCK,
@@ -60,7 +60,7 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
 #[cfg(any(feature = "atmega16", feature = "atmega164pa"))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::TWI,
+    peripheral: crate::pac::Twi,
     sda: port::PC1,
     scl: port::PC0,
 }
@@ -74,7 +74,7 @@ avr_hal_generic::impl_i2c_twi! {
 ))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
-    crate::pac::TWI,
+    crate::pac::Twi,
     port::Pin<port::mode::Input, port::PC4>,
     port::Pin<port::mode::Input, port::PC5>,
     CLOCK,
@@ -88,7 +88,7 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
 ))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::TWI,
+    peripheral: crate::pac::Twi,
     sda: port::PC4,
     scl: port::PC5,
 }
@@ -96,7 +96,7 @@ avr_hal_generic::impl_i2c_twi! {
 #[cfg(any(feature = "atmega328pb"))]
 pub type I2c0<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
-    crate::pac::TWI0,
+    crate::pac::Twi0,
     port::Pin<port::mode::Input, port::PC4>,
     port::Pin<port::mode::Input, port::PC5>,
     CLOCK,
@@ -104,14 +104,14 @@ pub type I2c0<CLOCK> = avr_hal_generic::i2c::I2c<
 #[cfg(any(feature = "atmega328pb"))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::TWI0,
+    peripheral: crate::pac::Twi0,
     sda: port::PC4,
     scl: port::PC5,
 }
 #[cfg(any(feature = "atmega328pb"))]
 pub type I2c1<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
-    crate::pac::TWI1,
+    crate::pac::Twi1,
     port::Pin<port::mode::Input, port::PE0>,
     port::Pin<port::mode::Input, port::PE1>,
     CLOCK,
@@ -119,7 +119,7 @@ pub type I2c1<CLOCK> = avr_hal_generic::i2c::I2c<
 #[cfg(any(feature = "atmega328pb"))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::TWI1,
+    peripheral: crate::pac::Twi1,
     sda: port::PE0,
     scl: port::PE1,
 }
@@ -127,7 +127,7 @@ avr_hal_generic::impl_i2c_twi! {
 #[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
     crate::Atmega,
-    crate::pac::TWI,
+    crate::pac::Twi,
     port::Pin<port::mode::Input, port::PC1>,
     port::Pin<port::mode::Input, port::PC0>,
     CLOCK,
@@ -135,7 +135,7 @@ pub type I2c<CLOCK> = avr_hal_generic::i2c::I2c<
 #[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 avr_hal_generic::impl_i2c_twi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::TWI,
+    peripheral: crate::pac::Twi,
     sda: port::PC1,
     scl: port::PC0,
 }
