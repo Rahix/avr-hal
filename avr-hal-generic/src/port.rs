@@ -633,18 +633,22 @@ macro_rules! impl_port_traditional_base {
                 #[inline]
                 unsafe fn out_set(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>]().modify(|r, w| {
-                            w.bits(r.bits() | self.mask)
-                        }),)+
+                        $(DynamicPort::[<PORT $name>] => {
+                            (*<$port>::ptr()).[<port $name:lower>]().modify(|r, w| {
+                                w.bits(r.bits() | self.mask)
+                            });
+                        })+
                     }
                 }
 
                 #[inline]
                 unsafe fn out_clear(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<port $name:lower>]().modify(|r, w| {
-                            w.bits(r.bits() & !self.mask)
-                        }),)+
+                        $(DynamicPort::[<PORT $name>] => {
+                            (*<$port>::ptr()).[<port $name:lower>]().modify(|r, w| {
+                                w.bits(r.bits() & !self.mask)
+                            });
+                        })+
                     }
                 }
 
@@ -655,7 +659,7 @@ macro_rules! impl_port_traditional_base {
                             if $chip_supports_atomic_toggle {
                                 (*<$port>::ptr()).[<pin $name:lower>]().write(|w| {
                                     w.bits(self.mask)
-                                })
+                                });
                             } else {
                                 // This read-modify-write sequence cannot be optimized into a single sbi/cbi instruction,
                                 // so it is wrapped in a critical section which ensures we will never hit a race-condition here.
@@ -663,7 +667,7 @@ macro_rules! impl_port_traditional_base {
                                     (*<$port>::ptr()).[<port $name:lower>]().modify(|r, w| {
                                         w.bits(r.bits() ^ self.mask)
                                     })
-                                })
+                                });
                             }
                         },)+
                     }
@@ -690,18 +694,22 @@ macro_rules! impl_port_traditional_base {
                 #[inline]
                 unsafe fn make_output(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<ddr $name:lower>]().modify(|r, w| {
-                            w.bits(r.bits() | self.mask)
-                        }),)+
+                        $(DynamicPort::[<PORT $name>] => {
+                            (*<$port>::ptr()).[<ddr $name:lower>]().modify(|r, w| {
+                                w.bits(r.bits() | self.mask)
+                            });
+                        })+
                     }
                 }
 
                 #[inline]
                 unsafe fn make_input(&mut self, pull_up: bool) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).[<ddr $name:lower>]().modify(|r, w| {
-                            w.bits(r.bits() & !self.mask)
-                        }),)+
+                        $(DynamicPort::[<PORT $name>] => {
+                            (*<$port>::ptr()).[<ddr $name:lower>]().modify(|r, w| {
+                                w.bits(r.bits() & !self.mask)
+                            });
+                        })+
                     }
                     if pull_up {
                         self.out_set()
@@ -730,14 +738,14 @@ macro_rules! impl_port_traditional_base {
                     unsafe fn out_set(&mut self) {
                         (*<$port>::ptr()).[<port $name:lower>]().modify(|_, w| {
                             w.[<p $name:lower $pin>]().set_bit()
-                        })
+                        });
                     }
 
                     #[inline]
                     unsafe fn out_clear(&mut self) {
                         (*<$port>::ptr()).[<port $name:lower>]().modify(|_, w| {
                             w.[<p $name:lower $pin>]().clear_bit()
-                        })
+                        });
                     }
 
                     #[inline]
@@ -745,14 +753,14 @@ macro_rules! impl_port_traditional_base {
                         if $chip_supports_atomic_toggle {
                             (*<$port>::ptr()).[<pin $name:lower>]().write(|w| {
                                 w.[<p $name:lower $pin>]().set_bit()
-                            })
+                            });
                         } else {
                             // This read-modify-write sequence cannot be optimized into a single sbi/cbi instruction,
                             // so it is wrapped in a critical section which ensures we will never hit a race-condition here.
                             $crate::avr_device::interrupt::free(|_| {
                                 (*<$port>::ptr()).[<port $name:lower>]().modify(|r, w| {
                                     w.[<p $name:lower $pin>]().bit(!r.[<p $name:lower $pin>]().bit())
-                                })
+                                });
                             })
                         }
                     }
@@ -771,7 +779,7 @@ macro_rules! impl_port_traditional_base {
                     unsafe fn make_output(&mut self) {
                         (*<$port>::ptr()).[<ddr $name:lower>]().modify(|_, w| {
                             w.[<p $name:lower $pin>]().set_bit()
-                        })
+                        });
                     }
 
                     #[inline]
