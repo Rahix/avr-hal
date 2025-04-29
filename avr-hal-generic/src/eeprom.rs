@@ -320,7 +320,7 @@ macro_rules! impl_eeprom_atmega {
                 regs.eecr().write(|w| {
                     // Set Master Write Enable bit, and and Erase+Write mode mode..
                     w.eempe().set_bit().eepm().val_0x00()
-                })
+                });
             }
             #[inline]
             pub unsafe fn set_erase_mode(regs: &$EEPROM) {
