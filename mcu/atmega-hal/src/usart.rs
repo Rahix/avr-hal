@@ -334,10 +334,14 @@ impl
 
     fn raw_interrupt(&mut self, event: crate::usart::Event, state: bool) {
         match event {
-            crate::usart::Event::RxComplete => self.ucsr1b().modify(|_, w| w.rxcie1().bit(state)),
-            crate::usart::Event::TxComplete => self.ucsr1b().modify(|_, w| w.txcie1().bit(state)),
+            crate::usart::Event::RxComplete => {
+                self.ucsr1b().modify(|_, w| w.rxcie1().bit(state));
+            }
+            crate::usart::Event::TxComplete => {
+                self.ucsr1b().modify(|_, w| w.txcie1().bit(state));
+            }
             crate::usart::Event::DataRegisterEmpty => {
-                self.ucsr1b().modify(|_, w| w.udrie1().bit(state))
+                self.ucsr1b().modify(|_, w| w.udrie1().bit(state));
             }
         }
     }
@@ -410,10 +414,14 @@ impl
 
     fn raw_interrupt(&mut self, event: crate::usart::Event, state: bool) {
         match event {
-            crate::usart::Event::RxComplete => self.ucsr0b().modify(|_, w| w.rxcie0().bit(state)),
-            crate::usart::Event::TxComplete => self.ucsr0b().modify(|_, w| w.txcie0().bit(state)),
+            crate::usart::Event::RxComplete => {
+                self.ucsr0b().modify(|_, w| w.rxcie0().bit(state));
+            }
+            crate::usart::Event::TxComplete => {
+                self.ucsr0b().modify(|_, w| w.txcie0().bit(state));
+            }
             crate::usart::Event::DataRegisterEmpty => {
-                self.ucsr0b().modify(|_, w| w.udrie0().bit(state))
+                self.ucsr0b().modify(|_, w| w.udrie0().bit(state));
             }
         }
     }
