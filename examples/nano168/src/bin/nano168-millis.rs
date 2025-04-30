@@ -53,7 +53,7 @@ fn millis_init(tc0: arduino_hal::pac::TC0) {
     });
 }
 
-#[avr_device::interrupt(atmega328p)]
+#[avr_device::interrupt(atmega168)]
 fn TIMER0_COMPA() {
     avr_device::interrupt::free(|cs| {
         let counter_cell = MILLIS_COUNTER.borrow(cs);
