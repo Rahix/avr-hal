@@ -255,10 +255,14 @@ impl
 
     fn raw_interrupt(&mut self, event: crate::usart::Event, state: bool) {
         match event {
-            crate::usart::Event::RxComplete => self.ucsrb().modify(|_, w| w.rxcie().bit(state)),
-            crate::usart::Event::TxComplete => self.ucsrb().modify(|_, w| w.txcie().bit(state)),
+            crate::usart::Event::RxComplete => {
+                self.ucsrb().modify(|_, w| w.rxcie().bit(state));
+            }
+            crate::usart::Event::TxComplete => {
+                self.ucsrb().modify(|_, w| w.txcie().bit(state));
+            }
             crate::usart::Event::DataRegisterEmpty => {
-                self.ucsrb().modify(|_, w| w.udrie().bit(state))
+                self.ucsrb().modify(|_, w| w.udrie().bit(state));
             }
         }
     }
