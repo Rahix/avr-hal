@@ -19,8 +19,6 @@ attiny88 = ["avr-device/attiny88", "device-selected"]
 attiny167 = ["avr-device/attiny167", "device-selected"]
 attiny2313 = ["avr-device/attiny2313", "device-selected"]
 
-critical-section-impl = ["avr-device/critical-section-impl"]
-
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
 
