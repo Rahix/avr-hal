@@ -29,7 +29,7 @@ fn main() -> ! {
     // it gives one clock count every 4 µs.
     // since the clock register size is 16 bits, the timer is full every
     // 1/(16e6/64)*2^16 ≈ 260 ms
-    let timer1 = dp.tc1;
+    let timer1 = dp.TC1;
     timer1.tccr1b().write(|w| w.cs1().prescale_64());
 
     'outer: loop {

@@ -24,7 +24,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d5.enable();
     /// ```
     pub struct Timer0Pwm {
-        timer: crate::pac::Tc0,
+        timer: crate::pac::TC0,
         init: |tim, prescaler| {
             tim.tccr0a().modify(|_r, w| w.wgm0().pwm_fast());
             tim.tccr0b().modify(|_r, w| match prescaler {
@@ -78,7 +78,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d9.enable();
     /// ```
     pub struct Timer1Pwm {
-        timer: crate::pac::Tc1,
+        timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
             tim.tccr1b().modify(|_r, w| {
@@ -136,7 +136,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d11.enable();
     /// ```
     pub struct Timer2Pwm {
-        timer: crate::pac::Tc2,
+        timer: crate::pac::TC2,
         init: |tim, prescaler| {
             tim.tccr2a().modify(|_r, w| w.wgm2().pwm_fast());
             tim.tccr2b().modify(|_r, w| match prescaler {
@@ -173,7 +173,7 @@ avr_hal_generic::impl_simple_pwm! {
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC3` for PWM (pins `PD0`, `PD2`)
     pub struct Timer3Pwm {
-        timer: crate::pac::Tc3,
+        timer: crate::pac::TC3,
         init: |tim, prescaler| {
             tim.tccr3a().modify(|_r, w| w.wgm3().set(0b01));
             tim.tccr3b().modify(|_r, w| {
@@ -214,7 +214,7 @@ avr_hal_generic::impl_simple_pwm! {
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC4` for PWM (pins `PD1`, `PD2`)
     pub struct Timer4Pwm {
-        timer: crate::pac::Tc4,
+        timer: crate::pac::TC4,
         init: |tim, prescaler| {
             tim.tccr4a().modify(|_r, w| w.wgm4().set(0b01));
             tim.tccr4b().modify(|_r, w| {
@@ -266,7 +266,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d13.enable();
     /// ```
     pub struct Timer0Pwm {
-        timer: crate::pac::Tc0,
+        timer: crate::pac::TC0,
         init: |tim, prescaler| {
             tim.tccr0a().modify(|_r, w| w.wgm0().pwm_fast());
             tim.tccr0b().modify(|_r, w| match prescaler {
@@ -315,7 +315,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d11.enable();
     /// ```
     pub struct Timer1Pwm {
-        timer: crate::pac::Tc1,
+        timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
             tim.tccr1b().modify(|_r, w| match prescaler {
@@ -373,7 +373,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// ```
 
     pub struct Timer2Pwm {
-        timer: crate::pac::Tc2,
+        timer: crate::pac::TC2,
         init: |tim, prescaler| {
             tim.tccr2a().modify(|_r, w| w.wgm2().set(0b01));
             tim.tccr2b().modify(|_r, w| {
@@ -426,7 +426,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d5.enable();
     /// ```
     pub struct Timer3Pwm {
-        timer: crate::pac::Tc3,
+        timer: crate::pac::TC3,
         init: |tim, prescaler| {
             tim.tccr3a().modify(|_r, w| w.wgm3().set(0b01));
             tim.tccr3b().modify(|_r, w| {
@@ -489,7 +489,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d6.enable();
     /// ```
     pub struct Timer4Pwm {
-        timer: crate::pac::Tc4,
+        timer: crate::pac::TC4,
         init: |tim, prescaler| {
             tim.tccr4a().modify(|_r, w| w.wgm4().set(0b01));
             tim.tccr4b().modify(|_r, w| {
@@ -552,7 +552,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d46.enable();
     /// ```
     pub struct Timer5Pwm {
-        timer: crate::pac::Tc5,
+        timer: crate::pac::TC5,
         init: |tim, prescaler| {
             tim.tccr5a().modify(|_r, w| w.wgm5().set(0b01));
             tim.tccr5b().modify(|_r, w| {
@@ -614,7 +614,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d11.enable();
     /// ```
     pub struct Timer0Pwm {
-        timer: crate::pac::Tc0,
+        timer: crate::pac::TC0,
         init: |tim, prescaler| {
             tim.tccr0a().modify(|_r, w| w.wgm0().pwm_fast());
             tim.tccr0b().modify(|_r, w| match prescaler {
@@ -663,7 +663,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d9.enable();
     /// ```
     pub struct Timer1Pwm {
-        timer: crate::pac::Tc1,
+        timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
             tim.tccr1b().modify(|_r, w| w.wgm1().set(0b01));
@@ -721,7 +721,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d5.enable();
     /// ```
     pub struct Timer3Pwm {
-        timer: crate::pac::Tc3,
+        timer: crate::pac::TC3,
         init: |tim, prescaler| {
             tim.tccr3a().modify(|_r, w| w.wgm3().set(0b01));
             tim.tccr3b().modify(|_r, w| w.wgm3().set(0b01));
@@ -763,7 +763,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d6.enable();
     /// ```
     pub struct Timer4Pwm {
-        timer: crate::pac::Tc4,
+        timer: crate::pac::TC4,
         init: |tim, prescaler| {
             tim.tccr4a().modify(|_r, w| w.pwm4a().set_bit());
             tim.tccr4a().modify(|_r, w| w.pwm4b().set_bit());
@@ -823,7 +823,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// b4.enable();
     /// ```
     pub struct Timer0Pwm {
-        timer: crate::pac::Tc0,
+        timer: crate::pac::TC0,
         init: |tim, prescaler| {
             tim.tccr0a().modify(|_r, w| w.wgm0().pwm_fast());
             tim.tccr0b().modify(|_r, w| match prescaler {
@@ -871,7 +871,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d5.enable();
     /// ```
     pub struct Timer1Pwm {
-        timer: crate::pac::Tc1,
+        timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
             tim.tccr1b().modify(|_r, w| {
@@ -923,7 +923,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d7.enable();
     /// ```
     pub struct Timer2Pwm {
-        timer: crate::pac::Tc2,
+        timer: crate::pac::TC2,
         init: |tim, prescaler| {
             tim.tccr2a().modify(|_r, w| w.wgm2().pwm_fast());
             tim.tccr2b().modify(|_r, w| match prescaler {
@@ -960,7 +960,7 @@ avr_hal_generic::impl_simple_pwm! {
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC3` for PWM (pins `PB6`, `PB7`)
     pub struct Timer3Pwm {
-        timer: crate::pac::Tc3,
+        timer: crate::pac::TC3,
         init: |tim, prescaler| {
             tim.tccr3a().modify(|_r, w| w.wgm3().set(0b01));
             tim.tccr3b().modify(|_r, w| {
@@ -1012,7 +1012,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d9.enable();
     /// ```
     pub struct Timer1Pwm {
-        timer: crate::pac::Tc1,
+        timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
             tim.tccr1b().modify(|_r, w| {
@@ -1064,7 +1064,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d11.enable();
     /// ```
     pub struct Timer2Pwm {
-        timer: crate::pac::Tc2,
+        timer: crate::pac::TC2,
         init: |tim, prescaler| {
             tim.tccr2().modify(|_r, w| w.wgm20().set_bit().wgm21().set_bit());
             tim.tccr2().modify(|_r, w| match prescaler {
@@ -1102,7 +1102,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// b3.enable();
     /// ```
     pub struct Timer0Pwm {
-        timer: crate::pac::Tc0,
+        timer: crate::pac::TC0,
         init: |tim, prescaler| {
             tim.tccr0a().modify(|_r, w| w.wgm0().set(0b11));
             tim.tccr0a().modify(|_r, w| w.com0a().set(0b00));
@@ -1145,7 +1145,7 @@ avr_hal_generic::impl_simple_pwm! {
     /// d5.enable();
     /// ```
     pub struct Timer1Pwm {
-        timer: crate::pac::Tc1,
+        timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a().modify(|_r, w| w.wgm1().set(0b01));
             tim.tccr1a().modify(|_r, w| w.com1a().set(0b00));

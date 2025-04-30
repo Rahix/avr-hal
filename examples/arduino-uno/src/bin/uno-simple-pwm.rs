@@ -12,7 +12,7 @@ fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
     let pins = arduino_hal::pins!(dp);
 
-    let timer0 = Timer0Pwm::new(dp.tc0, Prescaler::Prescale64);
+    let timer0 = Timer0Pwm::new(dp.TC0, Prescaler::Prescale64);
 
     // Digital pin 5 is connected to a LED and a resistor in series
     let mut pwm_led = pins.d5.into_output().into_pwm(&timer0);

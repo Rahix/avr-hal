@@ -243,7 +243,7 @@ macro_rules! pins {
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
         $crate::Usart::new(
-            $p.usart1,
+            $p.USART1,
             $pins.d0,
             $pins.d1.into_output(),
             $crate::hal::usart::BaudrateExt::into_baudrate($baud),
@@ -264,7 +264,7 @@ macro_rules! default_serial {
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
         $crate::Usart::new(
-            $p.usart1,
+            $p.USART1,
             $pins.rx,
             $pins.tx.into_output(),
             $crate::hal::usart::BaudrateExt::into_baudrate($baud),
@@ -287,7 +287,7 @@ macro_rules! default_serial {
 /// let dp = arduino_hal::Peripherals::take().unwrap();
 /// let pins = arduino_hal::pins!(dp);
 /// let serial = arduino_hal::Usart::new(
-///     dp.usart1,
+///     dp.USART1,
 ///     pins.d0,
 ///     pins.d1.into_output(),
 ///     // See src/usart.rs for why some boards use the BaudrateArduinoExt trait
@@ -305,7 +305,7 @@ macro_rules! default_serial {
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
         $crate::Usart::new(
-            $p.usart0,
+            $p.USART0,
             $pins.d0,
             $pins.d1.into_output(),
             // See comment in avr-hal-generic/src/usart.rs for why these boards use the
@@ -333,7 +333,7 @@ macro_rules! default_serial {
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {
         $crate::Usart::new(
-            $p.usart0,
+            $p.USART0,
             $pins.d0,
             $pins.d1.into_output(),
             $crate::hal::usart::BaudrateExt::into_baudrate($baud),

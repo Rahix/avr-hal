@@ -40,7 +40,7 @@ pub use avr_hal_generic::spi::*;
 ))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
-    crate::pac::Spi,
+    crate::pac::SPI,
     port::PB1,
     port::PB2,
     port::PB3,
@@ -54,7 +54,7 @@ pub type Spi = avr_hal_generic::spi::Spi<
 ))]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Spi,
+    peripheral: crate::pac::SPI,
     sclk: port::PB1,
     mosi: port::PB2,
     miso: port::PB3,
@@ -70,7 +70,7 @@ avr_hal_generic::impl_spi! {
 ))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
-    crate::pac::Spi,
+    crate::pac::SPI,
     port::PB5,
     port::PB3,
     port::PB4,
@@ -85,7 +85,7 @@ pub type Spi = avr_hal_generic::spi::Spi<
 ))]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Spi,
+    peripheral: crate::pac::SPI,
     sclk: port::PB5,
     mosi: port::PB3,
     miso: port::PB4,
@@ -95,7 +95,7 @@ avr_hal_generic::impl_spi! {
 #[cfg(feature = "atmega328pb")]
 pub type Spi0 = avr_hal_generic::spi::Spi<
     crate::Atmega,
-    crate::pac::Spi0,
+    crate::pac::SPI0,
     port::PB5,
     port::PB3,
     port::PB4,
@@ -104,7 +104,7 @@ pub type Spi0 = avr_hal_generic::spi::Spi<
 #[cfg(feature = "atmega328pb")]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Spi0,
+    peripheral: crate::pac::SPI0,
     sclk: port::PB5,
     mosi: port::PB3,
     miso: port::PB4,
@@ -113,7 +113,7 @@ avr_hal_generic::impl_spi! {
 #[cfg(feature = "atmega328pb")]
 pub type Spi1 = avr_hal_generic::spi::Spi<
     crate::Atmega,
-    crate::pac::Spi1,
+    crate::pac::SPI1,
     port::PC1,
     port::PE3,
     port::PC0,
@@ -122,7 +122,7 @@ pub type Spi1 = avr_hal_generic::spi::Spi<
 #[cfg(feature = "atmega328pb")]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Spi1,
+    peripheral: crate::pac::SPI1,
     sclk: port::PC1,
     mosi: port::PE3,
     miso: port::PC0,
@@ -132,7 +132,7 @@ avr_hal_generic::impl_spi! {
 #[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
-    crate::pac::Spi,
+    crate::pac::SPI,
     port::PB7,
     port::PB5,
     port::PB6,
@@ -141,7 +141,7 @@ pub type Spi = avr_hal_generic::spi::Spi<
 #[cfg(any(feature = "atmega1284p", feature = "atmega32a"))]
 avr_hal_generic::impl_spi! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Spi,
+    peripheral: crate::pac::SPI,
     sclk: port::PB7,
     mosi: port::PB5,
     miso: port::PB6,

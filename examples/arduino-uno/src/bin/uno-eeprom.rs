@@ -13,7 +13,7 @@ fn main() -> ! {
     let pins = arduino_hal::pins!(dp);
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    let mut ep = arduino_hal::Eeprom::new(dp.eeprom);
+    let mut ep = arduino_hal::Eeprom::new(dp.EEPROM);
     let ep_capacity = ep.capacity();
     ufmt::uwriteln!(&mut serial, "eeprom capacity is:{}\r", ep_capacity).unwrap_infallible();
 

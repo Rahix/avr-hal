@@ -35,7 +35,7 @@ const MILLIS_INCREMENT: u32 = PRESCALER * TIMER_COUNTS / 16000;
 static MILLIS_COUNTER: avr_device::interrupt::Mutex<cell::Cell<u32>> =
     avr_device::interrupt::Mutex::new(cell::Cell::new(0));
 
-fn millis_init(tc0: arduino_hal::pac::Tc0) {
+fn millis_init(tc0: arduino_hal::pac::TC0) {
     // Configure the timer for the above interval (in CTC mode)
     // and enable its interrupt.
     tc0.tccr0a().write(|w| w.wgm0().ctc());
@@ -76,7 +76,7 @@ fn main() -> ! {
     let pins = arduino_hal::pins!(dp);
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    millis_init(dp.tc0);
+    millis_init(dp.TC0);
 
     // Enable interrupts globally
     unsafe { avr_device::interrupt::enable() };

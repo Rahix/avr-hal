@@ -27,7 +27,7 @@ fn main() -> ! {
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
     let mut i2c = arduino_hal::I2c::new(
-        dp.twi,
+        dp.TWI,
         pins.a4.into_pull_up_input(),
         pins.a5.into_pull_up_input(),
         50000,

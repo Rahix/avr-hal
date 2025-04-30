@@ -55,7 +55,7 @@ pub struct AdcSettings {
     pub ref_voltage: ReferenceVoltage,
 }
 
-fn apply_settings(peripheral: &crate::pac::Adc, settings: AdcSettings) {
+fn apply_settings(peripheral: &crate::pac::ADC, settings: AdcSettings) {
     peripheral.adcsra().write(|w| {
         w.aden().set_bit();
         match settings.clock_divider {
@@ -76,10 +76,10 @@ fn apply_settings(peripheral: &crate::pac::Adc, settings: AdcSettings) {
 }
 
 /// Check the [`avr_hal_generic::adc::Adc`] documentation.
-pub type Adc<CLOCK> = avr_hal_generic::adc::Adc<crate::Atmega, crate::pac::Adc, CLOCK>;
+pub type Adc<CLOCK> = avr_hal_generic::adc::Adc<crate::Atmega, crate::pac::ADC, CLOCK>;
 
 /// Check the [`avr_hal_generic::adc::Channel`] documentation.
-pub type Channel = avr_hal_generic::adc::Channel<crate::Atmega, crate::pac::Adc>;
+pub type Channel = avr_hal_generic::adc::Channel<crate::Atmega, crate::pac::ADC>;
 
 /// Additional channels
 ///
@@ -178,63 +178,63 @@ pub mod channel {
 ))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Adc,
+    peripheral: crate::pac::ADC,
     settings: AdcSettings,
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
-    channel_id: crate::pac::adc::admux::Mux,
+    channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
-        port::PC0: (crate::pac::adc::admux::Mux::Adc0, didr0::adc0d),
-        port::PC1: (crate::pac::adc::admux::Mux::Adc1, didr0::adc1d),
-        port::PC2: (crate::pac::adc::admux::Mux::Adc2, didr0::adc2d),
-        port::PC3: (crate::pac::adc::admux::Mux::Adc3, didr0::adc3d),
-        port::PC4: (crate::pac::adc::admux::Mux::Adc4, didr0::adc4d),
-        port::PC5: (crate::pac::adc::admux::Mux::Adc5, didr0::adc5d),
+        port::PC0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
+        port::PC1: (crate::pac::adc::admux::MUX_A::ADC1, didr0::adc1d),
+        port::PC2: (crate::pac::adc::admux::MUX_A::ADC2, didr0::adc2d),
+        port::PC3: (crate::pac::adc::admux::MUX_A::ADC3, didr0::adc3d),
+        port::PC4: (crate::pac::adc::admux::MUX_A::ADC4, didr0::adc4d),
+        port::PC5: (crate::pac::adc::admux::MUX_A::ADC5, didr0::adc5d),
     },
     channels: {
         #[cfg(feature = "enable-extra-adc")]
-        channel::ADC6: crate::pac::adc::admux::Mux::Adc6,
+        channel::ADC6: crate::pac::adc::admux::MUX_A::ADC6,
         #[cfg(feature = "enable-extra-adc")]
-        channel::ADC7: crate::pac::adc::admux::Mux::Adc7,
-        channel::Vbg: crate::pac::adc::admux::Mux::AdcVbg,
-        channel::Gnd: crate::pac::adc::admux::Mux::AdcGnd,
+        channel::ADC7: crate::pac::adc::admux::MUX_A::ADC7,
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
         #[cfg(any(feature = "atmega328p", feature = "atmega328pb", feature = "atmega48p"))]
-        channel::Temperature: crate::pac::adc::admux::Mux::Tempsens,
+        channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
     },
 }
 
 #[cfg(any(feature = "atmega16", feature = "atmega32a"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Adc,
+    peripheral: crate::pac::ADC,
     settings: AdcSettings,
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
-    channel_id: crate::pac::adc::admux::Mux,
+    channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
-        port::PA0: (crate::pac::adc::admux::Mux::Adc0),
-        port::PA1: (crate::pac::adc::admux::Mux::Adc1),
-        port::PA2: (crate::pac::adc::admux::Mux::Adc2),
-        port::PA3: (crate::pac::adc::admux::Mux::Adc3),
-        port::PA4: (crate::pac::adc::admux::Mux::Adc4),
-        port::PA5: (crate::pac::adc::admux::Mux::Adc5),
-        port::PA6: (crate::pac::adc::admux::Mux::Adc6),
-        port::PA7: (crate::pac::adc::admux::Mux::Adc7),
+        port::PA0: (crate::pac::adc::admux::MUX_A::ADC0),
+        port::PA1: (crate::pac::adc::admux::MUX_A::ADC1),
+        port::PA2: (crate::pac::adc::admux::MUX_A::ADC2),
+        port::PA3: (crate::pac::adc::admux::MUX_A::ADC3),
+        port::PA4: (crate::pac::adc::admux::MUX_A::ADC4),
+        port::PA5: (crate::pac::adc::admux::MUX_A::ADC5),
+        port::PA6: (crate::pac::adc::admux::MUX_A::ADC6),
+        port::PA7: (crate::pac::adc::admux::MUX_A::ADC7),
     },
     channels: {
-        channel::Vbg: crate::pac::adc::admux::Mux::AdcVbg,
-        channel::Gnd: crate::pac::adc::admux::Mux::AdcGnd,
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }
 
 #[cfg(feature = "atmega32u4")]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Adc,
+    peripheral: crate::pac::ADC,
     settings: AdcSettings,
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: u8,
@@ -266,33 +266,33 @@ avr_hal_generic::impl_adc! {
 #[cfg(feature = "atmega128a")]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Adc,
+    peripheral: crate::pac::ADC,
     settings: AdcSettings,
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
-    channel_id: crate::pac::adc::admux::Mux,
+    channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
-        port::PF0: (crate::pac::adc::admux::Mux::Adc0),
-        port::PF1: (crate::pac::adc::admux::Mux::Adc1),
-        port::PF2: (crate::pac::adc::admux::Mux::Adc2),
-        port::PF3: (crate::pac::adc::admux::Mux::Adc3),
-        port::PF4: (crate::pac::adc::admux::Mux::Adc4),
-        port::PF5: (crate::pac::adc::admux::Mux::Adc5),
-        port::PF6: (crate::pac::adc::admux::Mux::Adc6),
-        port::PF7: (crate::pac::adc::admux::Mux::Adc7),
+        port::PF0: (crate::pac::adc::admux::MUX_A::ADC0),
+        port::PF1: (crate::pac::adc::admux::MUX_A::ADC1),
+        port::PF2: (crate::pac::adc::admux::MUX_A::ADC2),
+        port::PF3: (crate::pac::adc::admux::MUX_A::ADC3),
+        port::PF4: (crate::pac::adc::admux::MUX_A::ADC4),
+        port::PF5: (crate::pac::adc::admux::MUX_A::ADC5),
+        port::PF6: (crate::pac::adc::admux::MUX_A::ADC6),
+        port::PF7: (crate::pac::adc::admux::MUX_A::ADC7),
     },
     channels: {
-        channel::Vbg: crate::pac::adc::admux::Mux::AdcVbg,
-        channel::Gnd: crate::pac::adc::admux::Mux::AdcGnd,
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }
 
 #[cfg(any(feature = "atmega2560", feature = "atmega1280"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Adc,
+    peripheral: crate::pac::ADC,
     settings: AdcSettings,
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: u8,
@@ -327,81 +327,81 @@ avr_hal_generic::impl_adc! {
 #[cfg(any(feature = "atmega1284p"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Adc,
+    peripheral: crate::pac::ADC,
     settings: AdcSettings,
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
-    channel_id: crate::pac::adc::admux::Mux,
+    channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
-        port::PA0: (crate::pac::adc::admux::Mux::Adc0, didr0::adc0d),
-        port::PA1: (crate::pac::adc::admux::Mux::Adc1, didr0::adc1d),
-        port::PA2: (crate::pac::adc::admux::Mux::Adc2, didr0::adc2d),
-        port::PA3: (crate::pac::adc::admux::Mux::Adc3, didr0::adc3d),
-        port::PA4: (crate::pac::adc::admux::Mux::Adc4, didr0::adc4d),
-        port::PA5: (crate::pac::adc::admux::Mux::Adc5, didr0::adc5d),
+        port::PA0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
+        port::PA1: (crate::pac::adc::admux::MUX_A::ADC1, didr0::adc1d),
+        port::PA2: (crate::pac::adc::admux::MUX_A::ADC2, didr0::adc2d),
+        port::PA3: (crate::pac::adc::admux::MUX_A::ADC3, didr0::adc3d),
+        port::PA4: (crate::pac::adc::admux::MUX_A::ADC4, didr0::adc4d),
+        port::PA5: (crate::pac::adc::admux::MUX_A::ADC5, didr0::adc5d),
     },
     channels: {
         #[cfg(feature = "enable-extra-adc")]
-        channel::ADC6: crate::pac::adc::admux::Mux::Adc6,
+        channel::ADC6: crate::pac::adc::admux::MUX_A::ADC6,
         #[cfg(feature = "enable-extra-adc")]
-        channel::ADC7: crate::pac::adc::admux::Mux::Adc7,
-        channel::Vbg: crate::pac::adc::admux::Mux::AdcVbg,
-        channel::Gnd: crate::pac::adc::admux::Mux::AdcGnd,
+        channel::ADC7: crate::pac::adc::admux::MUX_A::ADC7,
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }
 
 #[cfg(any(feature = "atmega8"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Adc,
+    peripheral: crate::pac::ADC,
     settings: AdcSettings,
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
-    channel_id: crate::pac::adc::admux::Mux,
+    channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
-        port::PC0: (crate::pac::adc::admux::Mux::Adc0),
-        port::PC1: (crate::pac::adc::admux::Mux::Adc1),
-        port::PC2: (crate::pac::adc::admux::Mux::Adc2),
-        port::PC3: (crate::pac::adc::admux::Mux::Adc3),
-        port::PC4: (crate::pac::adc::admux::Mux::Adc4),
-        port::PC5: (crate::pac::adc::admux::Mux::Adc5),
+        port::PC0: (crate::pac::adc::admux::MUX_A::ADC0),
+        port::PC1: (crate::pac::adc::admux::MUX_A::ADC1),
+        port::PC2: (crate::pac::adc::admux::MUX_A::ADC2),
+        port::PC3: (crate::pac::adc::admux::MUX_A::ADC3),
+        port::PC4: (crate::pac::adc::admux::MUX_A::ADC4),
+        port::PC5: (crate::pac::adc::admux::MUX_A::ADC5),
     },
     channels: {
         #[cfg(feature = "enable-extra-adc")]
-        channel::ADC6: crate::pac::adc::admux::Mux::Adc6,
+        channel::ADC6: crate::pac::adc::admux::MUX_A::ADC6,
         #[cfg(feature = "enable-extra-adc")]
-        channel::ADC7: crate::pac::adc::admux::Mux::Adc7,
-        channel::Vbg: crate::pac::adc::admux::Mux::AdcVbg,
-        channel::Gnd: crate::pac::adc::admux::Mux::AdcGnd,
+        channel::ADC7: crate::pac::adc::admux::MUX_A::ADC7,
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }
 
 #[cfg(any(feature = "atmega164pa"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Adc,
+    peripheral: crate::pac::ADC,
     settings: AdcSettings,
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
-    channel_id: crate::pac::adc::admux::Mux,
+    channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
         peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
-        port::PA0: (crate::pac::adc::admux::Mux::Adc0, didr0::adc0d),
-        port::PA1: (crate::pac::adc::admux::Mux::Adc1, didr0::adc1d),
-        port::PA2: (crate::pac::adc::admux::Mux::Adc2, didr0::adc2d),
-        port::PA3: (crate::pac::adc::admux::Mux::Adc3, didr0::adc3d),
-        port::PA4: (crate::pac::adc::admux::Mux::Adc4, didr0::adc4d),
-        port::PA5: (crate::pac::adc::admux::Mux::Adc5, didr0::adc5d),
-        port::PA6: (crate::pac::adc::admux::Mux::Adc6, didr0::adc6d),
-        port::PA7: (crate::pac::adc::admux::Mux::Adc7, didr0::adc7d),
+        port::PA0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
+        port::PA1: (crate::pac::adc::admux::MUX_A::ADC1, didr0::adc1d),
+        port::PA2: (crate::pac::adc::admux::MUX_A::ADC2, didr0::adc2d),
+        port::PA3: (crate::pac::adc::admux::MUX_A::ADC3, didr0::adc3d),
+        port::PA4: (crate::pac::adc::admux::MUX_A::ADC4, didr0::adc4d),
+        port::PA5: (crate::pac::adc::admux::MUX_A::ADC5, didr0::adc5d),
+        port::PA6: (crate::pac::adc::admux::MUX_A::ADC6, didr0::adc6d),
+        port::PA7: (crate::pac::adc::admux::MUX_A::ADC7, didr0::adc7d),
     },
     channels: {
-        channel::Vbg: crate::pac::adc::admux::Mux::AdcVbg,
-        channel::Gnd: crate::pac::adc::admux::Mux::AdcGnd,
+        channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+        channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }

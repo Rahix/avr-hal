@@ -42,7 +42,7 @@ pub type UsartReader<USART, RX, TX, CLOCK> =
 
 #[cfg(any(feature = "atmega16"))]
 pub type Usart0<CLOCK> = Usart<
-    crate::pac::Usart,
+    crate::pac::USART,
     port::Pin<port::mode::Input, port::PD0>,
     port::Pin<port::mode::Output, port::PD1>,
     CLOCK,
@@ -56,7 +56,7 @@ pub type Usart0<CLOCK> = Usart<
     feature = "atmega164pa"
 ))]
 pub type Usart0<CLOCK> = Usart<
-    crate::pac::Usart0,
+    crate::pac::USART0,
     port::Pin<port::mode::Input, port::PD0>,
     port::Pin<port::mode::Output, port::PD1>,
     CLOCK,
@@ -71,7 +71,7 @@ pub type Usart0<CLOCK> = Usart<
 ))]
 avr_hal_generic::impl_usart_traditional! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Usart0,
+    peripheral: crate::pac::USART0,
     register_suffix: 0,
     rx: port::PD0,
     tx: port::PD1,
@@ -79,7 +79,7 @@ avr_hal_generic::impl_usart_traditional! {
 
 #[cfg(feature = "atmega328pb")]
 pub type Usart1<CLOCK> = Usart<
-    crate::pac::Usart1,
+    crate::pac::USART1,
     port::Pin<port::mode::Input, port::PB4>,
     port::Pin<port::mode::Output, port::PB3>,
     CLOCK,
@@ -87,7 +87,7 @@ pub type Usart1<CLOCK> = Usart<
 #[cfg(feature = "atmega328pb")]
 avr_hal_generic::impl_usart_traditional! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Usart1,
+    peripheral: crate::pac::USART1,
     register_suffix: 1,
     rx: port::PB4,
     tx: port::PB3,
@@ -102,7 +102,7 @@ avr_hal_generic::impl_usart_traditional! {
     feature = "atmega164pa"
 ))]
 pub type Usart1<CLOCK> = Usart<
-    crate::pac::Usart1,
+    crate::pac::USART1,
     port::Pin<port::mode::Input, port::PD2>,
     port::Pin<port::mode::Output, port::PD3>,
     CLOCK,
@@ -116,7 +116,7 @@ pub type Usart1<CLOCK> = Usart<
 ))]
 avr_hal_generic::impl_usart_traditional! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Usart1,
+    peripheral: crate::pac::USART1,
     register_suffix: 1,
     rx: port::PD2,
     tx: port::PD3,
@@ -124,7 +124,7 @@ avr_hal_generic::impl_usart_traditional! {
 
 #[cfg(any(feature = "atmega128a", feature = "atmega1280", feature = "atmega2560"))]
 pub type Usart0<CLOCK> = Usart<
-    crate::pac::Usart0,
+    crate::pac::USART0,
     port::Pin<port::mode::Input, port::PE0>,
     port::Pin<port::mode::Output, port::PE1>,
     CLOCK,
@@ -132,7 +132,7 @@ pub type Usart0<CLOCK> = Usart<
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_usart_traditional! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Usart0,
+    peripheral: crate::pac::USART0,
     register_suffix: 0,
     rx: port::PE0,
     tx: port::PE1,
@@ -140,7 +140,7 @@ avr_hal_generic::impl_usart_traditional! {
 
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 pub type Usart2<CLOCK> = Usart<
-    crate::pac::Usart2,
+    crate::pac::USART2,
     port::Pin<port::mode::Input, port::PH0>,
     port::Pin<port::mode::Output, port::PH1>,
     CLOCK,
@@ -148,7 +148,7 @@ pub type Usart2<CLOCK> = Usart<
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_usart_traditional! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Usart2,
+    peripheral: crate::pac::USART2,
     register_suffix: 2,
     rx: port::PH0,
     tx: port::PH1,
@@ -156,7 +156,7 @@ avr_hal_generic::impl_usart_traditional! {
 
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 pub type Usart3<CLOCK> = Usart<
-    crate::pac::Usart3,
+    crate::pac::USART3,
     port::Pin<port::mode::Input, port::PJ0>,
     port::Pin<port::mode::Output, port::PJ1>,
     CLOCK,
@@ -164,7 +164,7 @@ pub type Usart3<CLOCK> = Usart<
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_usart_traditional! {
     hal: crate::Atmega,
-    peripheral: crate::pac::Usart3,
+    peripheral: crate::pac::USART3,
     register_suffix: 3,
     rx: port::PJ0,
     tx: port::PJ1,
@@ -172,7 +172,7 @@ avr_hal_generic::impl_usart_traditional! {
 
 #[cfg(any(feature = "atmega8", feature = "atmega32a"))]
 pub type Usart0<CLOCK> = Usart<
-    crate::pac::Usart,
+    crate::pac::USART,
     port::Pin<port::mode::Input, port::PD0>,
     port::Pin<port::mode::Output, port::PD1>,
     CLOCK,
@@ -191,7 +191,7 @@ impl
         crate::Atmega,
         crate::port::Pin<crate::port::mode::Input, port::PD0>,
         crate::port::Pin<crate::port::mode::Output, port::PD1>,
-    > for crate::pac::Usart
+    > for crate::pac::USART
 {
     fn raw_init<CLOCK>(&mut self, baudrate: crate::usart::Baudrate<CLOCK>) {
         // msb of ubrrh has to be 0 to set ubrrh register. (see atmega8 datasheet)
@@ -272,7 +272,7 @@ impl
         crate::Atmega,
         crate::port::Pin<crate::port::mode::Input, port::PD2>,
         crate::port::Pin<crate::port::mode::Output, port::PD3>,
-    > for crate::pac::Usart1
+    > for crate::pac::USART1
 {
     fn raw_init<CLOCK>(&mut self, baudrate: crate::usart::Baudrate<CLOCK>) {
         let ubrr1h: u8 = (baudrate.ubrr >> 8) as u8;
@@ -352,7 +352,7 @@ impl
         crate::Atmega,
         crate::port::Pin<crate::port::mode::Input, port::PE0>,
         crate::port::Pin<crate::port::mode::Output, port::PE1>,
-    > for crate::pac::Usart0
+    > for crate::pac::USART0
 {
     fn raw_init<CLOCK>(&mut self, baudrate: crate::usart::Baudrate<CLOCK>) {
         let ubrr0h: u8 = (baudrate.ubrr >> 8) as u8;
