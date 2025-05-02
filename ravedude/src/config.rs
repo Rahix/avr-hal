@@ -49,7 +49,7 @@ impl RavedudeConfig {
                 port: args.port.clone(),
                 reset_delay: args.reset_delay,
                 board: args.legacy_board_name().clone(),
-                output_mode: args.output_mode.unwrap_or(OutputMode::default()),
+                output_mode: args.output_mode.unwrap_or_default(),
                 newline_after: None,
                 newline_on: None,
             },
@@ -67,7 +67,7 @@ impl RavedudeGeneralConfig {
                 )
             }
 
-			return Ok(NewlineMode::Off);
+            return Ok(NewlineMode::Off);
         }
 
         Ok(match (self.newline_on.as_ref(), self.newline_after) {

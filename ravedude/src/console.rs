@@ -2,12 +2,10 @@ use std::io::Read as _;
 use std::io::Write as _;
 
 use anyhow::Context as _;
-use colored::Colorize as _;
 
 use crate::config::NewlineMode;
 use crate::config::OutputMode;
 use crate::config::OutputMode::*;
-use crate::task_message;
 
 pub fn open(
     port: &std::path::PathBuf,
@@ -16,11 +14,6 @@ pub fn open(
     newline_mode: NewlineMode,
     space_after: Option<u8>,
 ) -> anyhow::Result<()> {
-    task_message!("Console", "{} at {} baud", port.display(), baudrate);
-    task_message!("", "{}", "CTRL+C to exit.".dimmed());
-    // Empty line for visual consistency
-    eprintln!();
-
     let mut rx = serialport::new(port.to_string_lossy(), baudrate)
         .timeout(std::time::Duration::from_secs(2))
         .open_native()
