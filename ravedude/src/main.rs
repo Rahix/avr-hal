@@ -348,8 +348,7 @@ fn ravedude() -> anyhow::Result<()> {
             })?;
 
         let port = port.context("console can only be opened for devices with USB-to-Serial")?;
-		let newline_mode = ravedude_config.general_options.newline_mode()?;
-
+        let newline_mode = ravedude_config.general_options.newline_mode()?;
 
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
         task_message!("", "{}", "CTRL+C to exit.".dimmed());
@@ -358,9 +357,9 @@ fn ravedude() -> anyhow::Result<()> {
         console::open(
             &port,
             baudrate.get(),
-			ravedude_config.general_options.output_mode,
-			newline_mode,
-			newline_mode.space_after()
+            ravedude_config.general_options.output_mode,
+            newline_mode,
+            newline_mode.space_after(),
         )?;
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
