@@ -1,27 +1,28 @@
 {
   inputs = {
-    utils = {
-      url = "github:numtide/flake-utils";
-    };
-
-    naersk = {
-      url = "github:nix-community/naersk";
-    };
+    utils.url = "github:numtide/flake-utils";
+    naersk.url = "github:nix-community/naersk";
+    fenix.url = "github:nix-community/fenix";
   };
 
-  outputs = { self, nixpkgs, utils, naersk }:
+  outputs = { nixpkgs, utils, naersk, fenix, ... }:
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
+          overlays = [ fenix.overlays.default ];
         };
-
-        naersk' = pkgs.callPackage naersk {};
-
         lib = pkgs.lib;
 
-      in
-      rec {
+        rust-toolchain = pkgs.fenix.fromToolchainFile {
+          file = ./rust-toolchain.toml;
+          sha256 = "X/4ZBHO3iW0fOenQ3foEvscgAPJYl2abspaBThDOukI=";
+        };
+        naersk' = pkgs.callPackage naersk {
+          cargo = rust-toolchain;
+          rustc = rust-toolchain;
+        };
+      in {
         packages.default = naersk'.buildPackage {
           pname = "ravedude";
           src = ./.;
