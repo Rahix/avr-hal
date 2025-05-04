@@ -38,7 +38,7 @@ disable-device-selection-error = []
 docsrs = ["atmega328p"]
 
 [dependencies]
-avr-hal-generic = { path = "../../avr-hal-generic/" }
+avr-hal-generic = { version="0.1.0", path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
 version = "0.7"
