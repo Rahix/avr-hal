@@ -27,3 +27,16 @@ jobs:
       - name: Test ravedude
         run: |
           cargo test --manifest-path ravedude/Cargo.toml
+
+  rustfmt:
+    name: Apply rustfmt formatting (ravedude)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt
+      - uses: actions-rust-lang/rustfmt@v1
+        with:
+          manifest-path: ravedude/Cargo.toml
