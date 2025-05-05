@@ -69,7 +69,7 @@ impl Avrdude {
                 anyhow::bail!(
                     "{} \n\
                     Use the following command: {}", 
-                    default_error, 
+                    default_error,
                     "sudo apt install avr-libc gcc-avr pkg-config avrdude libudev-dev build-essential".bright_black()
             );
             }
