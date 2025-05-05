@@ -1,0 +1,132 @@
+pub mod adc {
+    pub use crate::periphals::adc::*;
+
+    use crate::port;
+
+    avr_hal_generic::impl_adc! {
+        hal: crate::Attiny,
+        peripheral: crate::pac::ADC,
+        settings: AdcSettings,
+        apply_settings: |peripheral, settings| {
+            apply_clock(peripheral, settings);
+            peripheral.amiscr.write(|w| match settings.ref_voltage {
+                ReferenceVoltage::Aref => w.arefen().set_bit(),
+                _ => w.arefen().clear_bit(),
+            });
+            peripheral.admux.write(|w| match settings.ref_voltage {
+                ReferenceVoltage::Aref => w.refs().avcc(),
+                ReferenceVoltage::AVcc => w.refs().avcc(),
+                ReferenceVoltage::Internal1_1 => w.refs().internal_11(),
+                ReferenceVoltage::Internal2_56 => w.refs().internal_256(),
+            });
+        },
+        channel_id: crate::pac::adc::admux::MUX_A,
+        set_channel: |peripheral, id| {
+            peripheral.admux.modify(|_, w| w.mux().variant(id));
+        },
+        pins: {
+            port::PA0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
+            port::PA1: (crate::pac::adc::admux::MUX_A::ADC1, didr0::adc1d),
+            port::PA2: (crate::pac::adc::admux::MUX_A::ADC2, didr0::adc2d),
+            port::PA3: (crate::pac::adc::admux::MUX_A::ADC3, didr0::adc3d),
+            port::PA4: (crate::pac::adc::admux::MUX_A::ADC4, didr0::adc4d),
+            port::PA5: (crate::pac::adc::admux::MUX_A::ADC5, didr0::adc5d),
+            port::PA6: (crate::pac::adc::admux::MUX_A::ADC6, didr0::adc6d),
+            port::PA7: (crate::pac::adc::admux::MUX_A::ADC7, didr0::adc7d),
+            port::PB5: (crate::pac::adc::admux::MUX_A::ADC8, didr1::adc8d),
+            port::PB6: (crate::pac::adc::admux::MUX_A::ADC9, didr1::adc9d),
+            port::PB7: (crate::pac::adc::admux::MUX_A::ADC10, didr1::adc10d),
+        },
+        channels: {
+            channel::AVcc_4: crate::pac::adc::admux::MUX_A::ADC_AVCC_4,
+            channel::Vbg: crate::pac::adc::admux::MUX_A::ADC_VBG,
+            channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
+            channel::Temperature: crate::pac::adc::admux::MUX_A::TEMPSENS,
+        },
+    }
+}
+
+pub mod eeprom {
+    pub use crate::periphals::eeprom::*;
+
+    avr_hal_generic::impl_eeprom_attiny! {
+        hal: crate::Attiny,
+        peripheral: crate::pac::EEPROM,
+        capacity: 512,
+        addr_width: u16,
+        set_address: |peripheral, address| {
+            peripheral.eear.write(|w| w.bits(address));
+        },
+    }
+}
+
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB)
+    };
+}
+
+pub mod port {
+    pub use crate::periphals::port::*;
+
+    avr_hal_generic::impl_port_traditional! {
+        enum Ports {
+            A: crate::pac::PORTA = [0, 1, 2, 3, 4, 5, 6, 7],
+            B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5, 6, 7],
+        }
+    }
+}
+
+pub mod simple_pwm {
+    pub use crate::periphals::simple_pwm::*;
+
+    // Fixme: Implement PWM for ATtiny167.
+}
+
+pub mod spi {
+    pub use crate::periphals::spi::*;
+
+    use crate::port;
+
+    pub type Spi = avr_hal_generic::spi::Spi<
+        crate::Attiny,
+        crate::pac::SPI,
+        port::PA5,
+        port::PA4,
+        port::PA2,
+        port::PA6,
+    >;
+
+    avr_hal_generic::impl_spi! {
+        hal: crate::Attiny,
+        peripheral: crate::pac::SPI,
+        sclk: port::PA5,
+        mosi: port::PA4,
+        miso: port::PA2,
+        cs: port::PA6,
+    }
+}
+
+pub mod wdt {
+    pub use crate::periphals::wdt::*;
+
+    avr_hal_generic::impl_wdt! {
+        hal: crate::Attiny,
+        peripheral: crate::pac::WDT,
+        mcusr: crate::pac::cpu::MCUSR,
+        wdtcsr_name: wdtcr,
+        timeout: |to, w| match to {
+            Timeout::Ms16 => w.wdpl().cycles_2k_512k(),
+            Timeout::Ms32 => w.wdpl().cycles_4k_1024k(),
+            Timeout::Ms64 => w.wdpl().cycles_8k(),
+            Timeout::Ms125 => w.wdpl().cycles_16k(),
+            Timeout::Ms250 => w.wdpl().cycles_32k(),
+            Timeout::Ms500 => w.wdpl().cycles_64k(),
+            Timeout::Ms1000 => w.wdpl().cycles_128k(),
+            Timeout::Ms2000 => w.wdpl().cycles_256k(),
+            Timeout::Ms4000 => w.wdph().set_bit().wdpl().cycles_2k_512k(),
+            Timeout::Ms8000 => w.wdph().set_bit().wdpl().cycles_4k_1024k(),
+        },
+    }
+}
