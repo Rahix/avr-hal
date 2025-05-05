@@ -28,7 +28,6 @@
 //! ufmt::uwriteln!(&mut serial, "data: {:?}", data_in).unwrap();
 //! ```
 
-
 #[allow(unused_imports)]
 use crate::port;
 pub use avr_hal_generic::spi::*;
