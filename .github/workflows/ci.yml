@@ -116,3 +116,14 @@ jobs:
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
         run: cd "mcu/${{ matrix.m.crate }}" && RUSTFLAGS="-C target-cpu=${{ matrix.m.name }}" cargo build --target=avr-none --features "${{ matrix.m.name }}" -Z build-std=core
+
+  rustfmt:
+    name: Apply rustfmt formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly-2025-04-27
+          components: rust-src, rustfmt
+      - uses: actions-rust-lang/rustfmt@v1
