@@ -1,6 +1,6 @@
 [package]
 name = "attiny-hal"
-version = "0.1.0"
+version = "0.2.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
 edition = "2021"
@@ -13,10 +13,10 @@ categories = ["no-std", "embedded", "hardware-support"]
 [features]
 rt = ["avr-device/rt"]
 device-selected = []
-attiny84 = ["avr-device/attiny84", "device-selected"]
-attiny85 = ["avr-device/attiny85", "device-selected"]
-attiny88 = ["avr-device/attiny88", "device-selected"]
-attiny167 = ["avr-device/attiny167", "device-selected"]
+attiny84 = ["avr-device/attiny84", "device-selected", "_peripheral-simple-pwm"]
+attiny85 = ["avr-device/attiny85", "device-selected", "_peripheral-adc", "_peripheral-simple-pwm"]
+attiny88 = ["avr-device/attiny88", "device-selected", "_peripheral-adc", "_peripheral-spi", "_peripheral-simple-pwm"]
+attiny167 = ["avr-device/attiny167", "device-selected", "_peripheral-adc", "_peripheral-spi"]
 attiny2313 = ["avr-device/attiny2313", "device-selected"]
 
 critical-section-impl = ["avr-device/critical-section-impl"]
@@ -26,6 +26,10 @@ disable-device-selection-error = []
 
 # We must select a microcontroller to build on docs.rs
 docsrs = ["attiny85"]
+
+_peripheral-adc = []
+_peripheral-spi = []
+_peripheral-simple-pwm = []
 
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
