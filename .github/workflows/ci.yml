@@ -7,6 +7,8 @@ on:
       - next
       - wip
   pull_request:
+    paths-ignore:
+      - 'ravedude/**'
 
 jobs:
   ci:
@@ -114,20 +116,3 @@ jobs:
       - name: Test-compile HAL crate for an MCU
         if: "${{ matrix.m.type == 'mcu' }}"
         run: cd "mcu/${{ matrix.m.crate }}" && RUSTFLAGS="-C target-cpu=${{ matrix.m.name }}" cargo build --target=avr-none --features "${{ matrix.m.name }}" -Z build-std=core
-
-  ravedude:
-    name: "ravedude"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-      - name: Install libudev
-        run: sudo apt-get update && sudo apt-get install -y libudev-dev
-      - name: Check ravedude
-        run: |
-          cargo check --manifest-path ravedude/Cargo.toml
-      - name: Test ravedude
-        run: |
-          cargo test --manifest-path ravedude/Cargo.toml
