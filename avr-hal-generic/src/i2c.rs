@@ -181,9 +181,11 @@ pub trait I2cOps<H, SDA, SCL> {
     /// Read some bytes from the bus.
     ///
     /// This method must only be called after a transaction in read mode was successfully started.
+    /// If `last_read` is set then last byte will be nacked. Should be set to false if there will
+    /// be a subsequent read without a start (e.g. when using `transaction`).
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
-    fn raw_read(&mut self, buffer: &mut [u8]) -> Result<(), Error>;
+    fn raw_read(&mut self, buffer: &mut [u8], last_read: bool) -> Result<(), Error>;
 
     /// Send a stop-condition and release the bus.
     ///
@@ -386,7 +388,7 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2
 
     fn read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error> {
         self.p.raw_start(address, Direction::Read)?;
-        self.p.raw_read(buffer)?;
+        self.p.raw_read(buffer, true)?;
         self.p.raw_stop()?;
         Ok(())
     }
@@ -406,7 +408,7 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2
         self.p.raw_start(address, Direction::Write)?;
         self.p.raw_write(bytes)?;
         self.p.raw_start(address, Direction::Read)?;
-        self.p.raw_read(buffer)?;
+        self.p.raw_read(buffer, true)?;
         self.p.raw_stop()?;
         Ok(())
     }
@@ -421,13 +423,20 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal::i2c::I2c<SevenB
         operations: &mut [embedded_hal::i2c::Operation<'_>],
     ) -> Result<(), Self::Error> {
         let mut previous_direction = Direction::Read;
-        for (idx, operation) in operations.iter_mut().enumerate() {
+        let mut ops_iter = operations.iter_mut().enumerate().peekable();
+        while let Some((idx, operation)) = ops_iter.next() {
             match operation {
                 embedded_hal::i2c::Operation::Read(buffer) => {
                     if idx == 0 || previous_direction != Direction::Read {
                         self.p.raw_start(address, Direction::Read)?;
                     }
-                    self.p.raw_read(buffer)?;
+
+                    let next_op_is_read = matches!(
+                        ops_iter.peek(),
+                        Some((_, embedded_hal::i2c::Operation::Read(_)))
+                    );
+
+                    self.p.raw_read(buffer, !next_op_is_read)?;
                     previous_direction = Direction::Read;
                 }
                 embedded_hal::i2c::Operation::Write(bytes) => {
@@ -561,10 +570,10 @@ macro_rules! impl_i2c_twi {
             }
 
             #[inline]
-            fn raw_read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
+            fn raw_read(&mut self, buffer: &mut [u8], last_read: bool) -> Result<(), Error> {
                 let last = buffer.len() - 1;
                 for (i, byte) in buffer.iter_mut().enumerate() {
-                    if i != last {
+                    if i != last || !last_read {
                         self.twcr
                             .write(|w| w.twint().set_bit().twen().set_bit().twea().set_bit());
                         // wait()
