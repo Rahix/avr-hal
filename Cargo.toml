@@ -18,6 +18,7 @@ members = [
     # MCU HAL crates
     "mcu/atmega-hal",
     "mcu/attiny-hal",
+    "mcu/avrmodern-hal",
 
     # Higher level crates
     "arduino-hal",
@@ -36,6 +37,7 @@ members = [
     "examples/sparkfun-promini-5v",
     "examples/trinket-pro",
     "examples/trinket",
+    "examples/avrmodern",
 ]
 exclude = [
     # The RAVEDUDE! Yeah!

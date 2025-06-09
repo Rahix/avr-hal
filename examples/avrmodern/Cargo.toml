@@ -1,0 +1,23 @@
+[package]
+name = "attiny402-examples"
+description = "Examples for attiny402 and other modern chips"
+version = "0.0.0"
+authors = ["tvijlbrief@gmail.com"]
+edition = "2021"
+publish = false
+
+[dependencies]
+panic-halt = "1.0.0"
+ufmt = "0.2.0"
+nb = "1.1.0"
+embedded-hal = "1.0"
+
+[dependencies.arduino-hal]
+path = "../../arduino-hal/"
+features = ["attiny402"]
+#features = ["attiny1614"]
+#features = ["attiny3224"]
+#features = ["avr128db28"]
+
+[dependencies.avr-device]
+version = "0.7"

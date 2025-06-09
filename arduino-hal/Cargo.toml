@@ -19,6 +19,7 @@ critical-section-impl = ["avr-device/critical-section-impl"]
 board-selected = []
 mcu-atmega = []
 mcu-attiny = []
+mcu-avrmodern = []
 arduino-diecimila = ["mcu-atmega", "atmega-hal/atmega168", "board-selected"]
 arduino-leonardo = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
 arduino-mega2560 = ["mcu-atmega", "atmega-hal/atmega2560", "board-selected"]
@@ -31,6 +32,10 @@ sparkfun-promini-3v3 = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enabl
 sparkfun-promini-5v = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
 trinket = ["mcu-attiny", "attiny-hal/attiny85", "board-selected"]
 nano168 = ["mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc", "board-selected"]
+attiny402 = ["mcu-avrmodern", "avrmodern-hal/attiny402", "board-selected"]
+attiny1614 = ["mcu-avrmodern", "avrmodern-hal/attiny1614", "board-selected"]
+#attiny3224 = ["mcu-avrmodern", "avrmodern-hal/attiny3224", "board-selected"]
+#avr128db28 = ["mcu-avrmodern", "avrmodern-hal/avr128db28", "board-selected"]
 
 # We must select a board to build on docs.rs
 docsrs = ["arduino-uno"]
@@ -56,6 +61,11 @@ features = ["disable-device-selection-error"]
 [dependencies.attiny-hal]
 path = "../mcu/attiny-hal/"
 optional = true
+
+[dependencies.avrmodern-hal]
+path = "../mcu/avrmodern-hal/"
+optional = true
+features = ["disable-device-selection-error"]
 
 [dependencies.avr-device]
 version = "0.7"

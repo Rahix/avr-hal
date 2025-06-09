@@ -15,6 +15,8 @@ use crate::port;
 pub struct Baudrate<CLOCK> {
     /// Value of the `UBRR#` register
     pub ubrr: u16,
+    /// Value of the `baud#` register for modern AVR
+    pub modbr: u16,
     /// Value of the `U2X#` bit
     pub u2x: bool,
     /// The baudrate calculation depends on the configured clock rate, thus a `CLOCK` generic
@@ -52,6 +54,7 @@ impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
     /// Calculate parameters for a certain baudrate at a certain `CLOCK` speed.
     pub fn new(baud: u32) -> Baudrate<CLOCK> {
         let mut ubrr = (CLOCK::FREQ / 4 / baud - 1) / 2;
+        let modbr = 4 * CLOCK::FREQ / baud;
         let mut u2x = true;
         debug_assert!(ubrr <= u16::MAX as u32);
         if ubrr > 4095 {
@@ -61,6 +64,7 @@ impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
 
         Baudrate {
             ubrr: ubrr as u16,
+            modbr: modbr as u16,
             u2x,
             _clock: marker::PhantomData,
         }
@@ -72,6 +76,7 @@ impl<CLOCK: crate::clock::Clock> Baudrate<CLOCK> {
     pub fn with_exact(u2x: bool, ubrr: u16) -> Baudrate<CLOCK> {
         Baudrate {
             ubrr,
+            modbr: 0,
             u2x,
             _clock: marker::PhantomData,
         }
@@ -542,6 +547,85 @@ macro_rules! impl_usart_traditional {
                         $crate::usart::Event::DataRegisterEmpty =>
                             self.[<ucsr $n b>].modify(|_, w| w.[<udrie $n>]().bit(state)),
                     }
+                }
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_usart_modern {
+    (
+        hal: $HAL:ty,
+        peripheral: $USART:ty,
+        rx: $rxpin:ty,
+        tx: $txpin:ty,
+    ) => {
+        $crate::paste::paste! {
+            impl $crate::usart::UsartOps<
+                $HAL,
+                $crate::port::Pin<$crate::port::mode::Input, $rxpin>,
+                $crate::port::Pin<$crate::port::mode::Output, $txpin>,
+            > for $USART {
+                fn raw_init<CLOCK>(&mut self, baudrate: $crate::usart::Baudrate<CLOCK>) {
+                    self.baud.write(|w| unsafe { w.bits(baudrate.modbr)});
+
+                    // Enable receiver and transmitter but leave interrupts disabled.
+                    self.ctrlb.write(|w| w
+                        .txen().set_bit()
+                        .rxen().set_bit()
+                    );
+
+                    // Set frame format to 8n1 for now.  At some point, this should be made
+                    // configurable, similar to what is done in other HALs.
+                    // Defaults to 8bit after reset.
+                    // self.ctrlc.write(|w| w
+                    //     .chsize()._8bit() // Note that chsize() is a field for attiny402, but not for attiny1614!
+                    // );
+                }
+
+                fn raw_deinit(&mut self) {
+                    // Wait for any ongoing transfer to finish.
+                    $crate::nb::block!(self.raw_flush()).ok();
+                    // self.[<ucsr $n b>].reset(); // TODO?
+                }
+
+                fn raw_flush(&mut self) -> $crate::nb::Result<(), core::convert::Infallible> {
+                    if self.status.read().dreif() == false {
+                        Err($crate::nb::Error::WouldBlock)
+                    } else {
+                        Ok(())
+                    }
+                }
+
+                fn raw_write(&mut self, byte: u8) -> $crate::nb::Result<(), core::convert::Infallible> {
+                    // Call flush to make sure the data-register is empty
+                    self.raw_flush()?;
+
+                    self.txdatal.write(|w| unsafe { w.bits(byte) });
+                    Ok(())
+                }
+
+                fn raw_read(&mut self) -> $crate::nb::Result<u8, core::convert::Infallible> {
+                    if self.status.read().rxcif() == false {
+                        return Err($crate::nb::Error::WouldBlock);
+                    }
+
+                    Ok(self.rxdatal.read().bits())
+                }
+
+                fn raw_interrupt(&mut self, event: $crate::usart::Event, state: bool) {
+                    // TODO
+                    /*
+                    match event {
+                         $crate::usart::Event::RxComplete =>
+                             self.[<ucsr $n b>].modify(|_, w| w.[<rxcie $n>]().bit(state)),
+                         $crate::usart::Event::TxComplete =>
+                             self.[<ucsr $n b>].modify(|_, w| w.[<txcie $n>]().bit(state)),
+                         $crate::usart::Event::DataRegisterEmpty =>
+                             self.[<ucsr $n b>].modify(|_, w| w.[<udrie $n>]().bit(state)),
+                     }
+                     */
                 }
             }
         }
