@@ -62,10 +62,10 @@ fn main() -> ! {
     irdroino_led2.set_low();
 
     // Enable group 2 (PORTD)
-    dp.EXINT.pcicr.write(|w| unsafe { w.bits(0b100) });
+    dp.EXINT.pcicr().write(|w| unsafe { w.bits(0b100) });
 
     // Enable pin change interrupts on PCINT18 which is pin PD2 (= d2)
-    dp.EXINT.pcmsk2.write(|w| w.bits(0b100));
+    dp.EXINT.pcmsk2().write(|w| w.set(0b100));
 
     let ir = Receiver::with_pin(Clock::FREQ, pins.d2);
 
@@ -141,12 +141,12 @@ impl Clock {
 
     pub fn start(&self, tc0: arduino_hal::pac::TC0) {
         // Configure the timer for the above interval (in CTC mode)
-        tc0.tccr0a.write(|w| w.wgm0().ctc());
-        tc0.ocr0a.write(|w| w.bits(Self::TOP));
-        tc0.tccr0b.write(|w| w.cs0().variant(Self::PRESCALER));
+        tc0.tccr0a().write(|w| w.wgm0().ctc());
+        tc0.ocr0a().write(|w| w.set(Self::TOP));
+        tc0.tccr0b().write(|w| w.cs0().variant(Self::PRESCALER));
 
         // Enable interrupt
-        tc0.timsk0.write(|w| w.ocie0a().set_bit());
+        tc0.timsk0().write(|w| w.ocie0a().set_bit());
     }
 
     pub fn now(&self) -> u32 {
