@@ -873,18 +873,22 @@ macro_rules! impl_port_new_base {
                 #[inline]
                 unsafe fn out_set(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).out.modify(|r, w| {
+                        $(DynamicPort::[<PORT $name>] => {
+                            (*<$port>::ptr()).out().modify(|r, w| {
                             w.bits(r.bits() | self.mask)
-                        }),)+
+                        });
+                    })+
                     }
                 }
 
                 #[inline]
                 unsafe fn out_clear(&mut self) {
                     match self.port {
-                        $(DynamicPort::[<PORT $name>] => (*<$port>::ptr()).out.modify(|r, w| {
+                        $(DynamicPort::[<PORT $name>] => {
+                            (*<$port>::ptr()).out().modify(|r, w| {
                             w.bits(r.bits() & !self.mask)
-                        }),)+
+                        });
+                    })+
                     }
                 }
 
@@ -892,10 +896,10 @@ macro_rules! impl_port_new_base {
                 unsafe fn out_toggle(&mut self) {
                     match self.port {
                         $(DynamicPort::[<PORT $name>] => {
-                                (*<$port>::ptr()).outtgl.write(|w| {
+                                (*<$port>::ptr()).outtgl().write(|w| {
                                     w.bits(self.mask)
-                                })
-                        },)+
+                                });
+                        })+
                     }
                 }
 
@@ -958,28 +962,28 @@ macro_rules! impl_port_new_base {
 
                     #[inline]
                     unsafe fn out_set(&mut self) {
-                        (*<$port>::ptr()).outset.write(|w| {
+                        (*<$port>::ptr()).outset().write(|w| {
                             w.[<p $name:lower $pin>]().set_bit()
-                        })
+                        });
                     }
 
                     #[inline]
                     unsafe fn out_clear(&mut self) {
-                        (*<$port>::ptr()).outclr.write(|w| {
+                        (*<$port>::ptr()).outclr().write(|w| {
                             w.[<p $name:lower $pin>]().set_bit()
-                        })
+                        });
                     }
 
                     #[inline]
                     unsafe fn out_toggle(&mut self) {
-                            (*<$port>::ptr()).outtgl.write(|w| {
+                            (*<$port>::ptr()).outtgl().write(|w| {
                                 w.[<p $name:lower $pin>]().set_bit()
-                            })
+                            });
                     }
 
                     #[inline]
                     unsafe fn out_get(&self) -> bool {
-                        (*<$port>::ptr()).out.read().[<p $name:lower $pin>]().bit()
+                        (*<$port>::ptr()).out().read().[<p $name:lower $pin>]().bit()
                     }
 
                     #[inline]
@@ -989,14 +993,14 @@ macro_rules! impl_port_new_base {
 
                     #[inline]
                     unsafe fn make_output(&mut self) {
-                        (*<$port>::ptr()).dir.modify(|_, w| {
+                        (*<$port>::ptr()).dir().modify(|_, w| {
                             w.[<p $name:lower $pin>]().set_bit()
-                        })
+                        });
                     }
 
                     #[inline]
                     unsafe fn make_input(&mut self, pull_up: bool) {
-                        (*<$port>::ptr()).dir.modify(|_, w| {
+                        (*<$port>::ptr()).dir().modify(|_, w| {
                             w.[<p $name:lower $pin>]().clear_bit()
                         });
                         if pull_up {

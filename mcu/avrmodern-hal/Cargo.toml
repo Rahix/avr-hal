@@ -19,7 +19,7 @@ attiny1614 = ["avr-device/attiny1614", "device-selected"]
 #attiny3224 = ["avr-device/attiny3224", "device-selected"]
 #avr128db28 = ["avr-device/avr128db28", "device-selected"]
 
-critical-section-impl = ["avr-device/critical-section-impl"]
+#critical-section-impl = ["avr-device/critical-section-impl"]
 
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
@@ -31,6 +31,7 @@ docsrs = ["attiny402"]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
+#avr-device = { git = "https://github.com/rahix/avr-device", rev = "330cdf1fb1a7301b9d6cf62491c16e69d6aa7312" }
 version = "0.7"
 
 # Because this crate has its own check that at least one device is selected, we
