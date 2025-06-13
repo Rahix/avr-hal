@@ -24,7 +24,7 @@ The current rust compiler does not support `target-cpu` for all modern AVR chips
 You can pick any modern chip, but note that you should use `attiny402` for chips with 8kB or less flash memory (these have a 2 byte vector table) and `attiny1614` for bigger flash memories. The amount of flash should be specified with a linker argument (which overrules the CRT file), so for the AVR128DB28 we can use:
 
 ```
-rustflags = ["-C", "target-cpu=attiny1614", "-C", "link-args=-Wl,--defsym=__TEXT_REGION_LENGTH__=131072"]
+rustflags = ["-C", "target-cpu=attiny1614", "-C", "link-args=-Wl,--defsym=__TEXT_REGION_LENGTH__=32768", "-C", "link-args=-Wl,--defsym=__DATA_REGION_ORIGIN__=16384", "-C", "link-args=-Wl,--defsym=__DATA_REGION_LENGTH__=16384", "-C", "link-args=-Wl,--defsym=__stack=32767" ]
 ```
 
 For programs up to 32kB we need to set the flash mapping:

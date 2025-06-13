@@ -4,8 +4,8 @@ rustflags = ["-C", "target-cpu=attiny402"]
 #rustflags = ["-C", "target-cpu=attiny1614"]
 #This works for AVR128DB28 for programs > 32kB:
 #rustflags = ["-C", "target-cpu=atxmega128a3", "-C", "link-args=-Wl,--defsym=__DATA_REGION_ORIGIN__=16384", "-C", "link-args=-Wl,--defsym=__DATA_REGION_LENGTH__=16384", "-C", "link-args=-Wl,--defsym=__stack=32767" ]
-# note that we use the known attiny1614 to build for the unknown avr128db28 by specifying the correct flash size to the linker:
-#rustflags = ["-C", "target-cpu=attiny1614", "-C", "link-args=-Wl,--defsym=__TEXT_REGION_LENGTH__=131072"]
+# note that we use the known attiny1614 to build for the unknown avr128db28 by specifying the correct sizes to the linker:
+#rustflags = ["-C", "target-cpu=attiny1614", "-C", "link-args=-Wl,--defsym=__TEXT_REGION_LENGTH__=131072", "-C", "link-args=-Wl,--defsym=__DATA_REGION_ORIGIN__=16384", "-C", "link-args=-Wl,--defsym=__DATA_REGION_LENGTH__=16384", "-C", "link-args=-Wl,--defsym=__stack=32767" ]
 # for attiny3224:
 #rustflags = ["-C", "target-cpu=attiny1614", "-C", "link-args=-Wl,--defsym=__TEXT_REGION_LENGTH__=32768"]
 

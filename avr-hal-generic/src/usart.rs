@@ -571,10 +571,10 @@ macro_rules! impl_usart_modern {
                 $crate::port::Pin<$crate::port::mode::Output, $txpin>,
             > for $USART {
                 fn raw_init<CLOCK>(&mut self, baudrate: $crate::usart::Baudrate<CLOCK>) {
-                    self.baud.write(|w| unsafe { w.bits(baudrate.modbr)});
+                    self.baud().write(|w| unsafe { w.bits(baudrate.modbr)});
 
                     // Enable receiver and transmitter but leave interrupts disabled.
-                    self.ctrlb.write(|w| w
+                    self.ctrlb().write(|w| w
                         .txen().set_bit()
                         .rxen().set_bit()
                     );
@@ -594,7 +594,7 @@ macro_rules! impl_usart_modern {
                 }
 
                 fn raw_flush(&mut self) -> $crate::nb::Result<(), core::convert::Infallible> {
-                    if self.status.read().dreif() == false {
+                    if self.status().read().dreif() == false {
                         Err($crate::nb::Error::WouldBlock)
                     } else {
                         Ok(())
@@ -605,16 +605,16 @@ macro_rules! impl_usart_modern {
                     // Call flush to make sure the data-register is empty
                     self.raw_flush()?;
 
-                    self.txdatal.write(|w| unsafe { w.bits(byte) });
+                    self.txdatal().write(|w| unsafe { w.bits(byte) });
                     Ok(())
                 }
 
                 fn raw_read(&mut self) -> $crate::nb::Result<u8, core::convert::Infallible> {
-                    if self.status.read().rxcif() == false {
+                    if self.status().read().rxcif() == false {
                         return Err($crate::nb::Error::WouldBlock);
                     }
 
-                    Ok(self.rxdatal.read().bits())
+                    Ok(self.rxdatal().read().bits())
                 }
 
                 fn raw_interrupt(&mut self, event: $crate::usart::Event, state: bool) {
