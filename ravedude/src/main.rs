@@ -264,12 +264,6 @@ fn ravedude() -> anyhow::Result<()> {
         anyhow::bail!("no named board given and no board options provided");
     };
 
-    if ravedude_config.general_options.newline_on.is_some()
-        && ravedude_config.general_options.newline_after.is_some()
-    {
-        anyhow::bail!("newline_on and newline_after cannot be used at the same time");
-    }
-
     let board_avrdude_options = board
         .avrdude
         .take()
