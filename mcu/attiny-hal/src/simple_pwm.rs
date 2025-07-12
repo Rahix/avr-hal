@@ -1,6 +1,11 @@
 pub use avr_hal_generic::simple_pwm::{IntoPwmPin, Prescaler, PwmPinOps};
 
-#[cfg(any(feature = "attiny85", feature = "attiny84", feature = "attiny88"))]
+#[cfg(any(
+    feature = "attiny85",
+    feature = "attiny84",
+    feature = "attiny88",
+    feature = "attiny13a"
+))]
 use crate::port::*;
 
 #[cfg(feature = "attiny84")]
@@ -79,7 +84,7 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
-#[cfg(feature = "attiny85")]
+#[cfg(any(feature = "attiny85", feature = "attiny13a"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC0` for PWM (pins `PB0`, `PB1`)
     ///

@@ -44,7 +44,7 @@ avr_hal_generic::impl_port_traditional! {
     }
 }
 
-#[cfg(feature = "attiny85")]
+#[cfg(any(feature = "attiny85", feature = "attiny13a"))]
 avr_hal_generic::impl_port_traditional! {
     enum Ports {
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5],

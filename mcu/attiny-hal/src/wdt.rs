@@ -3,7 +3,12 @@ pub use avr_hal_generic::wdt::{Timeout, WdtOps};
 
 pub type Wdt = avr_hal_generic::wdt::Wdt<crate::Attiny, crate::pac::WDT>;
 
-#[cfg(any(feature = "attiny85", feature = "attiny167", feature = "attiny2313"))]
+#[cfg(any(
+    feature = "attiny85",
+    feature = "attiny167",
+    feature = "attiny2313",
+    feature = "attiny13a"
+))]
 avr_hal_generic::impl_wdt! {
     hal: crate::Attiny,
     peripheral: crate::pac::WDT,

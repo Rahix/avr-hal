@@ -5,6 +5,7 @@
 //! Common HAL (hardware abstraction layer) for ATtiny* microcontrollers.
 //!
 //! **Note**: This version of the documentation was built for
+#![cfg_attr(feature = "attiny13a", doc = "**ATtiny13A**.")]
 #![cfg_attr(feature = "attiny85", doc = "**ATtiny85**.")]
 #![cfg_attr(feature = "attiny88", doc = "**ATtiny88**.")]
 #![cfg_attr(feature = "attiny167", doc = "**ATtiny167**.")]
@@ -25,6 +26,7 @@ compile_error!(
 
     Please select one of the following
 
+    * attiny13a
     * attiny85
     * attiny88
     * attiny167
@@ -32,6 +34,10 @@ compile_error!(
     "
 );
 
+/// Reexport of `attiny13a` from `avr-device`
+///
+#[cfg(feature = "attiny13a")]
+pub use avr_device::attiny13a as pac;
 /// Reexport of `attiny167` from `avr-device`
 ///
 #[cfg(feature = "attiny167")]
@@ -61,13 +67,25 @@ pub use avr_device::entry;
 pub use pac::Peripherals;
 
 pub use avr_hal_generic::clock;
-pub use avr_hal_generic::delay;
 pub use avr_hal_generic::prelude;
 
-// ATtiny2313 does not have ADC and will not compile with this module
-#[cfg(all(feature = "device-selected", not(feature = "attiny2313")))]
+#[cfg(feature = "device-selected")]
+pub mod delay;
+#[cfg(feature = "device-selected")]
+pub use delay::{delay_ms, delay_ns, delay_us, Delay};
+
+// ATtiny2313 and ATtiny13A do not have ADC and will not compile with this module
+#[cfg(all(
+    feature = "device-selected",
+    not(feature = "attiny2313"),
+    not(feature = "attiny13a")
+))]
 pub mod adc;
-#[cfg(all(feature = "device-selected", not(feature = "attiny2313")))]
+#[cfg(all(
+    feature = "device-selected",
+    not(feature = "attiny2313"),
+    not(feature = "attiny13a")
+))]
 pub use adc::Adc;
 
 #[cfg(feature = "device-selected")]
@@ -83,14 +101,26 @@ pub mod wdt;
 #[cfg(feature = "device-selected")]
 pub use wdt::Wdt;
 
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", not(feature = "attiny13a")))]
 pub mod eeprom;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", not(feature = "attiny13a")))]
 pub use eeprom::Eeprom;
 
-#[cfg(feature = "device-selected")]
+#[cfg(all(
+    feature = "device-selected",
+    not(feature = "attiny13a"),
+    not(feature = "attiny2313"),
+    not(feature = "attiny84"),
+    not(feature = "attiny85")
+))]
 pub mod spi;
-#[cfg(feature = "device-selected")]
+#[cfg(all(
+    feature = "device-selected",
+    not(feature = "attiny13a"),
+    not(feature = "attiny2313"),
+    not(feature = "attiny84"),
+    not(feature = "attiny85")
+))]
 pub use spi::Spi;
 
 pub struct Attiny;
@@ -121,6 +151,13 @@ macro_rules! pins {
 macro_rules! pins {
     ($p:expr) => {
         $crate::Pins::new($p.PORTA, $p.PORTB)
+    };
+}
+#[cfg(feature = "attiny13a")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTB)
     };
 }
 #[cfg(feature = "attiny2313")]
