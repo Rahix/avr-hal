@@ -3,7 +3,7 @@ avr-hal ![Continuous Integration](https://github.com/Rahix/avr-hal/workflows/Con
 Hardware Abstraction Layer for AVR microcontrollers and common boards (for example Arduino).  Based on the [`avr-device`](https://github.com/Rahix/avr-device) crate.
 
 ## Quickstart
-You need a nightly Rust compiler for compiling Rust code for AVR.  The correct version will be installed automatically due to the `rust-toolchain.toml` file.
+You need a nightly Rust compiler for compiling Rust code for AVR.  The correct version will be installed automatically thanks to the `rust-toolchain.toml` file.
 
 Install dependencies:
 
@@ -23,7 +23,7 @@ Install dependencies:
   ```
   winget install AVRDudes.AVRDUDE ZakKemble.avr-gcc
   ```
-  On older systems you can use [Scoop](https://scoop.sh/) which you first have to install using Powershell:
+  On older systems, you can use [Scoop](https://scoop.sh/) which you first have to install using PowerShell:
   ```PowerShell
   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Needed to run a remote script the first time
   irm get.scoop.sh | iex
@@ -35,7 +35,7 @@ Install dependencies:
   ```
   See [Setting up environment](https://github.com/Rahix/avr-hal/wiki/Setting-up-environment) for more information.
   
-Next, install ["ravedude"](./ravedude), a tool which seamlessly integrates flashing your board into the usual cargo workflow:
+Next, install ["ravedude"](./ravedude), a tool that seamlessly integrates flashing your board into the usual cargo workflow:
 
 ```bash
 cargo +stable install ravedude
@@ -71,7 +71,7 @@ The [examples directory](./examples) contains lots of examples for common hardwa
 HAL crates for AVR microcontroller families.  If you have a custom board, you'll want to work with these crates.  Please check their documentation for a list of supported MCUs.
 
 ### `avr-hal-generic` [![avr-hal-generic docs](https://img.shields.io/badge/docs-git-4d76ae)][avr-hal-generic docs]
-This is a generic crate containing most of the HAL implementations in the form of macros which are instanciated in each HAL crate for the specific MCUs.  If you intend to write drivers that work with any AVR chip, targeting `avr-hal-generic` is probably the best route.
+This is a generic crate containing most of the HAL implementations in the form of macros which are instantiated in each HAL crate for the specific MCUs.  If you intend to write drivers that work with any AVR chip, targeting `avr-hal-generic` is probably the best route.
 
 ### [`ravedude`](./ravedude) [![crates.io page](https://img.shields.io/crates/v/ravedude.svg)](https://crates.io/crates/ravedude)
 `ravedude` is a utility for seamlessly integrating avrdude and a serial console into the cargo workflow.  With a bit of configuration (check its [README](./ravedude/README.md)!) you can then upload your code to your board and view its output over the serial console by just using `cargo run` as you would normally.
