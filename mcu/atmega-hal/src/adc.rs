@@ -56,7 +56,7 @@ pub struct AdcSettings {
 }
 
 fn apply_settings(peripheral: &crate::pac::ADC, settings: AdcSettings) {
-    peripheral.adcsra.write(|w| {
+    peripheral.adcsra().write(|w| {
         w.aden().set_bit();
         match settings.clock_divider {
             ClockDivider::Factor2 => w.adps().prescaler_2(),
@@ -68,7 +68,7 @@ fn apply_settings(peripheral: &crate::pac::ADC, settings: AdcSettings) {
             ClockDivider::Factor128 => w.adps().prescaler_128(),
         }
     });
-    peripheral.admux.write(|w| match settings.ref_voltage {
+    peripheral.admux().write(|w| match settings.ref_voltage {
         ReferenceVoltage::Aref => w.refs().aref(),
         ReferenceVoltage::AVcc => w.refs().avcc(),
         ReferenceVoltage::Internal => w.refs().internal(),
@@ -183,7 +183,7 @@ avr_hal_generic::impl_adc! {
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
         port::PC0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
@@ -213,7 +213,7 @@ avr_hal_generic::impl_adc! {
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
         port::PA0: (crate::pac::adc::admux::MUX_A::ADC0),
@@ -239,8 +239,8 @@ avr_hal_generic::impl_adc! {
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: u8,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().bits(id & 0x1f));
-        peripheral.adcsrb.modify(|_, w| w.mux5().bit(id & 0x20 != 0));
+        peripheral.admux().modify(|_, w| w.mux().set(id & 0x1f));
+        peripheral.adcsrb().modify(|_, w| w.mux5().bit(id & 0x20 != 0));
     },
     pins: {
         port::PF0: (0b000000, didr0::adc0d),
@@ -271,7 +271,7 @@ avr_hal_generic::impl_adc! {
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
         port::PF0: (crate::pac::adc::admux::MUX_A::ADC0),
@@ -297,8 +297,8 @@ avr_hal_generic::impl_adc! {
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: u8,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().bits(id & 0x1f));
-        peripheral.adcsrb.modify(|_, w| w.mux5().bit(id & 0x20 != 0));
+        peripheral.admux().modify(|_, w| w.mux().set(id & 0x1f));
+        peripheral.adcsrb().modify(|_, w| w.mux5().bit(id & 0x20 != 0));
     },
     pins: {
         port::PF0: (0b000000, didr0::adc0d),
@@ -332,7 +332,7 @@ avr_hal_generic::impl_adc! {
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
         port::PA0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),
@@ -360,7 +360,7 @@ avr_hal_generic::impl_adc! {
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
         port::PC0: (crate::pac::adc::admux::MUX_A::ADC0),
@@ -388,7 +388,7 @@ avr_hal_generic::impl_adc! {
     apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
     channel_id: crate::pac::adc::admux::MUX_A,
     set_channel: |peripheral, id| {
-        peripheral.admux.modify(|_, w| w.mux().variant(id));
+        peripheral.admux().modify(|_, w| w.mux().variant(id));
     },
     pins: {
         port::PA0: (crate::pac::adc::admux::MUX_A::ADC0, didr0::adc0d),

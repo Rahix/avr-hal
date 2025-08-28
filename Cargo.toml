@@ -18,6 +18,7 @@ members = [
     # MCU HAL crates
     "mcu/atmega-hal",
     "mcu/attiny-hal",
+    "mcu/avrmodern-hal",
 
     # Higher level crates
     "arduino-hal",
@@ -36,9 +37,13 @@ members = [
     "examples/sparkfun-promini-5v",
     "examples/trinket-pro",
     "examples/trinket",
+    "examples/avrmodern",
 ]
 exclude = [
     # The RAVEDUDE! Yeah!
     "ravedude",
 ]
 resolver = "2"
+
+[patch.crates-io]
+avr-device = { git = "https://github.com/rahix/avr-device", rev = "330cdf1fb1a7301b9d6cf62491c16e69d6aa7312" }

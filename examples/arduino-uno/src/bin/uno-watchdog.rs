@@ -24,7 +24,7 @@ fn main() -> ! {
         arduino_hal::delay_ms(100);
     }
 
-    let mut watchdog = wdt::Wdt::new(dp.WDT, &dp.CPU.mcusr);
+    let mut watchdog = wdt::Wdt::new(dp.WDT, &dp.CPU.mcusr());
     watchdog.start(wdt::Timeout::Ms2000).unwrap();
 
     loop {
