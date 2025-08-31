@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added a `general.output-mode` setting in `Ravedude.toml` ([#549]).
+
+  This setting can be used to set a numeric output mode for the serial console
+  instead of the default ascii representation.  One of `ascii`, `hex`, `dec`,
+  or `bin` can be chosen.
+
+  Additionaly either `general.newline-after = N` can be set to print a newline
+  after N bytes, or `general.newline-on = "\n"` to print a newline when a
+  specific byte is received.
+
+  For example:
+  ```toml
+  [general]
+  output-mode = "hex"
+  newline-after = 4
+  ```
+
+[#549]: https://github.com/Rahix/avr-hal/pull/549
 
 
 ## [0.2.0] - 2025-04-22
