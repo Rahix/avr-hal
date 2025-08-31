@@ -221,6 +221,7 @@ impl BoardConfig {
 }
 
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, Default, PartialEq)]
+#[serde(rename_all = "kebab-case")]
 pub enum OutputMode {
     #[default]
     Ascii,
