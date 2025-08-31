@@ -132,6 +132,22 @@ port = "/dev/ttyACM0"
 # ravedude should open a serial console after flashing
 open-console = true
 
+# console output mode. Can be ascii, hex, dec or bin
+output-mode = "ascii"
+
+# Print a newline after this byte
+# not used with output_mode ascii
+# hex (0x) and bin (0b) notations are supported.
+# matching chars/bytes are NOT removed
+# to add newlines after \n (in non-ascii mode), use \n, 0x0a or 0b00001010
+# newline-on = '\n'
+
+# Print a newline after n bytes
+# not used with output_mode ascii
+# defaults to 16 for hex and dec and 8 for bin
+# if dividable by 4, bytes will be grouped to 4
+# newline-after = 16
+
 # baudrate for the serial console (this is **not** the avrdude flashing baudrate)
 serial-baudrate = 57600
 
