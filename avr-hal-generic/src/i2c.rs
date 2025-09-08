@@ -289,6 +289,9 @@ where
     pub fn ping_device(&mut self, address: u8, direction: Direction) -> Result<bool, Error> {
         match self.p.raw_start(address, direction) {
             Ok(_) => {
+                if direction == Direction::Read {
+                    self.p.raw_read(&mut [0], true)?
+                }
                 self.p.raw_stop()?;
                 Ok(true)
             }
