@@ -189,11 +189,21 @@ pub trait I2cOps<H, SDA, SCL> {
 
     /// Send a stop-condition and release the bus.
     ///
-    /// This method must only be called after successfully starting a bus transaction.  This method
-    /// does not need to block until the stop condition has actually occured.
+    /// This method must only be called after successfully starting a bus transaction and
+    /// transmitting  at least one data packet. This method does not need to block until the stop
+    /// condition has actually occured.
     ///
     /// **Warning**: This is a low-level method and should not be called directly from user code.
     fn raw_stop(&mut self) -> Result<(), Error>;
+
+    /// Release the bus immediately.
+    ///
+    /// This method can be called anytime. The bus is switched off and all transmissions are
+    /// terminated, regardless of any ongoing operation. This method is useful mostly for probing
+    /// the bus without sending data.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_force_stop(&mut self) -> Result<(), Error>;
 }
 
 /// I2C driver
@@ -289,7 +299,7 @@ where
     pub fn ping_device(&mut self, address: u8, direction: Direction) -> Result<bool, Error> {
         match self.p.raw_start(address, direction) {
             Ok(_) => {
-                self.p.raw_stop()?;
+                self.p.raw_force_stop()?;
                 Ok(true)
             }
             Err(Error::AddressNack) => Ok(false),
@@ -376,7 +386,11 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2
     fn write(&mut self, address: u8, bytes: &[u8]) -> Result<(), Self::Error> {
         self.p.raw_start(address, Direction::Write)?;
         self.p.raw_write(bytes)?;
-        self.p.raw_stop()?;
+        if bytes.len() > 0 {
+            self.p.raw_stop()?;
+        } else {
+            self.p.raw_force_stop()?;
+        }
         Ok(())
     }
 }
@@ -389,7 +403,11 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2
     fn read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error> {
         self.p.raw_start(address, Direction::Read)?;
         self.p.raw_read(buffer, true)?;
-        self.p.raw_stop()?;
+        if buffer.len() > 0 {
+            self.p.raw_stop()?;
+        } else {
+            self.p.raw_force_stop()?;
+        }
         Ok(())
     }
 }
@@ -409,7 +427,11 @@ impl<H, I2C: I2cOps<H, SDA, SCL>, SDA, SCL, CLOCK> embedded_hal_v0::blocking::i2
         self.p.raw_write(bytes)?;
         self.p.raw_start(address, Direction::Read)?;
         self.p.raw_read(buffer, true)?;
-        self.p.raw_stop()?;
+        if buffer.len() > 0 {
+            self.p.raw_stop()?;
+        } else {
+            self.p.raw_force_stop()?;
+        }
         Ok(())
     }
 }
@@ -607,6 +629,13 @@ macro_rules! impl_i2c_twi {
             fn raw_stop(&mut self) -> Result<(), Error> {
                 self.twcr
                     .write(|w| w.twen().set_bit().twint().set_bit().twsto().set_bit());
+                Ok(())
+            }
+
+            #[inline]
+            fn raw_force_stop(&mut self) -> Result<(), Error> {
+                self.twcr
+                    .write(|w| w.twint().set_bit());
                 Ok(())
             }
         }
