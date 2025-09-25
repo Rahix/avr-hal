@@ -108,6 +108,9 @@ impl RavedudeGeneralConfig {
         if args.open_console {
             self.open_console = true;
         }
+        if let Some(console_port) = args.console_port.clone() {
+            self.console_port = Some(console_port);
+        }
         if let Some(serial_baudrate) = args.baudrate {
             self.serial_baudrate = Some(
                 NonZeroU32::new(serial_baudrate)
