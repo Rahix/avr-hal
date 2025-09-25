@@ -130,7 +130,12 @@ struct Args {
     #[clap(short = 'c', long = "open-console")]
     open_console: bool,
 
-    #[clap(short = 'C', long = "console-port", value_parser, env = "RAVEDUDE_CONSOLE_PORT")]
+    #[clap(
+        short = 'C',
+        long = "console-port",
+        value_parser,
+        env = "RAVEDUDE_CONSOLE_PORT"
+    )]
     console_port: Option<std::path::PathBuf>,
 
     /// Baudrate which should be used for the serial console.
@@ -346,7 +351,9 @@ fn ravedude() -> anyhow::Result<()> {
                 "-b/--baudrate is needed for the serial console"
             })?;
 
-        let port = console_port.or_else(|| port).context("console can only be opened for devices with USB-to-Serial")?;
+        let port = console_port
+            .or_else(|| port)
+            .context("console can only be opened for devices with USB-to-Serial")?;
         let newline_mode = ravedude_config.general_options.newline_mode()?;
 
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
