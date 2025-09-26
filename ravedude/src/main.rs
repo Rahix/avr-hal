@@ -294,8 +294,6 @@ fn ravedude() -> anyhow::Result<()> {
         },
     }?;
 
-    let console_port = ravedude_config.general_options.console_port.clone();
-
     if let Some(bin) = args.bin_or_legacy_bin() {
         if let Some(wait_time) = args.reset_delay {
             if wait_time > 0 {
@@ -351,9 +349,11 @@ fn ravedude() -> anyhow::Result<()> {
                 "-b/--baudrate is needed for the serial console"
             })?;
 
+        let console_port = ravedude_config.general_options.console_port.clone();
         let port = console_port
             .or_else(|| port)
-            .context("console can only be opened for devices with USB-to-Serial")?;
+            .context("no programmer serial port or `console-port` was set")
+            .context("cannot open console without a serial port")?;
         let newline_mode = ravedude_config.general_options.newline_mode()?;
 
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
