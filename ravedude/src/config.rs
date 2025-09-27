@@ -39,6 +39,7 @@ impl RavedudeConfig {
         Ok(Self {
             general_options: RavedudeGeneralConfig {
                 open_console: args.open_console,
+                console_port: args.console_port.clone(),
                 serial_baudrate: match args.baudrate {
                     Some(serial_baudrate) => Some(
                         NonZeroU32::new(serial_baudrate)
@@ -90,6 +91,7 @@ impl RavedudeGeneralConfig {
 pub struct RavedudeGeneralConfig {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub open_console: bool,
+    pub console_port: Option<std::path::PathBuf>,
     pub serial_baudrate: Option<NonZeroU32>,
     pub port: Option<std::path::PathBuf>,
     pub reset_delay: Option<u64>,
@@ -105,6 +107,9 @@ impl RavedudeGeneralConfig {
     pub fn apply_overrides_from(&mut self, args: &crate::Args) -> anyhow::Result<()> {
         if args.open_console {
             self.open_console = true;
+        }
+        if let Some(console_port) = args.console_port.clone() {
+            self.console_port = Some(console_port);
         }
         if let Some(serial_baudrate) = args.baudrate {
             self.serial_baudrate = Some(
