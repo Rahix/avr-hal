@@ -132,6 +132,10 @@ port = "/dev/ttyACM0"
 # ravedude should open a serial console after flashing
 open-console = true
 
+# you can optionally specify a separate port for the console
+# (can also be set with `--console-port` or RAVEDUDE_CONSOLE_PORT environment variable)
+# console-port = "/dev/ttyACM1"
+
 # console output mode. Can be ascii, hex, dec or bin
 output-mode = "ascii"
 
