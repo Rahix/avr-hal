@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added a `general.console-port` option with a corresponding
+  `-C`/`--console-port` CLI option to set a console port that's separate from
+  the programming port ([#683]).
+
+[#683]: https://github.com/Rahix/avr-hal/pull/683
 
 
 ## [0.2.1] - 2025-08-31
