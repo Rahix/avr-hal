@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["GIFR_SPEC","R","W"],"type":["INTF0_R","INTF0_W","PCIF_R","PCIF_W"]};
