@@ -253,3 +253,17 @@
 
     [mighty-core-atmega1284p.usb-info]
     error = "Not able to guess port"
+
+[butterfly]
+    name = "AVR Butterfly (ATmega169(V))"
+
+    [butterfly.reset]
+    automatic = true
+
+    [butterfly.avrdude]
+    programmer = "stk500v2"
+    partno = "atmega169"
+    baudrate = -1
+    do-chip-erase = true
+
+    # The AVR Butterfly does not have USB-Serial, thus no port is known or needed.
