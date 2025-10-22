@@ -71,6 +71,20 @@ impl Clock for MHz8 {
     const FREQ: u32 = 8_000_000;
 }
 
+/// 4 MHz Clock
+#[derive(ufmt::derive::uDebug, Debug)]
+pub struct MHz4;
+impl Clock for MHz4 {
+    const FREQ: u32 = 4_000_000;
+}
+
+/// 2 MHz Clock
+#[derive(ufmt::derive::uDebug, Debug)]
+pub struct MHz2;
+impl Clock for MHz2 {
+    const FREQ: u32 = 2_000_000;
+}
+
 /// 1 MHz Clock
 #[derive(ufmt::derive::uDebug, Debug)]
 pub struct MHz1;
