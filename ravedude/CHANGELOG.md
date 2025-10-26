@@ -10,9 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `-C`/`--console-port` CLI option to set a console port that's separate from
   the programming port ([#683]).
 - Support for the AVR `butterfly` board ([#685]).
+- Support for the _SparkFun Pro Mini 3v3_ (`promini-3v3`) board ([#687]).
 
 [#683]: https://github.com/Rahix/avr-hal/pull/683
 [#685]: https://github.com/Rahix/avr-hal/pull/685
+[#687]: https://github.com/Rahix/avr-hal/pull/687
 
 
 ## [0.2.1] - 2025-08-31
