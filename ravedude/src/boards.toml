@@ -179,6 +179,21 @@
     [promini-5v.usb-info]
     error = "Not able to guess port"
 
+[promini-3v3]
+    name = "SparkFun Pro Mini 3v3 (8MHz)"
+
+    [promini-3v3.reset]
+    automatic = true
+
+    [promini-3v3.avrdude]
+    programmer = "arduino"
+    partno = "atmega328p"
+    baudrate = 57600
+    do-chip-erase = true
+
+    [promini-3v3.usb-info]
+    error = "Not able to guess port"
+
 [trinket-pro]
     name = "Trinket Pro"
 
