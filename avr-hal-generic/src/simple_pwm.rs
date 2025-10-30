@@ -175,7 +175,7 @@ macro_rules! impl_simple_pwm {
                 }
 
                 fn get_duty(&self) -> Self::Duty {
-                    unsafe { (&*<$TIMER>::ptr()) }.$ocr.read().bits() as Self::Duty
+                    unsafe { (&*<$TIMER>::ptr()) }.$ocr().read().bits() as Self::Duty
                 }
 
                 fn get_max_duty(&self) -> Self::Duty {
@@ -185,7 +185,7 @@ macro_rules! impl_simple_pwm {
                 fn set_duty(&mut self, duty: Self::Duty) {
                     // SAFETY: This register is exclusively used here so there are no concurrency
                     // issues.
-                    unsafe { (&*<$TIMER>::ptr()).$ocr.write(|w| w.bits(duty.into())); };
+                    unsafe { (&*<$TIMER>::ptr()).$ocr().write(|w| w.bits(duty.into())); };
                 }
             }
         )+

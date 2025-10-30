@@ -197,13 +197,13 @@ impl
         // msb of ubrrh has to be 0 to set ubrrh register. (see atmega8 datasheet)
         let ubrrh: u8 = ((baudrate.ubrr >> 8) & 0x0F) as u8;
         let ubrrl: u8 = (baudrate.ubrr & 0xFF) as u8;
-        self.ubrrh().write(|w| w.bits(ubrrh));
-        self.ubrrl.write(|w| w.bits(ubrrl));
-        self.ucsra.write(|w| w.u2x().bit(baudrate.u2x));
+        self.ubrrh().write(|w| w.set(ubrrh));
+        self.ubrrl().write(|w| w.set(ubrrl));
+        self.ucsra().write(|w| w.u2x().bit(baudrate.u2x));
 
         // Enable receiver and transmitter but leave interrupts disabled.
         #[rustfmt::skip]
-        self.ucsrb.write(|w| w
+        self.ucsrb().write(|w| w
             .txen().set_bit()
             .rxen().set_bit()
         );
@@ -223,11 +223,11 @@ impl
     fn raw_deinit(&mut self) {
         // Wait for any ongoing transfer to finish.
         avr_hal_generic::nb::block!(self.raw_flush()).ok();
-        self.ucsrb.reset();
+        self.ucsrb().reset();
     }
 
     fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), core::convert::Infallible> {
-        if self.ucsra.read().udre().bit_is_clear() {
+        if self.ucsra().read().udre().bit_is_clear() {
             Err(avr_hal_generic::nb::Error::WouldBlock)
         } else {
             Ok(())
@@ -241,24 +241,28 @@ impl
         // Call flush to make sure the data-register is empty
         self.raw_flush()?;
 
-        self.udr.write(|w| w.bits(byte));
+        self.udr().write(|w| w.set(byte));
         Ok(())
     }
 
     fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, core::convert::Infallible> {
-        if self.ucsra.read().rxc().bit_is_clear() {
+        if self.ucsra().read().rxc().bit_is_clear() {
             return Err(avr_hal_generic::nb::Error::WouldBlock);
         }
 
-        Ok(self.udr.read().bits())
+        Ok(self.udr().read().bits())
     }
 
     fn raw_interrupt(&mut self, event: crate::usart::Event, state: bool) {
         match event {
-            crate::usart::Event::RxComplete => self.ucsrb.modify(|_, w| w.rxcie().bit(state)),
-            crate::usart::Event::TxComplete => self.ucsrb.modify(|_, w| w.txcie().bit(state)),
+            crate::usart::Event::RxComplete => {
+                self.ucsrb().modify(|_, w| w.rxcie().bit(state));
+            }
+            crate::usart::Event::TxComplete => {
+                self.ucsrb().modify(|_, w| w.txcie().bit(state));
+            }
             crate::usart::Event::DataRegisterEmpty => {
-                self.ucsrb.modify(|_, w| w.udrie().bit(state))
+                self.ucsrb().modify(|_, w| w.udrie().bit(state));
             }
         }
     }
@@ -277,13 +281,13 @@ impl
     fn raw_init<CLOCK>(&mut self, baudrate: crate::usart::Baudrate<CLOCK>) {
         let ubrr1h: u8 = (baudrate.ubrr >> 8) as u8;
         let ubrr1l: u8 = baudrate.ubrr as u8;
-        self.ubrr1h.write(|w| w.bits(ubrr1h));
-        self.ubrr1l.write(|w| w.bits(ubrr1l));
-        self.ucsr1a.write(|w| w.u2x1().bit(baudrate.u2x));
+        self.ubrr1h().write(|w| w.set(ubrr1h));
+        self.ubrr1l().write(|w| w.set(ubrr1l));
+        self.ucsr1a().write(|w| w.u2x1().bit(baudrate.u2x));
 
         // Enable receiver and transmitter but leave interrupts disabled.
         #[rustfmt::skip]
-        self.ucsr1b.write(|w| w
+        self.ucsr1b().write(|w| w
             .txen1().set_bit()
             .rxen1().set_bit()
         );
@@ -291,7 +295,7 @@ impl
         // Set frame format to 8n1 for now.  At some point, this should be made
         // configurable, similar to what is done in other HALs.
         #[rustfmt::skip]
-        self.ucsr1c.write(|w| w
+        self.ucsr1c().write(|w| w
             .umsel1().usart_async()
             .ucsz1().chr8()
             .usbs1().stop1()
@@ -302,11 +306,11 @@ impl
     fn raw_deinit(&mut self) {
         // Wait for any ongoing transfer to finish.
         avr_hal_generic::nb::block!(self.raw_flush()).ok();
-        self.ucsr1b.reset();
+        self.ucsr1b().reset();
     }
 
     fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), core::convert::Infallible> {
-        if self.ucsr1a.read().udre1().bit_is_clear() {
+        if self.ucsr1a().read().udre1().bit_is_clear() {
             Err(avr_hal_generic::nb::Error::WouldBlock)
         } else {
             Ok(())
@@ -320,24 +324,28 @@ impl
         // Call flush to make sure the data-register is empty
         self.raw_flush()?;
 
-        self.udr1.write(|w| w.bits(byte));
+        self.udr1().write(|w| w.set(byte));
         Ok(())
     }
 
     fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, core::convert::Infallible> {
-        if self.ucsr1a.read().rxc1().bit_is_clear() {
+        if self.ucsr1a().read().rxc1().bit_is_clear() {
             return Err(avr_hal_generic::nb::Error::WouldBlock);
         }
 
-        Ok(self.udr1.read().bits())
+        Ok(self.udr1().read().bits())
     }
 
     fn raw_interrupt(&mut self, event: crate::usart::Event, state: bool) {
         match event {
-            crate::usart::Event::RxComplete => self.ucsr1b.modify(|_, w| w.rxcie1().bit(state)),
-            crate::usart::Event::TxComplete => self.ucsr1b.modify(|_, w| w.txcie1().bit(state)),
+            crate::usart::Event::RxComplete => {
+                self.ucsr1b().modify(|_, w| w.rxcie1().bit(state));
+            }
+            crate::usart::Event::TxComplete => {
+                self.ucsr1b().modify(|_, w| w.txcie1().bit(state));
+            }
             crate::usart::Event::DataRegisterEmpty => {
-                self.ucsr1b.modify(|_, w| w.udrie1().bit(state))
+                self.ucsr1b().modify(|_, w| w.udrie1().bit(state));
             }
         }
     }
@@ -357,17 +365,18 @@ impl
     fn raw_init<CLOCK>(&mut self, baudrate: crate::usart::Baudrate<CLOCK>) {
         let ubrr0h: u8 = (baudrate.ubrr >> 8) as u8;
         let ubrr0l: u8 = baudrate.ubrr as u8;
-        self.ubrr0h.write(|w| w.bits(ubrr0h));
-        self.ubrr0l.write(|w| w.bits(ubrr0l));
-        self.ucsr0a.write(|w| w.u2x0().bit(baudrate.u2x));
+        self.ubrr0h().write(|w| w.set(ubrr0h));
+        self.ubrr0l().write(|w| w.set(ubrr0l));
+        self.ucsr0a().write(|w| w.u2x0().bit(baudrate.u2x));
 
         // Enable receiver and transmitter but leave interrupts disabled.
-        self.ucsr0b.write(|w| w.txen0().set_bit().rxen0().set_bit());
+        self.ucsr0b()
+            .write(|w| w.txen0().set_bit().rxen0().set_bit());
 
         // Set frame format to 8n1 for now.  At some point, this should be made
         // configurable, similar to what is done in other HALs.
         #[rustfmt::skip]
-        self.ucsr0c.write(|w| w
+        self.ucsr0c().write(|w| w
             .umsel0().usart_async()
             .ucsz0().chr8()
             .usbs0().stop1()
@@ -378,11 +387,11 @@ impl
     fn raw_deinit(&mut self) {
         // Wait for any ongoing transfer to finish.
         avr_hal_generic::nb::block!(self.raw_flush()).ok();
-        self.ucsr0b.reset();
+        self.ucsr0b().reset();
     }
 
     fn raw_flush(&mut self) -> avr_hal_generic::nb::Result<(), core::convert::Infallible> {
-        if self.ucsr0a.read().udre0().bit_is_clear() {
+        if self.ucsr0a().read().udre0().bit_is_clear() {
             Err(avr_hal_generic::nb::Error::WouldBlock)
         } else {
             Ok(())
@@ -396,24 +405,28 @@ impl
         // Call flush to make sure the data-register is empty
         self.raw_flush()?;
 
-        self.udr0.write(|w| w.bits(byte));
+        self.udr0().write(|w| w.set(byte));
         Ok(())
     }
 
     fn raw_read(&mut self) -> avr_hal_generic::nb::Result<u8, core::convert::Infallible> {
-        if self.ucsr0a.read().rxc0().bit_is_clear() {
+        if self.ucsr0a().read().rxc0().bit_is_clear() {
             return Err(avr_hal_generic::nb::Error::WouldBlock);
         }
 
-        Ok(self.udr0.read().bits())
+        Ok(self.udr0().read().bits())
     }
 
     fn raw_interrupt(&mut self, event: crate::usart::Event, state: bool) {
         match event {
-            crate::usart::Event::RxComplete => self.ucsr0b.modify(|_, w| w.rxcie0().bit(state)),
-            crate::usart::Event::TxComplete => self.ucsr0b.modify(|_, w| w.txcie0().bit(state)),
+            crate::usart::Event::RxComplete => {
+                self.ucsr0b().modify(|_, w| w.rxcie0().bit(state));
+            }
+            crate::usart::Event::TxComplete => {
+                self.ucsr0b().modify(|_, w| w.txcie0().bit(state));
+            }
             crate::usart::Event::DataRegisterEmpty => {
-                self.ucsr0b.modify(|_, w| w.udrie0().bit(state))
+                self.ucsr0b().modify(|_, w| w.udrie0().bit(state));
             }
         }
     }

@@ -55,3 +55,11 @@ pub use trinket_pro::*;
 mod trinket;
 #[cfg(feature = "trinket")]
 pub use trinket::*;
+#[cfg(feature = "attiny402")]
+mod attiny402;
+#[cfg(feature = "attiny402")]
+pub use attiny402::*;
+#[cfg(feature = "attiny1614")]
+mod attiny1614;
+#[cfg(feature = "attiny1614")]
+pub use attiny1614::*;

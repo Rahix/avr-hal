@@ -24,6 +24,10 @@
 #![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
 #![cfg_attr(feature = "trinket", doc = "**Trinket**.")]
 #![cfg_attr(feature = "nano168", doc = "**Nano clone (ATmega168)**.")]
+#![cfg_attr(feature = "attiny402", doc = "**ATtiny402**.")]
+#![cfg_attr(feature = "attiny1614", doc = "**ATtiny1614**.")]
+// #![cfg_attr(feature = "attiny3224", doc = "**ATtiny3224**.")]
+// #![cfg_attr(feature = "avr128db28", doc = "**avr128db28**.")]
 //! This means that only items which are available for this board are visible.  If you are using a
 //! different board, try building the documentation locally with
 //!
@@ -72,6 +76,8 @@ compile_error!(
     * trinket-pro
     * trinket
     * nano168
+    * attiny402
+    * attiny1614
     "
 );
 
@@ -100,6 +106,13 @@ pub use atmega_hal as hal;
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use atmega_hal::pac;
+
+#[doc(no_inline)]
+#[cfg(feature = "mcu-avrmodern")]
+pub use avrmodern_hal as hal;
+#[doc(no_inline)]
+#[cfg(feature = "mcu-avrmodern")]
+pub use avrmodern_hal::pac;
 
 #[doc(no_inline)]
 #[cfg(feature = "mcu-attiny")]
@@ -165,7 +178,7 @@ pub mod spi {
 #[cfg(feature = "mcu-atmega")]
 pub use spi::Spi;
 
-#[cfg(feature = "mcu-atmega")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-avrmodern"))]
 pub mod usart {
     pub use crate::hal::usart::{Baudrate, UsartOps};
 
@@ -177,15 +190,15 @@ pub mod usart {
 }
 
 #[doc(no_inline)]
-#[cfg(feature = "mcu-atmega")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-avrmodern"))]
 pub use usart::Usart;
 
-#[cfg(feature = "board-selected")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-attiny"))]
 pub mod eeprom {
     pub use crate::hal::eeprom::{Eeprom, EepromOps, OutOfBoundsError};
 }
 #[doc(no_inline)]
-#[cfg(feature = "board-selected")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-attiny"))]
 pub use eeprom::Eeprom;
 
 #[cfg(feature = "board-selected")]
@@ -197,7 +210,7 @@ pub mod simple_pwm {
     pub use attiny_hal::simple_pwm::*;
 }
 
-#[cfg(feature = "mcu-atmega")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-avrmodern"))]
 pub mod prelude {
     pub use crate::hal::prelude::*;
 
@@ -336,6 +349,40 @@ macro_rules! default_serial {
             $p.USART0,
             $pins.d0,
             $pins.d1.into_output(),
+            $crate::hal::usart::BaudrateExt::into_baudrate($baud),
+        )
+    };
+}
+
+/// Convenience macro to instantiate the [`Usart`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::default_serial!(dp, pins, 57600);
+/// ```
+#[cfg(any(feature = "attiny402"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART0,
+            $pins.a7,
+            $pins.a6.into_output(),
+            $crate::hal::usart::BaudrateExt::into_baudrate($baud),
+        )
+    };
+}
+
+#[cfg(any(feature = "attiny1614"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART0,
+            $pins.b3,
+            $pins.b2.into_output(),
             $crate::hal::usart::BaudrateExt::into_baudrate($baud),
         )
     };
