@@ -405,3 +405,26 @@ avr_hal_generic::impl_adc! {
         channel::Gnd: crate::pac::adc::admux::MUX_A::ADC_GND,
     },
 }
+
+#[cfg(any(feature = "atmega169pa"))]
+avr_hal_generic::impl_adc! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::ADC,
+    settings: AdcSettings,
+    apply_settings: |peripheral, settings| { apply_settings(peripheral, settings) },
+    channel_id: u8,
+    set_channel: |peripheral, id| {
+        peripheral.admux.modify(|_, w| w.mux().variant(id));
+    },
+    pins: {
+        port::PF0: (0b000000, didr0::adc0d),
+        port::PF1: (0b000001, didr0::adc1d),
+        port::PF2: (0b000010, didr0::adc2d),
+        port::PF3: (0b000011, didr0::adc3d),
+        port::PF4: (0b000100, didr0::adc4d),
+        port::PF5: (0b000101, didr0::adc5d),
+        port::PF6: (0b000110, didr0::adc6d),
+        port::PF7: (0b000111, didr0::adc7d),
+    },
+    channels: {},
+}

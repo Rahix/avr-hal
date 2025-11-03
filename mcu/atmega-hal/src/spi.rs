@@ -35,8 +35,9 @@ pub use avr_hal_generic::spi::*;
 #[cfg(any(
     feature = "atmega128a",
     feature = "atmega1280",
+    feature = "atmega169pa",
     feature = "atmega2560",
-    feature = "atmega32u4"
+    feature = "atmega32u4",
 ))]
 pub type Spi = avr_hal_generic::spi::Spi<
     crate::Atmega,
@@ -49,6 +50,7 @@ pub type Spi = avr_hal_generic::spi::Spi<
 #[cfg(any(
     feature = "atmega128a",
     feature = "atmega1280",
+    feature = "atmega169pa",
     feature = "atmega2560",
     feature = "atmega32u4"
 ))]
