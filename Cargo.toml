@@ -17,6 +17,7 @@ members = [
 
     # MCU HAL crates
     "mcu/atmega-hal",
+    "mcu/atxmega-hal",
     "mcu/attiny-hal",
 
     # Higher level crates
@@ -28,6 +29,7 @@ members = [
     "examples/arduino-mega2560",
     "examples/arduino-mega1280",
     "examples/arduino-nano",
+    "examples/arduino-nano-every",
     "examples/arduino-uno",
     "examples/atmega2560",
     "examples/nano168",

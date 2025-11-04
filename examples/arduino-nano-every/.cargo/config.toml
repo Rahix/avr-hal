@@ -1,0 +1,5 @@
+[build]
+target = "../../avr-specs/avr-atmega4809.json"
+
+[unstable]
+build-std = ["core"]
