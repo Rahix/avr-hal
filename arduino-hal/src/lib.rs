@@ -12,6 +12,7 @@
 #![cfg_attr(feature = "arduino-mega1280", doc = "**Arduino Mega 1280**.")]
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
+#![cfg_attr(feature = "nano-every", doc = "**Nano Every**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
 #![cfg_attr(
     feature = "sparkfun-promini-3v3",
@@ -66,6 +67,7 @@ compile_error!(
     * arduino-mega1280
     * arduino-nano
     * arduino-uno
+    * nano-every
     * sparkfun-promicro
     * sparkfun-promini-3v3
     * sparkfun-promini-5v
@@ -102,6 +104,13 @@ pub use atmega_hal as hal;
 pub use atmega_hal::pac;
 
 #[doc(no_inline)]
+#[cfg(feature = "mcu-atxmega")]
+pub use atxmega_hal as hal;
+#[doc(no_inline)]
+#[cfg(feature = "mcu-atxmega")]
+pub use atxmega_hal::pac;
+
+#[doc(no_inline)]
 #[cfg(feature = "mcu-attiny")]
 pub use attiny_hal as hal;
 #[doc(no_inline)]
@@ -130,7 +139,7 @@ pub mod port;
 pub use port::Pins;
 
 /// Analog to Digital converter.
-#[cfg(feature = "mcu-atmega")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-atxmega"))]
 pub mod adc {
     pub use crate::hal::adc::{
         channel, AdcChannel, AdcOps, AdcSettings, Channel, ClockDivider, ReferenceVoltage,
@@ -140,7 +149,7 @@ pub mod adc {
     pub type Adc = crate::hal::Adc<crate::DefaultClock>;
 }
 #[doc(no_inline)]
-#[cfg(feature = "mcu-atmega")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-atxmega"))]
 pub use adc::Adc;
 
 /// I2C bus controller.
@@ -165,7 +174,7 @@ pub mod spi {
 #[cfg(feature = "mcu-atmega")]
 pub use spi::Spi;
 
-#[cfg(feature = "mcu-atmega")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-atxmega"))]
 pub mod usart {
     pub use crate::hal::usart::{Baudrate, UsartOps};
 
@@ -177,15 +186,15 @@ pub mod usart {
 }
 
 #[doc(no_inline)]
-#[cfg(feature = "mcu-atmega")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-atxmega"))]
 pub use usart::Usart;
 
-#[cfg(feature = "board-selected")]
+#[cfg(all(feature = "board-selected", not(feature = "nano-every")))]
 pub mod eeprom {
     pub use crate::hal::eeprom::{Eeprom, EepromOps, OutOfBoundsError};
 }
 #[doc(no_inline)]
-#[cfg(feature = "board-selected")]
+#[cfg(all(feature = "board-selected", not(feature = "nano-every")))]
 pub use eeprom::Eeprom;
 
 #[cfg(feature = "board-selected")]
@@ -197,7 +206,7 @@ pub mod simple_pwm {
     pub use attiny_hal::simple_pwm::*;
 }
 
-#[cfg(feature = "mcu-atmega")]
+#[cfg(any(feature = "mcu-atmega", feature = "mcu-atxmega"))]
 pub mod prelude {
     pub use crate::hal::prelude::*;
 
@@ -247,6 +256,19 @@ macro_rules! default_serial {
             $pins.d0,
             $pins.d1.into_output(),
             $crate::hal::usart::BaudrateExt::into_baudrate($baud),
+        )
+    };
+}
+
+#[cfg(any(feature = "nano-every"))]
+#[macro_export]
+macro_rules! default_serial {
+    ($p:expr, $pins:expr, $baud:expr) => {
+        $crate::Usart::new(
+            $p.USART3,
+            $pins.rx,
+            $pins.tx.into_output(),
+            $crate::hal::usart::BaudrateAtxExt::into_baudrate($baud),
         )
     };
 }

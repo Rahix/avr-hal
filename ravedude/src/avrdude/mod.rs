@@ -169,6 +169,14 @@ impl Avrdude {
             command = command.arg("-b").arg(baudrate.to_string());
         }
 
+        for option in options.extra_options.iter().flatten() {
+            command = command.arg("-U").arg(option)
+        }
+
+        if let Some(touch_rate) = options.touch_baudrate {
+            command = command.arg("-r").arg(touch_rate.to_string());
+        }
+
         // TODO: Check that `bin` does not contain :
         let mut flash_instruction: std::ffi::OsString = "flash:w:".into();
         flash_instruction.push(bin);

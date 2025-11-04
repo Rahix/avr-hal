@@ -48,6 +48,23 @@
     [nano-new.usb-info]
     error = "Not able to guess port"
 
+[nano-every]
+    name = "Arduino Every"
+
+    [nano-every.reset]
+    automatic = true
+
+    [nano-every.avrdude]
+    programmer = "jtag2updi"
+    partno = "atmega4809"
+    baudrate = 115200
+    do-chip-erase = true
+    extra-options = ["fuse2:w:0x01:m", "fuse5:w:0xC9:m", "fuse8:w:0x00:m"]
+    touch-baudrate = 1200
+
+    [nano-every.usb-info]
+    port-ids = [{ vid = 0x2341, pid = 0x0058 }]
+
 [leonardo]
     name = "Arduino Leonardo"
 

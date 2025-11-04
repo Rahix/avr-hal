@@ -141,6 +141,20 @@ impl BaudrateArduinoExt for u32 {
     }
 }
 
+pub trait BaudrateAtxExt {
+    /// Calculate baudrate parameters for atxmega.
+    fn into_baudrate<CLOCK: crate::clock::Clock>(self) -> Baudrate<CLOCK>;
+}
+
+impl crate::usart::BaudrateAtxExt for u32 {
+    fn into_baudrate<CLOCK: crate::clock::Clock>(self) -> Baudrate<CLOCK> {
+        //https://github.com/arduino/ArduinoCore-megaavr/blob/5e639ee40afa693354d3d056ba7fb795a8948c11/cores/arduino/UART.cpp#L157
+        let ubrr = ((8 * CLOCK::FREQ / self) + 1) / 2;
+        debug_assert!(ubrr <= u16::MAX as u32);
+        Baudrate::with_exact(false, ubrr as u16)
+    }
+}
+
 /// Events/Interrupts for USART peripherals
 #[repr(u8)]
 pub enum Event {
@@ -542,6 +556,107 @@ macro_rules! impl_usart_traditional {
                         $crate::usart::Event::DataRegisterEmpty =>
                             self.[<ucsr $n b>].modify(|_, w| w.[<udrie $n>]().bit(state)),
                     }
+                }
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_usart_new {
+    (
+        hal: $HAL:ty,
+        peripheral: $USART:ty,
+        rx: $rxpin:ty,
+        tx: $txpin:ty,
+    ) => {
+        $crate::paste::paste! {
+            impl $crate::usart::UsartOps<
+                $HAL,
+                $crate::port::Pin<$crate::port::mode::Input, $rxpin>,
+                $crate::port::Pin<$crate::port::mode::Output, $txpin>,
+            > for $USART {
+                fn raw_init<CLOCK>(&mut self, baudrate: $crate::usart::Baudrate<CLOCK>) {
+
+
+                    self.ctrlb.modify(|_, w| w.rxen().clear_bit().txen().clear_bit());
+                    self.ctrla.reset(); // disable interrupt during init
+
+                    self.baud.write(|w|w.bits(baudrate.ubrr));
+
+
+                    // Set frame format to 8n1 for now.  At some point, this should be made
+                    // configurable, similar to what is done in other HALs.
+                    self.ctrlc.write(|w| w
+                        .normal_cmode().asynchronous()
+                        .normal_chsize()._8bit()
+                        .normal_sbmode()._1bit()
+                        .normal_pmode().disabled()
+                    );
+
+
+                    // Enable receiver and transmitter but leave interrupts disabled.
+                    self.ctrlb.write(|w| w
+                        .txen().set_bit()
+                        .rxen().set_bit()
+                        .rxmode().normal()
+                        .sfden()
+                        .clear_bit() // Disable start-of-frame detection
+                        .odme()
+                        .clear_bit() // Disable open-drain mode
+                        .mpcm()
+                        .clear_bit()
+                    );
+
+                   self.ctrla.write(|w| {
+                                    w.rxcie()
+                                    .set_bit() // Receive Complete Interrupt Enable
+                                    .dreie()
+                                    .set_bit() // Data Register Empty Interrupt Enable
+                                });
+                }
+
+                fn raw_deinit(&mut self) {
+                    // Wait for any ongoing transfer to finish.
+                     $crate::nb::block!(self.raw_flush()).ok();
+                     self.ctrlb.reset();
+                }
+
+                fn raw_flush(&mut self) -> $crate::nb::Result<(), core::convert::Infallible> {
+                    if self.status.read().txcif().bit_is_set() {
+                        Ok(())
+                    } else {
+                        Err($crate::nb::Error::WouldBlock)
+                    }
+                }
+
+                fn raw_write(&mut self, byte: u8) -> $crate::nb::Result<(), core::convert::Infallible> {
+                    if self.status.read().dreif().bit_is_set() {
+                        self.txdatal.write(|w| w.bits(byte));
+                        Ok(())
+                    } else {
+                        Err($crate::nb::Error::WouldBlock)
+                    }
+                }
+
+                fn raw_read(&mut self) -> $crate::nb::Result<u8, core::convert::Infallible> {
+                    if self.status.read().rxcif().bit_is_clear() {
+                        return Err($crate::nb::Error::WouldBlock);
+                    }
+
+                    Ok(self.rxdatal.read().bits())
+                }
+
+                fn raw_interrupt(&mut self, event: $crate::usart::Event, state: bool) {
+                    match event {
+                        $crate::usart::Event::RxComplete =>
+                            self.ctrla.modify(|_, w| w.rxcie().bit(state)),
+                        $crate::usart::Event::TxComplete =>
+                            self.ctrla.modify(|_, w| w.txcie().bit(state)),
+                        $crate::usart::Event::DataRegisterEmpty =>
+                            self.ctrla.modify(|_, w| w.dreie().bit(state)),
+                    }
+
                 }
             }
         }
