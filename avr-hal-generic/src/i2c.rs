@@ -478,7 +478,8 @@ macro_rules! impl_i2c_twi {
             fn raw_setup<CLOCK: $crate::clock::Clock>(&mut self, speed: u32) {
                 // Calculate TWBR register value
                 let twbr = ((CLOCK::FREQ / speed) - 16) / 2;
-                self.twbr.write(|w| unsafe { w.bits(twbr as u8) });
+                self.twbr
+                    .write(|w| unsafe { w.bits(twbr.try_into().unwrap()) });
 
                 // Disable prescaler
                 self.twsr.write(|w| w.twps().prescaler_1());
