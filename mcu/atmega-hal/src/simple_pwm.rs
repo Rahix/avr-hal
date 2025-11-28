@@ -318,12 +318,16 @@ avr_hal_generic::impl_simple_pwm! {
         timer: crate::pac::TC1,
         init: |tim, prescaler| {
             tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
-            tim.tccr1b.modify(|_r, w| match prescaler {
-                Prescaler::Direct => w.cs1().direct(),
-                Prescaler::Prescale8 => w.cs1().prescale_8(),
-                Prescaler::Prescale64 => w.cs1().prescale_64(),
-                Prescaler::Prescale256 => w.cs1().prescale_256(),
-                Prescaler::Prescale1024 => w.cs1().prescale_1024(),
+            tim.tccr1b.modify(|_r, w| {
+                w.wgm1().bits(0b01);
+
+                match prescaler {
+                    Prescaler::Direct => w.cs1().direct(),
+                    Prescaler::Prescale8 => w.cs1().prescale_8(),
+                    Prescaler::Prescale64 => w.cs1().prescale_64(),
+                    Prescaler::Prescale256 => w.cs1().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs1().prescale_1024(),
+                }
             });
         },
         pins: {
