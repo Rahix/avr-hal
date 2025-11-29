@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["MCUSR_SPEC","R","W"],"type":["BORF_R","BORF_W","EXTRF_R","EXTRF_W","PORF_R","PORF_W","WDRF_R","WDRF_W"]};

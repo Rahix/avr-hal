@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["ADCSRB_SPEC","R","W"],"type":["ACME_R","ACME_W"]};

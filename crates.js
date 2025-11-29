@@ -1,0 +1,2 @@
+window.ALL_CRATES = ["arduino_hal","atmega_hal","attiny_hal","avr_device","avr_device_macros","avr_hal_generic","bare_metal","cfg_if","critical_section","embedded_hal","embedded_hal_bus","embedded_storage","nb","paste","proc_macro2","quote","syn","ufmt","ufmt_macros","ufmt_write","unicode_ident","unwrap_infallible","vcell"];
+//{"start":21,"fragment_lengths":[13,13,13,13,20,18,13,9,19,15,19,19,5,8,14,8,6,7,14,13,16,20,8]}
