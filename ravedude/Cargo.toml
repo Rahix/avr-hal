@@ -24,3 +24,10 @@ clap = { version = "4.0.0", features = ["derive", "env"] }
 
 [target.'cfg(windows)'.dependencies]
 terminal-link = "0.1.0"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+overflow-checks = true
+panic = "abort"
