@@ -132,13 +132,13 @@ impl Avrdude {
                 .prefix(".avrdude-")
                 .suffix(".conf")
                 .tempfile()
-                .unwrap();
+                .context("failed creating name for avrdude config")?;
             let mut f = std::fs::File::create(&config).context("could not create avrdude.conf")?;
             f.write_all(include_bytes!("avrdude-6.conf"))
+                .and_then(|_| f.flush())
                 .context("could not write avrdude.conf for avrdude <=7.0")?;
-            f.flush().unwrap();
 
-            command = command.arg("-C").arg(&config.as_ref());
+            command = command.arg("-C").arg(config.as_ref());
             Some(config)
         } else {
             // For avrdude versions >=7.1, we don't supply a custom configuration file for now.

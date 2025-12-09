@@ -91,6 +91,9 @@
 //! ```
 //!
 //! For reference, take a look at [`boards.toml`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml).
+
+#![deny(clippy::as_conversions)]
+
 use anyhow::Context as _;
 use colored::Colorize as _;
 use config::OutputMode;
@@ -192,10 +195,7 @@ impl Args {
     ///
     /// Returns `None` if no binary argument was passed.
     fn bin_or_legacy_bin(&self) -> Option<&std::path::Path> {
-        self.bin_legacy
-            .as_ref()
-            .map(|p| p.as_path())
-            .or(self.bin.as_ref().map(|p| p.as_path()))
+        self.bin_legacy.as_deref().or(self.bin.as_deref())
     }
 }
 
@@ -351,7 +351,7 @@ fn ravedude() -> anyhow::Result<()> {
 
         let console_port = ravedude_config.general_options.console_port.clone();
         let port = console_port
-            .or_else(|| port)
+            .or(port)
             .context("no programmer serial port or `console-port` was set")
             .context("cannot open console without a serial port")?;
         let newline_mode = ravedude_config.general_options.newline_mode()?;

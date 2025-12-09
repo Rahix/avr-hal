@@ -26,7 +26,7 @@ pub fn print_error(e: anyhow::Error) {
         e.to_string().bold()
     );
 
-    eprintln!("");
+    eprintln!();
 
     for cause in e.chain().skip(1) {
         eprintln!(
