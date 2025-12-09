@@ -132,11 +132,11 @@ impl Avrdude {
                 .prefix(".avrdude-")
                 .suffix(".conf")
                 .tempfile()
-                .expect("TODO");
+                .context("failed creating name for avrdude config")?;
             let mut f = std::fs::File::create(&config).context("could not create avrdude.conf")?;
             f.write_all(include_bytes!("avrdude-6.conf"))
+                .and_then(|_| f.flush())
                 .context("could not write avrdude.conf for avrdude <=7.0")?;
-            f.flush().expect("TODO");
 
             command = command.arg("-C").arg(config.as_ref());
             Some(config)
