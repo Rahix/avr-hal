@@ -55,38 +55,38 @@ pub fn open(
                     }
                 }
                 if output_mode == Ascii {
-                    stdout.write_all(&buf[..count]).unwrap();
+                    stdout.write_all(&buf[..count]).expect("TODO");
                 } else {
                     for byte in &buf[..count] {
                         byte_count += 1;
                         match output_mode {
                             Ascii => unreachable!(),
-                            Hex => write!(stdout, "{:02x} ", byte).unwrap(),
-                            Dec => write!(stdout, "{:03} ", byte).unwrap(),
-                            Bin => write!(stdout, "{:08b} ", byte).unwrap(),
+                            Hex => write!(stdout, "{:02x} ", byte).expect("TODO"),
+                            Dec => write!(stdout, "{:03} ", byte).expect("TODO"),
+                            Bin => write!(stdout, "{:08b} ", byte).expect("TODO"),
                         }
 
                         if let Some(space_after) = space_after {
                             if byte_count % space_after == 0 {
-                                write!(stdout, " ").unwrap();
+                                write!(stdout, " ").expect("TODO");
                             }
                         }
                         match newline_mode {
                             NewlineMode::On(newline_on) => {
                                 if *byte == newline_on {
-                                    writeln!(stdout).unwrap()
+                                    writeln!(stdout).expect("TODO")
                                 }
                             }
                             NewlineMode::After(newline_after) => {
                                 if byte_count % newline_after == 0 {
-                                    writeln!(stdout).unwrap();
+                                    writeln!(stdout).expect("TODO");
                                 }
                             }
                             NewlineMode::Off => {}
                         }
                     }
                 }
-                stdout.flush().unwrap();
+                stdout.flush().expect("TODO");
             }
             Err(e) => {
                 assert!(e.kind() == std::io::ErrorKind::TimedOut);

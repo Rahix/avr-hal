@@ -218,7 +218,7 @@ impl BoardConfig {
                 for serialport::SerialPortInfo {
                     port_name,
                     port_type,
-                } in serialport::available_ports().unwrap()
+                } in serialport::available_ports().expect("TODO")
                 {
                     if let serialport::SerialPortType::UsbPort(usb_info) = port_type {
                         for &BoardPortID { vid, pid } in ports {
