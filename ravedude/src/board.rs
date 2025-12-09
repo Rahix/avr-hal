@@ -53,11 +53,12 @@ pub fn get_board_from_manifest(manifest_path: &Path) -> anyhow::Result<config::R
                 )
             }
             if let Some(inherit) = board_config.inherit.as_deref() {
-                let base_board = get_board_from_name(inherit)?.board_config.unwrap();
-                board.board_config = Some(board.board_config.take().unwrap().merge(base_board));
+                let base_board = get_board_from_name(inherit)?.board_config.expect("TODO");
+                board.board_config =
+                    Some(board.board_config.take().expect("TODO").merge(base_board));
             }
         } else if let Some(board_name) = board.general_options.board.as_deref() {
-            let base_board = get_board_from_name(board_name)?.board_config.unwrap();
+            let base_board = get_board_from_name(board_name)?.board_config.expect("TODO");
             board.board_config = Some(base_board);
         }
         board
