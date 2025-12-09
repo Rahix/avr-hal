@@ -29,7 +29,7 @@ pub fn get_board_from_name(board_name: &str) -> anyhow::Result<config::RavedudeC
 
             for board in all_boards.keys() {
                 msg.push('\n');
-                msg.push_str(&board);
+                msg.push_str(board);
             }
             anyhow::anyhow!(msg)
         })?),
