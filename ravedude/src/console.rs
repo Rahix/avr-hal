@@ -34,70 +34,99 @@ pub fn open(
     let mut byte_count = 0;
 
     // Spawn a thread for the receiving end because stdio is not portably non-blocking...
-    std::thread::spawn(move || loop {
-        #[cfg(not(target_os = "windows"))]
-        let mut buf = [0u8; 4098];
+    let receiver = std::thread::spawn(move || -> anyhow::Result<()> {
+        loop {
+            #[cfg(not(target_os = "windows"))]
+            let mut buf = [0u8; 4098];
 
-        // Use buffer size 1 for windows because it blocks on rx.read until the buffer is full
-        #[cfg(target_os = "windows")]
-        let mut buf = [0u8; 1];
+            // Use buffer size 1 for windows because it blocks on rx.read until the buffer is full
+            #[cfg(target_os = "windows")]
+            let mut buf = [0u8; 1];
 
-        match rx.read(&mut buf) {
-            Ok(count) => {
-                #[cfg(target_os = "windows")]
-                {
-                    // On windows, we must ensure that we are not sending anything outside of the
-                    // ASCII range.
-                    for byte in &mut buf[..count] {
-                        if *byte & 0x80 != 0 {
-                            *byte = '?'.try_into().unwrap();
+            match rx.read(&mut buf) {
+                Ok(count) => {
+                    #[cfg(target_os = "windows")]
+                    {
+                        // On windows, we must ensure that we are not sending anything outside of the
+                        // ASCII range.
+                        for byte in &mut buf[..count] {
+                            if *byte & 0x80 != 0 {
+                                *byte = '?'.try_into().unwrap();
+                            }
                         }
                     }
-                }
-                if output_mode == Ascii {
-                    stdout.write_all(&buf[..count]).expect("TODO");
-                } else {
-                    for byte in &buf[..count] {
-                        byte_count += 1;
-                        match output_mode {
-                            Ascii => unreachable!(),
-                            Hex => write!(stdout, "{:02x} ", byte).expect("TODO"),
-                            Dec => write!(stdout, "{:03} ", byte).expect("TODO"),
-                            Bin => write!(stdout, "{:08b} ", byte).expect("TODO"),
-                        }
+                    if output_mode == Ascii {
+                        stdout.write_all(&buf[..count])?;
+                    } else {
+                        for byte in &buf[..count] {
+                            byte_count += 1;
+                            match output_mode {
+                                Ascii => unreachable!(),
+                                Hex => write!(stdout, "{:02x} ", byte)?,
+                                Dec => write!(stdout, "{:03} ", byte)?,
+                                Bin => write!(stdout, "{:08b} ", byte)?,
+                            }
 
-                        if let Some(space_after) = space_after {
-                            if byte_count % space_after == 0 {
-                                write!(stdout, " ").expect("TODO");
-                            }
-                        }
-                        match newline_mode {
-                            NewlineMode::On(newline_on) => {
-                                if *byte == newline_on {
-                                    writeln!(stdout).expect("TODO")
+                            if let Some(space_after) = space_after {
+                                if byte_count % space_after == 0 {
+                                    write!(stdout, " ")?;
                                 }
                             }
-                            NewlineMode::After(newline_after) => {
-                                if byte_count % newline_after == 0 {
-                                    writeln!(stdout).expect("TODO");
+                            match newline_mode {
+                                NewlineMode::On(newline_on) => {
+                                    if *byte == newline_on {
+                                        writeln!(stdout)?
+                                    }
                                 }
+                                NewlineMode::After(newline_after) => {
+                                    if byte_count % newline_after == 0 {
+                                        writeln!(stdout)?;
+                                    }
+                                }
+                                NewlineMode::Off => {}
                             }
-                            NewlineMode::Off => {}
                         }
                     }
+                    stdout.flush()?;
                 }
-                stdout.flush().expect("TODO");
-            }
-            Err(e) => {
-                assert!(e.kind() == std::io::ErrorKind::TimedOut);
+                Err(e) => {
+                    assert!(e.kind() == std::io::ErrorKind::TimedOut);
+                }
             }
         }
     });
 
+    // Spawn a thread for the sending end because stdio is not portably non-blocking...
+    let sender = std::thread::spawn(move || -> anyhow::Result<()> {
+        loop {
+            let mut buf = [0u8; 4098];
+            let count = stdin.read(&mut buf)?;
+            tx.write_all(&buf[..count])?;
+            tx.flush()?;
+        }
+    });
+
     loop {
-        let mut buf = [0u8; 4098];
-        let count = stdin.read(&mut buf)?;
-        tx.write_all(&buf[..count])?;
-        tx.flush()?;
+        if sender.is_finished() {
+            sender
+                .join()
+                .unwrap()
+                .context("error while sending data to target")?;
+            break;
+        }
+
+        if receiver.is_finished() {
+            receiver
+                .join()
+                .unwrap()
+                .context("error while receiving data from target")?;
+            break;
+        }
+
+        // We don't have a portable select so instead we poll our two threads every 100ms.  Not
+        // pretty but at least this should work absolutely everywhere...
+        std::thread::sleep(std::time::Duration::from_millis(100));
     }
+
+    Ok(())
 }
