@@ -138,7 +138,7 @@ impl Avrdude {
                 .context("could not write avrdude.conf for avrdude <=7.0")?;
             f.flush().unwrap();
 
-            command = command.arg("-C").arg(&config.as_ref());
+            command = command.arg("-C").arg(config.as_ref());
             Some(config)
         } else {
             // For avrdude versions >=7.1, we don't supply a custom configuration file for now.

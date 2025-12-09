@@ -8,7 +8,7 @@ use crate::config::OutputMode;
 use crate::config::OutputMode::*;
 
 pub fn open(
-    port: &std::path::PathBuf,
+    port: &std::path::Path,
     baudrate: u32,
     output_mode: OutputMode,
     newline_mode: NewlineMode,
