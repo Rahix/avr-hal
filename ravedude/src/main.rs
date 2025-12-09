@@ -91,6 +91,9 @@
 //! ```
 //!
 //! For reference, take a look at [`boards.toml`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml).
+
+#![deny(clippy::as_conversions)]
+
 use anyhow::Context as _;
 use colored::Colorize as _;
 use config::OutputMode;

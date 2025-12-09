@@ -16,7 +16,11 @@ fn serialize_baudrate<S>(val: &Option<Option<NonZeroU32>>, serializer: S) -> Res
 where
     S: serde::Serializer,
 {
-    let baudrate = val.as_ref().map(|val| val.map_or(-1, |x| x.get() as i32));
+    let baudrate = val
+        .as_ref()
+        .map(|val| val.map_or_else(|| Ok(-1), |x| i32::try_from(x.get())))
+        .transpose()
+        .map_err(|e| serde::ser::Error::custom(format!("failed serializing baudrate: {e}")))?;
 
     baudrate.serialize(serializer)
 }
@@ -28,9 +32,15 @@ where
     Ok(match Option::<i32>::deserialize(deserializer)? {
         None => None,
         Some(-1) => Some(None),
-        Some(baudrate) => Some(Some(NonZeroU32::new(baudrate as _).ok_or_else(|| {
-            serde::de::Error::custom(format!("invalid baudrate: {baudrate}"))
-        })?)),
+        Some(baudrate) => Some(Some(
+            u32::try_from(baudrate)
+                .map_err(|_e| serde::de::Error::custom(format!("baudrate too high: {baudrate}")))
+                .and_then(|b| {
+                    NonZeroU32::new(b).ok_or_else(|| {
+                        serde::de::Error::custom(format!("baudrate must not be zero: {baudrate}"))
+                    })
+                })?,
+        )),
     })
 }
 
