@@ -55,7 +55,7 @@ pub fn open(
                     }
                 }
                 if output_mode == Ascii {
-                    stdout.write(&buf[..count]).unwrap();
+                    stdout.write_all(&buf[..count]).unwrap();
                 } else {
                     for byte in &buf[..count] {
                         byte_count += 1;
@@ -97,7 +97,7 @@ pub fn open(
     loop {
         let mut buf = [0u8; 4098];
         let count = stdin.read(&mut buf)?;
-        tx.write(&buf[..count])?;
+        tx.write_all(&buf[..count])?;
         tx.flush()?;
     }
 }
