@@ -210,26 +210,29 @@ pub struct BoardPortID {
     pub pid: u16,
 }
 
+fn find_port(ports: &[BoardPortID]) -> anyhow::Result<std::path::PathBuf> {
+    for serialport::SerialPortInfo {
+        port_name,
+        port_type,
+    } in
+        serialport::available_ports().context("failed fetching list of available serial ports")?
+    {
+        if let serialport::SerialPortType::UsbPort(usb_info) = port_type {
+            for &BoardPortID { vid, pid } in ports {
+                if usb_info.vid == vid && usb_info.pid == pid {
+                    return Ok(port_name.into());
+                }
+            }
+        }
+    }
+    Err(anyhow::anyhow!("Serial port not found."))
+}
+
 impl BoardConfig {
     pub fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         match &self.usb_info {
             Some(BoardUSBInfo::Error(err)) => Some(Err(anyhow::anyhow!(err.clone()))),
-            Some(BoardUSBInfo::PortIds(ports)) => {
-                for serialport::SerialPortInfo {
-                    port_name,
-                    port_type,
-                } in serialport::available_ports().expect("TODO")
-                {
-                    if let serialport::SerialPortType::UsbPort(usb_info) = port_type {
-                        for &BoardPortID { vid, pid } in ports {
-                            if usb_info.vid == vid && usb_info.pid == pid {
-                                return Some(Ok(port_name.into()));
-                            }
-                        }
-                    }
-                }
-                Some(Err(anyhow::anyhow!("Serial port not found.")))
-            }
+            Some(BoardUSBInfo::PortIds(ports)) => Some(find_port(ports)),
             None => None,
         }
     }
