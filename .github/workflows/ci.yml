@@ -51,6 +51,9 @@ jobs:
             name: arduino-nano
             examples: true
           - type: board
+            name: arduino-micro
+            examples: true
+          - type: board
             name: nano168
             examples: true
           - type: board
