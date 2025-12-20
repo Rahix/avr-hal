@@ -1,0 +1,1 @@
+searchState.loadedDescShard("ufmt_write", 0, "<code>μfmt</code>’s <code>uWrite</code> trait\nThe error associated to this writer\nA collection of methods that are required / used to format …\nWrites a <code>char</code> into this writer, returning whether the …\nWrites a string slice into this writer, returning whether …")
