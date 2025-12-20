@@ -19,9 +19,9 @@
 mod diecimila;
 #[cfg(feature = "arduino-diecimila")]
 pub use diecimila::*;
-#[cfg(feature = "arduino-leonardo")]
+#[cfg(any(feature = "arduino-leonardo", feature = "arduino-micro"))]
 mod leonardo;
-#[cfg(feature = "arduino-leonardo")]
+#[cfg(any(feature = "arduino-leonardo", feature = "arduino-micro"))]
 pub use leonardo::*;
 #[cfg(any(feature = "arduino-mega2560", feature = "arduino-mega1280"))]
 mod mega;

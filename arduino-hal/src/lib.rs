@@ -10,6 +10,7 @@
 #![cfg_attr(feature = "arduino-leonardo", doc = "**Arduino Leonardo**.")]
 #![cfg_attr(feature = "arduino-mega2560", doc = "**Arduino Mega 2560**.")]
 #![cfg_attr(feature = "arduino-mega1280", doc = "**Arduino Mega 1280**.")]
+#![cfg_attr(feature = "arduino-micro", doc = "**Arduino Micro**.")]
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
@@ -64,6 +65,7 @@ compile_error!(
     * arduino-leonardo
     * arduino-mega2560
     * arduino-mega1280
+    * arduino-micro
     * arduino-nano
     * arduino-uno
     * sparkfun-promicro
@@ -238,7 +240,7 @@ macro_rules! pins {
 /// let pins = arduino_hal::pins!(dp);
 /// let serial = arduino_hal::default_serial!(dp, pins, 57600);
 /// ```
-#[cfg(any(feature = "arduino-leonardo"))]
+#[cfg(any(feature = "arduino-leonardo", feature = "arduino-micro"))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {

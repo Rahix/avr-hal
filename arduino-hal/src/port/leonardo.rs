@@ -1,7 +1,7 @@
 pub use atmega_hal::port::{mode, Pin, PinMode, PinOps};
 
 avr_hal_generic::renamed_pins! {
-    /// Pins of the **Arduino Leonardo**.
+    /// Pins of the **Arduino Leonardo** and **Arduno Micro**.
     ///
     /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
     pub struct Pins {

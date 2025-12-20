@@ -20,6 +20,7 @@ pub(crate) mod default {
         feature = "arduino-mega2560",
         feature = "arduino-mega1280",
         feature = "arduino-nano",
+        feature = "arduino-micro",
         feature = "arduino-uno",
         feature = "sparkfun-promicro",
         feature = "sparkfun-promini-5v",

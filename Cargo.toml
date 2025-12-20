@@ -28,6 +28,7 @@ members = [
     "examples/arduino-mega2560",
     "examples/arduino-mega1280",
     "examples/arduino-nano",
+    "examples/arduino-micro",
     "examples/arduino-uno",
     "examples/atmega2560",
     "examples/nano168",
