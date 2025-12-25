@@ -26,6 +26,7 @@ pub(crate) mod default {
         feature = "sparkfun-promini-5v",
         feature = "trinket-pro",
         feature = "nano168",
+        feature = "digispark"
     ))]
     pub type DefaultClock = avr_hal_generic::clock::MHz16;
     #[cfg(any(feature = "trinket", feature = "sparkfun-promini-3v3"))]
