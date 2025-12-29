@@ -14,6 +14,7 @@ categories = ["no-std", "embedded", "hardware-support"]
 default = ["rt"]
 rt = ["avr-device/rt"]
 
+usb-support = ["usb-device"]
 board-selected = []
 mcu-atmega = []
 mcu-attiny = []
@@ -22,7 +23,7 @@ arduino-leonardo = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
 arduino-mega2560 = ["mcu-atmega", "atmega-hal/atmega2560", "board-selected"]
 arduino-mega1280 = ["mcu-atmega", "atmega-hal/atmega1280", "board-selected"]
 arduino-nano = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
-arduino-micro = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
+arduino-micro = ["mcu-atmega", "atmega-hal/atmega32u4", "atmega-hal/usb-support", "usb-support", "board-selected"]
 arduino-uno = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
 trinket-pro = ["mcu-atmega", "atmega-hal/atmega328p", "board-selected"]
 sparkfun-promicro = ["mcu-atmega", "atmega-hal/atmega32u4", "board-selected"]
@@ -38,6 +39,7 @@ docsrs = ["arduino-uno"]
 cfg-if = "1"
 embedded-hal = "1.0"
 ufmt = "0.2.0"
+usb-device = { version = "0.3.2", optional = true }
 
 [dependencies.avr-hal-generic]
 path = "../avr-hal-generic/"

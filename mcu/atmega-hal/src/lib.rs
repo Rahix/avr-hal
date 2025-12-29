@@ -119,6 +119,11 @@ pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
 pub use avr_hal_generic::prelude;
 
+#[cfg(feature = "usb-support")]
+mod usb;
+#[cfg(feature = "usb-support")]
+pub use usb::UsbdBus;
+
 #[cfg(feature = "device-selected")]
 pub mod adc;
 #[cfg(feature = "device-selected")]
