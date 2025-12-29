@@ -14,6 +14,7 @@ categories = ["no-std", "embedded", "hardware-support"]
 rt = ["avr-device/rt"]
 device-selected = []
 enable-extra-adc = []
+usb-support = ["usb-device"]
 atmega48p = ["avr-device/atmega48p", "device-selected"]
 atmega16 = ["avr-device/atmega16", "device-selected"]
 atmega164pa = ["avr-device/atmega164pa", "device-selected"]
@@ -21,7 +22,7 @@ atmega168 = ["avr-device/atmega168", "device-selected"]
 atmega328p = ["avr-device/atmega328p", "device-selected"]
 atmega328pb = ["avr-device/atmega328pb", "device-selected"]
 atmega32a = ["avr-device/atmega32a", "device-selected"]
-atmega32u4 = ["avr-device/atmega32u4", "device-selected"]
+atmega32u4 = ["avr-device/atmega32u4", "device-selected", "usb-support"]
 atmega2560 = ["avr-device/atmega2560", "device-selected"]
 atmega128a = ["avr-device/atmega128a", "device-selected"]
 atmega1280 = ["avr-device/atmega1280", "device-selected"]
@@ -37,6 +38,7 @@ docsrs = ["atmega328p"]
 
 [dependencies]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
+usb-device = { version = "0.3.2", optional = true }
 
 [dependencies.avr-device]
 version = "0.8"
