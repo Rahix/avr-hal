@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Quadrature encoder interface"><title>_embedded_hal_Qei in arduino_hal::prelude - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-20739d33.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arduino_hal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.88.0-nightly (10fa3c449 2025-04-26)" data-channel="nightly" data-search-js="search-f7877310.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-4e99c027.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../static.files/main-7ef8a74a.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../arduino_hal/index.html">arduino_<wbr>hal</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">_embedded_<wbr>hal_<wbr>Qei</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#examples" title="Examples">Examples</a></li></ul><h3><a href="#required-associated-types">Required Associated Types</a></h3><ul class="block"><li><a href="#associatedtype.Count" title="Count">Count</a></li></ul><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.count" title="count">count</a></li><li><a href="#tymethod.direction" title="direction">direction</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2><a href="index.html">In arduino_<wbr>hal::<wbr>prelude</a></h2></div></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">arduino_hal</a>::<wbr><a href="index.html">prelude</a></div><h1>Trait <span class="trait">_embedded_hal_Qei</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/embedded_hal/lib.rs.html#973">Source</a> </span></div><pre class="rust item-decl"><code>pub trait _embedded_hal_Qei {
+    type <a href="#associatedtype.Count" class="associatedtype">Count</a>;
+
+    // Required methods
+    fn <a href="#tymethod.count" class="fn">count</a>(&amp;self) -&gt; Self::<a class="associatedtype" href="trait._embedded_hal_Qei.html#associatedtype.Count" title="type arduino_hal::prelude::_embedded_hal_Qei::Count">Count</a>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.direction" class="fn">direction</a>(&amp;self) -&gt; <a class="enum" href="../../embedded_hal/enum.Direction.html" title="enum embedded_hal::Direction">Direction</a>;
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Quadrature encoder interface</p>
+<p><em>This trait is available if embedded-hal is built with the <code>"unproven"</code> feature.</em></p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<p>You can use this interface to measure the speed of a motor</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern crate </span>embedded_hal <span class="kw">as </span>hal;
+<span class="attr">#[macro_use(block)]
+</span><span class="kw">extern crate </span>nb;
+
+<span class="kw">use </span>hal::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">fn </span>main() {
+    <span class="kw">let </span><span class="kw-2">mut </span>qei: Qei1 = {
+        <span class="comment">// ..
+    </span>};
+    <span class="kw">let </span><span class="kw-2">mut </span>timer: Timer6 = {
+        <span class="comment">// ..
+    </span>};
+
+
+    <span class="kw">let </span>before = qei.count();
+    timer.start(<span class="number">1</span>.s());
+    <span class="macro">block!</span>(timer.wait());
+    <span class="kw">let </span>after = qei.count();
+
+    <span class="kw">let </span>speed = after.wrapping_sub(before);
+    <span class="macro">println!</span>(<span class="string">"Speed: {} pulses per second"</span>, speed);
+}
+</code></pre></div>
+</div></details><h2 id="required-associated-types" class="section-header">Required Associated Types<a href="#required-associated-types" class="anchor">§</a></h2><div class="methods"><details class="toggle" open><summary><section id="associatedtype.Count" class="method"><a class="src rightside" href="../../src/embedded_hal/lib.rs.html#975">Source</a><h4 class="code-header">type <a href="#associatedtype.Count" class="associatedtype">Count</a></h4></section></summary><div class="docblock"><p>The type of the value returned by <code>count</code></p>
+</div></details></div><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.count" class="method"><a class="src rightside" href="../../src/embedded_hal/lib.rs.html#978">Source</a><h4 class="code-header">fn <a href="#tymethod.count" class="fn">count</a>(&amp;self) -&gt; Self::<a class="associatedtype" href="trait._embedded_hal_Qei.html#associatedtype.Count" title="type arduino_hal::prelude::_embedded_hal_Qei::Count">Count</a></h4></section></summary><div class="docblock"><p>Returns the current pulse count of the encoder</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.direction" class="method"><a class="src rightside" href="../../src/embedded_hal/lib.rs.html#981">Source</a><h4 class="code-header">fn <a href="#tymethod.direction" class="fn">direction</a>(&amp;self) -&gt; <a class="enum" href="../../embedded_hal/enum.Direction.html" title="enum embedded_hal::Direction">Direction</a></h4></section></summary><div class="docblock"><p>Returns the count direction</p>
+</div></details></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"></div><script src="../../trait.impl/embedded_hal/trait.Qei.js" async></script></section></div></main></body></html>

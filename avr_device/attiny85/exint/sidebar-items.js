@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["gifr","gimsk","mcucr","pcmsk"],"struct":["RegisterBlock"],"type":["GIFR","GIMSK","MCUCR","PCMSK"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CLKPS_A"],"struct":["CLKPR_SPEC"],"type":["CLKPCE_R","CLKPCE_W","CLKPS_R","CLKPS_W","R","W"]};
