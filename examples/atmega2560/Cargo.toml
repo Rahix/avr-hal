@@ -10,7 +10,7 @@ panic-halt = "1.0.0"
 ufmt = "0.2.0"
 nb = "1.1.0"
 embedded-hal = "1.0"
-avr-device = { version = "0.8", features = ["rt"] }
+avr-device = { version = "0.8.1", features = ["rt"] }
 
 [dependencies.embedded-hal-v0]
 version = "0.2.3"
