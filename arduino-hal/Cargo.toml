@@ -30,6 +30,7 @@ sparkfun-promini-3v3 = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enabl
 sparkfun-promini-5v = ["mcu-atmega", "atmega-hal/atmega328p", "atmega-hal/enable-extra-adc", "board-selected"]
 trinket = ["mcu-attiny", "attiny-hal/attiny85", "board-selected"]
 nano168 = ["mcu-atmega", "atmega-hal/atmega168", "atmega-hal/enable-extra-adc", "board-selected"]
+digispark = ["mcu-attiny", "attiny-hal/attiny85", "board-selected"]
 
 # We must select a board to build on docs.rs
 docsrs = ["arduino-uno"]
