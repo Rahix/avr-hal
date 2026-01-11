@@ -251,6 +251,138 @@ avr_hal_generic::impl_simple_pwm! {
     }
 }
 
+#[cfg(feature = "atmega169pa")]
+avr_hal_generic::impl_simple_pwm! {
+    /// Use `TC0` for PWM (pins `PB4`)
+    ///
+    /// # Example
+    /// ```
+    /// let mut timer0 = Timer0Pwm::new(dp.TC0, Prescaler::Prescale64);
+    ///
+    /// let mut pb4 = pins.pb4.into_output().into_pwm(&mut timer0);
+    ///
+    /// pb4.set_duty(128);
+    /// pb4.enable();
+    /// ```
+    pub struct Timer0Pwm {
+        timer: crate::pac::TC0,
+        init: |tim, prescaler| {
+            tim.tccr0a.modify(|_r, w| {
+                w.wgm00().set_bit().wgm01().set_bit(); // pwm_fast
+                match prescaler {
+                    Prescaler::Direct => w.cs0().direct(),
+                    Prescaler::Prescale8 => w.cs0().prescale_8(),
+                    Prescaler::Prescale64 => w.cs0().prescale_64(),
+                    Prescaler::Prescale256 => w.cs0().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs0().prescale_1024()
+                }
+            });
+        },
+        pins: {
+            PB4: {
+                ocr: ocr0a,
+                into_pwm: |tim| if enable {
+                    tim.tccr0a.modify(|_r, w| w.com0a().match_clear());
+                } else {
+                    tim.tccr0a.modify(|_r, w| w.com0a().disconnected());
+                },
+            },
+        },
+    }
+}
+
+#[cfg(feature = "atmega169pa")]
+avr_hal_generic::impl_simple_pwm! {
+    /// Use `TC1` for PWM (pins `PB5`, `PB6`)
+    ///
+    /// # Example
+    /// ```
+    /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
+    ///
+    /// let mut pb5 = pins.pb5.into_output().into_pwm(&mut timer1);
+    /// let mut pb6 = pins.pb6.into_output().into_pwm(&mut timer1);
+    ///
+    /// pb5.set_duty(128);
+    /// pb5.enable();
+    /// pb6.set_duty(128);
+    /// pb6.enable();
+    /// ```
+    pub struct Timer1Pwm {
+        timer: crate::pac::TC1,
+        init: |tim, prescaler| {
+            tim.tccr1a.modify(|_r, w| w.wgm1().bits(0b01));
+            tim.tccr1b.modify(|_r, w| w.wgm1().bits(0b01));
+
+            tim.tccr1b.modify(|_r, w| match prescaler {
+                Prescaler::Direct => w.cs1().direct(),
+                Prescaler::Prescale8 => w.cs1().prescale_8(),
+                Prescaler::Prescale64 => w.cs1().prescale_64(),
+                Prescaler::Prescale256 => w.cs1().prescale_256(),
+                Prescaler::Prescale1024 => w.cs1().prescale_1024(),
+            });
+        },
+        pins: {
+            PB5: {
+                ocr: ocr1a,
+                into_pwm: |tim| if enable {
+                    tim.tccr1a.modify(|_r, w| w.com1a().match_clear());
+                } else {
+                    tim.tccr1a.modify(|_r, w| w.com1a().disconnected());
+                },
+            },
+
+            PB6: {
+                ocr: ocr1b,
+                into_pwm: |tim| if enable {
+                    tim.tccr1a.modify(|_r, w| w.com1b().match_clear());
+                } else {
+                    tim.tccr1a.modify(|_r, w| w.com1b().disconnected());
+                },
+            },
+        },
+    }
+}
+
+#[cfg(feature = "atmega169pa")]
+avr_hal_generic::impl_simple_pwm! {
+    /// Use `TC1` for PWM (pin `PB7`)
+    ///
+    /// # Example
+    /// ```
+    /// let mut timer1 = Timer1Pwm::new(dp.TC1, Prescaler::Prescale64);
+    ///
+    /// let mut pb7 = pins.pb7.into_output().into_pwm(&mut timer1);
+    ///
+    /// pb7.set_duty(128);
+    /// pb7.enable();
+    /// ```
+    pub struct Timer2Pwm {
+        timer: crate::pac::TC2,
+        init: |tim, prescaler| {
+            tim.tccr2a.modify(|_r, w| {
+                w.wgm20().set_bit().wgm21().set_bit(); // pwm_fast
+                match prescaler {
+                    Prescaler::Direct => w.cs2().direct(),
+                    Prescaler::Prescale8 => w.cs2().prescale_8(),
+                    Prescaler::Prescale64 => w.cs2().prescale_64(),
+                    Prescaler::Prescale256 => w.cs2().prescale_256(),
+                    Prescaler::Prescale1024 => w.cs2().prescale_1024(),
+                }
+            });
+        },
+        pins: {
+            PB7: {
+                ocr: ocr2a,
+                into_pwm: |tim| if enable {
+                    tim.tccr2a.modify(|_r, w| w.com2a().match_clear());
+                } else {
+                    tim.tccr2a.modify(|_r, w| w.com2a().disconnected());
+                },
+            },
+        },
+    }
+}
+
 #[cfg(any(feature = "atmega1280", feature = "atmega2560"))]
 avr_hal_generic::impl_simple_pwm! {
     /// Use `TC0` for PWM (pins `PB7`, `PG5`)

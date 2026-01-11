@@ -75,6 +75,10 @@ pub use avr_device::atmega164pa as pac;
 ///
 #[cfg(feature = "atmega168")]
 pub use avr_device::atmega168 as pac;
+/// Reexport of `atmega169pa` from `avr-device`
+///
+#[cfg(feature = "atmega169pa")]
+pub use avr_device::atmega169pa as pac;
 /// Reexport of `atmega2560` from `avr-device`
 ///
 #[cfg(feature = "atmega2560")]
@@ -193,7 +197,7 @@ macro_rules! pins {
     };
 }
 
-#[cfg(any(feature = "atmega128a"))]
+#[cfg(any(feature = "atmega128a", feature = "atmega169pa"))]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {

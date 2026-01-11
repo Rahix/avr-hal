@@ -1,0 +1,21 @@
+[package]
+name = "avr-butterfly-examples"
+description = "Examples for the AVR Butterfly board with Atmega169V chip"
+version = "0.0.0"
+authors = ["Markus Kolb <github@tower-net.de>"]
+edition = "2024"
+publish = false
+
+[features]
+critical-section-impl = ["avr-device/critical-section-impl"]
+
+[dependencies]
+panic-halt = "1.0.0"
+ufmt = "0.2.0"
+nb = "1.1.0"
+embedded-hal = "1.0"
+avr-device = { version = "0.7", features = ["rt"] }
+
+[dependencies.atmega-hal]
+path = "../../mcu/atmega-hal/"
+features = ["atmega169pa"]

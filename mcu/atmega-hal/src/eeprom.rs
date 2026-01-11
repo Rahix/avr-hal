@@ -86,7 +86,7 @@ avr_hal_generic::impl_eeprom_atmega! {
     },
 }
 
-#[cfg(any(feature = "atmega8", feature = "atmega16"))]
+#[cfg(any(feature = "atmega8", feature = "atmega16", feature = "atmega169pa"))]
 avr_hal_generic::impl_eeprom_atmega_old! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
@@ -97,7 +97,7 @@ avr_hal_generic::impl_eeprom_atmega_old! {
     },
 }
 
-#[cfg(any(feature = "atmega32a"))]
+#[cfg(feature = "atmega32a")]
 avr_hal_generic::impl_eeprom_atmega_old! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,
@@ -108,7 +108,7 @@ avr_hal_generic::impl_eeprom_atmega_old! {
     },
 }
 
-#[cfg(any(feature = "atmega128a",))]
+#[cfg(feature = "atmega128a")]
 avr_hal_generic::impl_eeprom_atmega_old! {
     hal: crate::Atmega,
     peripheral: crate::pac::EEPROM,

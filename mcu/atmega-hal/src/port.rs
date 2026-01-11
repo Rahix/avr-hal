@@ -64,7 +64,7 @@ avr_hal_generic::impl_port_traditional! {
     }
 }
 
-#[cfg(any(feature = "atmega128a"))]
+#[cfg(any(feature = "atmega128a", feature = "atmega169pa"))]
 avr_hal_generic::impl_port_traditional_old! {
     enum Ports {
         A: crate::pac::PORTA = [0, 1, 2, 3, 4, 5, 6, 7],
