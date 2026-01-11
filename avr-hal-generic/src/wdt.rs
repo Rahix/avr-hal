@@ -37,6 +37,12 @@ pub trait WdtOps<H> {
     /// **Warning**: This is a low-level method and should not be called directly from user code.
     fn raw_init(&mut self, m: &Self::MCUSR);
 
+    /// Sets the mode for the watchdog timer.
+    /// Refer to the `WdtMode` enum for more infos.
+    ///
+    /// **Warning**: This is a low-level method and should not be called directly from user code.
+    fn raw_set_mode(&mut self, mode: WdtMode);
+
     /// Start the watchdog timer with the specified timeout.
     ///
     /// If the timeout value is not supported, `Err(())` should be returned.
@@ -55,6 +61,21 @@ pub trait WdtOps<H> {
     fn raw_stop(&mut self);
 }
 
+#[derive(Copy, Clone)]
+/// The mode that dictates how the watchdog should behave.
+/// This needs to be called **after** the `start` function.
+pub enum WdtMode {
+    /// Trigger the interrupt `WDT`, but do not perform a softreset.
+    /// **Warning**: On many `atmega` devices, a watchdog timeout resets the mode automatically, to
+    /// prevent the microcontroller from getting stuck in a infinite loop. So subsequent timeouts
+    /// will cause a softreset. When you want to trigger an interrupt multiple times,
+    /// you need to call the `rearm` method after every timeout.
+    Interrupt,
+    /// Softreset the microcontroller.
+    /// This is the default on many microcontrollers.
+    SystemReset,
+}
+
 pub struct Wdt<H, WDT> {
     p: WDT,
     _h: PhantomData<H>,
@@ -64,6 +85,14 @@ impl<H, WDT: WdtOps<H>> Wdt<H, WDT> {
     pub fn new(mut p: WDT, m: &WDT::MCUSR) -> Self {
         p.raw_init(m);
         Self { p, _h: PhantomData }
+    }
+
+    pub fn rearm(&mut self, m: &WDT::MCUSR) {
+        self.p.raw_init(m);
+    }
+
+    pub fn set_mode(&mut self, mode: WdtMode) {
+        self.p.raw_set_mode(mode);
     }
 
     pub fn start(&mut self, timeout: Timeout) -> Result<(), ()> {
@@ -96,6 +125,23 @@ macro_rules! impl_wdt {
                 /// If a prior reset was provided by the watchdog, the WDRF in MCUSR would be set,
                 /// so WDRF is also cleared to allow for re-enabling the watchdog.
                 m.modify(|_, w| w.wdrf().clear_bit());
+                self.$wdtcsr.modify(|_, w| w.wde().clear_bit());
+            }
+
+            #[inline]
+            fn raw_set_mode(&mut self, mode: $crate::wdt::WdtMode) {
+                // Enable watchdog configuration mode.
+                self.$wdtcsr.modify(|_, w| w.wdce().set_bit());
+                match mode {
+                    $crate::wdt::WdtMode::Interrupt => {
+                        self.$wdtcsr
+                            .modify(|_, w| w.wde().clear_bit().wdie().set_bit());
+                    }
+                    $crate::wdt::WdtMode::SystemReset => {
+                        self.$wdtcsr
+                            .modify(|_, w| w.wde().set_bit().wdie().clear_bit());
+                    }
+                }
             }
 
             #[inline]
