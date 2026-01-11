@@ -217,6 +217,91 @@ impl<PIN: PinOps, MODE: mode::Io> Pin<MODE, PIN> {
     }
 }
 
+
+impl<PIN: PinOps> Pin<mode::Output, PIN> {
+    /// Temporarily put this pin into input mode (with pull-up enabled) and revert back to output afterwards.
+    pub fn with_pin_as_pull_up_input<F, R>(&mut self, f: F) -> R
+    where
+        F: FnOnce(&mut Pin<mode::Input<mode::PullUp>, PIN>) -> R,
+    {
+        // Save state so we can restore it afterwards
+        let state = self.is_set_high();
+        // To "move" the pin out of current "owner" variable without actually moving
+        // SAFETY: This is okay because the pins are trivial structs.
+        let pin: Self = unsafe { core::ptr::read(self) };
+        let mut pin = pin.into_pull_up_input();
+        let res = f(&mut pin);
+        *self = if state {
+            pin.into_output_high()
+        } else {
+            pin.into_output()
+        };
+        res
+    }
+
+    /// Temporarily put this pin into input mode (floating) and revert back to output afterwards.
+    pub fn with_pin_as_floating_input<F, R>(&mut self, f: F) -> R
+    where
+        F: FnOnce(&mut Pin<mode::Input<mode::Floating>, PIN>) -> R,
+    {
+        // Save state so we can restore it afterwards
+        let state = self.is_set_high();
+        // To "move" the pin out of current "owner" variable without actually moving
+        // SAFETY: This is okay because the pins are trivial structs.
+        let pin: Self = unsafe { core::ptr::read(self) };
+        let mut pin = pin.into_floating_input();
+        let res = f(&mut pin);
+        *self = if state {
+            pin.into_output_high()
+        } else {
+            pin.into_output()
+        };
+        res
+    }
+}
+
+impl<PIN: PinOps, IMODE: mode::InputMode> Pin<mode::Input<IMODE>, PIN> {
+    pub fn with_pin_as_output<F, R>(&mut self, f: F) -> R
+    where
+        F: FnOnce(&mut Pin<mode::Output, PIN>) -> R,
+    {
+        // Find out if pull-up was enabled
+        let was_pull_up = unsafe { self.pin.out_get() };
+        // To "move" the pin out of current "owner" variable without actually moving
+        // SAFETY: This is okay because the pins are trivial structs.
+        let pin: Self = unsafe { core::ptr::read(self) };
+        let mut pin = pin.into_output();
+        let res = f(&mut pin);
+        // TODO: Here it would be nice to write back to *self, but should work without for now.
+        if was_pull_up {
+            pin.into_pull_up_input();
+        } else {
+            pin.into_floating_input();
+        };
+        res
+    }
+
+    pub fn with_pin_as_output_high<F, R>(&mut self, f: F) -> R
+    where
+        F: FnOnce(&mut Pin<mode::Output, PIN>) -> R,
+    {
+        // Find out if pull-up was enabled
+        let was_pull_up = unsafe { self.pin.out_get() };
+        // To "move" the pin out of current "owner" variable without actually moving
+        // SAFETY: This is okay because the pins are trivial structs.
+        let pin: Self = unsafe { core::ptr::read(self) };
+        let mut pin = pin.into_output_high();
+        let res = f(&mut pin);
+        // TODO: Here it would be nice to write back to *self, but should work without for now.
+        if was_pull_up {
+            pin.into_pull_up_input();
+        } else {
+            pin.into_floating_input();
+        };
+        res
+    }
+}
+
 /// # Downgrading
 /// For applications where the exact pin is irrelevant, a specific pin can be downgraded to a
 /// "dynamic pin" which can represent any pin:
