@@ -19,21 +19,25 @@ fn get_all_boards() -> anyhow::Result<HashMap<String, config::BoardConfig>> {
 }
 
 pub fn get_board_from_name(board_name: &str) -> anyhow::Result<config::RavedudeConfig> {
+    Ok(config::RavedudeConfig {
+        board_config: Some(get_board_config_from_name(board_name)?),
+        ..Default::default()
+    })
+}
+
+fn get_board_config_from_name(board_name: &str) -> anyhow::Result<config::BoardConfig> {
     let mut all_boards = get_all_boards()?;
 
-    Ok(config::RavedudeConfig {
-        board_config: Some(all_boards.remove(board_name).ok_or_else(|| {
-            let mut msg = format!("invalid board: {board_name}\n");
+    all_boards.remove(board_name).ok_or_else(|| {
+        let mut msg = format!("invalid board: {board_name}\n");
 
-            msg.push_str("valid boards:");
+        msg.push_str("valid boards:");
 
-            for board in all_boards.keys() {
-                msg.push('\n');
-                msg.push_str(&board);
-            }
-            anyhow::anyhow!(msg)
-        })?),
-        ..Default::default()
+        for board in all_boards.keys() {
+            msg.push('\n');
+            msg.push_str(board);
+        }
+        anyhow::anyhow!(msg)
     })
 }
 
@@ -53,11 +57,11 @@ pub fn get_board_from_manifest(manifest_path: &Path) -> anyhow::Result<config::R
                 )
             }
             if let Some(inherit) = board_config.inherit.as_deref() {
-                let base_board = get_board_from_name(inherit)?.board_config.unwrap();
+                let base_board = get_board_config_from_name(inherit)?;
                 board.board_config = Some(board.board_config.take().unwrap().merge(base_board));
             }
         } else if let Some(board_name) = board.general_options.board.as_deref() {
-            let base_board = get_board_from_name(board_name)?.board_config.unwrap();
+            let base_board = get_board_config_from_name(board_name)?;
             board.board_config = Some(base_board);
         }
         board
