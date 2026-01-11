@@ -70,6 +70,11 @@ pub mod adc;
 #[cfg(all(feature = "device-selected", not(feature = "attiny2313")))]
 pub use adc::Adc;
 
+#[cfg(feature = "attiny85")]
+pub mod spi;
+#[cfg(feature = "attiny85")]
+pub use spi::Spi;
+
 #[cfg(feature = "device-selected")]
 pub mod port;
 #[cfg(feature = "device-selected")]
