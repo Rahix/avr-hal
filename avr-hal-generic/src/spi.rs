@@ -1,5 +1,5 @@
 //! SPI Implementation
-use crate::port;
+use crate::{port, usart::UsartOps};
 use core::marker::PhantomData;
 use embedded_hal::spi::{self, SpiBus};
 
@@ -198,6 +198,42 @@ pub struct Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> {
     write_in_progress: bool,
     _cs: PhantomData<CSPIN>,
     _h: PhantomData<H>,
+}
+
+impl<H, USART, SCLKPIN, MOSIPIN, MISOPIN, UsartSPIDummyPin>
+    Spi<H, USART, SCLKPIN, MOSIPIN, MISOPIN, UsartSPIDummyPin>
+where
+    USART: SpiOps<H, SCLKPIN, MOSIPIN, MISOPIN, UsartSPIDummyPin>
+        + UsartOps<H, port::Pin<port::mode::Input, MISOPIN>, port::Pin<port::mode::Output, MOSIPIN>>,
+    SCLKPIN: port::PinOps,
+    MOSIPIN: port::PinOps,
+    MISOPIN: port::PinOps,
+{
+    /// Instantiate a USART based SPI with the registers, SCLK/MOSI/MISO pins, and settings,
+    /// with the internal pull-up enabled on the MISO pin.
+    ///
+    /// The pins are not actually used directly, but they are moved into the struct in
+    /// order to enforce that they are in the correct mode, and cannot be used by anyone
+    /// else while SPI is active.
+    pub fn new_from_usart(
+        p: USART,
+        sclk: port::Pin<port::mode::Output, SCLKPIN>,
+        mosi: port::Pin<port::mode::Output, MOSIPIN>,
+        miso: port::Pin<port::mode::Input<port::mode::PullUp>, MISOPIN>,
+        settings: Settings,
+    ) -> Self {
+        let mut spi = Self {
+            p,
+            sclk,
+            mosi,
+            miso: miso.forget_imode(),
+            write_in_progress: false,
+            _cs: PhantomData,
+            _h: PhantomData,
+        };
+        spi.p.raw_setup(&settings);
+        spi
+    }
 }
 
 impl<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN> Spi<H, SPI, SCLKPIN, MOSIPIN, MISOPIN, CSPIN>
