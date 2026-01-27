@@ -190,6 +190,26 @@ pub mod eeprom {
 #[cfg(feature = "board-selected")]
 pub use eeprom::Eeprom;
 
+#[doc(no_inline)]
+#[cfg(any(
+    feature = "arduino-micro",
+    feature = "arduino-leonardo",
+    feature = "sparkfun-promicro"
+))]
+pub use atmega_hal::default_usb_bus_with_pll;
+
+#[cfg(any(
+    feature = "arduino-micro",
+    feature = "arduino-leonardo",
+    feature = "sparkfun-promicro"
+))]
+#[macro_export]
+macro_rules! default_usb_bus_with_pll_macro {
+    ($p:expr) => {
+        $crate::default_usb_bus_with_pll::<$crate::DefaultClock>($p.USB_DEVICE, $p.PLL)
+    };
+}
+
 #[cfg(feature = "board-selected")]
 pub mod simple_pwm {
     #[cfg(feature = "mcu-atmega")]
