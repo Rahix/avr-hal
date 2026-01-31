@@ -12,7 +12,7 @@
 //! If we use the standard simple_pwm, we'll use an 8-bit TC.
 //! We'd need a prescaler equal to factor 320 000 to get a 50 Hz PWM cycle.
 //! 
-//! The longest PWM cycle per prescaler is defined by MAX value (2^16) = 65c536
+//! The longest PWM cycle per prescaler is defined by MAX value (2^16) = 65536
 //! Options:
 //!     * Prescale8: 16 MHz / 8 = 2 MHz => 0.5 us per clock tick * 65 5363 = 32.8 ms period max.
 //!         --> 20 ms is achieved after 39 999 clock ticks.
