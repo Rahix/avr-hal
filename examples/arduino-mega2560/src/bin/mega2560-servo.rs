@@ -9,10 +9,15 @@
 //! * 20 ms PWM period required = 50 Hz
 //! * Control range: 0.5 to 2.5 ms for a 0 to 180 degrees rotation.
 //!
-//! If we use the standard simple_pwm, we'll use an 8-bit TC.
-//! We'd need a prescaler equal to factor 320 000 to get a 50 Hz PWM cycle.
+//! If we use the standard simple_pwm, we'll use an 8-bit TC. That would limit us to 256 steps.
+//! The timer/counter will then count from 0 to 255 at the pace defined by the clock (with prescaler
+//! modification). With this we can check which PWM period we can achieve with an 8-bit timer/counter:
+//! * With Prescale64: 1 clock tick of 256 total ticks = 4 us * 256 = +- 1 ms.
+//! * With Prescale256: 1 clock tick = 16us * 256 = 4.1 ms.
+//! * With Prescale1024: 1 clock tick = +- 0.1 us * 256 = 16.4 ms. 
 //! 
-//! The longest PWM cycle per prescaler is defined by MAX value (2^16) = 65536
+//! If we use 16-bit timer/counters, we get a better control on the exact PWM period time.
+//! The longest PWM cycle per prescaler is defined by MAX value (2^16) = 65536 (<-> 2^8 = 256).
 //! Options:
 //!     * Prescale8: 16 MHz / 8 = 2 MHz => 0.5 us per clock tick * 65 5363 = 32.8 ms period max.
 //!         --> 20 ms is achieved after 39 999 clock ticks.
@@ -24,7 +29,11 @@
 //! 
 //! For most cases Prescale64 will be sufficient.
 //! 
-//! For details on the timer/counter registers, refer to the ATMega2560 docs.
+//! Note: On the ATMega2560 TC1, TC3, TC4 and TC5 are 16-bit timer/counters.
+//!       TC0 and TC2 are 0-bit timer/counters.
+//!
+//! For details on the timer/counter registers, refer to the Arduino-Mega docs: https://docs.arduino.cc/hardware/mega-2560/
+
 #![no_std]
 #![no_main]
 
@@ -77,8 +86,8 @@ fn main () -> ! {
     // * 0.5 ms = 125 ticks (0 - 124)
     // * 2.0 ms = 500 ticks (0 - 499)
     // * 2.5 ms = 625 ticks (0 - 624)
-    // Servo SG90 0 degrees with Prescale8 = 124
-    // Servo SG90 180 degrees with Prescale8 = 624
+    // Servo SG90 0 degrees = 0.5 ms -> with Prescale8 = 124
+    // Servo SG90 180 degrees = 2.5 ms -> with Prescale8 = 624
     tc3.ocr3a().write(|w| w.set(124u16)); // Now we set it to 0 degrees.
     
     // Toggle pin D3 into an output pin connect it to the TC3 output.
@@ -88,7 +97,7 @@ fn main () -> ! {
     
     loop {
         for ticks in [124u16, 374u16, 624u16, 374u16] {
-            tc3.ocr3a().write(|w| w.set(ticks)); // Now we set it to 0 degrees.
+            tc3.ocr3a().write(|w| w.set(ticks)); // Now we set the angle using the 'duty'.
             arduino_hal::delay_ms(500);
         }
     }
