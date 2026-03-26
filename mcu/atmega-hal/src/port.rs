@@ -65,7 +65,7 @@ avr_hal_generic::impl_port_traditional! {
 }
 
 #[cfg(feature = "atmega4809")]
-avr_hal_generic::impl_port_setclrtgl! {
+avr_hal_generic::impl_port_mega0! {
     enum Ports {
         A: crate::pac::PORTA = [0, 1, 2, 3, 4, 5, 6, 7],
         B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5],

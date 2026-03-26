@@ -15,6 +15,7 @@ features = ["docsrs"]
 
 [features]
 docsrs = ["avr-device/docsrs"]
+mega0 = []
 
 [dependencies]
 nb = "1.1.0"

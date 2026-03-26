@@ -76,6 +76,51 @@ avr_hal_generic::impl_usart_traditional! {
     rx: port::PD0,
     tx: port::PD1,
 }
+#[cfg(any(feature = "atmega4809"))]
+pub type Usart3<CLOCK> = Usart<
+    crate::pac::USART3,
+    port::Pin<port::mode::Input, port::PB1>,
+    port::Pin<port::mode::Output, port::PB0>,
+    CLOCK,
+>;
+#[cfg(any(feature = "atmega4809"))]
+avr_hal_generic::impl_usart_mega0! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::USART3,
+    alt_name: default,
+    rx: port::PB1,
+    tx: port::PB0,
+}
+#[cfg(any(feature = "atmega4809"))]
+pub type Usart3Alt<CLOCK> = Usart<
+    crate::pac::USART3,
+    port::Pin<port::mode::Input, port::PB5>,
+    port::Pin<port::mode::Output, port::PB4>,
+    CLOCK,
+>;
+#[cfg(any(feature = "atmega4809"))]
+avr_hal_generic::impl_usart_mega0! {
+    hal: crate::Atmega,
+    peripheral: crate::pac::USART3,
+    alt_name: alt1,
+    rx: port::PB5,
+    tx: port::PB4,
+}
+//#[cfg(any(feature = "atmega4809"))]
+//pub type Usart1<CLOCK> = Usart<
+//    crate::pac::USART1,
+//    port::Pin<port::mode::Input, port::PC5>,
+//    port::Pin<port::mode::Output, port::PC4>,
+//    CLOCK,
+//>;
+//#[cfg(any(feature = "atmega4809"))]
+//avr_hal_generic::impl_usart_traditional! {
+//    hal: crate::Atmega,
+//    peripheral: crate::pac::USART1,
+//    register_suffix: 0,
+//    rx: port::PC5,
+//    tx: port::PC4,
+//}
 
 #[cfg(feature = "atmega328pb")]
 pub type Usart1<CLOCK> = Usart<

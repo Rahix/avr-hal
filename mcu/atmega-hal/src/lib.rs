@@ -148,16 +148,16 @@ pub use port::Pins;
 //#[cfg(feature = "device-selected")]
 //pub mod simple_pwm;
 //
-//#[cfg(feature = "device-selected")]
-//pub mod usart;
-//#[cfg(feature = "device-selected")]
-//pub use usart::Usart;
-//
+#[cfg(feature = "device-selected")]
+pub mod usart;
+#[cfg(feature = "device-selected")]
+pub use usart::Usart;
+
 //#[cfg(feature = "device-selected")]
 //pub mod wdt;
 //#[cfg(feature = "device-selected")]
 //pub use wdt::Wdt;
-//
+
 //#[cfg(feature = "device-selected")]
 //pub mod eeprom;
 //#[cfg(feature = "device-selected")]

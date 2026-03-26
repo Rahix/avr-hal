@@ -231,7 +231,7 @@ avr_hal_generic::impl_adc! {
     },
 }
 
-#[cfg(feature = "atmega32u4")]
+#[cfg(any(feature = "atmega32u4",feature = "atmega4809"))]
 avr_hal_generic::impl_adc! {
     hal: crate::Atmega,
     peripheral: crate::pac::ADC,
