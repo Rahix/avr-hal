@@ -30,4 +30,6 @@ pub(crate) mod default {
     pub type DefaultClock = avr_hal_generic::clock::MHz16;
     #[cfg(any(feature = "trinket", feature = "sparkfun-promini-3v3"))]
     pub type DefaultClock = avr_hal_generic::clock::MHz8;
+    #[cfg(any(feature = "usbtiny"))]
+    pub type DefaultClock = avr_hal_generic::clock::MHz1;
 }
