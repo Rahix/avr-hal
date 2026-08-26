@@ -96,6 +96,12 @@ compile_error!(
 #[doc(cfg(feature = "rt"))]
 pub use avr_device::entry;
 
+/// Reexport of the [`avr_device`](https://docs.rs/avr-device) crate.
+///
+/// This makes items such as `avr_device::interrupt` available without depending
+/// on `avr-device` directly and keeping its version in sync manually.
+pub use avr_device;
+
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use atmega_hal as hal;
