@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Baudrate"],"trait":["UsartOps"],"type":["Usart","UsartReader","UsartWriter"]};

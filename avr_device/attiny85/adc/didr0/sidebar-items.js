@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["DIDR0_SPEC"],"type":["ADC0D_R","ADC0D_W","ADC1D_R","ADC1D_W","ADC2D_R","ADC2D_W","ADC3D_R","ADC3D_W","R","W"]};

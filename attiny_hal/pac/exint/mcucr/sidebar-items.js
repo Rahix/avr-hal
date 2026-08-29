@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ISC0_A"],"struct":["MCUCR_SPEC"],"type":["ISC0_R","ISC0_W","R","W"]};

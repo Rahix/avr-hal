@@ -1,0 +1,1 @@
+searchState.loadedDescShard("avr_device_macros", 0, "Adapted from …")

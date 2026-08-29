@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["wdtcr"],"struct":["RegisterBlock"],"type":["WDTCR"]};

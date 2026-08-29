@@ -1,0 +1,1 @@
+searchState.loadedDescShard("ufmt_macros", 0, "<code>μfmt</code> macros\nAutomatically derive the <code>uDebug</code> trait for a <code>struct</code> or <code>enum</code>")

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["OSCCAL_SPEC"],"type":["OSCCAL_R","OSCCAL_W","R","W"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["UDR0_SPEC"],"type":["R","W"]};
