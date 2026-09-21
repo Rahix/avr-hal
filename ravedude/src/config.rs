@@ -16,7 +16,11 @@ fn serialize_baudrate<S>(val: &Option<Option<NonZeroU32>>, serializer: S) -> Res
 where
     S: serde::Serializer,
 {
-    let baudrate = val.as_ref().map(|val| val.map_or(-1, |x| x.get() as i32));
+    let baudrate = val
+        .as_ref()
+        .map(|val| val.map_or_else(|| Ok(-1), |x| i32::try_from(x.get())))
+        .transpose()
+        .map_err(|e| serde::ser::Error::custom(format!("failed serializing baudrate: {e}")))?;
 
     baudrate.serialize(serializer)
 }
@@ -28,9 +32,15 @@ where
     Ok(match Option::<i32>::deserialize(deserializer)? {
         None => None,
         Some(-1) => Some(None),
-        Some(baudrate) => Some(Some(NonZeroU32::new(baudrate as _).ok_or_else(|| {
-            serde::de::Error::custom(format!("invalid baudrate: {baudrate}"))
-        })?)),
+        Some(baudrate) => Some(Some(
+            u32::try_from(baudrate)
+                .map_err(|_e| serde::de::Error::custom(format!("baudrate too high: {baudrate}")))
+                .and_then(|b| {
+                    NonZeroU32::new(b).ok_or_else(|| {
+                        serde::de::Error::custom(format!("baudrate must not be zero: {baudrate}"))
+                    })
+                })?,
+        )),
     })
 }
 
@@ -200,26 +210,29 @@ pub struct BoardPortID {
     pub pid: u16,
 }
 
+fn find_port(ports: &[BoardPortID]) -> anyhow::Result<std::path::PathBuf> {
+    for serialport::SerialPortInfo {
+        port_name,
+        port_type,
+    } in
+        serialport::available_ports().context("failed fetching list of available serial ports")?
+    {
+        if let serialport::SerialPortType::UsbPort(usb_info) = port_type {
+            for &BoardPortID { vid, pid } in ports {
+                if usb_info.vid == vid && usb_info.pid == pid {
+                    return Ok(port_name.into());
+                }
+            }
+        }
+    }
+    Err(anyhow::anyhow!("Serial port not found."))
+}
+
 impl BoardConfig {
     pub fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         match &self.usb_info {
             Some(BoardUSBInfo::Error(err)) => Some(Err(anyhow::anyhow!(err.clone()))),
-            Some(BoardUSBInfo::PortIds(ports)) => {
-                for serialport::SerialPortInfo {
-                    port_name,
-                    port_type,
-                } in serialport::available_ports().unwrap()
-                {
-                    if let serialport::SerialPortType::UsbPort(usb_info) = port_type {
-                        for &BoardPortID { vid, pid } in ports {
-                            if usb_info.vid == vid && usb_info.pid == pid {
-                                return Some(Ok(port_name.into()));
-                            }
-                        }
-                    }
-                }
-                Some(Err(anyhow::anyhow!("Serial port not found.")))
-            }
+            Some(BoardUSBInfo::PortIds(ports)) => Some(find_port(ports)),
             None => None,
         }
     }
