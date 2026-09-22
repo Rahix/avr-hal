@@ -19,6 +19,7 @@
 #![cfg_attr(feature = "atmega1284p", doc = "**ATmega1284P**.")]
 #![cfg_attr(feature = "atmega8", doc = "**ATmega8**.")]
 #![cfg_attr(feature = "atmega88p", doc = "**ATmega88P**.")]
+#![cfg_attr(feature = "atmega4809", doc = "**ATmega4809**.")]
 //! This means that only items which are available for this MCU are visible.  If you are using
 //! a different chip, try building the documentation locally with:
 //!
@@ -48,6 +49,7 @@ compile_error!(
     * atmega1284p
     * atmega8
     * atmega88p
+    * atmega4809
     "
 );
 
@@ -107,6 +109,10 @@ pub use avr_device::atmega8 as pac;
 ///
 #[cfg(feature = "atmega88p")]
 pub use avr_device::atmega88p as pac;
+/// Reexport of `atmega4809` from `avr-device`
+///
+#[cfg(feature = "atmega4809")]
+pub use avr_device::atmega4809 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -125,43 +131,43 @@ pub use avr_hal_generic::clock;
 pub use avr_hal_generic::delay;
 pub use avr_hal_generic::prelude;
 
-#[cfg(feature = "device-selected")]
-pub mod adc;
-#[cfg(feature = "device-selected")]
-pub use adc::Adc;
-
-#[cfg(feature = "device-selected")]
-pub mod i2c;
-#[cfg(feature = "device-selected")]
-pub use i2c::I2c;
-
-#[cfg(feature = "device-selected")]
-pub mod spi;
-#[cfg(feature = "device-selected")]
-pub use spi::Spi;
-
+//#[cfg(feature = "device-selected")]
+//pub mod adc;
+//#[cfg(feature = "device-selected")]
+//pub use adc::Adc;
+//
+//#[cfg(feature = "device-selected")]
+//pub mod i2c;
+//#[cfg(feature = "device-selected")]
+//pub use i2c::I2c;
+//
+//#[cfg(feature = "device-selected")]
+//pub mod spi;
+//#[cfg(feature = "device-selected")]
+//pub use spi::Spi;
+//
 #[cfg(feature = "device-selected")]
 pub mod port;
 #[cfg(feature = "device-selected")]
 pub use port::Pins;
 
-#[cfg(feature = "device-selected")]
-pub mod simple_pwm;
-
+//#[cfg(feature = "device-selected")]
+//pub mod simple_pwm;
+//
 #[cfg(feature = "device-selected")]
 pub mod usart;
 #[cfg(feature = "device-selected")]
 pub use usart::Usart;
 
-#[cfg(feature = "device-selected")]
-pub mod wdt;
-#[cfg(feature = "device-selected")]
-pub use wdt::Wdt;
+//#[cfg(feature = "device-selected")]
+//pub mod wdt;
+//#[cfg(feature = "device-selected")]
+//pub use wdt::Wdt;
 
-#[cfg(feature = "device-selected")]
-pub mod eeprom;
-#[cfg(feature = "device-selected")]
-pub use eeprom::Eeprom;
+//#[cfg(feature = "device-selected")]
+//pub mod eeprom;
+//#[cfg(feature = "device-selected")]
+//pub use eeprom::Eeprom;
 
 pub struct Atmega;
 
@@ -196,6 +202,14 @@ macro_rules! pins {
 macro_rules! pins {
     ($p:expr) => {
         $crate::Pins::new($p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF)
+    };
+}
+
+#[cfg(feature = "atmega4809")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB, $p.PORTC, $p.PORTD, $p.PORTE, $p.PORTF)
     };
 }
 

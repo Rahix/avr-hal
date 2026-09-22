@@ -50,6 +50,13 @@ impl Clock for MHz16 {
     const FREQ: u32 = 16_000_000;
 }
 
+/// 16 MHz Clock with prescaler divisor of 6 (used for 4809 peripherals)
+#[derive(ufmt::derive::uDebug, Debug)]
+pub struct MHz16_6;
+impl Clock for MHz16_6 {
+    const FREQ: u32 = 16_000_000 / 6;
+}
+
 /// 12 MHz Clock
 #[derive(ufmt::derive::uDebug, Debug)]
 pub struct MHz12;

@@ -64,6 +64,18 @@ avr_hal_generic::impl_port_traditional! {
     }
 }
 
+#[cfg(feature = "atmega4809")]
+avr_hal_generic::impl_port_mega0! {
+    enum Ports {
+        A: crate::pac::PORTA = [0, 1, 2, 3, 4, 5, 6, 7],
+        B: crate::pac::PORTB = [0, 1, 2, 3, 4, 5],
+        C: crate::pac::PORTC = [0, 1, 2, 3, 4, 5, 6, 7],
+        D: crate::pac::PORTD = [0, 1, 2, 3, 4, 5, 6, 7],
+        E: crate::pac::PORTE = [0, 1, 2, 3],
+        F: crate::pac::PORTF = [0, 1, 2, 3, 4, 5, 6],
+    }
+}
+
 #[cfg(any(feature = "atmega128a"))]
 avr_hal_generic::impl_port_traditional_old! {
     enum Ports {

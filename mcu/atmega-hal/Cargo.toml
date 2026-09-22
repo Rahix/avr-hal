@@ -28,6 +28,7 @@ atmega1280 = ["avr-device/atmega1280", "device-selected"]
 atmega1284p = ["avr-device/atmega1284p", "device-selected"]
 atmega8 = ["avr-device/atmega8", "device-selected"]
 atmega88p = ["avr-device/atmega88p", "device-selected"]
+atmega4809 = ["avr-hal-generic/mega0", "avr-device/atmega4809", "device-selected"]
 
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
