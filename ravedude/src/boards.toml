@@ -282,3 +282,14 @@
     do-chip-erase = true
 
     # The AVR Butterfly does not have USB-Serial, thus no port is known or needed.
+[usbtiny]
+    name = "USBTiny"
+
+    [usbtiny.reset]
+    automatic = true
+
+    [usbtiny.avrdude]
+    programmer = "usbtiny"
+    partno = "attiny85"
+    baudrate = -1
+    do-chip-erase = true
