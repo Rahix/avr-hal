@@ -25,13 +25,13 @@ use panic_halt as _;
 use arduino_hal::{
     hal::port::{PD2, PD6, PD7},
     pac::tc0::tccr0b::CS0_A,
-    port::mode::{Floating, Input, Output},
     port::Pin,
+    port::mode::{Floating, Input, Output},
     prelude::*,
 };
 use avr_device::interrupt::Mutex;
 
-use infrared::{protocol::nec::NecCommand, protocol::*, Receiver};
+use infrared::{Receiver, protocol::nec::NecCommand, protocol::*};
 
 type IrPin = Pin<Input<Floating>, PD2>;
 type IrProto = Nec;

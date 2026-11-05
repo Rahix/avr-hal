@@ -128,7 +128,7 @@ pub use clock::default::DefaultClock;
 #[cfg(feature = "board-selected")]
 mod delay;
 #[cfg(feature = "board-selected")]
-pub use delay::{delay_ms, delay_ns, delay_us, Delay};
+pub use delay::{Delay, delay_ms, delay_ns, delay_us};
 
 #[cfg(feature = "board-selected")]
 pub mod port;
@@ -141,7 +141,7 @@ pub use port::Pins;
 #[cfg(feature = "mcu-atmega")]
 pub mod adc {
     pub use crate::hal::adc::{
-        channel, AdcChannel, AdcOps, AdcSettings, Channel, ClockDivider, ReferenceVoltage,
+        AdcChannel, AdcOps, AdcSettings, Channel, ClockDivider, ReferenceVoltage, channel,
     };
 
     /// Check the [`avr_hal_generic::adc::Adc`] documentation.

@@ -110,8 +110,10 @@ impl Avrdude {
             anyhow::bail!(
                 "Avrdude does not meet minimum version requirements. v{}.{} was found while v{}.{} or greater is required.\n\
                 You may find a more suitable version here: https://download.savannah.gnu.org/releases/avrdude/",
-                major, minor,
-                req_major, req_minor,
+                major,
+                minor,
+                req_major,
+                req_minor,
             );
         }
         Ok(())

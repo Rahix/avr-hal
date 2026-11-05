@@ -1,8 +1,8 @@
 #![no_std]
 #![no_main]
 
-use atmega_hal::usart::{Baudrate, Usart};
 use atmega_hal::Eeprom;
+use atmega_hal::usart::{Baudrate, Usart};
 use panic_halt as _;
 
 // Define core clock in the root crate

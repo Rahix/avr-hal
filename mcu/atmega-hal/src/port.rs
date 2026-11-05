@@ -17,7 +17,7 @@
 //! }
 //! ```
 
-pub use avr_hal_generic::port::{mode, PinMode, PinOps};
+pub use avr_hal_generic::port::{PinMode, PinOps, mode};
 
 #[cfg(any(
     feature = "atmega48p",

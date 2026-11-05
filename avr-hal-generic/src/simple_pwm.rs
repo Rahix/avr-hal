@@ -4,8 +4,8 @@ use core::marker::PhantomData;
 use embedded_hal::pwm;
 use embedded_hal::pwm::{ErrorKind, ErrorType, SetDutyCycle};
 
-use crate::port::mode;
 use crate::port::Pin;
+use crate::port::mode;
 
 /// Clock prescaler for PWM
 ///
