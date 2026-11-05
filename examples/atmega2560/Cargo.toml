@@ -2,7 +2,7 @@
 name = "atmega2560-examples"
 version = "0.0.0"
 authors = ["Rahix <rahix@rahix.de>", "Armandas Jarušauskas <jarusauskas@gmail.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [dependencies]
