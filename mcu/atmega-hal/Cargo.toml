@@ -3,7 +3,7 @@ name = "atmega-hal"
 version = "0.1.0"
 
 authors = ["Rahix <rahix@rahix.de>"]
-edition = "2021"
+edition = "2024"
 description = "HAL crate for ATmega-series AVR microcontrollers"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/rahix/avr-hal"

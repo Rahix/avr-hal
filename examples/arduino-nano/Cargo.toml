@@ -2,7 +2,7 @@
 name = "arduino-nano-examples"
 version = "0.0.0"
 authors = ["David R. Morrison <drmorr@evokewonder.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [dependencies]

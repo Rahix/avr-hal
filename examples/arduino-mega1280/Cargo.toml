@@ -2,7 +2,7 @@
 name = "arduino-mega1280-examples"
 version = "0.0.0"
 authors = ["Rahix <rahix@rahix.de>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [dependencies]
