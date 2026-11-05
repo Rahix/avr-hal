@@ -1,10 +1,8 @@
 #![no_std]
 #![no_main]
 
-use atmega_hal::delay::Delay;
 use atmega_hal::usart::{Baudrate, Usart};
 use atmega_hal::Eeprom;
-use embedded_hal::delay::DelayNs;
 use panic_halt as _;
 
 // Define core clock in the root crate
@@ -16,8 +14,6 @@ const BOOT_COUNT_OFFSET: u16 = 0;
 fn main() -> ! {
     let dp = atmega_hal::Peripherals::take().unwrap();
     let pins = atmega_hal::pins!(dp);
-
-    let mut delay = Delay::<crate::CoreClock>::new();
 
     // set up serial interface for text output
     let mut serial = Usart::new(
