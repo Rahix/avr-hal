@@ -18,7 +18,7 @@ use arduino_hal::prelude::*;
 // an artifact of the avr-hal examples structure.
 #[cfg(not(doc))]
 #[panic_handler]
-fn panic(info: &core::panic::PanicInfo) -> ! {
+fn panic(_info: &core::panic::PanicInfo) -> ! {
     // disable interrupts - firmware has panicked so no ISRs should continue running
     avr_device::interrupt::disable();
 
@@ -62,7 +62,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     // }
 
     // Print panic location:
-    // if let Some(loc) = info.location() {
+    // if let Some(loc) = _info.location() {
     //     ufmt::uwriteln!(
     //         &mut serial,
     //         "  At {}:{}:{}\r",
