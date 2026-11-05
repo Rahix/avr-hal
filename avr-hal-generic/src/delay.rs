@@ -218,9 +218,9 @@ impl delay_v0::DelayUs<u16> for Delay<crate::clock::MHz1> {
 
         // compensate for the time taken by the preceeding and next commands (about 22 cycles)
         us -= 22; // = 2 cycles
-                  // the following loop takes 4 microseconds (4 cycles)
-                  // per iteration, so execute it us/4 times
-                  // us is at least 4, divided by 4 gives us 1 (no zero delay bug)
+        // the following loop takes 4 microseconds (4 cycles)
+        // per iteration, so execute it us/4 times
+        // us is at least 4, divided by 4 gives us 1 (no zero delay bug)
         us >>= 2; // us div 4, = 4 cycles
 
         busy_loop(us);

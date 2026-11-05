@@ -237,7 +237,10 @@ fn ravedude() -> anyhow::Result<()> {
 
     let mut ravedude_config = match (manifest_path.as_deref(), args.legacy_board_name()) {
         (Some(_), Some(board_name)) => {
-            anyhow::bail!("can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml", board_name);
+            anyhow::bail!(
+                "can't pass board as command-line argument when Ravedude.toml is present; set `board = {:?}` under [general] in Ravedude.toml",
+                board_name
+            );
         }
         (Some(path), None) => board::get_board_from_manifest(path)?,
         (None, Some(board_name)) => {

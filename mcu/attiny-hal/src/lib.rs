@@ -32,14 +32,6 @@ compile_error!(
     "
 );
 
-/// Reexport of `attiny167` from `avr-device`
-///
-#[cfg(feature = "attiny167")]
-pub use avr_device::attiny167 as pac;
-/// Reexport of `attiny2313` from `avr-device`
-///
-#[cfg(feature = "attiny2313")]
-pub use avr_device::attiny2313 as pac;
 /// Reexport of `attiny84` from `avr-device`
 ///
 #[cfg(feature = "attiny84")]
@@ -52,6 +44,14 @@ pub use avr_device::attiny85 as pac;
 ///
 #[cfg(feature = "attiny88")]
 pub use avr_device::attiny88 as pac;
+/// Reexport of `attiny167` from `avr-device`
+///
+#[cfg(feature = "attiny167")]
+pub use avr_device::attiny167 as pac;
+/// Reexport of `attiny2313` from `avr-device`
+///
+#[cfg(feature = "attiny2313")]
+pub use avr_device::attiny2313 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]

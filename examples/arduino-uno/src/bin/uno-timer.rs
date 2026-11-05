@@ -9,11 +9,11 @@ and then modernized to account for API drift since 2020
 
 */
 
-use arduino_hal::port::mode::Output;
 use arduino_hal::port::Pin;
+use arduino_hal::port::mode::Output;
 use arduino_hal::prelude::*;
-use avr_device::atmega328p::tc1::tccr1b::CS1_A;
 use avr_device::atmega328p::TC1;
+use avr_device::atmega328p::tc1::tccr1b::CS1_A;
 use core::mem;
 use panic_halt as _;
 use ufmt::{uWrite, uwriteln};

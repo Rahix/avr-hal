@@ -9,7 +9,7 @@
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
-use arduino_hal::port::{mode, Pin};
+use arduino_hal::port::{Pin, mode};
 use core::sync::atomic::{AtomicBool, Ordering};
 use either::*;
 use panic_halt as _;

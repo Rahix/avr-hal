@@ -1,4 +1,4 @@
-pub use atmega_hal::port::{mode, Pin, PinMode, PinOps};
+pub use atmega_hal::port::{Pin, PinMode, PinOps, mode};
 
 avr_hal_generic::renamed_pins! {
     /// Pins of the **Arduino Mega 2560** and **Arduino Mega 1280**.

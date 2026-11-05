@@ -18,7 +18,7 @@ use panic_halt as _;
 
 use arduino_hal::{
     hal::port::{PD4, PD5, PD6},
-    port::{mode::Output, Pin},
+    port::{Pin, mode::Output},
 };
 
 fn shift_out(data_pin: &mut Pin<Output, PD4>, clock_pin: &mut Pin<Output, PD6>, data: &u8) {

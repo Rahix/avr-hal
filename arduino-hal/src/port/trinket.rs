@@ -1,4 +1,4 @@
-pub use attiny_hal::port::{mode, Pin, PinMode, PinOps};
+pub use attiny_hal::port::{Pin, PinMode, PinOps, mode};
 
 avr_hal_generic::renamed_pins! {
     pub struct Pins {
