@@ -17,7 +17,6 @@ static PIN_CHANGED: AtomicBool = AtomicBool::new(false);
 
 //This function is called on change of pin 2
 #[avr_device::interrupt(atmega328p)]
-#[allow(non_snake_case)]
 fn PCINT2() {
     PIN_CHANGED.store(true, Ordering::SeqCst);
 }
