@@ -124,7 +124,7 @@ fn TIMER1_COMPA() {
     let state = unsafe {
         // SAFETY: We _know_ that interrupts will only be enabled after the LED global was
         // initialized so this ISR will never run when LED is uninitialized.
-        &mut *INTERRUPT_STATE.as_mut_ptr()
+        &mut *(&raw mut INTERRUPT_STATE).cast::<InterruptState>()
     };
 
     state.blinker.toggle();

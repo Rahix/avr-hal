@@ -70,13 +70,21 @@ fn main() -> ! {
     let ir = Receiver::with_pin(Clock::FREQ, pins.d2);
 
     unsafe {
-        RECEIVER.replace(ir);
-        LED.replace(irdroino_led1);
-        ERROR_LED.replace(irdroino_led2);
+        // SAFETY: Interrupts are not enabled at this point so we can safely write the global
+        // variables here.  A memory barrier afterwards ensures the compiler won't reorder this
+        // after any operation that enables interrupts.
+        RECEIVER = Some(ir);
+        LED = Some(irdroino_led1);
+        ERROR_LED = Some(irdroino_led2);
+        core::sync::atomic::compiler_fence(core::sync::atomic::Ordering::SeqCst);
     }
 
     // Enable interrupts globally
-    unsafe { avr_device::interrupt::enable() };
+    unsafe {
+        // SAFETY: Not inside a critical section and any non-atomic operations have been completed
+        // at this point.
+        avr_device::interrupt::enable();
+    }
 
     ufmt::uwriteln!(&mut serial, "Hello from Arduino and Irdroino!\r").unwrap_infallible();
 
@@ -98,9 +106,16 @@ fn main() -> ! {
 
 #[avr_device::interrupt(atmega328p)]
 fn PCINT2() {
-    let recv = unsafe { RECEIVER.as_mut().unwrap() };
-    let led = unsafe { LED.as_mut().unwrap() };
-    let error_led = unsafe { ERROR_LED.as_mut().unwrap() };
+    let (recv, led, error_led) = unsafe {
+        // SAFETY: We _know_ that interrupts will only be enabled after the globals were
+        // initialized so this ISR will never run when they are uninitialized.  The globals are
+        // only accessed from this ISR afterwards, so no aliasing references exist.
+        (
+            (&mut *(&raw mut RECEIVER)).as_mut().unwrap(),
+            (&mut *(&raw mut LED)).as_mut().unwrap(),
+            (&mut *(&raw mut ERROR_LED)).as_mut().unwrap(),
+        )
+    };
 
     let now = CLOCK.now();
 
