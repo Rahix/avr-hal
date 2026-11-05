@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["DataOrder","SerialClockRate"],"struct":["ChipSelectPin","Settings","Spi"],"trait":["SpiOps"]};

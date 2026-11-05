@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["spmcsr"],"struct":["RegisterBlock"],"type":["SPMCSR"]};
