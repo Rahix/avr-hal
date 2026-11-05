@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- General improvements to error handling and reporting ([#690]).
+- Updated dependencies ([#690]).
+
+### Fixed
+- Fixed the console interaction code not catching errors in both the send and
+  receive path ([#690]).
+- Fixed the console potentially silently not sending all data to the device
+  ([#690]).
+
+[#690]: https://github.com/Rahix/avr-hal/pull/690
 
 
 ## [0.2.2] - 2025-10-26
