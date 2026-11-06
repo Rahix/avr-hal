@@ -39,8 +39,9 @@
 
 [nano-new]
     name = "Arduino Nano (New Bootloader)"
-    # 32 KiB flash minus the 512-byte optiboot bootloader.
-    max-application-size = 32256
+    # 32 KiB flash minus the 2 KiB bootloader, matching Arduino's board
+    # definition for both Nano bootloader variants.
+    max-application-size = 30720
 
     [nano-new.reset]
     automatic = true

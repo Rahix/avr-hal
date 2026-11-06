@@ -126,6 +126,7 @@ mod tests {
         let all_boards = get_all_boards()?;
 
         assert_eq!(all_boards["nano"].max_application_size, Some(30720));
+        assert_eq!(all_boards["nano-new"].max_application_size, Some(30720));
         assert_eq!(all_boards["uno"].max_application_size, Some(32256));
         assert_eq!(all_boards["mega2560"].max_application_size, Some(253952));
 
