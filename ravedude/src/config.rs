@@ -145,6 +145,7 @@ impl RavedudeGeneralConfig {
 pub struct BoardConfig {
     pub name: Option<String>,
     pub inherit: Option<String>,
+    pub max_application_size: Option<u32>,
     pub reset: Option<ResetOptions>,
     pub avrdude: Option<BoardAvrdudeOptions>,
     pub usb_info: Option<BoardUSBInfo>,
@@ -156,6 +157,7 @@ impl BoardConfig {
             name: self.name.or(base.name),
             // inherit is used to decide what BoardConfig to inherit and isn't used anywhere else
             inherit: None,
+            max_application_size: self.max_application_size.or(base.max_application_size),
             reset: self.reset.or(base.reset),
             avrdude: match self.avrdude {
                 Some(avrdude) => base.avrdude.map(|base_avrdude| avrdude.merge(base_avrdude)),

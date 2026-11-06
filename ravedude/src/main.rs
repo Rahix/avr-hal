@@ -77,6 +77,10 @@
 //!
 //! [board]
 //! name = "Custom Arduino Uno"
+//! # Maximum size of the application image in bytes.  ravedude measures the
+//! # linked firmware and refuses to flash it if it would overlap the bootloader.
+//! # Omit this option to disable the check.
+//! # max-application-size = 32256
 //!
 //! [board.reset]
 //! # The board automatically resets when attempting to flash
@@ -106,6 +110,7 @@ mod avrdude;
 mod board;
 mod config;
 mod console;
+mod firmware;
 mod ui;
 
 /// This represents the minimum (Major, Minor) version raverdude requires avrdude to meet.
@@ -298,6 +303,14 @@ fn ravedude() -> anyhow::Result<()> {
     }?;
 
     if let Some(bin) = args.bin_or_legacy_bin() {
+        if let Some(max_size) = board.max_application_size {
+            firmware::check_application_size(
+                bin,
+                max_size,
+                board.name.as_deref().unwrap_or("unnamed board"),
+            )?;
+        }
+
         if let Some(wait_time) = args.reset_delay {
             if wait_time > 0 {
                 println!("Waiting {} ms before proceeding", wait_time);

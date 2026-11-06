@@ -89,6 +89,12 @@ mod tests {
                 board.reset.is_some(),
                 "Board {name:?} doesn't have a `reset` key"
             );
+            if let Some(max_size) = board.max_application_size {
+                assert!(
+                    max_size > 0,
+                    "Board {name:?} has a zero `max-application-size`"
+                );
+            }
             assert!(
                 board.avrdude.is_some(),
                 "Board {name:?} doesn't have an `avrdude` key"
@@ -111,6 +117,17 @@ mod tests {
                 "Board {name:?}'s avrdude options doesn't have a `do_chip_erase` key"
             );
         }
+
+        Ok(())
+    }
+
+    #[test]
+    fn bootloader_limits_match_arduino_board_definitions() -> anyhow::Result<()> {
+        let all_boards = get_all_boards()?;
+
+        assert_eq!(all_boards["nano"].max_application_size, Some(30720));
+        assert_eq!(all_boards["uno"].max_application_size, Some(32256));
+        assert_eq!(all_boards["mega2560"].max_application_size, Some(253952));
 
         Ok(())
     }
