@@ -171,6 +171,10 @@ in `Ravedude.toml`.  It works like this:
 
 [board]
 name = "Custom Arduino Uno"
+# Maximum size of the application image in bytes.  ravedude measures the
+# linked firmware and refuses to flash it if it would overlap the bootloader.
+# Omit this option to disable the check.
+# max-application-size = 32256
 
 [board.reset]
 # The board automatically resets when attempting to flash

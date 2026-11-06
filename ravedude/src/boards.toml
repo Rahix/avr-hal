@@ -1,5 +1,7 @@
 [uno]
     name = "Arduino Uno"
+    # 32 KiB flash minus the 512-byte optiboot bootloader.
+    max-application-size = 32256
 
     [uno.reset]
     automatic = true
@@ -20,6 +22,8 @@
 
 [nano]
     name = "Arduino Nano"
+    # 32 KiB flash minus the 2 KiB bootloader of the classic Nano.
+    max-application-size = 30720
 
     [nano.reset]
     automatic = true
@@ -35,6 +39,9 @@
 
 [nano-new]
     name = "Arduino Nano (New Bootloader)"
+    # 32 KiB flash minus the 2 KiB bootloader, matching Arduino's board
+    # definition for both Nano bootloader variants.
+    max-application-size = 30720
 
     [nano-new.reset]
     automatic = true
@@ -50,6 +57,8 @@
 
 [leonardo]
     name = "Arduino Leonardo"
+    # 32 KiB flash minus the 4 KiB Caterina bootloader.
+    max-application-size = 28672
 
     [leonardo.reset]
     automatic = false
@@ -70,6 +79,8 @@
 
 [micro]
     name = "Arduino Micro"
+    # 32 KiB flash minus the 4 KiB Caterina bootloader.
+    max-application-size = 28672
 
     [micro.reset]
     automatic = false
@@ -92,6 +103,8 @@
 
 [mega2560]
     name = "Arduino Mega 2560"
+    # 256 KiB flash minus the 8 KiB bootloader.
+    max-application-size = 253952
 
     [mega2560.reset]
     automatic = true
@@ -114,6 +127,8 @@
 
 [mega1280]
     name = "Arduino Mega 1280"
+    # 128 KiB flash minus the 4 KiB bootloader.
+    max-application-size = 126976
 
     [mega1280.reset]
     automatic = true
@@ -130,6 +145,8 @@
 
 [diecimila]
     name = "Arduino Diecimila"
+    # 16 KiB flash minus the 2 KiB bootloader.
+    max-application-size = 14336
 
     [diecimila.reset]
     automatic = true
@@ -146,6 +163,8 @@
 
 [promicro]
     name = "SparkFun Pro Micro"
+    # 32 KiB flash minus the 4 KiB Caterina bootloader.
+    max-application-size = 28672
 
     [promicro.reset]
     automatic = false
@@ -166,6 +185,8 @@
 
 [promini-5v]
     name = "SparkFun Pro Mini 5V (16MHz)"
+    # 32 KiB flash minus the 2 KiB bootloader.
+    max-application-size = 30720
 
     [promini-5v.reset]
     automatic = true
@@ -181,6 +202,8 @@
 
 [promini-3v3]
     name = "SparkFun Pro Mini 3v3 (8MHz)"
+    # 32 KiB flash minus the 2 KiB bootloader.
+    max-application-size = 30720
 
     [promini-3v3.reset]
     automatic = true
@@ -224,6 +247,8 @@
 
 [nano168]
     name = "Nano Clone (ATmega168)"
+    # 16 KiB flash minus the 2 KiB bootloader.
+    max-application-size = 14336
 
     [nano168.reset]
     automatic = true
@@ -240,6 +265,8 @@
 
 [duemilanove]
     name = "Arduino Duemilanove"
+    # 32 KiB flash minus the 2 KiB bootloader.
+    max-application-size = 30720
 
     [duemilanove.reset]
     automatic = true

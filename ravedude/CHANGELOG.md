@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added the `board.max-application-size` option and populated it for the
+  built-in boards.  Firmware that would overlap the bootloader region is now
+  rejected before flashing instead of bricking the board ([#709]).
+
 ### Changed
 - General improvements to error handling and reporting ([#690]).
 - Updated dependencies ([#690]).
@@ -16,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([#690]).
 
 [#690]: https://github.com/Rahix/avr-hal/pull/690
+[#709]: https://github.com/Rahix/avr-hal/issues/709
 
 
 ## [0.2.2] - 2025-10-26
