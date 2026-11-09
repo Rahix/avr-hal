@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added a check for the maximum application size ([#715]). ravedude now refuses
+  to flash binaries that are too big, since these can potentially overwrite the
+  bootloader on the board. The maximum application size can be configured in
+  the board settings (`max-application-size`).
+
 ### Changed
 - General improvements to error handling and reporting ([#690]).
 - Updated dependencies ([#690]).
@@ -16,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([#690]).
 
 [#690]: https://github.com/Rahix/avr-hal/pull/690
+[#715]: https://github.com/Rahix/avr-hal/pull/715
 
 
 ## [0.2.2] - 2025-10-26
