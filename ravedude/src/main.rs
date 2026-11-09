@@ -77,6 +77,8 @@
 //!
 //! [board]
 //! name = "Custom Arduino Uno"
+//! # Maximum size of the application image in bytes (so it won't overwrite the bootloader)
+//! max-application-size = 32256
 //!
 //! [board.reset]
 //! # The board automatically resets when attempting to flash
@@ -106,6 +108,7 @@ mod avrdude;
 mod board;
 mod config;
 mod console;
+mod firmware;
 mod ui;
 
 /// This represents the minimum (Major, Minor) version raverdude requires avrdude to meet.
@@ -298,6 +301,10 @@ fn ravedude() -> anyhow::Result<()> {
     }?;
 
     if let Some(bin) = args.bin_or_legacy_bin() {
+        if let Some(max_size) = board.max_application_size {
+            firmware::check_application_size(bin, max_size)?;
+        }
+
         if let Some(wait_time) = args.reset_delay {
             if wait_time > 0 {
                 println!("Waiting {} ms before proceeding", wait_time);

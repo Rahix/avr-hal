@@ -171,6 +171,7 @@ in `Ravedude.toml`.  It works like this:
 
 [board]
 name = "Custom Arduino Uno"
+max-application-size = 32256
 
 [board.reset]
 # The board automatically resets when attempting to flash
