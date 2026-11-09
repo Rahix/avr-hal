@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["ubrr0","ucsr0a","ucsr0b","ucsr0c","udr0"],"struct":["RegisterBlock"],"type":["UBRR0","UCSR0A","UCSR0B","UCSR0C","UDR0"]};
