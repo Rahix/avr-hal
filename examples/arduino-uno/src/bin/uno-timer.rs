@@ -44,7 +44,12 @@ fn main() -> ! {
         core::sync::atomic::compiler_fence(core::sync::atomic::Ordering::SeqCst);
     }
 
-    //
+    // Enable sleep mode by setting the sleep bit in sleep mode control register (SMCR)
+    // https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
+    // Sections 9.1 and 9.11.1
+    dp.CPU.smcr.write(|w|{
+        w.se().set_bit()
+    });
 
     let tmr1: TC1 = dp.TC1;
 
