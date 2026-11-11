@@ -69,3 +69,63 @@ avr_hal_generic::impl_spi! {
     miso: port::PA2,
     cs: port::PA6,
 }
+
+
+#[cfg(feature = "attiny85")]
+pub type Spi = avr_hal_generic::spi::Spi<
+    crate::Attiny,
+    crate::pac::USI,
+    port::PB2,
+    port::PB1,
+    port::PB0,
+    port::PB4,
+    >;
+#[cfg(feature = "attiny85")]
+impl crate::spi::SpiOps<crate::Attiny, port::PB2, port::PB1, port::PB0, port::PB4> for crate::pac::USI {
+    fn raw_setup(&mut self, _settings: &Settings) {
+        self.usicr.write(|w| {
+            w.usiwm().three_wire();
+            w.usics().ext_pos();
+            w.usiclk().set_bit()
+        });
+    }
+
+    fn raw_release(&mut self) {
+        self.usicr.write(|w| {
+            w.usiwm().disabled()
+        });
+    }
+
+    fn raw_check_iflag(&self) -> bool {
+        self.usisr.read().usioif().bit_is_set()
+    }
+
+    fn raw_read(&self) -> u8 {
+        // TODO how to determine if its read fully?
+        // USIOIF tells if 8 cycles has completed, should we check first?
+        self.usibr.read().bits()
+    }
+
+    fn raw_write(&mut self, byte: u8) {
+        self.usidr.write(|w| {
+            w.bits(byte)
+        });
+
+        self.usisr.write(|w| {
+            w.usioif().set_bit()
+        });
+
+        while self.usisr.read().usioif().bit_is_clear() {
+            self.usicr.write(|w| {
+                // XXX WM and CS also need to be written to for it to work on my end
+                w.usiwm().three_wire();
+                w.usics().ext_pos();
+                w.usiclk().set_bit();
+                w.usitc().set_bit()
+            });
+            avr_device::asm::nop();
+            avr_device::asm::nop();
+            avr_device::asm::nop();
+        }
+    }
+}
