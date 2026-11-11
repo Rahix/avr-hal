@@ -55,3 +55,7 @@ pub use trinket_pro::*;
 mod trinket;
 #[cfg(feature = "trinket")]
 pub use trinket::*;
+#[cfg(feature = "digispark")]
+mod digispark;
+#[cfg(feature = "digispark")]
+pub use digispark::*;
