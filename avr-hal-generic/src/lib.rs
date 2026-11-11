@@ -20,6 +20,7 @@ pub mod port;
 pub mod simple_pwm;
 pub mod spi;
 pub mod usart;
+pub mod usart_spi;
 pub mod wdt;
 
 /// Prelude containing all HAL traits
