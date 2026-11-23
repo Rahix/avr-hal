@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Event"],"struct":["Baudrate","Usart","UsartReader","UsartWriter"],"trait":["BaudrateArduinoExt","BaudrateExt","UsartOps"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Direction","Error"],"mod":["twi_status"],"struct":["I2c"],"trait":["I2cOps"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["eear","eecr","eedr"],"struct":["RegisterBlock"],"type":["EEAR","EECR","EEDR"]};

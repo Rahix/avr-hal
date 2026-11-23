@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["GTCCR_SPEC"],"type":["PSR0_R","PSR0_W","R","TSM_R","TSM_W","W"]};

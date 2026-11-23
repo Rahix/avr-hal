@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":[["pins",1]],"mod":["adc","clock","delay","eeprom","i2c","pac","port","prelude","simple_pwm","spi","usart","wdt"],"struct":["Atmega","Peripherals"]};
