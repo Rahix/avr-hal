@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
+## [0.3.0] - 2026-11-23
 ### Added
 - Added a check for the maximum application size ([#715]). ravedude now refuses
   to flash binaries that are too big, since these can potentially overwrite the
@@ -191,7 +194,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial, miminal version.
 
 
-[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.2.2...HEAD
+[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.3.0...HEAD
+[0.3.0]: https://github.com/rahix/avr-hal/compare/ravedude-0.2.2...ravedude-0.3.0
 [0.2.2]: https://github.com/rahix/avr-hal/compare/ravedude-0.2.1...ravedude-0.2.2
 [0.2.1]: https://github.com/rahix/avr-hal/compare/ravedude-0.2.0...ravedude-0.2.1
 [0.2.0]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.8...ravedude-0.2.0
